@@ -1,0 +1,25 @@
+canvas 520 300
+label "Build pipeline: discover files, parse frontmatter, validate against the schema, resolve links, emit the graph, the search index, the pages, the discovery document and the NOW page, then build twice and compare bytes (highlighted) before www/ is published"
+caption "The highlighted double build is the proof of determinism: two builds must agree byte for byte before anything is published."
+box discover 16 40 96 44 "discover|files"
+box parse 128 40 96 44 "parse|frontmatter"
+box validate 240 40 96 44 "validate|schema"
+box links 352 40 96 44 "resolve|links"
+box graph 16 130 96 44 "graph|(RDF views)"
+box index 128 130 96 44 "search|index"
+box render 240 130 96 44 "render|pages"
+box disc 352 130 96 44 "discovery|document"
+box now 16 220 96 44 "NOW page"
+box verify 128 220 140 44 "build twice,|compare bytes" acc
+box out 300 220 200 44 "www/ — published as committed"
+arrow discover parse
+arrow parse validate
+arrow validate links
+arrow links graph via=400,107;64,107
+arrow graph index
+arrow index render
+arrow render disc
+arrow disc now via=400,197;64,197
+arrow now verify
+arrow verify out
+note "every step is deterministic; the double build is the proof"

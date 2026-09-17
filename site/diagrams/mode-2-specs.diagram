@@ -1,0 +1,22 @@
+canvas 460 280
+label "Mode 2, live specifications: a project's own decisions, specs (highlighted), tasks, gates, episodes and boards live in one Bundle, joined by the five engineering links, and the Bundle exports steer files for coding agents"
+caption "The highlighted specs are ordinary items: decided by decision items, implemented by tasks, verified by gates, all inside one Bundle."
+region bundle 16 20 428 170 "the project's own Bundle"
+box dec 30 36 96 40 "decisions"
+box spec 182 36 96 40 "specs" acc
+box task 334 36 96 40 "tasks"
+box gate 30 110 96 40 "gates"
+box epi 182 110 96 40 "episodes"
+box board 334 110 96 40 "boards"
+arrow spec dec
+text 154 50 "decided-by" size=10
+arrow task spec
+text 306 50 "implements" size=10
+arrow gate spec
+arrow epi gate dashed
+text 154 124 "runs" size=10
+arrow task board
+text 376 96 "as a board" size=10 right
+box steer 120 206 220 36 "steer files for coding agents"
+arrow bundle steer
+note "the same format, holding a project's own decisions, specs, tasks and gates"

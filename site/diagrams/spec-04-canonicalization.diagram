@@ -1,0 +1,13 @@
+canvas 460 280
+label "Canonicalization: the same four inputs (content tree, configuration, build instant, git log) built on machine A and on machine B give identical bytes (highlighted), through NFC normalisation, fixed sort orders, canonical JSON and SHA-256"
+caption "The highlighted result is the promise: build anywhere, get the same bytes, so a digest in the discovery document is a real integrity check."
+box in 16 30 150 90 "four inputs|content tree|config file|build instant + git log"
+box ma 210 30 110 50 "machine A"
+box mb 210 90 110 50 "machine B"
+box out 360 30 84 110 "identical|bytes" acc
+arrow in ma
+arrow in mb
+arrow ma out
+arrow mb out
+box steps 16 150 428 60 "NFC first → fixed sort orders → JCS JSON|→ SHA-256, lowercase hex"
+note "the promise: build it anywhere, get the same bytes — so a digest is a real check"

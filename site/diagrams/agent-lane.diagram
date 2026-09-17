@@ -1,0 +1,15 @@
+canvas 520 280
+label "The agent lane: a declared agent with a model, tasks, types, a channel and a budget runs as refresh, reads the published surfaces, and opens a proposal (highlighted) that carries provenance and an episode with its cost; the proposal passes the lints and the auto-merge guards, or is rejected before any lint runs when it steps outside its declared types"
+caption "The highlighted proposal is the only thing an agent lane can produce; a write to the branch is impossible by construction, and the budget stops the lane for the month."
+box decl 16 30 150 80 "agents[] entry|model · tasks · types|channel · budget"
+box run 206 30 120 80 "refresh --agent|reads surfaces,|calls the model"
+box prop 366 30 138 80 "proposal|prov: ai-generated|+ episode with usage" acc
+arrow decl run
+arrow run prop
+box guard 206 150 120 60 "declared types|and tasks? budget?"
+box lints 366 150 138 60 "lints at error,|auto-merge guards"
+box rej 16 150 150 60 "rejected: E509|skipped: E510"
+arrow prop guard
+arrow guard lints
+arrow guard rej
+note "never a write — every output is a proposal; the build stays model-free"

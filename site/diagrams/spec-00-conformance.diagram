@@ -1,0 +1,14 @@
+label "Conformance model: publisher (Level 0), reader (Level 1), writer (Level 2) and full engine (Level 3) each run their Level's vector set, and the passed vectors (highlighted arrow) make the claim: Level, version and vectors"
+caption "The highlighted step is the whole conformance model: a claim is the Level, the spec_version and the vectors that passed, with no badge and no registry."
+box p 16 24 130 40 "publisher (L0)"
+box r 16 76 130 40 "reader (L1)"
+box w 16 128 130 40 "writer (L2)"
+box f 16 180 130 40 "full engine (L3)"
+box vec 190 90 120 60 "vector set|of the Level"
+box claim 340 84 104 72 "claim:|Level +|version +|vectors"
+arrow p vec
+arrow r vec
+arrow w vec
+arrow f vec
+arrow vec claim acc
+note "no badge, no registry — the passed vectors are the proof"

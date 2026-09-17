@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reading the specification — AgenticSystemCore</title>
+<meta name="description" content="How to read the AgenticSystemCore specification: rule identifiers, BCP 14 key words, the bracketed trace references, retired rules, error codes, test vectors and conformance Levels.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/reading-the-specification/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/reading-the-specification/">
+<meta property="og:title" content="Reading the specification">
+<meta property="og:description" content="How to read the AgenticSystemCore specification: rule identifiers, BCP 14 key words, the bracketed trace references, retired rules, error codes, test vectors and conformance Levels.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Reading the specification","description":"How to read the AgenticSystemCore specification: rule identifiers, BCP 14 key words, the bracketed trace references, retired rules, error codes, test vectors and conformance Levels.","url":"https://agenticsystemcore.com/docs/reading-the-specification/","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+</nav>
+</header>
+<main id="main">
+<h1>Reading the specification</h1>
+<p class="summary"><strong>Summary</strong>A key to the specification's notation: what the rule identifiers mean, how the key words MUST and SHOULD are used, what the small bracketed references at the end of each rule are, why some rules are marked retired, and how error codes, vectors and Levels fit together.</p>
+<p>The specification is exact so that two implementers in two languages produce the same bytes. That exactness makes it dense. This page explains its conventions, so that the rule text can be read for what it says.</p>
+<h2 id="sections-and-rules">Sections and rules</h2>
+<p>The specification has twelve sections, <code>AGSC-00</code> to <code>AGSC-11</code>, each a page under <a href="/specs/">/specs/</a>. Every rule has a stable identifier of the form <code>AGSC-&lt;section&gt;-&lt;number&gt;</code>, for example <a class="ref" href="/specs/03-links/#AGSC-03-01">AGSC-03-01</a>, which is the first rule of the links section. Identifiers are never reused or renumbered (<a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a>). On this site every identifier is a link: click one to reach the rule, and copy the address to cite it.</p>
+<h2 id="the-key-words">The key words</h2>
+<p>MUST, MUST NOT, REQUIRED, SHALL, SHOULD, SHOULD NOT and MAY are used as defined in BCP 14 (RFC 2119 and RFC 8174), and only when written in capitals. MUST is an obligation whose violation is non-conformance; SHOULD is a recommendation that may be set aside for a stated reason; MAY is a permission.</p>
+<h2 id="the-small-bracketed-references">The small bracketed references</h2>
+<p>Every rule ends with a bracketed note such as <code>[PRD-002 ← D41, G04, research/16 §3.3]</code>. It is the rule's traceability record: why the rule exists and where it came from. It is shown small and grey on this site because it is not part of what the rule requires. Its parts are:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 25"><table>
+<thead><tr><th scope="col">Form</th><th scope="col">Meaning</th><th scope="col">Where to find it</th></tr></thead>
+<tbody>
+<tr><td><code>PRD-nnn</code>, <code>NFR-nn</code></td><td>A product requirement, or a non-functional requirement, in EARS form</td><td>Published on the <a href="/docs/requirements/">requirements page</a>; the identifiers link there</td></tr>
+<tr><td><code>Dnn</code>, <code>D41(4)</code></td><td>A numbered decision of the project's decision register, sometimes with a sub-item</td><td>The editors' internal working record; not published</td></tr>
+<tr><td><code>Rnn</code>, <code>Gnn</code>, <code>Vn-nn</code>, <code>AR2-nn</code>, <code>SO-nn</code>, <code>Mn</code>, <code>Un</code></td><td>Findings of review, gap, verification, adversarial and minimality passes over earlier drafts</td><td>The editors' internal working record; not published</td></tr>
+<tr><td><code>audit/X §n</code>, <code>research/nn §n</code></td><td>Sections of the project's audit and research memos</td><td>The editors' internal working record; not published</td></tr>
+<tr><td><code>Art. XI</code></td><td>An article of the project's development constitution</td><td>The editors' internal working record; not published</td></tr>
+<tr><td><code>OKF v0.2</code>, <code>RFC 9264</code>, <code>A2A §8.4</code></td><td>An external document the rule follows</td><td>The <a href="/docs/standards/">standards page</a> lists each with its version and the date it was checked</td></tr>
+</tbody></table></div>
+<p>A reader who wants to implement the specification needs none of the internal references: the rule text, the schemas, the ontology and the vectors are complete on their own (<a class="ref" href="/specs/00-overview/#AGSC-00-01">AGSC-00-01</a>). The references exist so that the editors can show, for every rule, what requirement it serves and which review put it there.</p>
+<h2 id="drafted-rules">Drafted rules</h2>
+<p>An identifier shown with a dotted underline and no link is drafted for the next release candidate in the engine repository and is not yet in the published specification; the <a href="/docs/status/">status page</a> says what the draft adds. It becomes a link when that release candidate is tagged and published here.</p>
+<h2 id="retired-rules">Retired rules</h2>
+<p>A rule marked <em>(retired at rc.3 …)</em> was found to say nothing that another rule did not already say, and was merged into that rule. Its identifier is kept and never reused, so that older citations still resolve, and the note says where its content now lives. Retired rules impose nothing.</p>
+<h2 id="amendments">Amendments</h2>
+<p>A rule marked <em>(added at rc.3 …)</em> or <em>(amended at rc.3 …)</em> changed at the third release candidate, and the note names the decision behind it. Released sections are immutable: a change ships as a new version (<a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a>).</p>
+<h2 id="error-codes">Error codes</h2>
+<p>Every failure a conforming tool reports has a code of the form <code>AGSC-E&lt;nnn&gt;</code>, and each code has exactly one row in the <a href="/specs/09-conformance/#section-9-4">registry</a> naming the rule that raises it. The hundreds digit is the area: 0 command line, 1 parsing, 2 schema, 3 links, 4 lint, 5 provenance and adoption, 6 determinism, 7 ledger, 8 composition, 9 input, output and federation.</p>
+<h2 id="vectors">Vectors</h2>
+<p>A vector is one JSON file with an input and an expected result, proving one rule (<a class="ref" href="/specs/09-conformance/#AGSC-09-04">AGSC-09-04</a>). Vectors are grouped by area; a required vector that is skipped counts as a failure; a withdrawn vector is kept for history and never run. Vectors are what a conformance claim asserts.</p>
+<h2 id="levels">Levels</h2>
+<p>An implementation claims exactly one Level: 0 publisher, 1 reader, 2 writer, 3 full engine (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-01">AGSC-10-01</a>). Each Level names the areas of vectors it must pass (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-02">AGSC-10-02</a> to <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-05">AGSC-10-05</a>), and each contains the one below. This site claims Level 0.</p>
+<h2 id="the-plain-language-boxes">The plain-language boxes</h2>
+<p>Each section page opens with a summary and a box headed <em>In plain language</em>. Those explain; they never decide. Where a box and a rule disagree, the rule is right and the box is wrong. The diagrams are drawn from the rules and are informative in the same way.</p>
+<h2 id="finding-things">Finding things</h2>
+<p>The <a href="/search/">search</a> indexes every page and every rule, so a search for <code>digest</code> finds the rules that use the word as well as the pages that explain it. The <a href="/docs/glossary/">glossary</a> lists every term, and the <a href="/ns/">ontology page</a> every vocabulary term with its definition.</p>
+</main>
+<footer class="site">
+<p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>
+<p><a href="/legal/">Legal and privacy</a> · <a href="/docs/compliance/">Compliance and security</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery document</a> · <a href="/llms.txt">llms.txt</a> · <a rel="me" href="https://orcid.org/0009-0001-3464-5283">ORCID 0009-0001-3464-5283</a></p>
+</footer>
+</body>
+</html>

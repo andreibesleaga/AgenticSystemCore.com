@@ -1,0 +1,7 @@
+label "Conformance levels as nested boxes: Level 0 publisher (highlighted, static files only) sits inside Level 1 reader, inside Level 2 writer, inside Level 3 full engine"
+caption "The highlighted Level 0 is what this site claims: static files, no engine; each outer Level adds obligations and vectors."
+region l3 16 20 428 210 "Level 3 — full engine: composition, governance, CLI"
+region l2 40 50 380 160 "Level 2 — writer: all surfaces, exports, chunks, boundary"
+region l1 64 80 332 110 "Level 1 — reader: parse, validate, links"
+box l0 100 110 260 50 "Level 0 — publisher: static files only|items, graph.jsonld, llms.txt, discovery" acc
+note "each Level contains the one below; a claim names one Level and its vectors"

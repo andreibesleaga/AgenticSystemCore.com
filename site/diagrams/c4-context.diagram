@@ -1,0 +1,22 @@
+canvas 520 300
+label "System context (C4 level 1): people, agents and implementers on the left use the engine and the static site (highlighted) inside the system boundary; GitHub, Cloudflare Pages, w3id.org and the npm registry on the right host, publish and resolve it"
+caption "The highlighted static site is the only thing readers and agents touch; every other box is a file store or a host, not an API."
+region sys 176 70 170 150 "AgenticSystemCore"
+box eng 190 90 142 44 "engine (CLI)"
+box site 190 156 142 44 "static site (www/)" acc
+box reader 16 40 120 44 "people: read,|contribute"
+box agent 16 110 120 44 "agents: read,|propose"
+box impl 16 180 120 44 "implementers:|spec + vectors"
+box gh 380 40 124 44 "GitHub|(PRs, CI)"
+box cf 380 110 124 44 "Cloudflare Pages"
+box w3 380 172 124 44 "w3id.org|(namespace)"
+box npm 380 232 124 36 "npm registry"
+arrow reader site
+arrow agent site
+arrow impl eng
+arrow eng site
+arrow gh cf
+arrow cf site
+arrow w3 site
+arrow npm eng
+note "files and URLs only — there is no API to call"

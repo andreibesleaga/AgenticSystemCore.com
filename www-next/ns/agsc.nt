@@ -1,0 +1,278 @@
+<https://w3id.org/agentic-system-core/ns#Attachment> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/agentic-system-core/ns#Attachment> <http://www.w3.org/2000/01/rdf-schema#comment> "A media file carried by an item under content/attachments/<slug>/ (AGSC-02-98); IRI <item-IRI>#attachment-<n> (AGSC-05-29). Pattern images are SVG only."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Attachment> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#Attachment> <http://www.w3.org/2000/01/rdf-schema#label> "Attachment"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Attachment> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/ns/prov#Entity> .
+<https://w3id.org/agentic-system-core/ns#Bundle> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/agentic-system-core/ns#Bundle> <http://www.w3.org/2000/01/rdf-schema#comment> "One directory tree of items published together; the concept scheme every Concept is in."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Bundle> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#Bundle> <http://www.w3.org/2000/01/rdf-schema#label> "Bundle"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Bundle> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2004/02/skos/core#ConceptScheme> .
+<https://w3id.org/agentic-system-core/ns#Cluster> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/agentic-system-core/ns#Cluster> <http://www.w3.org/2000/01/rdf-schema#comment> "A navigational grouping of items. Membership is skos:member, authored on the item. Cluster nesting is also skos:member — never skos:broader, which would put a Collection in a semantic relation."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Cluster> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#Cluster> <http://www.w3.org/2000/01/rdf-schema#label> "Cluster"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Cluster> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2004/02/skos/core#Collection> .
+<https://w3id.org/agentic-system-core/ns#Concept> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/agentic-system-core/ns#Concept> <http://www.w3.org/2000/01/rdf-schema#comment> "A unit of knowledge in a Bundle: a pattern, taxonomy, explainer, principle, decision, spec, task, term or (rc.3) architecture, distinguished by asc:kind."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Concept> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#Concept> <http://www.w3.org/2000/01/rdf-schema#label> "Concept"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Concept> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2004/02/skos/core#Concept> .
+<https://w3id.org/agentic-system-core/ns#Episode> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/agentic-system-core/ns#Episode> <http://www.w3.org/2000/01/rdf-schema#comment> "A recorded occurrence — a session, run or incident — with a start, an actor and an outcome."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Episode> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#Episode> <http://www.w3.org/2000/01/rdf-schema#label> "Episode"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Episode> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/ns/prov#Activity> .
+<https://w3id.org/agentic-system-core/ns#Gate> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/agentic-system-core/ns#Gate> <http://www.w3.org/2000/01/rdf-schema#comment> "A declared set of checks that a change must pass; its runs are Episodes."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Gate> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#Gate> <http://www.w3.org/2000/01/rdf-schema#label> "Gate"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Gate> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/ns/prov#Plan> .
+<https://w3id.org/agentic-system-core/ns#Harness> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/agentic-system-core/ns#Harness> <http://www.w3.org/2000/01/rdf-schema#comment> "A generated bundle of files assembled from a validated composition of Concepts; never authored, never stored under content/."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Harness> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#Harness> <http://www.w3.org/2000/01/rdf-schema#label> "Harness"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Harness> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/ns/prov#Plan> .
+<https://w3id.org/agentic-system-core/ns#Lesson> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/agentic-system-core/ns#Lesson> <http://www.w3.org/2000/01/rdf-schema#comment> "Knowledge distilled from one or more Episodes, carrying a severity; a Concept by essence."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Lesson> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#Lesson> <http://www.w3.org/2000/01/rdf-schema#label> "Lesson"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Lesson> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://w3id.org/agentic-system-core/ns#Concept> .
+<https://w3id.org/agentic-system-core/ns#Procedure> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/agentic-system-core/ns#Procedure> <http://www.w3.org/2000/01/rdf-schema#comment> "An executable-by-a-reader plan: trigger, steps and checks. Exports one-to-one to a skill file."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Procedure> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#Procedure> <http://www.w3.org/2000/01/rdf-schema#label> "Procedure"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Procedure> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/ns/prov#Plan> .
+<https://w3id.org/agentic-system-core/ns#Proposal> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/agentic-system-core/ns#Proposal> <http://www.w3.org/2000/01/rdf-schema#comment> "A proposed change to a Bundle. It has no file: it is a forge pull request, instantiated in exports from the derived git log."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Proposal> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#Proposal> <http://www.w3.org/2000/01/rdf-schema#label> "Proposal"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Proposal> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/ns/prov#Activity> .
+<https://w3id.org/agentic-system-core/ns#Review> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/agentic-system-core/ns#Review> <http://www.w3.org/2000/01/rdf-schema#comment> "The human assessment of a Proposal. It has no file: it is instantiated from a verified[] entry at the IRI <item-IRI>#review-<n>, its actor and instant carried by asc:verifiedBy and asc:verifiedAt (AGSC-05-15)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Review> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#Review> <http://www.w3.org/2000/01/rdf-schema#label> "Review"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Review> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/ns/prov#Activity> .
+<https://w3id.org/agentic-system-core/ns#Source> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/agentic-system-core/ns#Source> <http://www.w3.org/2000/01/rdf-schema#comment> "An external work cited by an item. It has no file: it is instantiated from a sources[] entry."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Source> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#Source> <http://www.w3.org/2000/01/rdf-schema#label> "Source"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Source> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/ns/prov#Entity> .
+<https://w3id.org/agentic-system-core/ns#blockedBy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#blockedBy> <http://www.w3.org/2000/01/rdf-schema#comment> "Mode-2 key 13: the subject cannot proceed until the object is resolved. No domain, range or super-property (AGSC-05-26a). Combiner semantics: none."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#blockedBy> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#blockedBy> <http://www.w3.org/2000/01/rdf-schema#label> "blocked by"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#blockedBy> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#blocks> .
+<https://w3id.org/agentic-system-core/ns#blocks> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#blocks> <http://www.w3.org/2000/01/rdf-schema#comment> "Computed inverse of asc:blockedBy; never authored."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#blocks> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#blocks> <http://www.w3.org/2000/01/rdf-schema#label> "blocks"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#blocks> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#blockedBy> .
+<https://w3id.org/agentic-system-core/ns#consumes> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#consumes> <http://www.w3.org/2000/01/rdf-schema#comment> "A port type name this item consumes (AGSC-02-96, AGSC-05-30)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#consumes> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Concept> .
+<https://w3id.org/agentic-system-core/ns#consumes> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#consumes> <http://www.w3.org/2000/01/rdf-schema#label> "consumes"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#consumes> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#contradicts> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#contradicts> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#SymmetricProperty> .
+<https://w3id.org/agentic-system-core/ns#contradicts> <http://www.w3.org/2000/01/rdf-schema#comment> "Asserts that two items cannot both be true. Selecting both in a composition is a warning, never a failure. No domain or range is declared: any item type may author this key, and declaring asc:Concept would entail a Concept typing for Procedures, Episodes and Gates (D48, V1-28)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#contradicts> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#contradicts> <http://www.w3.org/2000/01/rdf-schema#label> "contradicts"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#coveredBy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#coveredBy> <http://www.w3.org/2000/01/rdf-schema#comment> "Computed inverse of asc:covers; never authored."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#coveredBy> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#coveredBy> <http://www.w3.org/2000/01/rdf-schema#label> "covered by"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#coveredBy> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#covers> .
+<https://w3id.org/agentic-system-core/ns#covers> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#covers> <http://www.w3.org/2000/01/rdf-schema#comment> "Mode-2 key 12: the subject covers the object (a test, a check or a document covering a requirement). Combiner semantics: none."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#covers> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#covers> <http://www.w3.org/2000/01/rdf-schema#label> "covers"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#covers> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#coveredBy> .
+<https://w3id.org/agentic-system-core/ns#decidedBy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#decidedBy> <http://www.w3.org/2000/01/rdf-schema#comment> "Mode-2 key 14: the subject was settled by the object, a decision item. Combiner semantics: none."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#decidedBy> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#decidedBy> <http://www.w3.org/2000/01/rdf-schema#label> "decided by"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#decidedBy> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#decides> .
+<https://w3id.org/agentic-system-core/ns#decides> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#decides> <http://www.w3.org/2000/01/rdf-schema#comment> "Computed inverse of asc:decidedBy; never authored."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#decides> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#decides> <http://www.w3.org/2000/01/rdf-schema#label> "decides"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#decides> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#decidedBy> .
+<https://w3id.org/agentic-system-core/ns#excludes> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#excludes> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#SymmetricProperty> .
+<https://w3id.org/agentic-system-core/ns#excludes> <http://www.w3.org/2000/01/rdf-schema#comment> "Asserts mutual exclusion. Evaluated after the requires closure; a surviving pair invalidates a composition. No domain or range is declared, for the reason given on asc:contradicts."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#excludes> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#excludes> <http://www.w3.org/2000/01/rdf-schema#label> "excludes"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#generatedAt> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#generatedAt> <http://www.w3.org/2000/01/rdf-schema#comment> "Instant at which an item was generated, with an explicit UTC offset."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#generatedAt> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#generatedAt> <http://www.w3.org/2000/01/rdf-schema#label> "generated at"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#generatedAt> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://w3id.org/agentic-system-core/ns#generatedBy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#generatedBy> <http://www.w3.org/2000/01/rdf-schema#comment> "Actor string that generated an item: human:<id>, process:<id> or <producer>/<version>."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#generatedBy> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#generatedBy> <http://www.w3.org/2000/01/rdf-schema#label> "generated by"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#generatedBy> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#grade> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#grade> <http://www.w3.org/2000/01/rdf-schema#comment> "Evidence grade of a Source: primary, secondary or tertiary."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#grade> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Source> .
+<https://w3id.org/agentic-system-core/ns#grade> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#grade> <http://www.w3.org/2000/01/rdf-schema#label> "grade"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#grade> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#hasAttachment> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#hasAttachment> <http://www.w3.org/2000/01/rdf-schema#comment> "Links an item to one of its attachments (AGSC-05-29). No domain: items share no superclass (AGSC-05-13)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#hasAttachment> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#hasAttachment> <http://www.w3.org/2000/01/rdf-schema#label> "has attachment"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#hasAttachment> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/agentic-system-core/ns#Attachment> .
+<https://w3id.org/agentic-system-core/ns#implementedBy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#implementedBy> <http://www.w3.org/2000/01/rdf-schema#comment> "Computed inverse of asc:implements; never authored."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#implementedBy> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#implementedBy> <http://www.w3.org/2000/01/rdf-schema#label> "implemented by"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#implementedBy> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#implements> .
+<https://w3id.org/agentic-system-core/ns#implements> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#implements> <http://www.w3.org/2000/01/rdf-schema#comment> "Mode-2 key 10: the subject realises the object (code or a procedure realising a spec). Combiner semantics: none."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#implements> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#implements> <http://www.w3.org/2000/01/rdf-schema#label> "implements"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#implements> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#implementedBy> .
+<https://w3id.org/agentic-system-core/ns#isVerifiedBy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#isVerifiedBy> <http://www.w3.org/2000/01/rdf-schema#comment> "Computed inverse of asc:verifies; never authored. Distinct from the datatype property asc:verifiedBy (AGSC-05-15)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#isVerifiedBy> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#isVerifiedBy> <http://www.w3.org/2000/01/rdf-schema#label> "is verified by"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#isVerifiedBy> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#verifies> .
+<https://w3id.org/agentic-system-core/ns#kind> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#kind> <http://www.w3.org/2000/01/rdf-schema#comment> "Qualifier on a Concept: pattern, taxonomy, explainer, principle, decision, spec, task, term or (rc.3) architecture."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#kind> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Concept> .
+<https://w3id.org/agentic-system-core/ns#kind> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#kind> <http://www.w3.org/2000/01/rdf-schema#label> "kind"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#kind> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#level> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#level> <http://www.w3.org/2000/01/rdf-schema#comment> "Gate level: L1 (schema and links) or L2 (adds provenance, determinism and review)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#level> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Gate> .
+<https://w3id.org/agentic-system-core/ns#level> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#level> <http://www.w3.org/2000/01/rdf-schema#label> "level"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#level> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#mentions> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#mentions> <http://www.w3.org/2000/01/rdf-schema#comment> "Untyped edge produced by an inline Markdown link between items. Not a Link key; it may not appear in frontmatter."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#mentions> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#mentions> <http://www.w3.org/2000/01/rdf-schema#label> "mentions"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#model> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#model> <http://www.w3.org/2000/01/rdf-schema#comment> "Model identifier recorded when an item's origin is ai-assisted or ai-generated."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#model> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#model> <http://www.w3.org/2000/01/rdf-schema#label> "model"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#model> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#operator> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#operator> <http://www.w3.org/2000/01/rdf-schema#comment> "Actor accountable for an item: the human or organisation running the agent that produced it."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#operator> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#operator> <http://www.w3.org/2000/01/rdf-schema#label> "operator"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#operator> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#origin> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#origin> <http://www.w3.org/2000/01/rdf-schema#comment> "How an item came to exist: human, ai-assisted, ai-generated or imported."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#origin> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#origin> <http://www.w3.org/2000/01/rdf-schema#label> "origin"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#origin> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#outcome> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#outcome> <http://www.w3.org/2000/01/rdf-schema#comment> "Result of an Episode: success, partial or failure."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#outcome> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Episode> .
+<https://w3id.org/agentic-system-core/ns#outcome> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#outcome> <http://www.w3.org/2000/01/rdf-schema#label> "outcome"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#outcome> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#peerOrigin> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#peerOrigin> <http://www.w3.org/2000/01/rdf-schema#comment> "The Bundle IRI of the declared peer node under whose base a cited resource lives (AGSC-11-12). Emitted beside rdfs:seeAlso; takes part in no composition step. No range is declared: the object is a foreign node's Bundle IRI about which this node asserts no class (AGSC-05-23)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#peerOrigin> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#peerOrigin> <http://www.w3.org/2000/01/rdf-schema#label> "peer origin"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#produces> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#produces> <http://www.w3.org/2000/01/rdf-schema#comment> "A port type name this item produces (AGSC-02-96, AGSC-05-30); matched by exact equality in composition Step 5 (AGSC-07-23)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#produces> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Concept> .
+<https://w3id.org/agentic-system-core/ns#produces> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#produces> <http://www.w3.org/2000/01/rdf-schema#label> "produces"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#produces> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#retiredAt> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#retiredAt> <http://www.w3.org/2000/01/rdf-schema#comment> "The instant at which an item entered status retired (AGSC-11-22): modified, else date, by the midnight convention of AGSC-05-14, as xsd:dateTime."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#retiredAt> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#retiredAt> <http://www.w3.org/2000/01/rdf-schema#label> "retired at"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#retiredAt> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://w3id.org/agentic-system-core/ns#review> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#review> <http://www.w3.org/2000/01/rdf-schema#comment> "Connects an item to each asc:Review instantiated from its verified[] entries (AGSC-05-15), so a Review is reachable from its item without string-parsing a fragment IRI. No domain is declared, for the reason given on asc:contradicts (AGSC-05-13: no asc:Item superclass)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#review> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#review> <http://www.w3.org/2000/01/rdf-schema#label> "review"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#review> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/agentic-system-core/ns#Review> .
+<https://w3id.org/agentic-system-core/ns#severity> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#severity> <http://www.w3.org/2000/01/rdf-schema#comment> "Weight of a Lesson: info, warn or block."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#severity> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Lesson> .
+<https://w3id.org/agentic-system-core/ns#severity> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#severity> <http://www.w3.org/2000/01/rdf-schema#label> "severity"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#severity> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#sha256> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#sha256> <http://www.w3.org/2000/01/rdf-schema#comment> "Lowercase-hex SHA-256 of the attachment bytes at build (AGSC-05-29)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#sha256> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Attachment> .
+<https://w3id.org/agentic-system-core/ns#sha256> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#sha256> <http://www.w3.org/2000/01/rdf-schema#label> "SHA-256"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#sha256> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#source> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#source> <http://www.w3.org/2000/01/rdf-schema#comment> "Connects an item to each asc:Source instantiated from its sources[] entries (AGSC-05-14), so a Source is reachable from its item without string-parsing a fragment IRI. No domain is declared, for the reason given on asc:contradicts (AGSC-05-13: no asc:Item superclass)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#source> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#source> <http://www.w3.org/2000/01/rdf-schema#label> "source"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#source> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/agentic-system-core/ns#Source> .
+<https://w3id.org/agentic-system-core/ns#specVersion> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#specVersion> <http://www.w3.org/2000/01/rdf-schema#comment> "Version of the AgenticSystemCore specification a Bundle declares."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#specVersion> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Bundle> .
+<https://w3id.org/agentic-system-core/ns#specVersion> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#specVersion> <http://www.w3.org/2000/01/rdf-schema#label> "spec version"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#specVersion> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#staleAfter> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#staleAfter> <http://www.w3.org/2000/01/rdf-schema#comment> "Absolute instant after which an item is stale. Staleness is a comparison, never a decay function."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#staleAfter> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#staleAfter> <http://www.w3.org/2000/01/rdf-schema#label> "stale after"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#staleAfter> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://w3id.org/agentic-system-core/ns#status> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#status> <http://www.w3.org/2000/01/rdf-schema#comment> "Publication state of an item: draft, stable, deprecated or (rc.3) retired (AGSC-11-22)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#status> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#status> <http://www.w3.org/2000/01/rdf-schema#label> "status"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#status> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#taskState> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#taskState> <http://www.w3.org/2000/01/rdf-schema#comment> "One of the nine Agent2Agent 1.0 task states, verbatim (AGSC-02-99, AGSC-10-13)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#taskState> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Concept> .
+<https://w3id.org/agentic-system-core/ns#taskState> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#taskState> <http://www.w3.org/2000/01/rdf-schema#label> "task state"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#taskState> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#usedBy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#usedBy> <http://www.w3.org/2000/01/rdf-schema#comment> "Computed inverse of asc:uses; never authored. No domain or range is declared, for the reason given on asc:contradicts."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#usedBy> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#usedBy> <http://www.w3.org/2000/01/rdf-schema#label> "used by"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#usedBy> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#uses> .
+<https://w3id.org/agentic-system-core/ns#uses> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#uses> <http://www.w3.org/2000/01/rdf-schema#comment> "Soft dependency: the subject draws on the object. A composition warns when a used item is absent. No domain, range or super-property is declared: skos:related is a sub-property of skos:semanticRelation, whose domain and range are skos:Concept (S19/S20), so a super-property axiom would re-introduce the unintended Concept typing and the S37 contradiction for Clusters (AGSC-05-26a, V3-06)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#uses> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#uses> <http://www.w3.org/2000/01/rdf-schema#label> "uses"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#uses> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#usedBy> .
+<https://w3id.org/agentic-system-core/ns#verifiedAt> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#verifiedAt> <http://www.w3.org/2000/01/rdf-schema#comment> "Instant at which a human recorded a Review, with an explicit UTC offset."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#verifiedAt> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Review> .
+<https://w3id.org/agentic-system-core/ns#verifiedAt> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#verifiedAt> <http://www.w3.org/2000/01/rdf-schema#label> "verified at"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#verifiedAt> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://w3id.org/agentic-system-core/ns#verifiedBy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#verifiedBy> <http://www.w3.org/2000/01/rdf-schema#comment> "Actor string of the human who recorded a Review."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#verifiedBy> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Review> .
+<https://w3id.org/agentic-system-core/ns#verifiedBy> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#verifiedBy> <http://www.w3.org/2000/01/rdf-schema#label> "verified by"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#verifiedBy> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#verifiedOn> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/agentic-system-core/ns#verifiedOn> <http://www.w3.org/2000/01/rdf-schema#comment> "Instant at which a Source was last checked to resolve; an authored YYYY-MM-DD date is rendered as that day's midnight UTC instant. xsd:date is not in the OWL 2 datatype map, so xsd:dateTime keeps the ontology inside OWL 2 RL (AGSC-05-14, AGSC-05-22)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#verifiedOn> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Source> .
+<https://w3id.org/agentic-system-core/ns#verifiedOn> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#verifiedOn> <http://www.w3.org/2000/01/rdf-schema#label> "verified on"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#verifiedOn> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://w3id.org/agentic-system-core/ns#verifies> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/agentic-system-core/ns#verifies> <http://www.w3.org/2000/01/rdf-schema#comment> "Mode-2 key 11: the subject checks that the object holds. Its computed inverse is asc:isVerifiedBy (the datatype property asc:verifiedBy carries a Review actor and is unrelated). Combiner semantics: none."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#verifies> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
+<https://w3id.org/agentic-system-core/ns#verifies> <http://www.w3.org/2000/01/rdf-schema#label> "verifies"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#verifies> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#isVerifiedBy> .
+<https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/description> "Vocabulary for AgenticSystemCore Bundles: six item types plus Bundle, Source, Proposal, Review, Harness and (rc.3) Attachment, aligned to SKOS, PROV-O and DCTerms."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/license> <https://creativecommons.org/publicdomain/zero/1.0/> .
+<https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/title> "AgenticSystemCore vocabulary"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+<https://w3id.org/agentic-system-core/ns> <http://www.w3.org/2000/01/rdf-schema#label> "AgenticSystemCore vocabulary"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/agentic-system-core/ns/1.0.0-draft.1> .
+<https://w3id.org/agentic-system-core/ns> <http://www.w3.org/2002/07/owl#versionInfo> "1.0.0-draft.1"^^<http://www.w3.org/2001/XMLSchema#string> .

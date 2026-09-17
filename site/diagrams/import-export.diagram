@@ -1,0 +1,23 @@
+canvas 520 280
+label "Import and export: plain Markdown, OKF bundles, SKILL.md packs, JSON-LD and JSONL come into the Bundle (highlighted); Markdown or OKF, JSON-LD, JSONL and RDF, steer files, skill packs, llms.txt, chunks and Harnesses go out"
+caption "The highlighted Bundle is the only store; every format on the left comes in without loss and every format on the right is derived from it."
+box core 198 100 124 70 "Bundle|(Markdown + YAML)" acc
+box in1 16 24 146 34 "bare Markdown (adopt)"
+box in2 16 72 146 34 "OKF bundle"
+box in3 16 120 146 34 "SKILL.md packs"
+box in4 16 168 146 34 "JSON-LD, JSONL"
+box out1 364 24 140 34 "Markdown / OKF"
+box out2 364 72 140 34 "JSON-LD, JSONL, RDF"
+box out3 364 120 140 34 "steer files (AGENTS.md)"
+box out4 364 168 140 34 "skill packs"
+box out5 364 216 140 34 "llms.txt, chunks, Harness"
+arrow in1 core
+arrow in2 core
+arrow in3 core
+arrow in4 core
+arrow core out1
+arrow core out2
+arrow core out3
+arrow core out4
+arrow core out5
+note "lossless in and out; every prose export carries the Content Use Terms"

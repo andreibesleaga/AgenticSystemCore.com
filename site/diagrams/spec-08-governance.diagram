@@ -1,0 +1,15 @@
+canvas 520 300
+label "Governance: an item with a provenance record becomes a proposal (a pull request), gates run as CI checks with four lints and no model, a human reviews and merges (highlighted), and the merge becomes an entry of the ledger derived from git history"
+caption "The highlighted human review is the only approval the format admits; the ledger below records every merge in a hash chain whose head the discovery document pins."
+box item 16 30 120 50 "item + prov|(who made it)"
+box prop 176 30 120 50 "proposal|(pull request)"
+box gates 336 30 150 50 "gates → CI checks|lint, no model"
+box lints 176 110 310 60 "four lints on every build:|injection · secrets · PII · clean-room"
+box rev 16 110 120 60 "human review|then merge" acc
+box ledger 16 200 470 50 "derived ledger: a hash chain over git history|its head is pinned in the discovery document"
+arrow item prop
+arrow prop gates
+arrow gates lints
+arrow lints rev
+arrow rev ledger
+note "every change has an author, a reviewer and a place in the chain"

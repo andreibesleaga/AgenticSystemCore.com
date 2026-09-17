@@ -1,0 +1,7 @@
+canvas 460 280
+label "Anatomy of an item file: a YAML frontmatter block with type, title, description, tags, provenance, sources, links and ports, above a CommonMark body (highlighted) whose headings become anchors and chunk cuts"
+caption "The highlighted body is plain Markdown; the header above it is a small, safe YAML subset that a validator checks against the schema."
+region file 60 20 340 236 "<slug>.md"
+box fm 74 40 312 100 "--- YAML frontmatter ---|type · title · description · tags|prov (origin, operator) · sources|links: requires, uses, … · ports"
+box body 74 156 312 86 "CommonMark body|headings → anchors and chunk cuts|fenced code stays code" acc
+note "a small, safe YAML subset above; plain Markdown below"

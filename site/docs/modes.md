@@ -1,0 +1,73 @@
+---
+title: "The six modes"
+summary: "One folder of Markdown, one format, six ways of using it: an automatic wiki, a distributed memory for agents, live specifications for a software project, an evolving library of skills, knowledge that can be assembled into a running architecture, and a shared blackboard on which agents and people run a whole project until it is done."
+description: "The six modes of AgenticSystemCore: auto-wiki (with an optional agent lane), distributed agentic memory, live specifications, evolutive skills, runnable knowledge and the Blackboard, each with its mechanism and its requirements."
+---
+
+No mode adds a file type or a key. Each is a way of reading the same files, and one Bundle can be used in all six at once. The requirement identifiers (PRD-nnn) link to the [requirements page](/docs/requirements/).
+
+## Mode 0 — the automatic, self-correcting wiki
+
+**What you do.** Write Markdown. Run one command, or push to your repository. Get a website with a graph, a search index, an agent-facing text file and a discovery document. No language model is needed for any of it (PRD-012).
+
+**What "self-correcting" means here.** Nothing in this mode guesses. Every build runs deterministic checks and refuses to publish what fails them: the header against the schema, every link to an existing target, no cycles where cycles are forbidden, no orphans left unreported (AGSC-03-07 to AGSC-03-10). Every item can carry an instant after which it is stale, and the build flags it against its own build instant (AGSC-02-06, AGSC-04-11). A weekly refresh re-checks staleness and external links and opens at most one issue, never a commit (PRD-044). What went wrong becomes a Lesson item, and the set of Lessons is the error book (PRD-016). Corrections, whether a person or an agent writes them, arrive as proposals that a person ratifies (AGSC-08-03).
+
+{{diagram:mode-0-autowiki}}
+
+**Optional: let a model drive it.** Since the rc.4 draft a node may declare an **agent lane**: a model-driven or programmatic agent with a name, a model, a monthly budget, the tasks it may perform (create, edit, update, review, summarize, translate, refresh, plan, claim, work) and the item types it may touch (AGSC-01-36). It runs as the refresh verb or as a client of the tool server, reads the published surfaces, and can only ever open proposals, each carrying its provenance and an episode with its cost (AGSC-08-28). With `publish: auto` on its channel the wiki becomes **self-driving**: pages are created, edited, reviewed and updated by the model alone, under the standing ratification the owner configured once, the lints at error severity, the budget, and the rule that procedures, gates and configuration always stay with a person (AGSC-08-29). Non-determinism is confined to what is proposed; the build stays deterministic and model-free (AGSC-08-30). The lane is off by default.
+
+{{diagram:agent-lane}}
+
+Requirements: PRD-011 to PRD-021. Rules: [AGSC-06](/specs/06-surfaces/) for what is emitted, [AGSC-08](/specs/08-governance/) for the checks.
+
+## Mode 1 — distributed agentic memory
+
+**What you do.** Point an agent at a node. It reads the discovery document, the graph, the chunk export or llms.txt, or it calls the local tool server, which exposes exactly seven tools: search, read, links, compose, propose, ask and remember (AGSC-09-13). It cites items by their addresses. When it wants to change something, it proposes; a person merges.
+
+**Distributed.** A node can declare other nodes as peers, and the two can be checked for mutual conformance with one command (AGSC-10-12). An agent walks peers itself, over HTTPS only, refusing private and special-purpose addresses, with a hop limit, a fan-out cap and a request budget (AGSC-11-07 to AGSC-11-10). Everything that comes from a peer is marked untrusted and carries its origin (AGSC-11-11). Citing another node is done through sources, never through a link (AGSC-11-12).
+
+{{diagram:mode-1-memory}}
+
+Requirements: PRD-022 to PRD-027, PRD-057. Rules: [AGSC-05](/specs/05-graph/), [AGSC-06](/specs/06-surfaces/), [AGSC-11](/specs/11-boundary/).
+
+## Mode 2 — live specifications and the memory of a software project
+
+**What you do.** Keep a project's own decisions, specifications, tasks, gates and session records as items of the same format. Concepts of kind `principle`, `decision`, `spec`, `task` and `term`, plus Gate and Episode items, need no new type (PRD-028). Five engineering links join them: `implements`, `verifies`, `covers`, `blocked-by` and `decided-by` (AGSC-03-01). A Gate's checks compile into required status checks in CI (AGSC-08-09). Tasks carry an Agent2Agent task state, clusters of tasks are boards, and `/boards/` is a static export a client can merge across nodes (AGSC-10-13).
+
+**Steer files.** The Bundle exports instruction files for coding agents, such as `AGENTS.md`, from its NOW page and its Concepts, Procedures, Gates and Lessons, as context only; enforcement stays in CI (PRD-029). This specification is itself developed this way.
+
+{{diagram:mode-2-specs}}
+
+Requirements: PRD-028 to PRD-031. Rules: [AGSC-02 §2.10](/specs/02-item/#section-2-10), [AGSC-10 §10.5](/specs/10-implementation-profiles/#section-10-5).
+
+## Mode 3 — the evolving skills library
+
+**What you do.** Procedures export one-to-one to `SKILL.md` files, one pack per Cluster, installable into an agent's skill tree with one command (PRD-032, PRD-033). Packs are content only: no scripts, no executables, no symlinks, no tool allow-lists, and a lockfile of hashes verifies every file (PRD-035). An agent that improves a skill can import it back as a Procedure, and the round trip is byte-stable (PRD-034).
+
+{{diagram:mode-3-skills}}
+
+Requirements: PRD-032 to PRD-035. Rules: [AGSC-07 §7.4](/specs/07-composition/#section-7-4).
+
+## Mode 4 — runnable knowledge
+
+**What you do.** Select Concepts, in the browser or on the command line. The combiner runs five steps in a fixed order: it pulls in everything the selection requires, hides what is superseded, refuses any surviving pair that excludes each other, warns about contradictions and missing dependencies, then wires ports (AGSC-07-04 to AGSC-07-08, AGSC-07-23). A valid selection yields a Harness of exactly seven files (AGSC-07-12), byte-identical whether produced in the browser or by the CLI (AGSC-07-13). Runtime emitters for GABBE, kaiban-distributed, CrewAI, LangGraph, ADK and n8n are renderings of those seven files (AGSC-07-18). A saved architecture item re-runs its selection (AGSC-07-24).
+
+{{diagram:mode-4-runnable}}
+
+Requirements: PRD-036 to PRD-038. Rules: [AGSC-07](/specs/07-composition/).
+
+## Mode 5 — the Blackboard: self-driving product and project management
+
+**What you do.** Put a whole project on one Bundle: its decisions, specifications, tasks on boards, gates, procedures as skills, lessons and session records. Declare where proposals go and at least one surface agents can use. Optionally enable agent lanes whose tasks include planning, claiming and working. Then let people, local agents and remote agents work on it together (AGSC-10-16).
+
+**How it works.** It is the blackboard pattern realised on the format: the Bundle is the shared data structure, every participant reads it through the published surfaces, and writes to it only as proposals. A task is claimed by proposing its working state; concurrent claims resolve by merge order; the board export says who holds each task and whether the board is done, and an agent lane keeps working until every board it may touch is done, a task needs a person, or its budget is reached (AGSC-10-17). All of Modes 1 to 4 are in use at once: the memory, the live specs, the skills and the runnable architectures.
+
+**System 1 and System 2.** A Blackboard has two lanes. The fast lane is everything that runs without a fresh human decision: agent lanes, automatic merges, refresh, the ledger, the exports, the peer check. The slow lane is everything that needs one: gates, reviews, decisions, releases, and every change to a procedure, a gate, a cluster or the configuration. The fast lane can never reach the slow lane, and every fast-lane action is auditable afterwards through the ledger and the episode of each run (AGSC-10-18). Remote participants propose through contribute targets, channels or a declared responder; nodes never call nodes, so a blackboard shared by many agents needs no server of its own.
+
+{{diagram:mode-5-blackboard}}
+
+Requirements: PRD-063, PRD-064 (rc.4 draft). Rules: [AGSC-08 §8.6](/specs/08-governance/) and [AGSC-10 §10.6](/specs/10-implementation-profiles/) once rc.4 is published; until then the identifiers above are marked as drafted.
+
+## What every mode shares
+
+Provenance on every item, a human decision on every merge, a ledger derived from git history, the same discovery document, and the same honest limit: the checks prove that an artefact is what was published, never that it is safe or true (AGSC-08-19).

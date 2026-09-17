@@ -1,0 +1,30 @@
+# AgenticSystemCore
+
+<!-- agsc:provenance
+bundle: https://agenticsystemcore.com/
+license: LicenseRef-AgenticSystemCore-Content-Use-1.0
+terms: LicenseRef-AgenticSystemCore-Content-Use-1.0
+spec_version: 1.0.0-rc.3
+generated_at: 2026-09-17T09:00:10Z
+-->
+
+> An open specification for knowledge that people and software agents can both read, verify and build on, published here as a node of itself.
+
+## Guides
+
+- [Publish a Level-0 node](https://agenticsystemcore.com/procedures/publish-a-level-0-node/): Turn an existing CMS, wiki or static-site export into a conforming Level-0 node without running an engine.
+
+## Vocabulary
+
+- [Bundle](https://agenticsystemcore.com/concepts/bundle/): One directory tree of Markdown items plus exactly one agsc.config.json: the unit of publication and of conformance.
+- [Cluster](https://agenticsystemcore.com/concepts/cluster/): A navigational grouping of items. Membership is authored on the item, and nesting is expressed as membership.
+- [Concept](https://agenticsystemcore.com/concepts/concept/): A unit of knowledge in a Bundle, qualified by kind: pattern, taxonomy, explainer, principle, decision, spec, task, term or architecture.
+- [Episode](https://agenticsystemcore.com/concepts/episode/): A recorded occurrence, such as a session, a run or an incident, with a start instant, an actor and an outcome.
+- [Gate](https://agenticsystemcore.com/concepts/gate/): A declared set of checks that a change must pass, at level L1 or L2. Its runs are recorded as episodes.
+- [Harness](https://agenticsystemcore.com/concepts/harness/): Generated output: the file map a valid composition of selected items produces. A Harness is never authored.
+- [Item](https://agenticsystemcore.com/concepts/item/): One Markdown file with YAML frontmatter whose type is concept, episode, procedure, lesson, cluster or gate.
+- [Lesson](https://agenticsystemcore.com/concepts/lesson/): Knowledge distilled from one or more episodes, carrying a severity of info, warn or block.
+- [Link](https://agenticsystemcore.com/concepts/link/): A typed relation between two items of one Bundle, written as a frontmatter key whose values are slugs.
+- [NOW](https://agenticsystemcore.com/concepts/now/): Generated context about the current state of a Bundle, such as counts and last build. NOW is never an item.
+- [Procedure](https://agenticsystemcore.com/concepts/procedure/): A plan a reader can execute: a trigger, steps and checks. A procedure exports one to one to a skill file.
+- [Source](https://agenticsystemcore.com/concepts/source/): An external work cited by an item, written inline as a sources[] entry and published under a fragment IRI.

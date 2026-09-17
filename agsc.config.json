@@ -1,0 +1,27 @@
+{
+  "build": {
+    "feed": false,
+    "out": "www-next"
+  },
+  "bundle": {
+    "id": "agenticsystemcore",
+    "license_prose": "LicenseRef-AgenticSystemCore-Content-Use-1.0",
+    "license_schema": "CC0-1.0",
+    "operator": "human:andreibesleaga"
+  },
+  "site": {
+    "author": "Andrei Nicolae Besleaga",
+    "base": "https://agenticsystemcore.com/",
+    "tagline": "Auto-wiki, distributed agentic memory, live specifications, evolving skills and runnable architectures — one open format for people and agents. Reference Node Level-0 of the Agentic Knowledge Web.",
+    "title": "AgenticSystemCore"
+  },
+  "spec_version": "1.0.0-rc.3",
+  "tags": {
+    "allowed": [
+      "discovery",
+      "procedure",
+      "specification",
+      "vocabulary"
+    ]
+  }
+}

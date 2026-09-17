@@ -1,0 +1,24 @@
+canvas 520 300
+label "Data model: a Bundle holds items of six types (concept, episode, procedure, lesson, cluster, gate); every item is one Markdown file with a YAML header (highlighted) that carries typed links to other items, a provenance record and sources"
+caption "The highlighted file shape is the same for all six types; links, provenance and sources are keys in its header."
+region bundle 16 20 488 230 "Bundle: one directory, one configuration file"
+box concept 28 40 72 40 "Concept"
+box episode 108 40 72 40 "Episode"
+box procedure 188 40 72 40 "Procedure"
+box lesson 268 40 72 40 "Lesson"
+box cluster 348 40 72 40 "Cluster"
+box gate 428 40 72 40 "Gate"
+box item 130 110 260 44 "an item: one Markdown file + YAML header" acc
+box links 28 180 200 44 "14 typed links between items"
+box prov 260 180 110 44 "provenance"
+box src 392 180 100 44 "sources|(citations)"
+arrow concept item
+arrow episode item
+arrow procedure item
+arrow lesson item
+arrow cluster item
+arrow gate item
+arrow item links
+arrow item prov
+arrow item src
+note "six types, one file shape; everything else is a link, a source or a provenance record"

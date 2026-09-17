@@ -1,0 +1,16 @@
+canvas 500 270
+label "System overview: a folder of Markdown items and one configuration file goes through a deterministic build that emits pages for people, a graph, llms.txt with chunks, and the discovery document, which is highlighted"
+caption "The highlighted discovery document is where an agent starts; people start at the pages. Both come from the same files."
+region out 312 14 172 226 "what the build emits"
+box pages 324 28 148 36 "pages for people"
+box graph 324 76 148 36 "graph: JSON-LD, RDF"
+box llms 324 124 148 36 "llms.txt, chunks"
+box disc 324 172 148 36 "discovery document" acc
+box files 16 100 120 60 "Markdown items|+ one config file"
+box build 176 100 104 60 "deterministic|build"
+arrow files build
+arrow build pages
+arrow build graph
+arrow build llms
+arrow build disc
+note "one folder in, every surface out — the same bytes on every machine"

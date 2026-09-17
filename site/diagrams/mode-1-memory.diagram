@@ -1,0 +1,15 @@
+label "Mode 1, distributed agentic memory: an agent reads a node's items, graph and tools, writes through a proposal (highlighted) that a human ratifies before it reaches the store, and walks peer nodes itself"
+caption "Reads are open; the highlighted write path always passes through a human before anything is stored."
+region node 16 20 200 210 "a node (this site, or yours)"
+box store 30 40 172 44 "items + graph + llms.txt"
+box tools 30 100 172 44 "read: tools, graph, chunks"
+box propose 30 160 172 44 "write: proposal" acc
+box agent 300 96 130 48 "agent"
+box human 300 176 130 44 "human ratifies"
+box peer 300 20 130 44 "peer node"
+arrow agent tools
+arrow agent propose
+arrow propose human
+arrow human store dashed via=250,198;250,62
+arrow agent peer dashed
+note "open reads; every write is a proposal a human merges; nodes never call nodes"

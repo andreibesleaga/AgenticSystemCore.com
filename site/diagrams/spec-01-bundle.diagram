@@ -1,0 +1,13 @@
+canvas 460 280
+label "Bundle layout: one directory holding agsc.config.json, content/index.md, one Markdown file per item under content/<type-plural>/ (highlighted) and attachments; imports enter the directory and lossless exports leave it"
+caption "The highlighted item files are the whole knowledge base; configuration, the root document and attachments are the only other things in the tree."
+region dir 16 20 260 232 "one directory"
+box cfg 30 40 232 36 "agsc.config.json (closed)"
+box idx 30 86 232 36 "content/index.md (root document)"
+box items 30 132 232 50 "content/<type-plural>/<slug>.md|one item per file" acc
+box att 30 192 232 36 "content/attachments/<slug>/…"
+box imp 300 60 140 50 "import|(OKF, bare Markdown)"
+box exp 300 160 140 50 "export|(lossless)"
+arrow imp dir
+arrow dir exp
+note "everything a node knows is in this tree; nothing lives anywhere else"

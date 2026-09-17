@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Specification — AgenticSystemCore</title>
+<meta name="description" content="The AgenticSystemCore specification 1.0.0-rc.3: twelve sections, the discovery profile and the conformance levels.">
+<link rel="canonical" href="https://agenticsystemcore.com/specs/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/specs/">
+<meta property="og:title" content="Specification">
+<meta property="og:description" content="The AgenticSystemCore specification 1.0.0-rc.3: twelve sections, the discovery profile and the conformance levels.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"AgenticSystemCore specification","url":"https://agenticsystemcore.com/specs/","version":"1.0.0-rc.3"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/" aria-current="page">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+</nav>
+</header>
+<main id="main">
+<h1>Specification</h1>
+<p class="summary"><strong>Summary</strong>The twelve sections of the specification, the discovery profile and what a conformance claim is.</p>
+<section class="status" aria-labelledby="status-heading">
+<h2 id="status-heading">Status of this document</h2>
+<p>Specification <code>1.0.0-rc.3</code>, a release candidate tagged on 2026-09-17. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it. Released sections are immutable; a correction ships as a new version.</p>
+</section>
+<p>New to the notation? Read <a href="/docs/reading-the-specification/">how to read the specification</a> first: it explains the rule identifiers, the key words and the small bracketed references. Each section below opens with a summary, a plain-language box and a diagram before the normative text.</p>
+<h2 id="sections">Sections</h2>
+<ol class="index" start="0">
+<li><a href="/specs/00-overview/">Overview, terms, conformance model</a> <span class="id">AGSC-00</span><br><span class="snippet">What the specification covers, the words it uses, what it means to conform, and how versions change.</span></li>
+<li><a href="/specs/01-bundle/">Bundle: files, folders, encoding, configuration</a> <span class="id">AGSC-01</span><br><span class="snippet">The directory that holds a node's knowledge: its layout, slugs, encoding, the one configuration file, and how foreign content comes in and goes out.</span></li>
+<li><a href="/specs/02-item/">Item: frontmatter contract per type</a> <span class="id">AGSC-02</span><br><span class="snippet">One Markdown file with a small YAML header: the keys every item has, what each of the six types adds, the body rules, and the rc.3 additions for ports, architectures, attachments and tasks.</span></li>
+<li><a href="/specs/03-links/">Links: the fourteen keys, inverses, combiner semantics</a> <span class="id">AGSC-03</span><br><span class="snippet">The fourteen typed links between items, the inverses the build computes, the integrity checks, and which links the combiner reads.</span></li>
+<li><a href="/specs/04-canonicalization/">Canonicalization and determinism</a> <span class="id">AGSC-04</span><br><span class="snippet">Why two builds anywhere give the same bytes: canonical JSON, NFC text, one time format, fixed sort orders and SHA-256.</span></li>
+<li><a href="/specs/05-graph/">Graph: IRIs, RDF views, SKOS, PROV</a> <span class="id">AGSC-05</span><br><span class="snippet">How items become a graph with web addresses, the three RDF views, the ontology and its alignment to SKOS, PROV-O and Dublin Core, and the byte-level pins.</span></li>
+<li><a href="/specs/06-surfaces/">Published surfaces: routes, discovery files, llms.txt</a> <span class="id">AGSC-06</span><br><span class="snippet">Everything a node publishes: the fixed route set, the discovery document, llms.txt, the chunk export, the JSON-LD context, headers and budgets.</span></li>
+<li><a href="/specs/07-composition/">Composition: the closure algebra and the Harness</a> <span class="id">AGSC-07</span><br><span class="snippet">How a selection of items becomes a verdict and a Harness: the five steps in their fixed order, the seven Harness files, skill packs, ports and saved architectures.</span></li>
+<li><a href="/specs/08-governance/">Governance: provenance, gates, lints, ledger</a> <span class="id">AGSC-08</span><br><span class="snippet">Who made what and who approved it: provenance, sign-off trailers, gates, the four agent-safety lints and the ledger derived from git history.</span></li>
+<li><a href="/specs/09-conformance/">Conformance: classes, vectors, error codes, CLI contract</a> <span class="id">AGSC-09</span><br><span class="snippet">How a claim is made and checked: classes and Levels, the vector format, the command-line contract, the error-code registry and the independent validators.</span></li>
+<li><a href="/specs/10-implementation-profiles/">Implementation profiles (conformance Levels 0–3)</a> <span class="id">AGSC-10</span><br><span class="snippet">The four Levels of conformance, how an existing wiki or CMS becomes a node, how two nodes check each other, and project mode with tasks and boards.</span></li>
+<li><a href="/specs/11-boundary/">The node boundary: cross-origin access, federation, contribution, surfaces, visibility, retirement</a> <span class="id">AGSC-11</span><br><span class="snippet">Where a node meets the outside: cross-origin access, the nine parts of federation, the plugin contract for every agent surface, visibility, retirement and tombstones.</span></li>
+</ol>
+<h2 id="profile">Discovery profile</h2>
+<p><a href="/specs/agentic-knowledge/">The knowledge link set profile</a> documents the discovery document that every node serves at <code>/.well-known/knowledge-linkset</code>.</p>
+<h2 id="conformance">Conformance</h2>
+<p>A claim names exactly one Level, the <code>spec_version</code> and the vector set it passed (<a class="ref" href="/specs/00-overview/#AGSC-00-12">AGSC-00-12</a>, <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-01">AGSC-10-01</a>). This site claims <strong>Level 0</strong> against <code>1.0.0-rc.3</code>.</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 260" role="img" aria-label="Conformance levels as nested boxes: Level 0 publisher (highlighted, static files only) sits inside Level 1 reader, inside Level 2 writer, inside Level 3 full engine" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-levels" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="20" width="428" height="210" rx="8" stroke-dasharray="6 4"/>
+<rect x="40" y="50" width="380" height="160" rx="8" stroke-dasharray="6 4"/>
+<rect x="64" y="80" width="332" height="110" rx="8" stroke-dasharray="6 4"/>
+<rect x="100" y="110" width="260" height="50" rx="6" class="acc" stroke-width="2.2"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="230" y="14" font-size="11">Level 3 — full engine: composition, governance, CLI</text>
+<text x="230" y="44" font-size="11">Level 2 — writer: all surfaces, exports, chunks, boundary</text>
+<text x="230" y="74" font-size="11">Level 1 — reader: parse, validate, links</text>
+<text x="230" y="131.0" font-size="12">Level 0 — publisher: static files only</text>
+<text x="230" y="147.0" font-size="12">items, graph.jsonld, llms.txt, discovery</text>
+<text x="230" y="248" font-size="11">each Level contains the one below; a claim names one Level and its vectors</text>
+</g>
+</svg>
+<figcaption>The highlighted Level 0 is what this site claims: static files, no engine; each outer Level adds obligations and vectors.</figcaption>
+</figure>
+<h2 id="licence">Licence</h2>
+<p>The specification text is published under the Apache License 2.0 with the reference implementation. The schemas, the ontology and the identifiers are released under CC0 1.0.</p>
+</main>
+<footer class="site">
+<p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>
+<p><a href="/legal/">Legal and privacy</a> · <a href="/docs/compliance/">Compliance and security</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery document</a> · <a href="/llms.txt">llms.txt</a> · <a rel="me" href="https://orcid.org/0009-0001-3464-5283">ORCID 0009-0001-3464-5283</a></p>
+</footer>
+</body>
+</html>

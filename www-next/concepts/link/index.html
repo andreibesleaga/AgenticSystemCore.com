@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Link — AgenticSystemCore</title>
+<meta name="description" content="A typed relation between two items of one Bundle, written as a frontmatter key whose values are slugs.">
+<link rel="canonical" href="https://agenticsystemcore.com/concepts/link/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/concepts/link/">
+<meta property="og:title" content="Link">
+<meta property="og:description" content="A typed relation between two items of one Bundle, written as a frontmatter key whose values are slugs.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"DefinedTerm","name":"Link","description":"A typed relation between two items of one Bundle, written as a frontmatter key whose values are slugs.","url":"https://agenticsystemcore.com/concepts/link/","inDefinedTermSet":"https://agenticsystemcore.com/concepts/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/" aria-current="page">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+</nav>
+</header>
+<main id="main">
+<h1>Link</h1>
+<p class="summary"><strong>Summary</strong>A typed relation between two items of one Bundle, written as a frontmatter key whose values are slugs.</p>
+<dl class="meta">
+<dt>Type</dt><dd>concept · kind <code>term</code></dd>
+<dt>Cluster</dt><dd><a href="/clusters/vocabulary/">Vocabulary</a></dd>
+<dt>IRI</dt><dd><code>https://agenticsystemcore.com/concepts/link/</code></dd>
+<dt>Provenance</dt><dd>Written with AI assistance and reviewed by the operator (origin <code>ai-assisted</code>, operator <code>human:andreibesleaga</code>)</dd>
+</dl>
+<p>A <strong>Link</strong> is a typed relation between two items of the same Bundle. It is written as a frontmatter array under one of fourteen keys: the nine core keys <code>related</code>, <code>broader</code>, <code>narrower</code>, <code>uses</code>, <code>requires</code>, <code>excludes</code>, <code>derived-from</code>, <code>contradicts</code> and <code>supersedes</code>, and the five Mode-2 keys <code>implements</code>, <code>verifies</code>, <code>covers</code>, <code>blocked-by</code> and <code>decided-by</code>.</p>
+<p>Each value is a slug. A Link never crosses Bundles: a reference to another node is a citation in <code>sources[]</code>.</p>
+<h2 id="sources">Sources</h2>
+<ol class="sources">
+<li id="source-1"><a href="/specs/03-links/#AGSC-03-01">AGSC-03-01</a> <span class="grade">(primary)</span></li>
+<li id="source-2"><a href="/specs/03-links/#AGSC-03-02">AGSC-03-02</a> <span class="grade">(primary)</span></li>
+<li id="source-3"><a href="/specs/11-boundary/#AGSC-11-12">AGSC-11-12</a> <span class="grade">(primary)</span></li>
+</ol>
+</main>
+<footer class="site">
+<p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>
+<p><a href="/legal/">Legal and privacy</a> · <a href="/docs/compliance/">Compliance and security</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery document</a> · <a href="/llms.txt">llms.txt</a> · <a rel="me" href="https://orcid.org/0009-0001-3464-5283">ORCID 0009-0001-3464-5283</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,11 @@
+canvas 520 280
+label "Conformance mechanics: vectors (input and expected output per rule) are run by any implementation in any language, producing a report and a claim (highlighted); the CLI contract and the error-code registry fix the interfaces"
+caption "The highlighted claim is checkable by anyone who can run the vectors; the two boxes below fix the command-line contract and the one error-code format."
+box vec 16 40 150 60 "vectors|tests/vectors/<area>/|input → expected"
+box impl 210 40 130 60 "any implementation|(any language)"
+box rep 384 40 120 60 "report + claim|Level · version" acc
+arrow vec impl
+arrow impl rep
+box cli 16 140 230 60 "CLI contract: 16 verbs|exit 0 / 1 / 2 · JSON envelope"
+box codes 270 140 234 60 "error codes AGSC-E<nnn>|one registry, one rule each"
+note "a claim is checkable by anyone who can run the vectors"

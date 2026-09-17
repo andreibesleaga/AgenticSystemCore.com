@@ -1,0 +1,9 @@
+canvas 460 280
+label "Implementation profiles: node A declares peer B and node B declares peer A, and one command checks them mutually (highlighted); project mode makes tasks Concepts of kind task and clusters of tasks boards"
+caption "The highlighted mutual check proves that two nodes declare each other and that both link sets validate; it proves nothing about shared content."
+box a 16 60 150 60 "node A|declares peer B"
+box b 294 60 150 60 "node B|declares peer A"
+arrow a b both acc
+text 230 84 "mutual check"
+box boards 16 160 428 50 "project mode: tasks are Concepts of kind task,|clusters of tasks are boards (/boards/)"
+note "levels say what to implement; peers prove two nodes see each other"

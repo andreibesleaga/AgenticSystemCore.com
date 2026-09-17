@@ -1,0 +1,18 @@
+canvas 520 300
+label "Shape of the discovery document (highlighted): one linkset document holds one context anchored at the Bundle, whose relations point at the graph, llms.txt, the licence and documentation, the ontology and context, and the surfaces and peers; at Level 2 and above every artefact link carries a digest"
+caption "The highlighted document is an ordinary RFC 9264 link set; the profile only adds target attributes and changes nothing about how a generic client reads it."
+box doc 16 30 160 60 "linkset document|(application/linkset+json)" acc
+box ctx 216 30 130 60 "one context|anchor: the Bundle"
+box r1 372 20 132 30 "describedby → graph"
+box r2 372 58 132 30 "alternate → llms.txt"
+box r3 372 96 132 30 "license, service-doc"
+box r4 372 134 132 30 "rel#ontology, #context"
+box r5 372 172 132 30 "rel#surface, peer …"
+arrow doc ctx
+arrow ctx r1
+arrow ctx r2
+arrow ctx r3
+arrow ctx r4
+arrow ctx r5
+box attrs 16 200 334 50 "Level 2 and above: digest on every artefact link,|agsc-* bundle facts, ledger head"
+note "one document, one context, ordered relations, absolute hrefs"

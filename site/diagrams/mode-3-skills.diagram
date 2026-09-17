@@ -1,0 +1,10 @@
+label "Mode 3, evolutive skills: Procedures export to SKILL.md packs (highlighted), packs install into an agent's tool tree, and an improved skill comes back as a Procedure through import"
+caption "The highlighted packs are content only; the dashed return is how a skill improved in the field becomes a Procedure again."
+box proc 16 100 120 50 "Procedures|(steps + checks)"
+box pack 170 100 120 50 "SKILL.md packs" acc
+box tree 324 100 120 50 "agent tool tree|(.claude/skills…)"
+arrow proc pack
+arrow pack tree
+arrow tree proc dashed via=384,190;76,190
+text 230 204 "an improved skill comes back as a Procedure"
+note "packs are content only: no scripts, no executables, a lockfile of hashes"

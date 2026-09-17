@@ -1,0 +1,11 @@
+label "Mode 0, auto-wiki: people or agents write Markdown, lint gates check it (highlighted), a static site with search and a NOW page is built, and lessons and stale flags flow back to the writers"
+caption "The highlighted gates are deterministic checks, so the wiki corrects itself without any model; what comes back is a proposal a person ratifies."
+box write 16 90 110 50 "write Markdown|(people, agents)"
+box lint 160 85 120 60 "lint gates|schema, links,|staleness" acc
+box site 304 90 140 50 "static site|search, NOW, graph"
+box lessons 160 180 120 44 "lessons +|stale flags"
+arrow write lint
+arrow lint site
+arrow site lessons dashed
+arrow lessons write dashed
+note "no model needed: checks are deterministic lints; fixes return as proposals"

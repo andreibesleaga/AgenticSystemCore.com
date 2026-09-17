@@ -1,0 +1,18 @@
+canvas 520 280
+label "Proposal lifecycle: an edit becomes a local patch, then a signed pull request, CI runs the lint gates without a model, a human reviews (highlighted) and merges, the site rebuilds and deploys, and the ledger is derived from git history"
+caption "The highlighted human review is the only gate that can publish; the dashed return is a change request, which starts a new proposal."
+box edit 16 40 110 44 "edit an item|human or agent"
+box patch 156 40 110 44 "propose:|local patch"
+box pr 296 40 110 44 "pull request|+ sign-off"
+box ci 296 130 110 44 "CI lint gates|(no model)"
+box rev 156 130 110 44 "human review" acc
+box merge 16 130 110 44 "merge → rebuild|+ deploy"
+box ledger 156 210 250 40 "ledger derived from git, head published"
+arrow edit patch
+arrow patch pr
+arrow pr ci
+arrow ci rev
+arrow rev merge
+arrow merge ledger
+arrow rev edit dashed via=141,107;71,107
+note "nobody writes to the published branch directly; a human ratifies every change"

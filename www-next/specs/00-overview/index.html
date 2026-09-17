@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AGSC-00 — Overview, terms, conformance model — AgenticSystemCore</title>
+<meta name="description" content="AGSC-00 — Overview, terms, conformance model — section 00 of the AgenticSystemCore specification 1.0.0-rc.3.">
+<link rel="canonical" href="https://agenticsystemcore.com/specs/00-overview/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/specs/00-overview/">
+<meta property="og:title" content="AGSC-00 — Overview, terms, conformance model">
+<meta property="og:description" content="AGSC-00 — Overview, terms, conformance model — section 00 of the AgenticSystemCore specification 1.0.0-rc.3.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AGSC-00 — Overview, terms, conformance model","url":"https://agenticsystemcore.com/specs/00-overview/","version":"1.0.0-rc.3","license":"https://www.apache.org/licenses/LICENSE-2.0","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"},"isPartOf":"https://agenticsystemcore.com/specs/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/" aria-current="page">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+</nav>
+</header>
+<main id="main" class="wide">
+<h1>AGSC-00 — Overview, terms, conformance model</h1>
+<p class="summary"><strong>Summary</strong>What the specification covers, the words it uses, what it means to conform, and how versions change.</p>
+<section class="status" aria-labelledby="status-heading">
+<h2 id="status-heading">Status of this document</h2>
+<p>Specification <code>1.0.0-rc.3</code>, a release candidate tagged on 2026-09-17. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it. Released sections are immutable; a correction ships as a new version.</p>
+</section>
+<aside class="plain" aria-labelledby="plain"><h2 id="plain">In plain language</h2>
+<p><strong>What it is.</strong> AgenticSystemCore is a file format plus a few fixed outputs. You write knowledge as Markdown files with a small YAML header, keep them in one directory with one configuration file, and a conforming tool turns that directory into a website, a graph, a search index, an agent-facing text file, a chunk export and a discovery document — the same bytes every time, on any machine.</p>
+<p><strong>What conformance means.</strong> A tool is a <em>reader</em>, a <em>writer</em> or a <em>full engine</em>; a published site is a <em>node</em> at Level 0 to 3. A claim names the class or Level, the <code>spec_version</code> and the test vectors passed. There is no badge and no registry — the vectors are the proof.</p>
+<p><strong>Terms you will meet.</strong> A <em>Bundle</em> is the directory. An <em>Item</em> is one file; its <code>type</code> is one of concept, episode, procedure, lesson, cluster or gate. <em>NOW</em> is a generated summary page. Words like card, deck or page are never types.</p>
+<p><strong>How versions move.</strong> The <code>spec_version</code> is MAJOR.MINOR.PATCH. A MINOR adds and never removes; a reader must ignore what it does not know and must not fail on a higher MINOR. Only a MAJOR may break.</p>
+<p><strong>Where requirements live.</strong> Every product requirement that is served by the <em>shape</em> of the artefacts rather than one sentence is cited in §0.5, so a validator can check the citation.</p>
+<p class="id">This box explains; the rules below decide. New to the notation? See <a href="/docs/reading-the-specification/">how to read the specification</a>.</p>
+</aside>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 260" role="img" aria-label="Conformance model: publisher (Level 0), reader (Level 1), writer (Level 2) and full engine (Level 3) each run their Level's vector set, and the passed vectors (highlighted arrow) make the claim: Level, version and vectors" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-spec-00-conformance" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="24" width="130" height="40" rx="6"/>
+<rect x="16" y="76" width="130" height="40" rx="6"/>
+<rect x="16" y="128" width="130" height="40" rx="6"/>
+<rect x="16" y="180" width="130" height="40" rx="6"/>
+<rect x="190" y="90" width="120" height="60" rx="6"/>
+<rect x="340" y="84" width="104" height="72" rx="6"/>
+<path d="M129.1 65.6 L186.4 91.4" marker-end="url(#ar-spec-00-conformance)"/>
+<path d="M150.0 105.8 L186.0 110.9" marker-end="url(#ar-spec-00-conformance)"/>
+<path d="M149.9 136.6 L186.1 130.6" marker-end="url(#ar-spec-00-conformance)"/>
+<path d="M126.9 178.3 L186.4 150.1" marker-end="url(#ar-spec-00-conformance)"/>
+<path d="M314.0 120.0 L336.0 120.0" marker-end="url(#ar-spec-00-conformance)" class="acc" stroke-width="2.2"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="81" y="48.0" font-size="12">publisher (L0)</text>
+<text x="81" y="100.0" font-size="12">reader (L1)</text>
+<text x="81" y="152.0" font-size="12">writer (L2)</text>
+<text x="81" y="204.0" font-size="12">full engine (L3)</text>
+<text x="250" y="116.0" font-size="12">vector set</text>
+<text x="250" y="132.0" font-size="12">of the Level</text>
+<text x="392" y="100.0" font-size="12">claim:</text>
+<text x="392" y="116.0" font-size="12">Level +</text>
+<text x="392" y="132.0" font-size="12">version +</text>
+<text x="392" y="148.0" font-size="12">vectors</text>
+<text x="230" y="248" font-size="11">no badge, no registry — the passed vectors are the proof</text>
+</g>
+</svg>
+<figcaption>The highlighted step is the whole conformance model: a claim is the Level, the spec_version and the vectors that passed, with no badge and no registry.</figcaption>
+</figure>
+<nav class="toc" aria-labelledby="contents"><h2 id="contents">Contents</h2>
+<ol>
+<li><a href="#section-0-1">0.1 Scope</a></li>
+<li><a href="#section-0-2">0.2 Terms</a></li>
+<li><a href="#section-0-3">0.3 Conformance classes</a></li>
+<li><a href="#section-0-4">0.4 Versioning</a></li>
+<li><a href="#section-0-5">0.5 Requirement traceability for artefact-level requirements (added at rc.3, 2026-09-16 — V6-B §B0)</a></li>
+</ol></nav>
+<p><code>spec_version: &quot;1.0.0-rc.3&quot;</code> (draft of 2026-09-16; frozen at the rc.3 tag). The key words MUST, MUST NOT, REQUIRED, SHALL, SHOULD, SHOULD NOT, MAY are to be interpreted as described in BCP 14 (RFC 2119, RFC 8174) when, and only when, they appear in capitals. Each rule has a stable id <code>AGSC-&lt;section&gt;-&lt;nn&gt;</code>; ids are never reused or renumbered. Trailing brackets cite the requirement each rule serves.</p>
+<h2 id="section-0-1">0.1 Scope</h2>
+<ul>
+<li id="AGSC-00-01" class="rule-item"><a class="rule" href="#AGSC-00-01"><strong>AGSC-00-01</strong></a> (amended at rc.3) This specification — <code>spec/00</code>…<code>spec/11</code>, <code>schema/{item,bundle,config}.schema.json</code>, <code>ontology/agsc.ttl</code> and <code>tests/vectors/**</code>, checkable by the <code>tools/</code> validators of <a class="ref" href="/specs/09-conformance/#AGSC-09-90">AGSC-09-90</a> as they ship (two exist at rc.3; the nine command contracts are 1.0.0 deliverables — AR2-47) — is the definition of AgenticSystemCore. An implementation MUST NOT rely on behaviour that these files do not pin, and any behaviour observable only in a particular engine is a defect of that engine, not of this specification. <span class="trace">[<a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a> ← D47, Art. XI]</span></li>
+<li id="AGSC-00-02" class="rule-item"><a class="rule" href="#AGSC-00-02"><strong>AGSC-00-02</strong></a> This specification defines a file format, a graph projection, a set of published surfaces, a governance contract and a CLI contract. It does not define a network protocol, a server, a database or a reasoner. <span class="trace">[PRD non-goals ← D09, D43]</span></li>
+<li id="AGSC-00-03" class="rule-item"><a class="rule" href="#AGSC-00-03"><strong>AGSC-00-03</strong></a> Where a rule and a <code>tests/vectors/**</code> entry disagree, the rule is normative and the vector MUST be corrected by the procedure of <a class="ref" href="#AGSC-00-16">AGSC-00-16</a> (new versioned file; the wrong file republished as <code>withdrawn</code>). <span class="trace">[<a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a>, D48(7)]</span></li>
+</ul>
+<h2 id="section-0-2">0.2 Terms</h2>
+<ul>
+<li id="AGSC-00-04" class="rule-item"><a class="rule" href="#AGSC-00-04"><strong>AGSC-00-04</strong></a> <strong>Bundle</strong> — one directory tree of Markdown items plus exactly one <code>agsc.config.json</code>; the unit of publication and of conformance. <span class="trace">[D41]</span></li>
+<li id="AGSC-00-05" class="rule-item"><a class="rule" href="#AGSC-00-05"><strong>AGSC-00-05</strong></a> <strong>Item</strong> — one <code>.md</code> file with YAML frontmatter whose <code>type</code> is one of <code>concept</code>, <code>episode</code>, <code>procedure</code>, <code>lesson</code>, <code>cluster</code>, <code>gate</code>. &quot;Item&quot; is a term of this specification only; no common superclass exists in the ontology (§05). <span class="trace">[D41, D36-final]</span></li>
+<li id="AGSC-00-06" class="rule-item"><a class="rule" href="#AGSC-00-06"><strong>AGSC-00-06</strong></a> <strong>Concept</strong> (with a <code>kind</code> qualifier), <strong>Episode</strong>, <strong>Procedure</strong>, <strong>Lesson</strong>, <strong>Cluster</strong>, <strong>Gate</strong> are the six item types. <strong>Link</strong>, <strong>Source</strong>, <strong>Proposal</strong>, <strong>Review</strong>, <strong>Bundle</strong>, <strong>Harness</strong> complete the ubiquitous language; Proposal and Review have no file (they are a forge pull request and its <code>verified[]</code> evidence), Source is an inline <code>sources[]</code> entry, and a Harness is generated output only. <span class="trace">[D36-final, D41, audit/D §1.1]</span></li>
+<li id="AGSC-00-07" class="rule-item"><a class="rule" href="#AGSC-00-07"><strong>AGSC-00-07</strong></a> <strong>NOW</strong> is generated context, never an item and never hand-edited. <span class="trace">[R29, D44(a)]</span></li>
+<li id="AGSC-00-08" class="rule-item"><a class="rule" href="#AGSC-00-08"><strong>AGSC-00-08</strong></a> <strong>Card</strong>, <strong>page</strong>, <strong>deck</strong> and <strong>note</strong> are UI or import vocabulary; they MUST NOT appear as a <code>type</code>, a schema key or an ontology term. <span class="trace">[D36-final]</span></li>
+</ul>
+<h2 id="section-0-3">0.3 Conformance classes</h2>
+<ul>
+<li id="AGSC-00-09" class="rule-item"><a class="rule" href="#AGSC-00-09"><strong>AGSC-00-09</strong></a> A <strong>reader</strong> MUST implement §01–§03 and §05 read-side: locate items, parse the frontmatter subset, validate against <code>schema/item.schema.json</code>, resolve the fourteen Link keys — nine core + five Mode-2, only the core nine driving composition — and compute their inverses. A reader MUST pass every <code>required</code> vector in the areas <code>frontmatter/</code>, <code>slug/</code>, <code>links/</code>. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-002">PRD-002</a>, <a class="ref" href="/docs/requirements/#PRD-003">PRD-003</a>]</span></li>
+<li id="AGSC-00-10" class="rule-item"><a class="rule" href="#AGSC-00-10"><strong>AGSC-00-10</strong></a> A <strong>writer</strong> MUST implement §04, §05 and §06: canonical JSON, the four RDF views, the route set and the discovery files. A writer MUST pass every <code>required</code> vector in <code>jcs/</code>, <code>graph/</code> and <code>discovery/</code>, and MUST be a conforming reader. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-004">PRD-004</a>, <a class="ref" href="/docs/requirements/#PRD-022">PRD-022</a>, <a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a>]</span></li>
+<li id="AGSC-00-11" class="rule-item"><a class="rule" href="#AGSC-00-11"><strong>AGSC-00-11</strong></a> A <strong>full engine</strong> MUST additionally implement §07 (composition), §08 (governance) and §09 (CLI contract) and MUST pass every <code>required</code> vector in every area. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a>, <a class="ref" href="/docs/requirements/#PRD-042">PRD-042</a>, <a class="ref" href="/docs/requirements/#PRD-001">PRD-001</a>]</span></li>
+<li id="AGSC-00-12" class="rule-item"><a class="rule" href="#AGSC-00-12"><strong>AGSC-00-12</strong></a> An implementation claiming conformance MUST state its Level (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-01">AGSC-10-01</a> maps the class names of <a class="ref" href="#AGSC-00-09">AGSC-00-09</a>…11 to Levels 0–3, once), its <code>spec_version</code> and the vector set it passed. It MUST NOT claim a class whose vectors it does not pass. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-010">PRD-010</a>, D38-final]</span></li>
+<li id="AGSC-00-13" class="rule-item"><a class="rule" href="#AGSC-00-13"><strong>AGSC-00-13</strong></a> Optional vectors (<code>&quot;level&quot;: &quot;optional&quot;</code>) MAY fail without losing conformance; they cover SHOULD-level rules. A <code>withdrawn</code> vector (<a class="ref" href="#AGSC-00-16">AGSC-00-16</a>) is excluded from every class's required set and MUST NOT be run for a conformance claim. <span class="trace">[research/12 §1, D48(7)]</span></li>
+</ul>
+<h2 id="section-0-4">0.4 Versioning</h2>
+<ul>
+<li id="AGSC-00-14" class="rule-item"><a class="rule" href="#AGSC-00-14"><strong>AGSC-00-14</strong></a> <code>spec_version</code> is SemVer 2.0.0. MAJOR means a file valid under the previous MAJOR MAY fail validation; MINOR adds optional keys, enum values, link semantics or vectors; PATCH clarifies text or adds vectors that conforming implementations already pass. <span class="trace">[research/12 §8]</span></li>
+<li id="AGSC-00-15" class="rule-item"><a class="rule" href="#AGSC-00-15"><strong>AGSC-00-15</strong></a> A reader MUST accept any Bundle whose <code>spec_version</code> MAJOR equals its own, MUST tolerate unknown keys and unknown link keys, and MUST NOT reject a file for them. <span class="trace">[research/12 §P rules 11, 13; OKF v0.2]</span></li>
+<li id="AGSC-00-16" class="rule-item"><a class="rule" href="#AGSC-00-16"><strong>AGSC-00-16</strong></a> Released spec sections, JSON-LD context files and vector files are immutable; a change creates a new versioned file. A vector that <a class="ref" href="#AGSC-00-03">AGSC-00-03</a> shows to be wrong MUST NOT be edited in place: the corrected case ships as a new versioned vector file and the superseded file is retained with its <code>level</code> republished as <code>withdrawn</code> (excluded from every claim, <a class="ref" href="#AGSC-00-13">AGSC-00-13</a> — R10). Editing a released vector's <code>options.spec_version</code> at an rc bump, or re-pointing its <code>rule</code> to the rule that absorbed a retired one, is not a change to the case and is done in place (V7-26). Ontology terms are never deleted — they are marked <code>owl:deprecated true</code> with <code>dcterms:isReplacedBy</code>. <span class="trace">[research/12 §P rules 41, 42; D48(7)]</span></li>
+<li id="AGSC-00-17" class="rule-item"><a class="rule" href="#AGSC-00-17"><strong>AGSC-00-17</strong></a> <code>spec_version</code> MUST appear in the Bundle root <code>content/index.md</code> and in <code>agsc.config.json</code>; it MAY appear per item and, when present, MUST have the same MAJOR. <span class="trace">[research/12 §P rule 13]</span></li>
+</ul>
+<blockquote>
+<p><strong>rc.3 amendment (2026-09-16, D71):</strong> <a class="ref" href="#AGSC-00-01">AGSC-00-01</a> reads <code>spec/00</code>…<code>spec/11</code> — <code>spec/11-boundary.md</code> (the node boundary: cross-origin access, federation, contribution, surfaces, visibility, retirement) is part of the definition from <code>1.0.0-rc.3</code>. Its vector area is <code>boundary</code> (<code>bnd-nnnn</code>).</p>
+</blockquote>
+<h2 id="section-0-5">0.5 Requirement traceability for artefact-level requirements (added at rc.3, 2026-09-16 — V6-B §B0)</h2>
+<ul>
+<li id="AGSC-00-18" class="rule-item"><a class="rule" href="#AGSC-00-18"><strong>AGSC-00-18</strong></a> Seven product requirements are served by the shape of the artefacts rather than by a single rule sentence, so they are cited here and a validator checks the citation exists (<a class="ref" href="/specs/09-conformance/#AGSC-09-91">AGSC-09-91</a>'s trace-tag check). <strong><a class="ref" href="/docs/requirements/#NFR-01">NFR-01</a></strong> (zero runtime dependencies) is served by <a class="ref" href="/specs/06-surfaces/#AGSC-06-16">AGSC-06-16</a>, whose prebuilt inverted index is required to need no runtime dependency, and by <a class="ref" href="/specs/05-graph/#AGSC-05-23">AGSC-05-23</a>, which forbids a build-time reasoner. <strong><a class="ref" href="/docs/requirements/#NFR-09">NFR-09</a></strong> (unattended operation) is served by <a class="ref" href="/specs/04-canonicalization/#AGSC-04-03">AGSC-04-03</a>, which removes every interactive and ambient input from a build, and by <a class="ref" href="/specs/08-governance/#AGSC-08-20">AGSC-08-20</a>, whose ledger is derived rather than maintained. <strong><a class="ref" href="/docs/requirements/#NFR-13">NFR-13</a></strong> (offline and cross-platform) is served by <a class="ref" href="/specs/04-canonicalization/#AGSC-04-01">AGSC-04-01</a> (byte-identical on every operating system and runtime), <a class="ref" href="/specs/04-canonicalization/#AGSC-04-24">AGSC-04-24</a> (which artefacts that covers) and <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a> (a peer check that MUST accept two local files). <strong><a class="ref" href="/docs/requirements/#PRD-008">PRD-008</a></strong> (version and changelog agreement) is served by <a class="ref" href="#AGSC-00-17">AGSC-00-17</a>, which requires <code>spec_version</code> in both the Bundle root document and the configuration with matching MAJOR. <strong><a class="ref" href="/docs/requirements/#PRD-009">PRD-009</a></strong> (scaffold on initialisation) is served by <a class="ref" href="/specs/02-item/#AGSC-02-94">AGSC-02-94</a>, which requires <code>init</code> to synthesize files that validate against their own schemas. <strong><a class="ref" href="/docs/requirements/#PRD-012">PRD-012</a></strong> (fully functional with no model key) is served by <a class="ref" href="/specs/07-composition/#AGSC-07-01">AGSC-07-01</a>, which forbids a composition from requiring a network, a key or a server, and by <a class="ref" href="/specs/08-governance/#AGSC-08-27">AGSC-08-27</a>, which makes the review lane lint-only with any model review opt-in and non-gating. <strong><a class="ref" href="/docs/requirements/#PRD-016">PRD-016</a></strong> (failure knowledge as items, not an error-book file) is served by the <code>lesson</code> item type of <a class="ref" href="#AGSC-00-05">AGSC-00-05</a> and its heading contract in <a class="ref" href="/specs/02-item/#AGSC-02-21">AGSC-02-21</a>; no rule emits an error-book artefact and none may be added at 1.x. <span class="trace">[V6-B §B0, SO-26]</span></li>
+</ul>
+</main>
+<footer class="site">
+<p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>
+<p><a href="/legal/">Legal and privacy</a> · <a href="/docs/compliance/">Compliance and security</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery document</a> · <a href="/llms.txt">llms.txt</a> · <a rel="me" href="https://orcid.org/0009-0001-3464-5283">ORCID 0009-0001-3464-5283</a></p>
+</footer>
+</body>
+</html>

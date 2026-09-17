@@ -1,0 +1,12 @@
+canvas 460 280
+label "Links: item A authors requires: [b] (highlighted arrow to item B) and the build computes the inverse required-by from B back to A; the nine core keys drive composition, the five Mode-2 keys are navigation and provenance"
+caption "Only the highlighted direction is ever written; the dashed inverse is computed at build, so no file can disagree with another."
+box a 16 60 120 50 "item A|requires: [b]"
+box b 300 60 120 50 "item B"
+arrow a b acc
+text 218 78 "requires (authored)"
+arrow b a dashed via=360,150;76,150
+text 218 166 "required-by (computed inverse)"
+text 230 214 "core nine: related · broader · narrower · uses · requires"
+text 230 232 "excludes · derived-from · contradicts · supersedes — drive composition"
+text 230 250 "Mode-2 five: implements · verifies · covers · blocked-by · decided-by"

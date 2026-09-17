@@ -1,0 +1,14 @@
+canvas 520 300
+label "Containers (C4 level 2): the CLI with its five contexts, a local MCP server and a browser bundle on the left; GitHub Actions and the static site (highlighted) on the right; the CLI, the server and the browser all read or write the static site"
+caption "The highlighted static site is written only by the CLI under CI; the MCP server and the browser bundle read what it publishes."
+box cli 16 30 200 110 "agsc CLI (Node, zero deps)|Knowledge, Governance,|Composition, Distribution,|Interchange"
+box mcp 16 160 200 44 "local MCP server (7 tools)"
+box br 16 220 200 44 "browser: compose + page tools"
+box ci 300 30 204 60 "GitHub Actions|(the only backend)"
+box site 300 130 204 134 "static site www/|pages, graph, search index|llms.txt, chunks, skills|discovery document" acc
+arrow ci cli
+arrow cli site
+arrow ci site
+arrow mcp site
+arrow br site
+note "everything a user touches is a file; every write path ends in a pull request"

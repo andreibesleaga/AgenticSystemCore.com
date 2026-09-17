@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Standards and references — AgenticSystemCore</title>
+<meta name="description" content="The standards AgenticSystemCore builds on (RFC 8615, RFC 8288, RFC 9264, RFC 7284, RFC 9530, JCS, JSON-LD, SKOS, PROV-O, OWL 2 RL, OKF, MCP, WebMCP, A2A and more), the registrations requested, related work and publications.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/standards/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/standards/">
+<meta property="og:title" content="Standards and references">
+<meta property="og:description" content="The standards AgenticSystemCore builds on (RFC 8615, RFC 8288, RFC 9264, RFC 7284, RFC 9530, JCS, JSON-LD, SKOS, PROV-O, OWL 2 RL, OKF, MCP, WebMCP, A2A and more), the registrations requested, related work and publications.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Standards and references","description":"The standards AgenticSystemCore builds on (RFC 8615, RFC 8288, RFC 9264, RFC 7284, RFC 9530, JCS, JSON-LD, SKOS, PROV-O, OWL 2 RL, OKF, MCP, WebMCP, A2A and more), the registrations requested, related work and publications.","url":"https://agenticsystemcore.com/docs/standards/","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/" aria-current="page">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+</nav>
+</header>
+<main id="main" class="wide">
+<h1>Standards and references</h1>
+<p class="summary"><strong>Summary</strong>Every standard this work stands on or defines, with its version and the date it was checked; the three registrations it requests and their current status; the related work it was compared against; and the publications that describe it.</p>
+<h2 id="registrations-and-their-status">Registrations and their status</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Registrations"><table>
+<thead><tr><th scope="col">Registration</th><th scope="col">Where</th><th scope="col">Policy</th><th scope="col">Status</th></tr></thead>
+<tbody>
+<tr><th scope="row">Well-known URI suffix <code>knowledge-linkset</code></th><td>IANA Well-Known URIs registry (RFC 8615)</td><td>Specification Required; requested through the Internet-Draft</td><td>Not yet requested. The suffix <code>knowledge-linkset</code> will be requested for the Well-Known URIs registry (RFC 8615) through an Internet-Draft; it is not registered.</td></tr>
+<tr><th scope="row">Profile URI <code>https://w3id.org/agentic-system-core/profile/agentic-knowledge</code></th><td>IANA Profile URIs registry (RFC 7284)</td><td>First Come First Served</td><td>Not yet filed in the Profile URIs registry (RFC 7284).</td></tr>
+<tr><th scope="row">Internet-Draft on the discovery layer</th><td>IETF Datatracker, Independent Submission Stream</td><td>Reviewed by the Independent Submissions Editor</td><td>Not yet posted.</td></tr>
+<tr><th scope="row">Namespace <code>agentic-system-core</code></th><td>w3id.org permanent identifiers</td><td>Pull request reviewed by the w3id maintainers</td><td>The namespace <code>https://w3id.org/agentic-system-core/</code> does not resolve yet; the pull request to w3id.org has not been opened.</td></tr>
+<tr><th scope="row">Discovery link relation</th><td>IANA Link Relations registry</td><td>None needed: the registered relation <code>describedby</code> (RFC 6892) is used with the media type (<a class="ref" href="/specs/06-surfaces/#AGSC-06-25">AGSC-06-25</a>)</td><td>No request</td></tr>
+<tr><th scope="row">MCP extension identifier <code>com.agenticsystemcore/knowledge</code></th><td>MCP extensions mechanism (SEP-2133)</td><td>Reverse-domain identifier declared by the server; no registry entry (<a class="ref" href="/specs/11-boundary/#AGSC-11-18">AGSC-11-18</a>)</td><td>Declared in the specification</td></tr>
+</tbody></table></div>
+<h2 id="normative-building-blocks">Normative building blocks</h2>
+<p>The documents this specification stands on, with their status on the day they were checked. Nothing here claims adoption, review or endorsement by any body.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 19"><table>
+<thead><tr><th scope="col">Work</th><th scope="col">Status when checked</th><th scope="col">What is taken from it</th><th scope="col">Where</th></tr></thead>
+<tbody>
+<tr><td>RFC 8615 Well-Known URIs</td><td>Standards Track, May 2019</td><td>the <code>/.well-known/</code> path and its registry (Specification Required); the suffix <code>knowledge-linkset</code> is <strong>requested</strong>, not registered</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a></td></tr>
+<tr><td>RFC 8288 Web Linking</td><td>Standards Track, Oct 2017</td><td>link relation model; §2.1.2 — an unregistered extension relation MUST be a URI</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, 06-25, 11-05</td></tr>
+<tr><td>RFC 9264 Linkset</td><td>Standards Track, Jul 2022</td><td>the discovery document <em>is</em> an <code>application/linkset+json</code> document; §4.2.4.3 extension target attributes as arrays; §5 the <code>profile</code> media-type parameter</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a>…10</td></tr>
+<tr><td>RFC 6906 The <code>profile</code> Link Relation</td><td>Informational, Mar 2013</td><td>secondary carrier of the profile</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a>, 11-04</td></tr>
+<tr><td>RFC 7284 Profile URI Registry</td><td>Informational, Jun 2014</td><td>the one profile URI this specification requests</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a></td></tr>
+<tr><td>RFC 9530 Digest Fields</td><td>Standards Track, Feb 2024</td><td>the <code>sha-256</code> algorithm token and <code>digest</code> attribute syntax</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>, 06-10</td></tr>
+<tr><td>RFC 9727 api-catalog</td><td>Standards Track, Jun 2025</td><td>the design precedent: well-known + link relation + profile URI, no vendor media type</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a></td></tr>
+<tr><td>RFC 8785 JCS + erratum 7920</td><td>Standards Track, Jun 2020; erratum verified</td><td>canonical JSON; <code>-0</code> serialises as <code>0</code>; member names sorted by UTF-16 code unit</td><td><a class="ref" href="/specs/04-canonicalization/#AGSC-04-05">AGSC-04-05</a></td></tr>
+<tr><td>RFC 9110 HTTP Semantics</td><td>Standards Track, Jun 2022</td><td>quoted <code>ETag</code>, conneg, 303</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-05">AGSC-11-05</a>, 06-06</td></tr>
+<tr><td>RFC 3987 IRIs</td><td>Standards Track, Jan 2005</td><td>IRI character rules for cross-node citation</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-12">AGSC-11-12</a></td></tr>
+<tr><td>JSON Schema 2020-12</td><td>draft, keyword subset</td><td><code>minLength</code>/<code>maxLength</code> in Unicode code points</td><td><a class="ref" href="/specs/02-item/#AGSC-02-24">AGSC-02-24</a></td></tr>
+<tr><td>RDF 1.1 Turtle / N-Quads, JSON-LD 1.1, OWL 2 RL, SKOS, PROV-O, DCTerms</td><td>W3C Recommendations</td><td>the four graph views, the vocabulary profile, provenance classes</td><td>spec/05</td></tr>
+<tr><td>CommonMark 0.31.2</td><td>community spec</td><td>the body grammar; headings for chunk cuts</td><td><a class="ref" href="/specs/02-item/#AGSC-02-20">AGSC-02-20</a>, 06-27</td></tr>
+<tr><td>Unicode 16.0.0, UTS #46 (non-transitional)</td><td>Unicode Consortium</td><td>NFC, General_Category, IDNA mapping</td><td><a class="ref" href="/specs/04-canonicalization/#AGSC-04-22">AGSC-04-22</a>, 11-12</td></tr>
+<tr><td>A2A 1.0.x (Agent2Agent; repository tag v1.0.1 of 2026-05-28, specification page banner 1.0.0)</td><td>Linux Foundation, Agentic AI Foundation</td><td>the nine <code>TASK_STATE_*</code> values verbatim; the Agent Card and its §8.4 signing (JCS then JWS) as the optional <code>a2a-card</code> surface</td><td><a class="ref" href="/specs/02-item/#AGSC-02-99">AGSC-02-99</a>, 06-34</td></tr>
+<tr><td>MCP revision 2026-07-28, SEP-2133 Extensions (Final)</td><td>Agentic AI Foundation</td><td>the local tool server; the extension identifier <code>com.agenticsystemcore/knowledge</code> advertised through <code>server/discover</code></td><td><a class="ref" href="/specs/09-conformance/#AGSC-09-13">AGSC-09-13</a>, 11-18</td></tr>
+<tr><td>WebMCP Draft Community Group Report, 15 September 2026</td><td>W3C Web Machine Learning CG (draft, not a W3C standard)</td><td><code>document.modelContext</code>, <code>registerTool/getTools/executeTool</code>, <code>readOnlyHint</code>/<code>untrustedContentHint</code>/<code>consequentialHint</code></td><td><a class="ref" href="/specs/09-conformance/#AGSC-09-16">AGSC-09-16</a>, 11-18</td></tr>
+<tr><td>W3C VoID (IG Note 2011; <code>/.well-known/void</code> registered 2011)</td><td>W3C</td><td>prior art for dataset discovery; MUST be cited as complementary</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-12">AGSC-06-12</a></td></tr>
+</tbody></table></div>
+<h2 id="standards-register">Standards register</h2>
+<p><em>Define</em> means this project authors the artefact and requests its registration; <em>conform</em> means it implements someone else's standard. Anything without an executable test is a claim, not conformance.</p>
+<p><em>Define</em> = we author the artefact and register it; <em>conform</em> = we implement someone else's. Anything without an executable test is a claim, not conformance (audit/G §1).</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 20"><table>
+<thead><tr><th scope="col">Standard</th><th scope="col">Version / status</th><th scope="col">Our use</th><th scope="col">Stance</th><th scope="col">Conformance test</th><th scope="col">v1?</th></tr></thead>
+<tbody>
+<tr><td>OKF</td><td>v0.2</td><td>frontmatter superset; <code>index.md</code>/<code>log.md</code> reserved</td><td>conform</td><td>import Google sample bundles; export round-trip</td><td>Y</td></tr>
+<tr><td>CommonMark + GFM tables</td><td>0.31.2 / GFM 0.29</td><td>body profile; no footnotes, no raw HTML</td><td>conform</td><td><code>frontmatter/</code>, renderer golden fixtures</td><td>Y</td></tr>
+<tr><td>YAML</td><td>1.2.2, <strong>failsafe</strong> subset</td><td>frontmatter reader; types come from JSON Schema</td><td>conform (subset)</td><td><code>frontmatter/fm-0002/0005/0006</code></td><td>Y</td></tr>
+<tr><td>JSON Schema</td><td>2020-12, keyword subset</td><td><code>schema/*.json</code>; SHACL generated from it</td><td>conform</td><td>vectors validate against the schemas</td><td>Y</td></tr>
+<tr><td>JCS</td><td>RFC 8785 (Informational)</td><td>every emitted JSON; UTF-16 key sort</td><td>conform</td><td><code>jcs/jcs-0001</code>, <code>jcs-0002</code> + RFC App. B</td><td>Y</td></tr>
+<tr><td>RDFC-1.0</td><td>W3C Rec 2024-05-21</td><td><code>graph.nq</code>, <code>bundle.hash</code> — <strong>blank-node-free scope only</strong></td><td>conform (scoped)</td><td><code>graph/graph-0001</code>, <code>graph-0003</code></td><td>Y (scoped)</td></tr>
+<tr><td>JSON-LD</td><td>1.1 Rec</td><td><code>graph.jsonld</code>, per-item JSON-LD, CC0 context</td><td>conform (document only)</td><td>dev-lane expand + toRdf vs <code>graph.nq</code></td><td>Y</td></tr>
+<tr><td>Turtle</td><td>RDF 1.1 Rec</td><td><code>graph.ttl</code> stable profile</td><td>conform</td><td>third-party parse → isomorphic to <code>graph.nq</code></td><td>Y</td></tr>
+<tr><td>SKOS</td><td>Rec 2009</td><td>Concepts, Bundle scheme, nested Collections</td><td>conform</td><td><code>graph/graph-0002</code>; qSKOS subset in lint</td><td>Y</td></tr>
+<tr><td>PROV-O</td><td>Rec 2013</td><td>Episode/Procedure/Gate/Proposal/Review/Source</td><td>conform</td><td>shape check: Activity/Entity/Plan subclassing + datatype ranges; <strong>no <code>prov:Agent</code> is emitted</strong> — actors are strings, carried by <code>asc:verifiedBy</code>/<code>asc:operator</code>/<code>asc:generatedBy</code> per <a class="ref" href="/specs/05-graph/#AGSC-05-15">AGSC-05-15</a></td><td>Y</td></tr>
+<tr><td>OWL 2 RL</td><td>Rec 2012</td><td><code>ontology/agsc.ttl</code> profile</td><td>conform</td><td>profile check at release; RL-only lint</td><td>Y</td></tr>
+<tr><td>SHACL</td><td>Rec 2017</td><td>shapes generated from the schema</td><td>conform (dev lane)</td><td>pySHACL/dev validator over <code>graph.ttl</code></td><td>Y</td></tr>
+<tr><td>RFC 8615 well-known</td><td>Standards Track</td><td><code>/.well-known/knowledge-linkset</code> (D60; ladder <code>knowledge-linkset</code> → <code>agenticsystemcore-knowledge</code> → <code>agenticsystemcore.com-knowledge-linkset</code>)</td><td><strong>define</strong></td><td>registration template in the I-D; <strong>Specification Required</strong> (designated experts)</td><td>Y</td></tr>
+<tr><td>RFC 8288 relations</td><td>Standards Track</td><td>discovery link = registered <code>describedby</code> (D82 Q3); in the link set: <code>…/rel#graph</code>, <code>#ontology</code>, <code>#context</code>, <code>#now</code>, <code>#skills</code>, <code>#ledger</code>, <code>#peer</code>, <code>#surface</code>, <code>#contribute</code>, <code>#access</code> (extension URIs) plus registered relations for related-system links (<a class="ref" href="/specs/06-surfaces/#AGSC-06-35">AGSC-06-35</a>)</td><td><strong>define</strong></td><td><code>discovery/disc-0003</code>, <code>bnd-0029</code> (no unregistered short names)</td><td>Y</td></tr>
+<tr><td>RFC 7284 Profile URIs</td><td>Informational; IANA &quot;Profile URIs&quot; registry</td><td><code>https://w3id.org/agentic-system-core/profile/agentic-knowledge</code>, the RFC 9264 §5 profile of our link set</td><td><strong>define</strong></td><td>registration template in the I-D; w3id 303 resolves to <code>/specs/agentic-knowledge/</code></td><td>Y</td></tr>
+<tr><td>RFC 9264 linkset</td><td>Standards Track</td><td>the document <em>is</em> <code>application/linkset+json</code> with the §5 <code>profile</code> parameter; <code>linkset</code> is the sole top-level member; extension target attributes</td><td>conform + profile <strong>define</strong></td><td><code>discovery/disc-0003</code>, <code>disc-0004</code></td><td>Y</td></tr>
+<tr><td>RFC 9530 digest fields</td><td>Standards Track</td><td><code>digest</code> target attribute, <code>sha-256=:&lt;base64&gt;:</code>, on every artefact link</td><td>conform</td><td><code>discovery/disc-0003</code>; <code>tools/validate-wellknown</code> recomputes every digest</td><td>Y</td></tr>
+<tr><td>RFC 9651 Structured Field Values <em>(obsoletes RFC 8941)</em></td><td>Standards Track</td><td>the <code>sha-256=:&lt;base64&gt;:</code> <strong>Dictionary-member and Byte-Sequence</strong> syntax carried inside the <code>digest</code> target attribute — RFC 9530 names the field, RFC 9651 §3.3.5/§4.1 defines the <code>:…:</code> serialisation (<a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>)</td><td>conform</td><td><code>discovery/disc-0003</code></td><td>Y</td></tr>
+<tr><td>RFC 6906 profile link relation</td><td>Informational</td><td><code>Link: &lt;profile URI&gt;; rel=&quot;profile&quot;</code> fallback where the media-type parameter cannot be set</td><td>conform</td><td>live header probe recorded in the I-D Implementation Status</td><td>Y</td></tr>
+<tr><td>RFC 7763 <code>text/markdown</code></td><td>Standards Track</td><td><code>Content-Type: text/markdown; charset=utf-8; variant=GFM</code> on <code>/pages/*.md</code> (<a class="ref" href="/specs/06-surfaces/#AGSC-06-17">AGSC-06-17</a>)</td><td>conform</td><td><code>_headers</code> snapshot test; live header probe</td><td>Y</td></tr>
+<tr><td>TDMRep</td><td>W3C CG Final Report</td><td><code>/.well-known/tdmrep.json</code> carrying the same AI-usage policy as <code>robots.txt</code> (<a class="ref" href="/specs/06-surfaces/#AGSC-06-18">AGSC-06-18</a>)</td><td>conform</td><td>grammar + policy-parity lint</td><td>Y</td></tr>
+<tr><td>llms.txt</td><td>community spec v2 (2026-08-10)</td><td><code>/llms.txt</code>, <code>/llms-full.txt</code></td><td>profile of (H1 first; <a class="ref" href="/specs/06-surfaces/#AGSC-06-13a">AGSC-06-13a</a> is stricter)</td><td>structural lint: H1, blockquote, resolving links</td><td>Y</td></tr>
+<tr><td>Agent Skills</td><td>agentskills.io</td><td><code>SKILL.md</code> packs per Cluster</td><td>conform</td><td>name grammar (no <code>--</code>), <code>description</code> ≤1024</td><td>Y</td></tr>
+<tr><td>MCP</td><td>2026-07-28, stdio</td><td><code>agsc mcp</code>, seven tools (D51-b)</td><td>conform</td><td>Inspector <code>tools/list</code>; no stray stdout bytes</td><td>Y</td></tr>
+<tr><td>WebMCP</td><td>W3C Draft CG Report 2026-09-15</td><td>the same seven tools as page tools, <code>propose</code>/<code>remember</code> local-only</td><td>conform</td><td><code>cli/cli-0003</code>; origin-trial browser run; feature-detect fallback</td><td>Y</td></tr>
+<tr><td>AGENTS.md</td><td>agents.md convention</td><td><code>export --steer</code>, Harness <code>AGENTS.md</code></td><td>conform</td><td>byte-stable emit; context-only assertion</td><td>Y</td></tr>
+<tr><td>robots.txt</td><td>RFC 9309</td><td>AI-usage signals with <code>/.well-known/tdmrep.json</code></td><td>conform</td><td>grammar + size lint</td><td>Y</td></tr>
+<tr><td>security.txt</td><td>RFC 9116</td><td><code>Contact</code> + <code>Expires</code></td><td>conform</td><td>presence + expiry check</td><td>Y</td></tr>
+<tr><td>Sitemaps</td><td>sitemaps.org 0.9</td><td>one <code>sitemap.xml</code></td><td>conform</td><td>well-formedness, count, URL resolution</td><td>Y</td></tr>
+<tr><td>Schema.org</td><td>v30.0</td><td><code>TechArticle</code>, <code>DefinedTerm</code>, <code>Dataset</code> in HTML</td><td>conform</td><td>validator.schema.org on the release checklist</td><td>Y</td></tr>
+</tbody></table></div>
+<p>Also conformed to, and proved in the lanes of PLAN §10 rather than here: SemVer 2.0.0, Keep a Changelog 1.1.0, <code>SOURCE_DATE_EPOCH</code>, BCP 47, RFC 9110 conneg/303, WCAG 2.2 AA, REUSE 3.3, SLSA v1.0 Build L2, CITATION.cff 1.2.0. VoID (<code>/.well-known/void</code>, registered 2011) is prior art for dataset discovery and MUST be cited as complementary wherever our discovery layer is described. Dropped at v1: A2A <code>agent-card.json</code> (no endpoint exists), DCAT, DID/VC, SBOM — at rc.3 it MAY be declared as the <code>a2a-card</code> surface and emitted only beside a declared <code>responder</code> (<a class="ref" href="/specs/06-surfaces/#AGSC-06-34">AGSC-06-34</a>).</p>
+<h2 id="related-work">Related work</h2>
+<h3 id="1-one-sentence">1. One sentence</h3>
+<p><strong>Agent discovery finds who can act; knowledge discovery finds what is known.</strong> Every mechanism in the agent-discovery space catalogued below discovers an <em>actor or an endpoint</em> — an agent, a tool server, a service. This specification discovers a <em>described, integrity-checked body of knowledge</em>: a static Bundle of Markdown items with a typed graph, a discovery document that is an RFC 9264 link set, and digests on every artefact it points at. The two are complementary, and the survey that catalogues the former (<code>draft-jimenez-dawn-discovery-landscape-00</code>, 3 July 2026) never mentions RFC 9264 link sets and names no mechanism for the latter.</p>
+<h3 id="3-the-agent-discovery-mechanisms-and-why-none-of-them-is-this">3. The agent-discovery mechanisms, and why none of them is this</h3>
+<p>The DAWN landscape survey (Jimenez, Feng, Arkko, Kühlewind, Kandoi — Ericsson; <code>draft-jimenez-dawn-discovery-landscape-00</code>, 3 July 2026) catalogues the field. Its own scope statement is discovery of &quot;entities (agents, tools, services) and … their capabilities&quot;. The mechanisms, with this specification's reading of each:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 21"><table>
+<thead><tr><th scope="col">#</th><th scope="col">Mechanism</th><th scope="col">What it discovers</th><th scope="col">Reading</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>DNS-AID</td><td>agents, by DNS name</td><td>actor; DNS-centric</td></tr>
+<tr><td>2</td><td>DN-ANR</td><td>agents, by name resolution</td><td>actor</td></tr>
+<tr><td>3</td><td>AID</td><td>agent identifiers</td><td>actor</td></tr>
+<tr><td>4</td><td>AgentDNS (expired draft)</td><td>agent endpoints via DNS</td><td>actor</td></tr>
+<tr><td>5</td><td><code>api-catalog</code> (RFC 9727)</td><td>a site's APIs</td><td>endpoint; <strong>our design precedent</strong>, different object</td></tr>
+<tr><td>6</td><td>A2A Agent Cards (<code>/.well-known/agent-card.json</code>, registered by the Linux Foundation, permanent)</td><td>an agent's capabilities and interfaces</td><td>actor; complementary — declarable here as the <code>a2a-card</code> surface, never emitted without a responder</td></tr>
+<tr><td>7</td><td>MCP server discovery (SEP-2127 Server Cards — <strong>still an open pull request</strong> on 2026-09-12; SEP-2133 Extensions — Final)</td><td>MCP servers</td><td>endpoint; complementary — the local <code>mcp</code> surface is declared through the plugin contract</td></tr>
+<tr><td>8</td><td>ANP <code>/.well-known/agent-descriptions</code> (W3C AI Agent Protocol CG)</td><td>inter-agent descriptions</td><td>actor</td></tr>
+<tr><td>9</td><td>AIDIP</td><td>agent identity</td><td>actor</td></tr>
+<tr><td>10</td><td>AGNTCY ADS</td><td>agent directory service</td><td>actor</td></tr>
+<tr><td>11</td><td>3GPP 6G Rel-20 agent discovery</td><td>network-side agents</td><td>actor</td></tr>
+<tr><td>12</td><td>IoA (Internet of Agents)</td><td>agents</td><td>actor</td></tr>
+<tr><td>13</td><td>ARDP</td><td>agent resource discovery</td><td>actor / endpoint</td></tr>
+<tr><td>14</td><td>Agent Directory <code>/.well-known/ad</code></td><td>directory of agents</td><td>actor</td></tr>
+<tr><td>15</td><td>a2aregistry.org</td><td>hosted directory</td><td>actor</td></tr>
+<tr><td>+</td><td><code>/.well-known/ai</code> (<code>draft-aiendpoint-ai-discovery-01</code>), <code>/.well-known/agent-discovery.json</code> (ADP; the suffix <code>agent</code> was <strong>denied</strong> by IANA in June 2026, per the ADP draft's own text), <code>/.well-known/agents.txt</code> (agent policy), <code>draft-serra-mcp-discovery-uri-04</code> (<code>mcp:</code> scheme), <code>draft-narvaneni-agent-uri-03</code> (<code>agent:</code> scheme), <code>draft-aevum-agentcard-00</code></td><td>endpoints, policies, identities</td><td>name-space competition only; none describes a knowledge base</td></tr>
+</tbody></table></div>
+<p><strong>None of these discovers an integrity-checked knowledge bundle with a typed graph, and none uses an RFC 9264 link set.</strong> Since the survey, two mechanisms discover a single <em>context file</em> — <code>draft-arsentev-llm-context-discovery-00</code> (2026-09-11; well-known suffix and link relation <code>llm-context</code>, both requested from IANA, pointing at a publisher-curated file such as <code>/llms.txt</code>) and llms.txt v2 itself (2026-08-10; <code>rel=&quot;describedby&quot;</code> to the file) — and one discovers <em>agentic resources</em> (Agentic Resource Discovery, below). None carries digests over a set of artefacts, a typed graph, or a link set; that narrower gap is the one this specification fills, with registered building blocks rather than a new media type. Decided 2026-09-17 (D82 Q3): no fourth link relation — the discovery link is the registered <code>describedby</code> with <code>type=&quot;application/linkset+json&quot;</code>, the profile URI carries the refinement, and the Internet-Draft requests two registrations (the suffix and the profile URI), not three. The link set can in turn point at any of these neighbours through related-system links (<a class="ref" href="/specs/06-surfaces/#AGSC-06-35">AGSC-06-35</a>).</p>
+<h3 id="4-adjacent-work-the-four-verdicts">4. Adjacent work: the four verdicts</h3>
+<p><em>include</em> = cited normatively or as a link target · <em>complement</em> = orthogonal and pointed at · <em>compare</em> = same neighbourhood, different object · <em>compete</em> = contests only a name.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 22"><table>
+<thead><tr><th scope="col">Work</th><th scope="col">Verdict</th><th scope="col">Note</th></tr></thead>
+<tbody>
+<tr><td><code>llms.txt</code> (community spec, v2, modified 2026-08-10)</td><td>include</td><td>v2 fixes a grammar (a leading H1 is the only required element; blockquote, heading-free sections, H2 file lists, an <code>Optional</code> convention) and a discovery path (<code>rel=&quot;describedby&quot;</code>, <code>rel=&quot;alternate&quot; type=&quot;text/markdown&quot;</code>); <a class="ref" href="/specs/06-surfaces/#AGSC-06-13a">AGSC-06-13a</a> is a <strong>profile</strong> of it — H1 first, a provenance comment, a stricter byte layout</td></tr>
+<tr><td><code>draft-arsentev-llm-context-discovery-00</code> (Independent, 2026-09-11)</td><td>compare</td><td>requests the well-known suffix <code>llm-context</code> and the link relation <code>llm-context</code> for a publisher-curated LLM context file (typically <code>/llms.txt</code>); discovers one text file with no integrity, graph or bundle — complementary, and the nearest IETF neighbour of the discovery layer</td></tr>
+<tr><td>Agentic Resource Discovery, ARD v0.91 (Google with the Linux Foundation AI Catalog WG, 2026-06-17; <code>ards-project/ard-spec</code>, pushed 2026-09-12)</td><td>compare</td><td><code>/.well-known/ard.json</code> manifest of JSON-LD entries, <code>&lt;link rel=&quot;ard&quot;&gt;</code>, a federated <code>POST /search</code> registry API; entries describe <em>agentic resources</em> (agents, tools, services) and may use an OKF namespace in queries — the nearest live neighbour of a well-known discovery document, for actors and endpoints rather than a knowledge bundle</td></tr>
+<tr><td>Agent Skills (<code>SKILL.md</code>)</td><td>include</td><td>Procedures export one-to-one to skill files (spec/07 §7.4)</td></tr>
+<tr><td>AGENTS.md (Agentic AI Foundation)</td><td>complement</td><td>a repository instruction file; a possible link target, never a Bundle item</td></tr>
+<tr><td>Google Open Knowledge Format v0.2</td><td>compare</td><td>closest content-model neighbour: Markdown + YAML, <code>index.md</code>; no discovery, no integrity; imported losslessly (<a class="ref" href="/specs/01-bundle/#AGSC-01-26">AGSC-01-26</a>). Two things the I-D must say: OKF also calls its unit a <strong>&quot;Knowledge Bundle&quot;</strong> — this specification's <code>Bundle</code> is a different object (a directory, one configuration file and a typed graph), and the names are not interchangeable (AR2-53); and OKF's conformance philosophy is the opposite of this one — OKF forbids a consumer from rejecting a bundle for broken links or unknown types, this specification fails the build (AR2-54)</td></tr>
+<tr><td>W3C DCAT 3 (Rec, 22 Aug 2024)</td><td>complement</td><td>catalogue vocabulary a publisher MAY use to describe the Bundle as a <code>dcat:Dataset</code>; see spec/06 §6.8</td></tr>
+<tr><td>Schema.org <code>DataCatalog</code>/<code>Dataset</code></td><td>complement</td><td>one permitted serialisation of the same description in page JSON-LD</td></tr>
+<tr><td>NLWeb</td><td>complement</td><td>a consumer: a query endpoint over Schema.org data; every instance an MCP server</td></tr>
+<tr><td>IETF aipref (vocab/attach drafts; revisions move monthly — re-check before the I-D)</td><td>complement, hard boundary</td><td>AI-usage preferences; this specification emits TDMRep + robots signals and <strong>no</strong> aipref field at 1.x (<a class="ref" href="/specs/06-surfaces/#AGSC-06-18">AGSC-06-18</a>)</td></tr>
+<tr><td>IETF webbotauth</td><td>complement</td><td>bot identity by HTTP message signatures; this specification defines no agent identity</td></tr>
+<tr><td>IETF DAWN (proposed WG)</td><td>complement</td><td>discovery of <em>agents and AI resources</em> by name (DNS-centric); this specification discovers a published document set on a known origin through an HTTP well-known path and needs no naming layer — it is a stand-alone application of RFC 8615, 8288 and 9264, which is why it is offered on the Independent Stream; the RFC 5742 conflict review will ask exactly this, and this row is the answer (AR2-12)</td></tr>
+<tr><td>IETF agentproto (BOF)</td><td>complement</td><td>long-lived agent sessions; no overlap</td></tr>
+<tr><td>W3C AI Agent Memory Interoperability CG (chartered 2026-06-19)</td><td>compare</td><td>portable agent memory; the nearest &quot;memory&quot; neighbour, no report published when checked</td></tr>
+<tr><td><code>draft-saihm-memory-protocol-01</code> (In ISE Review)</td><td>compare</td><td>encrypted memory cells bound to MCP tools; the other ISE-stream AI-memory draft, different object</td></tr>
+<tr><td>W3C Linked Web Storage / Solid</td><td>complement</td><td>storage substrate; declarable here as the <code>solid</code> surface (<a class="ref" href="/specs/11-boundary/#AGSC-11-21">AGSC-11-21</a>), bytes pinned by the Solid Protocol</td></tr>
+<tr><td>Linked Data Fragments / Triple Pattern Fragments</td><td>include (informative)</td><td>the optional static fragments (<a class="ref" href="/specs/06-surfaces/#AGSC-06-33">AGSC-06-33</a>) are a static subset at the dump end of the LDF spectrum</td></tr>
+<tr><td>Wikidata / Wikibase, MediaWiki</td><td>compare</td><td>the hypertext lineage: a wiki with a typed graph; this specification is static, git-governed, and has no live write path</td></tr>
+<tr><td>Karpathy &quot;LLM wiki&quot; note (2026-04-04); Ming et al., <em>Retrieval as Reasoning: Self-Evolving Agent-Native Retrieval via LLM-Wiki</em>, arXiv 2605.25480</td><td>compare</td><td>agent-written wikis with an error book; this specification is public, human-and-agent governed, ontology-typed, and its Lessons page set is the error book</td></tr>
+<tr><td>agentpatternscatalog.org, nibzard/awesome-agentic-patterns, AgentO ontology</td><td>compare</td><td>pattern catalogues without a verified-evidence graph, composition to an executable harness, or a discovery layer; AgentO is a possible alignment target for <code>kind: pattern</code> items</td></tr>
+</tbody></table></div>
+<h3 id="5-what-is-new-here-stated-as-properties">5. What is new here, stated as properties</h3>
+<p>1. A knowledge base is discoverable by a <strong>registered-mechanism</strong> path (well-known URI + link relation + profile URI), with <strong>RFC 9530 digests</strong> on every artefact, and no new media type.
+2. Every machine artefact is <strong>byte-deterministic across implementations</strong> (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-24">AGSC-04-24</a>), which no wiki, catalogue or memory protocol above claims.
+3. Federation is <strong>static and client-side</strong> — nodes never call nodes — with a bounded walk, a mutual-conformance check and cross-node <em>citation</em> instead of cross-node links (spec/11 §11.3).
+4. Every agent surface is a <strong>declared plugin</strong> under one contract — declare, pin, inherit, prove (spec/11 §11.4) — so an external draft moving does not move the core.
+5. The <strong>agent-retrieval chunk export</strong> (<a class="ref" href="/specs/06-surfaces/#AGSC-06-26">AGSC-06-26</a>…31) gives agents stable, citable, pre-split units with provenance, without embeddings.</p>
+<p>These are property claims about the specification's text and vectors, not performance claims.</p>
+<h2 id="publications">Publications</h2>
+<ul>
+<li><strong>Preprint.</strong> In preparation; not yet published. It will establish the specification, its vectors and its discovery layer as of the tagged release, with a persistent identifier.</li>
+<li><strong>Internet-Draft.</strong> Not yet posted.</li>
+<li><strong>Papers.</strong> Journal and conference papers are planned after the preprint; none has been submitted.</li>
+</ul>
+<h3 id="how-to-cite">How to cite</h3>
+<p>Until the preprint is published, cite the specification by version and tag:</p>
+<pre tabindex="0"><code>Andrei Nicolae Besleaga. AgenticSystemCore specification 1.0.0-rc.3, 2026-09-17. https://agenticsystemcore.com/specs/</code></pre>
+</main>
+<footer class="site">
+<p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>
+<p><a href="/legal/">Legal and privacy</a> · <a href="/docs/compliance/">Compliance and security</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery document</a> · <a href="/llms.txt">llms.txt</a> · <a rel="me" href="https://orcid.org/0009-0001-3464-5283">ORCID 0009-0001-3464-5283</a></p>
+</footer>
+</body>
+</html>

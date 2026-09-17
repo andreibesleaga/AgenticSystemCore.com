@@ -1,0 +1,16 @@
+canvas 460 280
+label "Graph: an item becomes a node with an IRI (highlighted), exported as JSON-LD, Turtle and N-Quads; the asc: ontology, aligned to SKOS, PROV-O and DCTerms in OWL 2 RL, types it; there are no blank nodes and no reasoner at build"
+caption "The highlighted node is the item's web address; the three files on the right are one graph in three syntaxes."
+box item 16 40 120 50 "item|/concepts/<slug>/"
+box node 176 40 120 50 "graph node|(IRI)" acc
+box v1 336 20 108 34 "JSON-LD"
+box v2 336 62 108 34 "Turtle"
+box v3 336 104 108 34 "N-Quads"
+box onto 176 130 124 60 "ontology asc:|SKOS · PROV-O|DCTerms · OWL 2 RL"
+box no 16 130 120 60 "no blank nodes|no reasoner|at build"
+arrow item node
+arrow node v1
+arrow node v2
+arrow node v3
+arrow onto node
+note "one graph, three syntaxes; what you read is what was emitted"

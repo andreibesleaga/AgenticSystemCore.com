@@ -1,0 +1,16 @@
+canvas 460 280
+label "Surfaces: the build emits a fixed route set: pages, machine files, the well-known discovery document (highlighted), headers and sitemap, and the ledger, boards, skills and ontology files"
+caption "The highlighted discovery document is one route among the fixed set; the set is closed, so a reader knows what to expect from any node."
+box build 16 100 100 60 "build"
+region routes 160 20 284 236 "the route set"
+box r1 174 36 256 30 "pages: items, clusters, tags, search, NOW"
+box r2 174 74 256 30 "graph, search.json, chunks, llms.txt"
+box r3 174 112 256 30 "/.well-known/knowledge-linkset" acc
+box r4 174 150 256 30 "headers, sitemap, robots, security.txt"
+box r5 174 188 256 30 "ledger, boards, skills, /ns/"
+arrow build r1
+arrow build r2
+arrow build r3
+arrow build r4
+arrow build r5
+note "exactly this set, nothing more — so a reader knows what to expect"
