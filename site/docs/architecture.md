@@ -51,6 +51,9 @@ Two floors are never traded: the licence stack (NFR-10) and the clean-room rule 
 | C9 | No network, wall clock or file system in the pure core; network only in `refresh` and `mcp` | Ports, enforced by tests |
 | C10 | Determinism: canonical JSON, sorted keys, LF, NFC, UTC seconds, `SOURCE_DATE_EPOCH` | `verify` is a double build with a byte comparison, and it blocks merges |
 
+> **Amendment 2026-09-18 (D94, ADR-019).** The "zero runtime dependencies" constraint (C1, ADR-002) is superseded. The reference engine uses actively maintained, permissively licensed libraries at exact pinned versions for the standard formats and protocols it reads and writes, with a committed lockfile, `npm ci` installs and an `npm audit` gate; only what the specification pins byte-for-byte and no library produces is written by hand. The specification itself never required zero dependencies; a port from the vectors alone (NFR-02) and every determinism rule are unchanged.
+
+
 ## 4. Context
 
 {{diagram:c4-context}}

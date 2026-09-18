@@ -5,7 +5,7 @@ bundle: https://agenticsystemcore.com/
 license: LicenseRef-AgenticSystemCore-Content-Use-1.0
 terms: LicenseRef-AgenticSystemCore-Content-Use-1.0
 spec_version: 1.0.0-rc.4
-generated_at: 2026-09-18T06:05:03Z
+generated_at: 2026-09-18T08:24:10Z
 -->
 
 > An open specification for knowledge that people and software agents can both read, verify and build on, published here as a node of itself.
