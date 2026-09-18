@@ -15,7 +15,7 @@
     "tagline": "Auto-wiki, distributed agentic memory, live specifications, evolving skills, runnable architectures and a self-driving live board — one open format for people and agents. Reference Node Level-0 of the Agentic Knowledge Web.",
     "title": "AgenticSystemCore"
   },
-  "spec_version": "1.0.0-rc.3",
+  "spec_version": "1.0.0-rc.4",
   "tags": {
     "allowed": [
       "discovery",

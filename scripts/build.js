@@ -8,14 +8,14 @@
 //
 //   node scripts/build.js [--out <dir>]      (default: www)
 //   SOURCE_DATE_EPOCH=<seconds> node scripts/build.js
-//   AGSC_ENGINE=<path> AGSC_SPEC_TAG=<tag>   (defaults: ../agentic-system-core, 1.0.0-rc.3)
+//   AGSC_ENGINE=<path> AGSC_SPEC_TAG=<tag>   (defaults: ../agentic-system-core, 1.0.0-rc.4)
 'use strict';
 const fs = require('fs'), path = require('path'), crypto = require('crypto'), cp = require('child_process');
 const { compile: compileDiagram } = require('./diagram.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const ENGINE = path.resolve(ROOT, process.env.AGSC_ENGINE || '../agentic-system-core');
-const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.3';
+const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.4';
 // Output directory: `build.out` of agsc.config.json. It is `www-next` until launch so that the
 // repository can be pushed without Cloudflare Pages publishing the new site (Pages serves `www/`);
 // at launch the owner sets `build.out` to `www` (runbook §1a).
@@ -152,10 +152,11 @@ let RULE_INDEX = new Map(); // rule id or error code -> spec page slug
 let REQ_IDS = new Set();    // PRD-nnn / NFR-nn ids that the requirements page defines
 const RULES_WITHOUT_TRACE = []; // rules whose source carries no trailing trace bracket (reported at the end)
 // Rules and codes drafted for the next release candidate in the engine working tree: the guide may cite
-// them, rendered unlinked and marked, until the owner tags rc.4 and AGSC_SPEC_TAG moves (then empty this set).
-const PENDING_RULES = new Set(['AGSC-00-19', 'AGSC-00-20', 'AGSC-01-36', 'AGSC-01-37', 'AGSC-01-38', 'AGSC-08-28', 'AGSC-08-29', 'AGSC-08-30', 'AGSC-10-16', 'AGSC-10-17', 'AGSC-10-18', 'AGSC-E509', 'AGSC-E510', 'AGSC-E511', 'AGSC-E212']);
-const PENDING_VERSION = '1.0.0-rc.4';
-const PENDING_REQS = new Set(['PRD-063', 'PRD-064', 'PRD-065']);
+// them, rendered unlinked and marked, until the owner tags the next candidate and AGSC_SPEC_TAG moves
+// (then empty this set again). Emptied when rc.4 was tagged and published: every identifier drafted for
+// it is now in the published specification.
+const PENDING_RULES = new Set();
+const PENDING_REQS = new Set();
 function idTarget(code, o) {
   if (!/^AGSC-(?:\d{2}-\d{2,3}[a-z]?|E\d{3})$/.test(code) || !RULE_INDEX.has(code)) return null;
   const page = RULE_INDEX.get(code);
@@ -167,7 +168,7 @@ function linkIds(text, o) {
     let t = null;
     if (!o.inLink) t = m[0].startsWith('AGSC') ? idTarget(m[0], o) : (REQ_IDS.has(m[0]) && o.page !== 'requirements' ? `/docs/requirements/#${m[0]}` : null);
     const pending = !t && !o.inLink && (PENDING_RULES.has(m[0]) || PENDING_REQS.has(m[0]));
-    out += esc(text.slice(last, m.index)) + (t ? `<a class="ref" href="${esc(t)}">${esc(m[0])}</a>` : pending ? `<span class="ref pending" title="drafted for ${PENDING_VERSION}; not yet in the published ${SPEC_VERSION}">${esc(m[0])}</span>` : esc(m[0]));
+    out += esc(text.slice(last, m.index)) + (t ? `<a class="ref" href="${esc(t)}">${esc(m[0])}</a>` : pending ? `<span class="ref pending" title="drafted for the next release candidate; not yet in the published ${SPEC_VERSION}">${esc(m[0])}</span>` : esc(m[0]));
     last = m.index + m[0].length;
   }
   return out + esc(text.slice(last));
@@ -918,7 +919,6 @@ listPage('/clusters/', 'Clusters', 'The navigational groupings of this node.', c
 // the guide (site/docs/*.md, hand-authored, plus the tagged documents rendered through slots)
 const statusRows = [
   ['Specification <code>' + esc(SPEC_VERSION) + '</code>', 'Live', `Tagged on ${esc(SPEC_DATE)}; twelve sections at <a href="/specs/">/specs/</a>; the vocabulary and the vectors are frozen at the tag.`],
-  ['Specification <code>' + esc(PENDING_VERSION) + '</code>', 'In preparation', 'Drafted in the engine repository: the agent lane (spec/08 §8.6) with per-lane and node-wide monthly caps, the <code>.env</code> environment file, Mode 5 the LiveBoard (spec/10 §10.6), the <code>agents[]</code> and <code>budget</code> configuration, the declared scope by version (AGSC-00-20) and seven new vectors. The guide already describes them; their rule identifiers are shown marked until the release candidate is tagged and published here.'],
   ['This site as a Level-0 node', 'Live', `Items, <a href="/graph.jsonld"><code>graph.jsonld</code></a>, <a href="/llms.txt"><code>llms.txt</code></a> and the <a href="${WELLKNOWN}">discovery document</a> in its Level-0 form, checked by the Level-0 vectors and the discovery validator before every publish.`],
   ['Ontology files', 'Live', `Turtle, JSON-LD context, RDF/XML and N-Triples at <a href="/ns/">/ns/</a>.`],
   ['Namespace through w3id.org', STATUS.w3id ? 'Live' : 'Not yet resolving', regText.w3id],

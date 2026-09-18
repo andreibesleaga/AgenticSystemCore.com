@@ -6,7 +6,7 @@ Status: pre-launch (target 2026-10-10). Layout, config and workflows are generat
 
 ## Site v0 (added 2026-09-17, DS-7)
 
-The site is built without the engine, as a **Level-0 node** of the specification it publishes (AGSC-10-02). `scripts/build.js` (Node ≥ 22, standard library only) reads `content/`, `site/`, `assets/` and — from the engine repository checked out beside this one — `spec/`, `ontology/agsc.ttl` and `LICENSE-CONTENT` **at the release tag** (`1.0.0-rc.3`), and writes `www/`, which Cloudflare Pages serves as committed.
+The site is built without the engine, as a **Level-0 node** of the specification it publishes (AGSC-10-02). `scripts/build.js` (Node ≥ 22, standard library only) reads `content/`, `site/`, `assets/` and — from the engine repository checked out beside this one — `spec/`, `ontology/agsc.ttl` and `LICENSE-CONTENT` **at the release tag** (`1.0.0-rc.4`), and writes `www/`, which Cloudflare Pages serves as committed.
 
 ```bash
 node scripts/build.js      # writes www/ (SOURCE_DATE_EPOCH defaults to the tag's commit instant)

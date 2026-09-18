@@ -11,7 +11,7 @@
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const ROOT = path.resolve(__dirname, '..');
 const ENGINE = path.resolve(ROOT, process.env.AGSC_ENGINE || '../agentic-system-core');
-const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.3';
+const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.4';
 const WWW = path.join(ROOT, (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www'); // www-next until launch (README)
 const fails = [];
 const NO_TRACE_IN_SOURCE = new Set(['AGSC-05-26']); // the one rule whose source ends in a table with no bracket

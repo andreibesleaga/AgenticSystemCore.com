@@ -37,7 +37,7 @@
 <p class="summary"><strong>Summary</strong>The architecture of the reference implementation in the arc42 and C4 forms: quality goals, constraints, the system in its context, containers, five bounded contexts and their ports, the runtime sequences, deployment, the decisions of record and the threat model.</p>
 <p>This page restates the frozen architecture document of the project (its S02 artefact, arc42 with C4 views and ISO 42010 correspondence rules) for readers who are not going to read the engine's source. It adds nothing to it. The architecture satisfies the <a href="/docs/requirements/">requirements</a> and never overrides a rule of the <a href="/specs/">specification</a>; where this page and a rule disagree, the rule wins.</p>
 <h2 id="1-quality-goals-ranked">1. Quality goals, ranked</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 25"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 27"><table>
 <thead><tr><th scope="col">#</th><th scope="col">Quality goal</th><th scope="col">Meaning here</th><th scope="col">Requirements</th></tr></thead>
 <tbody>
 <tr><td>Q1</td><td>Correctness and determinism</td><td>Byte-identical rebuilds on every operating system; every requirement has a test; the ledger re-verifies offline</td><td><a class="ref" href="/docs/requirements/#NFR-03">NFR-03</a>, <a class="ref" href="/docs/requirements/#NFR-04">NFR-04</a>, <a class="ref" href="/docs/requirements/#NFR-05">NFR-05</a></td></tr>
@@ -48,7 +48,7 @@
 </tbody></table></div>
 <p>Two floors are never traded: the licence stack (<a class="ref" href="/docs/requirements/#NFR-10">NFR-10</a>) and the clean-room rule (<a class="ref" href="/docs/requirements/#NFR-12">NFR-12</a>).</p>
 <h2 id="2-stakeholders">2. Stakeholders</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 26"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
 <thead><tr><th scope="col">Who</th><th scope="col">Primary concern</th></tr></thead>
 <tbody>
 <tr><td>Human reader</td><td>Find a pattern with evidence; the site works without JavaScript</td></tr>
@@ -66,7 +66,7 @@
 <tr><td>Future port implementers in other languages</td><td>No hidden behaviour in the JavaScript; byte-level vectors; no build step</td></tr>
 </tbody></table></div>
 <h2 id="3-constraints">3. Constraints</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 27"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
 <thead><tr><th scope="col">#</th><th scope="col">Constraint</th><th scope="col">Consequence</th></tr></thead>
 <tbody>
 <tr><td>C1</td><td>Zero runtime dependencies: Node built-ins only, Node 22.14 or later</td><td>Every parser and writer is hand-written</td></tr>
@@ -128,7 +128,7 @@
 <p>People read the pages and machine surfaces over HTTPS and open proposals as pull requests. Agents call the local tool server over standard input and output, fetch the discovery document, the graph, llms.txt and the skill packs over HTTPS, and use the page tools where a browser exposes them. The owner performs every git write. Standards implementers request the link set and negotiate the vocabulary through w3id. Port implementers read the specification and the vectors. GitHub holds the repositories and runs the pipeline; Cloudflare Pages serves the site; w3id.org resolves the namespace; the npm registry distributes the engine. External interfaces are files and URLs only: there is no API to call.</p>
 <h2 id="5-solution-strategy">5. Solution strategy</h2>
 <p>A functional core compiles a folder of Markdown into every surface the product has. The content directory and the configuration file are the sole system of record; the engine is a pure compiler behind ports; GitHub Actions is the only thing that ever writes; Cloudflare Pages serves the output byte for byte. Every interactive path, in the browser, over MCP, over WebMCP or on the command line, ends in a local patch that a person turns into a proposal, and nothing publishes until a person merges.</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 30"><table>
 <thead><tr><th scope="col">Context</th><th scope="col">Responsibility</th><th scope="col">Aggregates</th><th scope="col">Verbs owned</th></tr></thead>
 <tbody>
 <tr><td>Knowledge</td><td>Parse, validate, link, ontology, graph; the vectors</td><td>Bundle, item (six types), Link, Source</td><td>Serves all</td></tr>
@@ -214,7 +214,7 @@
 </svg>
 <figcaption>The highlighted static site is written only by the CLI under CI; the MCP server and the browser bundle read what it publishes.</figcaption>
 </figure>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
 <thead><tr><th scope="col">Container</th><th scope="col">What it is</th></tr></thead>
 <tbody>
 <tr><td><code>agsc</code> CLI</td><td>Node, ESM, zero runtime dependencies; sixteen verbs, exit codes 0, 1 and 2, <code>--json</code> everywhere; five context directories under <code>src/</code> plus ports and Node adapters</td></tr>
@@ -225,7 +225,7 @@
 <tr><td>Bundle</td><td><code>content/**/*.md</code> plus <code>agsc.config.json</code>: the system of record; the ledger is derived into <code>www/</code>, not stored here</td></tr>
 </tbody></table></div>
 <h3 id="ports-and-adapters">Ports and adapters</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 30"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 32"><table>
 <thead><tr><th scope="col">Port</th><th scope="col">Purpose</th><th scope="col">Reference adapter</th><th scope="col">Plugin adapters, never required</th></tr></thead>
 <tbody>
 <tr><td>FileSystem</td><td>Read and write files</td><td>Node <code>fs</code></td><td>In-memory (tests), Deno, Bun, Workers</td></tr>
@@ -338,7 +338,7 @@
 </figure>
 <p><strong>Browser composition.</strong> <code>/compose/</code> loads the graph and the browser bundle, which is the same composition module set with no Node imports. The user ticks Concepts; the closure runs client-side in the normative order (<a class="ref" href="/specs/07-composition/#AGSC-07-04">AGSC-07-04</a> to <a class="ref" href="/specs/07-composition/#AGSC-07-08">AGSC-07-08</a>); the user names the Harness; the seven files are generated in memory and downloaded as a store-only zip, or file by file as the documented fallback. The bytes equal those of the command-line invocation for the same selection, and a vector asserts it (<a class="ref" href="/specs/07-composition/#AGSC-07-13">AGSC-07-13</a>).</p>
 <h2 id="8-deployment">8. Deployment</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 33"><table>
 <thead><tr><th scope="col">Lane</th><th scope="col">Trigger</th><th scope="col">Permissions</th><th scope="col">Result</th></tr></thead>
 <tbody>
 <tr><td>Engine CI</td><td>Push, pull request</td><td>Read only</td><td>Tests with a fixed clock and no network, coverage, self-lint, vectors, every independent validator</td></tr>
@@ -357,7 +357,7 @@
 <li><strong>Internationalisation.</strong> Language variants of an item share its slug and address and are served under a language path with <code>hreflang</code> alternates (<a class="ref" href="/specs/01-bundle/#AGSC-01-13">AGSC-01-13</a>).</li>
 </ul>
 <h2 id="10-decisions-of-record">10. Decisions of record</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 32"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 34"><table>
 <thead><tr><th scope="col">ADR</th><th scope="col">Decision</th></tr></thead>
 <tbody>
 <tr><td>001</td><td>Agent safety by structural defence, not by a classifier and not by sandboxing: trust-marked results, fenced prose, deterministic lints, identifier-only tools, inert skills, human merge; with the honest limit that hashes prove tampering, not safety</td></tr>
@@ -378,7 +378,7 @@
 <tr><td>016</td><td>Ports are wired verdict-neutrally in the fifth composition step</td></tr>
 </tbody></table></div>
 <h2 id="11-quality-lanes">11. Quality lanes</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 33"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 35"><table>
 <thead><tr><th scope="col">Requirement</th><th scope="col">Proved by</th></tr></thead>
 <tbody>
 <tr><td><a class="ref" href="/docs/requirements/#NFR-01">NFR-01</a> zero dependencies</td><td>The production dependency list is empty, and an audit runs</td></tr>
@@ -396,7 +396,7 @@
 <tr><td><a class="ref" href="/docs/requirements/#NFR-13">NFR-13</a> offline and cross-platform</td><td>A portability checklist on three operating systems</td></tr>
 </tbody></table></div>
 <h2 id="12-risks">12. Risks</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 34"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 36"><table>
 <thead><tr><th scope="col">Risk</th><th scope="col">Mitigation</th></tr></thead>
 <tbody>
 <tr><td>The hand-written Markdown renderer, which must render every imported body</td><td>Golden tests over the whole corpus; unsupported syntax is a lint error, never a rendering surprise</td></tr>
@@ -410,7 +410,7 @@
 </tbody></table></div>
 <h2 id="13-threat-model">13. Threat model</h2>
 <p>The assets are the content repository, the engine repository and its packages, the published site and exports, the CI secrets, the accounts, the domains and the w3id prefix, contributor personal data, the memories of downstream agents, and the clean-room invariants. The threats and their mitigations, in STRIDE terms:</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 35"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 37"><table>
 <thead><tr><th scope="col">Threat</th><th scope="col">Mitigation</th></tr></thead>
 <tbody>
 <tr><td>Prompt injection through merged content reaching agents</td><td>Trust-marked results, fenced prose, the injection scan at error severity for agent-authored changes, identifier-only tools, inert skills, human merge</td></tr>

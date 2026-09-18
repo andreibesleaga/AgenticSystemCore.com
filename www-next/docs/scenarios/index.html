@@ -38,7 +38,7 @@
 <p>Each feature file below is a frozen artefact of the project's requirements phase, published from the tagged release. The scenarios are written so that every step is executable: a concrete command, a route, a tool call or a file, never &quot;the system behaves correctly&quot;. Tags of the form <code>@PRD-nnn</code> link a scenario to a row of the <a href="/docs/requirements/">requirements page</a>; a few steps name rules of the specification.</p>
 <p>The scenarios describe the reference engine and the content site at general availability. Where a scenario names a surface that this Level-0 site does not yet serve, such as the local tool server, the combiner page or the skill packs, the <a href="/docs/status/">status page</a> says what is live today.</p>
 <h2 id="coverage">Coverage</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 17"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 18"><table>
 <thead><tr><th scope="col">File</th><th scope="col">Persona</th><th scope="col">Mode</th><th scope="col">Scenarios</th><th scope="col">PRD ids covered</th></tr></thead>
 <tbody>
 <tr><td><a href="#persona-0-dropin">persona-0-dropin</a></td><td>P0 drop-in user</td><td>0</td><td>2</td><td><a class="ref" href="/docs/requirements/#PRD-053">PRD-053</a></td></tr>
@@ -52,6 +52,7 @@
 <tr><td><a href="#persona-h-memory">persona-h-memory</a></td><td>P8 agent-as-memory</td><td>1 (import/export)</td><td>4</td><td><a class="ref" href="/docs/requirements/#PRD-022">PRD-022</a>, 026, 027</td></tr>
 <tr><td><a href="#persona-i-maintainer">persona-i-maintainer</a></td><td>P9 owner-as-operator</td><td>0</td><td>5</td><td><a class="ref" href="/docs/requirements/#PRD-005">PRD-005</a>, 044, 045, 048, 049</td></tr>
 <tr><td><a href="#persona-j-standards">persona-j-standards</a></td><td>P11 standards implementer</td><td>1</td><td>5</td><td><a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a>, 025, 050, 054</td></tr>
+<tr><td><a href="#persona-k-liveboard">persona-k-liveboard</a></td><td>P12 self-driving team (rc.4)</td><td>8</td><td>8</td><td><a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a>, 064, 065</td></tr>
 </tbody></table></div>
 <p>Not covered here by design: <strong>P10 port implementer</strong> — audit/D §3 has no (k) walkthrough for it; its
 acceptance runs instead through <code>tests/vectors/</code> + <code>spec/09-conformance</code> (M13, PLAN §5.3), not a
@@ -541,6 +542,79 @@ Feature: Standards implementer adopts the discovery format on their own site
     When the implementer runs &quot;the shipped validate-wellknown tool on https://agenticsystemcore.com/.well-known/knowledge-linkset&quot;
     Then it exits 0 and prints an agsc.diagnostics.v1 envelope with verb &quot;validate-wellknown&quot;
     And running it against a linkset carrying an unregistered short name exits 1</code></pre>
+<h3 id="persona-k-liveboard">persona-k-liveboard: Self-driving team — agents and people finish a project's tasks on one LiveBoard</h3>
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: PRD-063, PRD-064, PRD-065 · D87, D88, R66, R67, R69–R71 · spec/08 §8.6, spec/10 §10.6, spec/01 AGSC-01-36…38 (rc.4)
+# Source of truth: docs/PRD.md Amendment 8 and the rc.4 rules named on each step
+@persona-k @mode-5 @PRD-063 @PRD-064 @PRD-065
+Feature: Self-driving team — agents and people finish a project's tasks on one LiveBoard
+  As P12 (a self-driving team of agents and people)
+  I want a shared pull board that agents plan, claim and work on until it is done
+  So that product and project management runs itself under the guards a person configured once
+
+  Background:
+    Given a Bundle with a board cluster &quot;sprint-1&quot; holding tasks of kind task with task_state &quot;TASK_STATE_SUBMITTED&quot;
+    And agsc.config.json declares contribute[] and the surface &quot;mcp&quot;
+    And a channel &quot;lane&quot; with author &quot;lane-bot&quot;, owner &quot;human:alice&quot; and publish &quot;auto&quot;
+    And an agents[] entry &quot;worker&quot; of kind &quot;llm&quot; with tasks &quot;plan, claim, work, edit&quot; and types &quot;concept, episode, lesson&quot;, channel &quot;lane&quot;, budget_usd_month 5, enabled true
+
+  @PRD-064
+  Scenario: An agent claims a task by proposing its working state
+    When &quot;npx agentic-system-core refresh --agent worker&quot; runs
+    Then the agent opens a Proposal whose diff changes only task_state and modified of one task to &quot;TASK_STATE_WORKING&quot; (AGSC-10-17)
+    And the Proposal's items carry prov origin &quot;ai-generated&quot;, agent &quot;worker&quot;, the model and operator &quot;human:alice&quot;
+    And the Proposal contains one episode item with usage and outcome (AGSC-08-28 d)
+    And the auto-merge job merges it under every condition of AGSC-08-26 with the trailer &quot;Channel-Auto: lane&quot;
+    When &quot;npx agentic-system-core build&quot; runs
+    Then &quot;/boards/sprint-1.json&quot; shows that task with state &quot;TASK_STATE_WORKING&quot; and claimed_by &quot;worker&quot;
+
+  @PRD-064
+  Scenario: The board reaches done and the agent stops
+    Given every task of &quot;sprint-1&quot; has been proposed to &quot;TASK_STATE_COMPLETED&quot; and merged
+    When &quot;npx agentic-system-core build&quot; runs
+    Then &quot;/boards/sprint-1.json&quot; carries done true
+    When &quot;npx agentic-system-core refresh --agent worker&quot; runs
+    Then no Proposal is opened, because no board the agent may touch holds a claimable task (AGSC-10-17)
+
+  @PRD-063
+  Scenario: The agent lane cannot reach the slow lane
+    When the agent &quot;worker&quot; opens a Proposal that changes &quot;content/procedures/deploy.md&quot;
+    Then the Proposal is rejected with &quot;AGSC-E509&quot; before any lint runs (AGSC-08-28 c)
+    And a person, not the agent, is the only one who can change a procedure, a gate, a cluster or the configuration (AGSC-10-18)
+
+  @PRD-063
+  Scenario: The budget stops the lane for the month
+    Given the episodes of &quot;worker&quot; this month sum to usage cost_usd 5
+    When &quot;npx agentic-system-core refresh --agent worker&quot; runs
+    Then no model is called and the NOW page records the warning &quot;AGSC-E510&quot; (AGSC-08-28 e)
+
+  @PRD-063
+  Scenario: The build stays deterministic while the lane is non-deterministic
+    When &quot;npx agentic-system-core ci&quot; runs twice on the merged content
+    Then the two builds are byte-identical and no model call is reachable from lint, build, verify or ci (AGSC-08-30)
+    And &quot;npx agentic-system-core verify --ledger&quot; shows the lane's merges with mode &quot;auto&quot;
+
+  @PRD-065
+  Scenario: The work-in-progress limit keeps the agent on one task
+    Given &quot;worker&quot; already holds &quot;task-a&quot; in &quot;TASK_STATE_WORKING&quot; and max_claims is 1
+    When &quot;worker&quot; proposes &quot;TASK_STATE_WORKING&quot; for &quot;task-b&quot; without completing &quot;task-a&quot;
+    Then the Proposal is rejected with &quot;AGSC-E511&quot; before any lint runs (AGSC-10-17)
+    When &quot;worker&quot; proposes &quot;TASK_STATE_COMPLETED&quot; for &quot;task-a&quot; and &quot;TASK_STATE_WORKING&quot; for &quot;task-b&quot; in one Proposal
+    Then the Proposal is accepted and the board export shows &quot;task-b&quot; claimed_by &quot;worker&quot;
+
+  @PRD-065
+  Scenario: A planner cannot flood the board
+    Given max_new_items of &quot;worker&quot; is 20
+    When &quot;worker&quot; opens a Proposal that creates 21 task concepts
+    Then the Proposal is rejected with &quot;AGSC-E511&quot; naming the count and the bound (AGSC-08-28 c)
+
+  @PRD-065
+  Scenario: The node-wide cap and the .env file bound every model call
+    Given agsc.config.json has budget.usd_month 10 and a .env file in the Bundle root with &quot;AGSC_BUDGET_USD_MONTH=4&quot;
+    And the episodes of this month across every lane sum to usage cost_usd 4
+    When &quot;npx agentic-system-core refresh --agent worker&quot; runs
+    Then no model is called and the NOW page records the warning &quot;AGSC-E510&quot; (AGSC-01-38, AGSC-08-25)
+    And &quot;npx agentic-system-core ci --json&quot; prints the override name &quot;AGSC_BUDGET_USD_MONTH&quot; and never its value (AGSC-01-37)
+    And a .env file tracked in the content branch is reported as &quot;AGSC-E403&quot;</code></pre>
 </main>
 <footer class="site">
 <p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>

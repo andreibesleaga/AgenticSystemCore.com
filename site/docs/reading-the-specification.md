@@ -31,7 +31,7 @@ A reader who wants to implement the specification needs none of the internal ref
 
 ## Drafted rules
 
-An identifier shown with a dotted underline and no link is drafted for the next release candidate in the engine repository and is not yet in the published specification; the [status page](/docs/status/) says what the draft adds. It becomes a link when that release candidate is tagged and published here.
+When a next release candidate is being drafted in the engine repository, its identifiers are shown here with a dotted underline and no link until it is tagged and published; none are pending now.
 
 ## Retired rules
 

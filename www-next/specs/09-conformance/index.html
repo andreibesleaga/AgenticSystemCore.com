@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AGSC-09 — Conformance: classes, vectors, error codes, CLI contract — AgenticSystemCore</title>
-<meta name="description" content="AGSC-09 — Conformance: classes, vectors, error codes, CLI contract — section 09 of the AgenticSystemCore specification 1.0.0-rc.3.">
+<meta name="description" content="AGSC-09 — Conformance: classes, vectors, error codes, CLI contract — section 09 of the AgenticSystemCore specification 1.0.0-rc.4.">
 <link rel="canonical" href="https://agenticsystemcore.com/specs/09-conformance/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
 <link rel="stylesheet" href="/assets/site.css">
@@ -12,8 +12,8 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/specs/09-conformance/">
 <meta property="og:title" content="AGSC-09 — Conformance: classes, vectors, error codes, CLI contract">
-<meta property="og:description" content="AGSC-09 — Conformance: classes, vectors, error codes, CLI contract — section 09 of the AgenticSystemCore specification 1.0.0-rc.3.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AGSC-09 — Conformance: classes, vectors, error codes, CLI contract","url":"https://agenticsystemcore.com/specs/09-conformance/","version":"1.0.0-rc.3","license":"https://www.apache.org/licenses/LICENSE-2.0","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"},"isPartOf":"https://agenticsystemcore.com/specs/"}</script>
+<meta property="og:description" content="AGSC-09 — Conformance: classes, vectors, error codes, CLI contract — section 09 of the AgenticSystemCore specification 1.0.0-rc.4.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AGSC-09 — Conformance: classes, vectors, error codes, CLI contract","url":"https://agenticsystemcore.com/specs/09-conformance/","version":"1.0.0-rc.4","license":"https://www.apache.org/licenses/LICENSE-2.0","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"},"isPartOf":"https://agenticsystemcore.com/specs/"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -37,7 +37,7 @@
 <p class="summary"><strong>Summary</strong>How a claim is made and checked: classes and Levels, the vector format, the command-line contract, the error-code registry and the independent validators.</p>
 <section class="status" aria-labelledby="status-heading">
 <h2 id="status-heading">Status of this document</h2>
-<p>Specification <code>1.0.0-rc.3</code>, a release candidate tagged on 2026-09-17. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it. Released sections are immutable; a correction ships as a new version.</p>
+<p>Specification <code>1.0.0-rc.4</code>, a release candidate tagged on 2026-09-18. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it. Released sections are immutable; a correction ships as a new version.</p>
 </section>
 <aside class="plain" aria-labelledby="plain"><h2 id="plain">In plain language</h2>
 <p><strong>Classes and claims.</strong> Reader, writer, full engine; a claim names the class, the version and the vectors passed.</p>
@@ -100,14 +100,14 @@
 <ul>
 <li id="AGSC-09-07" class="rule-item"><a class="rule" href="#AGSC-09-07"><strong>AGSC-09-07</strong></a> The verb set is exactly <strong>sixteen</strong>: <code>init</code>, <code>lint</code>, <code>build</code>, <code>verify</code>, <code>ci</code>, <code>export</code>, <code>import</code>, <code>compose</code>, <code>propose</code>, <code>review</code>, <code>refresh</code>, <code>skills</code>, <code>mcp</code>, <code>run</code>, <code>trace</code>, <code>conform</code>. <code>run</code> and <code>trace</code> MUST be opt-in and disabled by default (<a class="ref" href="/specs/01-bundle/#AGSC-01-18">AGSC-01-18</a> <code>run.enabled</code>, default <code>false</code>); <code>conform</code> executes the vector set of a declared Level (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-01">AGSC-10-01</a>) and writes the <a class="ref" href="#AGSC-09-03">AGSC-09-03</a> report. Any other verb MUST exit 2 with <a class="ref" href="#AGSC-E001"><code>AGSC-E001</code></a>. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-001">PRD-001</a> ← D41, R54, D53, V4-A A-45]</span></li>
 <li id="AGSC-09-08" class="rule-item"><a class="rule" href="#AGSC-09-08"><strong>AGSC-09-08</strong></a> Exit codes: <strong>0</strong> success; <strong>1</strong> findings, a failed gate or a non-reproducible build; <strong>2</strong> usage error (unknown verb, unknown flag, missing argument, invalid configuration — including a malformed <code>SOURCE_DATE_EPOCH</code>, <a class="ref" href="#AGSC-E603"><code>AGSC-E603</code></a>, which is an environment/configuration fault and never a finding). <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-007">PRD-007</a>, PLAN §8, D48(7)]</span></li>
-<li id="AGSC-09-09" class="rule-item"><a class="rule" href="#AGSC-09-09"><strong>AGSC-09-09</strong></a> Global flags <code>--json</code>, <code>--quiet</code>, <code>--plain</code>, <code>--no-input</code>, <code>--version</code> MUST be honoured, as MUST <code>NO_COLOR</code> and <code>AGSC_*</code> environment variables. Precedence is flags &gt; environment &gt; project configuration &gt; user configuration. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-007">PRD-007</a> ← R54, R30]</span></li>
+<li id="AGSC-09-09" class="rule-item"><a class="rule" href="#AGSC-09-09"><strong>AGSC-09-09</strong></a> Global flags <code>--json</code>, <code>--quiet</code>, <code>--plain</code>, <code>--no-input</code>, <code>--version</code> MUST be honoured, as MUST <code>NO_COLOR</code> and <code>AGSC_*</code> environment variables. Precedence is flags &gt; environment &gt; project configuration &gt; user configuration; at rc.4 the environment includes the <code>.env</code> file of <a class="ref" href="/specs/01-bundle/#AGSC-01-37">AGSC-01-37</a>, read after the process environment, and every scalar configuration key has an <code>AGSC_*</code> name there. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-007">PRD-007</a> ← R54, R30, D88]</span></li>
 <li id="AGSC-09-10" class="rule-item"><a class="rule" href="#AGSC-09-10"><strong>AGSC-09-10</strong></a> Data goes to stdout; diagnostics go to stderr. Under <code>--json</code>, stdout MUST carry exactly one JCS-canonical envelope and stderr MUST carry one JSON object per line, one per finding. <code>findings[]</code> in the envelope, and the stderr lines, MUST be ordered by <code>(file, line, col, code)</code> compared code-point-wise, so that a byte comparison of the output is stable however the lint phases were scheduled. <span class="trace">[PLAN §8, D48(3)]</span></li>
 <li id="AGSC-09-11" class="rule-item"><a class="rule" href="#AGSC-09-11"><strong>AGSC-09-11</strong></a> The envelope shape is:</li>
 </ul>
 <pre tabindex="0" data-lang="json"><code>{ &quot;counts&quot;: { &quot;error&quot;: 0, &quot;warn&quot;: 0 },
   &quot;findings&quot;: [],
   &quot;schema&quot;: &quot;agsc.diagnostics.v1&quot;,
-  &quot;spec_version&quot;: &quot;1.0.0-rc.3&quot;,
+  &quot;spec_version&quot;: &quot;1.0.0-rc.4&quot;,
   &quot;status&quot;: &quot;pass&quot;,
   &quot;verb&quot;: &quot;lint&quot;,
   &quot;version&quot;: &quot;0.1.0&quot; }</code></pre>
@@ -178,6 +178,9 @@
 <tr id="AGSC-E506"><td><a class="ref" href="#AGSC-E506"><code>AGSC-E506</code></a></td><td>adoption defaulted or normalized a value (warning)</td><td><a class="ref" href="/specs/02-item/#AGSC-02-90">AGSC-02-90</a></td></tr>
 <tr id="AGSC-E508"><td><a class="ref" href="#AGSC-E508"><code>AGSC-E508</code></a></td><td>Level-0 item inherited <code>prov</code> from <code>bundle.operator</code> (warning)</td><td><a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-02">AGSC-10-02</a></td></tr>
 <tr id="AGSC-E507"><td><a class="ref" href="#AGSC-E507"><code>AGSC-E507</code></a></td><td>adopted body reference no longer resolves after relocation (warning)</td><td><a class="ref" href="/specs/02-item/#AGSC-02-95">AGSC-02-95</a></td></tr>
+<tr id="AGSC-E509"><td><a class="ref" href="#AGSC-E509"><code>AGSC-E509</code></a></td><td>agent-lane Proposal outside the declared <code>types[]</code>/<code>tasks[]</code>, or from an undeclared or disabled agent (rc.4)</td><td><a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a></td></tr>
+<tr id="AGSC-E510"><td><a class="ref" href="#AGSC-E510"><code>AGSC-E510</code></a></td><td>model call skipped: a monthly budget reached — the lane's <code>budget_usd_month</code> or the node's <code>budget.usd_month</code> (warning, rc.4)</td><td><a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a>, <a class="ref" href="/specs/01-bundle/#AGSC-01-38">AGSC-01-38</a></td></tr>
+<tr id="AGSC-E511"><td><a class="ref" href="#AGSC-E511"><code>AGSC-E511</code></a></td><td>agent-lane Proposal exceeds <code>max_new_items</code> (items created) or <code>max_claims</code> (tasks held in <code>TASK_STATE_WORKING</code>) (rc.4)</td><td><a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a>, <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-17">AGSC-10-17</a></td></tr>
 <tr id="AGSC-E601"><td><a class="ref" href="#AGSC-E601"><code>AGSC-E601</code></a></td><td>JSON artefact not JCS-canonical</td><td><a class="ref" href="/specs/04-canonicalization/#AGSC-04-06">AGSC-04-06</a></td></tr>
 <tr id="AGSC-E602"><td><a class="ref" href="#AGSC-E602"><code>AGSC-E602</code></a></td><td>build not byte-reproducible</td><td><a class="ref" href="/specs/04-canonicalization/#AGSC-04-02">AGSC-04-02</a></td></tr>
 <tr id="AGSC-E603"><td><a class="ref" href="#AGSC-E603"><code>AGSC-E603</code></a></td><td><code>SOURCE_DATE_EPOCH</code> malformed (exit 2)</td><td><a class="ref" href="/specs/04-canonicalization/#AGSC-04-09">AGSC-04-09</a></td></tr>
@@ -201,6 +204,7 @@
 <tr id="AGSC-E209"><td><a class="ref" href="#AGSC-E209"><code>AGSC-E209</code></a></td><td>boundary or discovery configuration invalid (<code>federation{}</code>, <code>chunks{}</code>, <code>contribute[]</code>, <code>visibility</code>, <code>related[]</code> out of range or malformed)</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-01">AGSC-11-01</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-14">AGSC-11-14</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-35">AGSC-06-35</a></td></tr>
 <tr id="AGSC-E210"><td><a class="ref" href="#AGSC-E210"><code>AGSC-E210</code></a></td><td>declared surface not implemented, or emitted bytes disagree with its declaration</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-16">AGSC-11-16</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-19">AGSC-11-19</a></td></tr>
 <tr id="AGSC-E211"><td><a class="ref" href="#AGSC-E211"><code>AGSC-E211</code></a></td><td>emitted surface without a declaration (warning)</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-19">AGSC-11-19</a></td></tr>
+<tr id="AGSC-E212"><td><a class="ref" href="#AGSC-E212"><code>AGSC-E212</code></a></td><td>the enabled agents' <code>budget_usd_month</code> sum exceeds <code>budget.usd_month</code> (rc.4)</td><td><a class="ref" href="/specs/01-bundle/#AGSC-01-36">AGSC-01-36</a></td></tr>
 <tr id="AGSC-E311"><td><a class="ref" href="#AGSC-E311"><code>AGSC-E311</code></a></td><td>Link key value is an absolute URL (a Link MUST NOT cross Bundles)</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-12">AGSC-11-12</a></td></tr>
 <tr id="AGSC-E312"><td><a class="ref" href="#AGSC-E312"><code>AGSC-E312</code></a></td><td>cross-node reference not normalisable to an IRI (omitted from the graph)</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-12">AGSC-11-12</a></td></tr>
 <tr id="AGSC-E411"><td><a class="ref" href="#AGSC-E411"><code>AGSC-E411</code></a></td><td>Link target is a retired item (warning)</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-22">AGSC-11-22</a></td></tr>

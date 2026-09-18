@@ -14,7 +14,7 @@ No mode adds a file type or a key. Each is a way of reading the same files, and 
 
 {{diagram:mode-0-autowiki}}
 
-**Optional: let a model drive it.** Since the rc.4 draft a node may declare an **agent lane**: a model-driven or programmatic agent with a name, a model, a monthly budget, the tasks it may perform (create, edit, update, review, summarize, translate, refresh, plan, claim, work) and the item types it may touch (AGSC-01-36). Each lane creates at most `max_new_items` items per proposal (default twenty) and, on a LiveBoard, holds at most `max_claims` tasks at once (default one); the whole node also carries one cap on model spend of every kind, ten dollars a month unless changed, and the enabled agents' budgets may not add up to more (AGSC-01-38). It runs as the refresh verb or as a client of the tool server, reads the published surfaces, and can only ever open proposals, each carrying its provenance and an episode with its cost (AGSC-08-28); `refresh --agent <name> --dry-run` shows the proposal it would open without opening it. With `publish: auto` on its channel the wiki becomes **self-driving**: pages are created, edited, reviewed and updated by the model alone, under the standing ratification the owner configured once, the lints at error severity, the budget, and the rule that procedures, gates and configuration always stay with a person (AGSC-08-29). Non-determinism is confined to what is proposed; the build stays deterministic and model-free (AGSC-08-30). The lane is off by default.
+**Optional: let a model drive it.** A node may declare an **agent lane**: a model-driven or programmatic agent with a name, a model, a monthly budget, the tasks it may perform (create, edit, update, review, summarize, translate, refresh, plan, claim, work) and the item types it may touch (AGSC-01-36). Each lane creates at most `max_new_items` items per proposal (default twenty) and, on a LiveBoard, holds at most `max_claims` tasks at once (default one); the whole node also carries one cap on model spend of every kind, ten dollars a month unless changed, and the enabled agents' budgets may not add up to more (AGSC-01-38). It runs as the refresh verb or as a client of the tool server, reads the published surfaces, and can only ever open proposals, each carrying its provenance and an episode with its cost (AGSC-08-28); `refresh --agent <name> --dry-run` shows the proposal it would open without opening it. With `publish: auto` on its channel the wiki becomes **self-driving**: pages are created, edited, reviewed and updated by the model alone, under the standing ratification the owner configured once, the lints at error severity, the budget, and the rule that procedures, gates and configuration always stay with a person (AGSC-08-29). Non-determinism is confined to what is proposed; the build stays deterministic and model-free (AGSC-08-30). The lane is off by default.
 
 {{diagram:agent-lane}}
 
@@ -66,7 +66,7 @@ Requirements: PRD-036 to PRD-038. Rules: [AGSC-07](/specs/07-composition/).
 
 {{diagram:mode-5-liveboard}}
 
-Requirements: PRD-063, PRD-064 (rc.4 draft). Rules: [AGSC-08 §8.6](/specs/08-governance/) and [AGSC-10 §10.6](/specs/10-implementation-profiles/) once rc.4 is published; until then the identifiers above are marked as drafted.
+Requirements: PRD-063, PRD-064. Rules: [AGSC-08 §8.6](/specs/08-governance/) and [AGSC-10 §10.6](/specs/10-implementation-profiles/).
 
 ## What every mode shares
 
