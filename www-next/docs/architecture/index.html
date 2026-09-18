@@ -80,6 +80,9 @@
 <tr><td>C9</td><td>No network, wall clock or file system in the pure core; network only in <code>refresh</code> and <code>mcp</code></td><td>Ports, enforced by tests</td></tr>
 <tr><td>C10</td><td>Determinism: canonical JSON, sorted keys, LF, NFC, UTC seconds, <code>SOURCE_DATE_EPOCH</code></td><td><code>verify</code> is a double build with a byte comparison, and it blocks merges</td></tr>
 </tbody></table></div>
+<blockquote>
+<p><strong>Amendment 2026-09-18 (D94, ADR-019).</strong> The &quot;zero runtime dependencies&quot; constraint (C1, ADR-002) is superseded. The reference engine uses actively maintained, permissively licensed libraries at exact pinned versions for the standard formats and protocols it reads and writes, with a committed lockfile, <code>npm ci</code> installs and an <code>npm audit</code> gate; only what the specification pins byte-for-byte and no library produces is written by hand. The specification itself never required zero dependencies; a port from the vectors alone (<a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a>) and every determinism rule are unchanged.</p>
+</blockquote>
 <h2 id="4-context">4. Context</h2>
 <figure class="diagram">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" role="img" aria-label="System context (C4 level 1): people, agents and implementers on the left use the engine and the static site (highlighted) inside the system boundary; GitHub, Cloudflare Pages, w3id.org and the npm registry on the right host, publish and resolve it" font-family="system-ui, sans-serif" font-size="14">
