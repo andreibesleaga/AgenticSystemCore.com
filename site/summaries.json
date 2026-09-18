@@ -19,7 +19,7 @@
   "/specs/07-composition/": "How a selection of items becomes a verdict and a Harness: the five steps in their fixed order, the seven Harness files, skill packs, ports and saved architectures.",
   "/specs/08-governance/": "Who made what and who approved it: provenance, sign-off trailers, gates, the four agent-safety lints, the optional agent lane and the ledger derived from git history.",
   "/specs/09-conformance/": "How a claim is made and checked: classes and Levels, the vector format, the command-line contract, the error-code registry and the independent validators.",
-  "/specs/10-implementation-profiles/": "The four Levels of conformance, how an existing wiki or CMS becomes a node, how two nodes check each other, project mode with tasks and boards, and the LiveBoard.",
+  "/specs/10-implementation-profiles/": "The four Levels of conformance, how an existing wiki or CMS becomes a node, how two nodes check each other, project mode with tasks and boards, and the live board.",
   "/specs/11-boundary/": "Where a node meets the outside: cross-origin access, the nine parts of federation, the plugin contract for every agent surface, visibility, retirement and tombstones.",
   "/specs/agentic-knowledge/": "The profile of the discovery document: how a client finds it, what it looks like, the relations and attributes it may carry, and how it relates to other work."
 }

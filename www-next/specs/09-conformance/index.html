@@ -43,8 +43,8 @@
 <p><strong>Classes and claims.</strong> Reader, writer, full engine; a claim names the class, the version and the vectors passed.</p>
 <p><strong>Vectors.</strong> One JSON file per test case under <code>tests/vectors/&lt;area&gt;/</code>, with an input, an expected result and the rule it proves. Twenty-five areas exist; a required vector that is skipped counts as a failure. Withdrawn vectors are kept for history and never run.</p>
 <p><strong>The CLI.</strong> Sixteen verbs, a JSON envelope on every result, exit codes with fixed meaning, no stray output on the tool channel. The local tool server exposes exactly seven tools.</p>
-<p><strong>Error codes.</strong> <code>AGSC-E&lt;nnn&gt;</code> in blocks by area (0xx bundle, 1xx config, 2xx frontmatter and boundary configuration, 3xx links, 4xx lint, 5xx adoption, 6xx canonicalization, 7xx graph, 8xx composition, 9xx safety and federation), registered once each; every code used has a registry row that names the rule that raises it.</p>
-<p><strong>Validators.</strong> A reference distribution ships standalone validators for the spec text, schemas, ontology, vectors, discovery file, features and diagrams, so that an independent party can check every normative artefact.</p>
+<p><strong>Error codes.</strong> <code>AGSC-E&lt;nnn&gt;</code> in blocks by area (0xx CLI, 1xx parse, 2xx schema and boundary configuration, 3xx links, 4xx lint, 5xx provenance and adoption, 6xx canonicalization and determinism, 7xx ledger, 8xx composition, 9xx I/O and federation), registered once each; every code used has a registry row that names the rule that raises it.</p>
+<p><strong>Validators.</strong> A reference distribution ships standalone validators for the spec text, schemas, ontology, vectors, discovery file, features and diagrams, plus two generators — nine command contracts in all (<a class="ref" href="#AGSC-09-90">AGSC-09-90</a>) — so that an independent party can check every normative artefact.</p>
 <p class="id">This box explains; the rules below decide. New to the notation? See <a href="/docs/reading-the-specification/">how to read the specification</a>.</p>
 </aside>
 <figure class="diagram">

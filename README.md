@@ -31,3 +31,12 @@ The gate additionally checks: a summary on every page, a name and a caption on e
 ## Output directory until launch (added 2026-09-17, session 25)
 
 `build.out` in `agsc.config.json` is **`www-next`**: the generated site is committed there and Cloudflare Pages keeps serving the minimal `www/` that is live today, so the repository can be pushed at any time without publishing. At launch (runbook §1a) set `build.out` to `"www"`, rebuild, run the gate, commit and push. `scripts/check.js` and `scripts/a11y.js` read the directory from the configuration.
+
+## Licences (added 2026-09-18)
+
+This repository carries both licence files at its root, copied from the engine repository so that the terms are readable where the content lives:
+
+- `LICENSE` — Apache-2.0, for the generator (`scripts/`) and everything else in this repository that is software.
+- `LICENSE-CONTENT` — the AgenticSystemCore Content Use Terms 1.0 (`LicenseRef-AgenticSystemCore-Content-Use-1.0`), for the published prose: the item bodies and descriptions in `content/` and `site/`, and the pages, text files and exports that carry that prose. The schemas, the ontology, the identifiers and the discovery document stay CC0-1.0, as the file says.
+
+Every generated page and both `llms` files already embed the Content Use Terms and link `/legal/`; these two files say the same thing at the root of the repository.
