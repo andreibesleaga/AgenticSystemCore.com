@@ -82,6 +82,7 @@
 </tbody></table></div>
 <blockquote>
 <p><strong>Amendment 2026-09-18 (D94, ADR-019).</strong> The &quot;zero runtime dependencies&quot; constraint (C1, ADR-002) is superseded. The reference engine uses actively maintained, permissively licensed libraries at exact pinned versions for the standard formats and protocols it reads and writes, with a committed lockfile, <code>npm ci</code> installs and an <code>npm audit</code> gate; only what the specification pins byte-for-byte and no library produces is written by hand. The specification itself never required zero dependencies; a port from the vectors alone (<a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a>) and every determinism rule are unchanged.</p>
+<p><strong>Amendment 2026-09-18 (D97).</strong> The reference engine is CommonJS and its floor is Node 22.12; the browser bundle stays ESM. The module system is a property of this one implementation, not of the specification — a conforming engine may be written in any language and any module system, and is judged only by the conformance vectors.</p>
 </blockquote>
 <h2 id="4-context">4. Context</h2>
 <figure class="diagram">
@@ -220,7 +221,7 @@
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
 <thead><tr><th scope="col">Container</th><th scope="col">What it is</th></tr></thead>
 <tbody>
-<tr><td><code>agsc</code> CLI</td><td>Node, ESM, a small set of pinned and audited libraries (D94); sixteen verbs, exit codes 0, 1 and 2, <code>--json</code> everywhere; five context directories under <code>src/</code> plus ports and Node adapters</td></tr>
+<tr><td><code>agsc</code> CLI</td><td>Node ≥ 22.12, CommonJS, a small set of pinned and audited libraries (D94, D97); sixteen verbs, exit codes 0, 1 and 2, <code>--json</code> everywhere; five context directories under <code>src/</code> plus ports and Node adapters</td></tr>
 <tr><td><code>agsc mcp</code></td><td>A local stdio JSON-RPC server exposing seven tools: search, read, links, compose, propose, ask, remember</td></tr>
 <tr><td>Browser bundle</td><td><code>www/js/agsc-core.js</code>: the same composition modules with no Node imports, plus the WebMCP page tools</td></tr>
 <tr><td>GitHub Actions</td><td><code>ci.yml</code>, <code>release.yml</code>, <code>refresh.yml</code>: the only backend</td></tr>
@@ -438,7 +439,7 @@
     implementer = person &quot;Standards / port implementer&quot; &quot;P10, P11, S13&quot;
 
     asc = softwareSystem &quot;AgenticSystemCore&quot; &quot;Compiles a Markdown Bundle into a wiki, an RDF graph, agent memory, skills and Harnesses&quot; {
-      cli = container &quot;agsc CLI&quot; &quot;Node &gt;=22.14, ESM, pinned audited dependencies&quot; &quot;Node.js&quot; {
+      cli = container &quot;agsc CLI&quot; &quot;Node &gt;=22.12, CommonJS, pinned audited dependencies&quot; &quot;Node.js&quot; {
         knowledge = component &quot;Knowledge&quot; &quot;parse, validate, link, ontology, graph&quot; &quot;src/knowledge/&quot;
         governance = component &quot;Provenance &amp; Governance&quot; &quot;prov, Gates, Proposals, lints, ledger&quot; &quot;src/governance/&quot;
         composition = component &quot;Composition&quot; &quot;closure algebra + Harness emitters&quot; &quot;src/composition/&quot;
