@@ -11,7 +11,7 @@ This page restates the frozen architecture document of the project (its S02 arte
 | # | Quality goal | Meaning here | Requirements |
 |---|---|---|---|
 | Q1 | Correctness and determinism | Byte-identical rebuilds on every operating system; every requirement has a test; the ledger re-verifies offline | NFR-03, NFR-04, NFR-05 |
-| Q2 | Simplicity | Zero dependencies, one configuration file, at most three commands per feature, delete before adding | NFR-01, NFR-06 |
+| Q2 | Simplicity | Few, pinned, audited dependencies (C1 as amended below); one configuration file, at most three commands per feature, delete before adding | NFR-01, NFR-06 |
 | Q3 | Agent safety | Published content is structurally data, never instruction; no agency is granted to text | NFR-07 |
 | Q4 | Portability | Files and ontologies are the plane; any language reimplements from the specification and the vectors; offline on three operating systems | NFR-02, NFR-08, NFR-13 |
 | Q5 | Cost near zero | No servers, no model on any gating lane, at most 10 dollars a month, visible on the NOW page | NFR-06, NFR-09, NFR-11 |
@@ -40,7 +40,7 @@ Two floors are never traded: the licence stack (NFR-10) and the clean-room rule 
 
 | # | Constraint | Consequence |
 |---|---|---|
-| C1 | Zero runtime dependencies: Node built-ins only, Node 22.14 or later | Every parser and writer is hand-written |
+| C1 | Zero runtime dependencies: Node built-ins only, Node 22.14 or later *(superseded — see the amendment below)* | Every parser and writer is hand-written |
 | C2 | The deployed system is static files plus CI: no servers, databases or queues | CI is the only backend; every write path ends in a pull request |
 | C3 | Cloudflare Pages, deployed from `www/` | The output directory is `www/`; `_headers` and `_redirects` are generated |
 | C4 | Content negotiation for `/ns/` through the w3id `.htaccess`, with no project-owned server code | Negotiation is a configuration file in a foreign repository |
@@ -84,7 +84,7 @@ The context map: Knowledge feeds Distribution as a conformist supplier (Distribu
 
 | Container | What it is |
 |---|---|
-| `agsc` CLI | Node, ESM, zero runtime dependencies; sixteen verbs, exit codes 0, 1 and 2, `--json` everywhere; five context directories under `src/` plus ports and Node adapters |
+| `agsc` CLI | Node, ESM, a small set of pinned and audited libraries (D94); sixteen verbs, exit codes 0, 1 and 2, `--json` everywhere; five context directories under `src/` plus ports and Node adapters |
 | `agsc mcp` | A local stdio JSON-RPC server exposing seven tools: search, read, links, compose, propose, ask, remember |
 | Browser bundle | `www/js/agsc-core.js`: the same composition modules with no Node imports, plus the WebMCP page tools |
 | GitHub Actions | `ci.yml`, `release.yml`, `refresh.yml`: the only backend |
@@ -150,7 +150,7 @@ Every action is pinned by commit hash; `pull_request_target` is never used; ther
 | ADR | Decision |
 |---|---|
 | 001 | Agent safety by structural defence, not by a classifier and not by sandboxing: trust-marked results, fenced prose, deterministic lints, identifier-only tools, inert skills, human merge; with the honest limit that hashes prove tampering, not safety |
-| 002 | Zero runtime dependencies, forever: Node built-ins only; a trivially auditable supply chain and portability to other runtimes |
+| 002 | Zero runtime dependencies, forever: Node built-ins only; a trivially auditable supply chain and portability to other runtimes — superseded 2026-09-18 by ADR-019 (D94) |
 | 003 | Static only: Cloudflare Pages from `www/`, no servers, databases, queues or Workers; CI is the only backend |
 | 004 | One vocabulary, fourteen links: six item types with a `kind` qualifier on Concept, nine core keys with composition meaning and five Mode-2 keys for navigation |
 | 005 | Namespace content negotiation through the w3id `.htaccess`: zero project-owned server code and permanent addresses independent of the domain |
@@ -170,7 +170,7 @@ Every action is pinned by commit hash; `pull_request_target` is never used; ther
 
 | Requirement | Proved by |
 |---|---|
-| NFR-01 zero dependencies | The production dependency list is empty, and an audit runs |
+| NFR-01 pinned, audited dependencies | The production dependency list is pinned to exact versions with a committed lockfile, `npm ci` installs and an `npm audit` gate |
 | NFR-02 language-independent plane | The vectors lane with no engine-private state, the correspondence-rule script and the independent validators |
 | NFR-03 coverage at least 99 percent | The coverage lane and a golden-thread check from every requirement to a test |
 | NFR-04 byte-identical builds | The determinism lane: double build and hash comparison, blocking merges, on three operating systems at tags |
@@ -194,7 +194,7 @@ Every action is pinned by commit hash; `pull_request_target` is never used; ther
 | Schedule pressure on the launch scope | Pre-agreed ordered trims; sample first, then batch |
 | Latency of the w3id pull request | The namespace is fixed in the ontology; launch does not depend on it |
 | False positives of the injection scan deterring contributors | A severity split, a labelled override, configuration-owned word lists |
-| Zero-dependency parsers and the classic parser attacks | Index-based state machines, null-prototype objects, identifier-only paths, a 1 MiB cap, a seeded fuzz lane; archives refused entirely |
+| Parsers and the classic parser attacks | Index-based state machines, null-prototype objects, identifier-only paths, a 1 MiB cap, a seeded fuzz lane; archives refused entirely |
 | Drift between modules, specification sections and vectors | The correspondence rules are machine-checked in CI |
 
 ## 13. Threat model
@@ -229,7 +229,7 @@ workspace "AgenticSystemCore" "Distributed Ontological Agentic Memory engine —
     implementer = person "Standards / port implementer" "P10, P11, S13"
 
     asc = softwareSystem "AgenticSystemCore" "Compiles a Markdown Bundle into a wiki, an RDF graph, agent memory, skills and Harnesses" {
-      cli = container "agsc CLI" "Node >=22.14, ESM, zero runtime dependencies" "Node.js" {
+      cli = container "agsc CLI" "Node >=22.14, ESM, pinned audited dependencies" "Node.js" {
         knowledge = component "Knowledge" "parse, validate, link, ontology, graph" "src/knowledge/"
         governance = component "Provenance & Governance" "prov, Gates, Proposals, lints, ledger" "src/governance/"
         composition = component "Composition" "closure algebra + Harness emitters" "src/composition/"

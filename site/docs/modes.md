@@ -66,7 +66,7 @@ Requirements: PRD-036 to PRD-038. Rules: [AGSC-07](/specs/07-composition/).
 
 {{diagram:mode-5-liveboard}}
 
-Requirements: PRD-063, PRD-064. Rules: [AGSC-08 §8.6](/specs/08-governance/) and [AGSC-10 §10.6](/specs/10-implementation-profiles/).
+Requirements: PRD-063, PRD-064. Rules: [AGSC-08 §8.6](/specs/08-governance/#section-8-6) and [AGSC-10 §10.6](/specs/10-implementation-profiles/#section-10-6).
 
 ## What every mode shares
 

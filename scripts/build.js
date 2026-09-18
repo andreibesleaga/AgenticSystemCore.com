@@ -727,7 +727,7 @@ const MODE_CARDS = [
   ['Live specifications', 'A project\'s decisions, specs, tasks and gates as one governed memory.', '/docs/modes/#mode-2-live-specifications-and-the-memory-of-a-software-project'],
   ['Evolving skills', 'Procedures become skill packs; improved skills come back as Procedures.', '/docs/modes/#mode-3-the-evolving-skills-library'],
   ['Runnable knowledge', 'Select Concepts, get a Harness of seven files a runtime can execute.', '/docs/modes/#mode-4-runnable-knowledge'],
-  ['Self-driving live board', 'Agents and people pull, claim and finish a project\'s tasks on one shared board until it is done.', '/docs/modes/#mode-5-the-liveboard-self-driving-product-and-project-management'],
+  ['The LiveBoard', 'Agents and people pull, claim and finish a project\'s tasks on one shared board until it is done.', '/docs/modes/#mode-5-the-liveboard-self-driving-product-and-project-management'],
 ];
 addPage('/', {
   title: config.site.title, summary: summaryOf('/'), description: index.fm.description, section: null,

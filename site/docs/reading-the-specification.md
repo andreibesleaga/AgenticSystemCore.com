@@ -35,11 +35,11 @@ When a next release candidate is being drafted in the engine repository, its ide
 
 ## Retired rules
 
-A rule marked *(retired at rc.3 …)* was found to say nothing that another rule did not already say, and was merged into that rule. Its identifier is kept and never reused, so that older citations still resolve, and the note says where its content now lives. Retired rules impose nothing.
+A rule marked *(retired at rc.3 or rc.4 …)* was found to say nothing that another rule did not already say, and was merged into that rule. Its identifier is kept and never reused, so that older citations still resolve, and the note says where its content now lives. Retired rules impose nothing.
 
 ## Amendments
 
-A rule marked *(added at rc.3 …)* or *(amended at rc.3 …)* changed at the third release candidate, and the note names the decision behind it. Released sections are immutable: a change ships as a new version (AGSC-00-16).
+A rule marked *(added at rc.3 …)*, *(amended at rc.3 …)*, *(added at rc.4 …)* or *(amended at rc.4 …)* changed at the third or the fourth release candidate, and the note names the decision behind it. Released sections are immutable: a change ships as a new version (AGSC-00-16).
 
 ## Error codes
 
