@@ -1,0 +1,19 @@
+canvas 520 300
+label "Mode 5, the LiveBoard: people, local agents and remote agents pull work from the shared Bundle (highlighted: decisions, specs, tasks on boards, gates, skills, lessons) through its published surfaces and write to it only as proposals; the fast lane of agent lanes and automatic merges never reaches the slow lane of gates, reviews and decisions, where a person decides"
+caption "The highlighted Bundle is the shared pull board itself; every participant reads it and proposes to it, and the dashed border is the line the fast lane can never cross."
+box bb 176 24 170 122 "the Bundle as LiveBoard|decisions · specs · tasks|boards · gates · skills|lessons · episodes" acc
+box people 16 40 120 44 "people"
+box local 16 100 120 44 "local agents"
+box remote 16 160 120 44 "remote agents"
+arrow people bb
+arrow local bb
+arrow remote bb
+box fast 380 24 124 70 "fast lane|agent lanes, auto|merges, refresh"
+box boards 380 110 124 44 "boards: claimed_by,|done"
+arrow bb fast
+arrow fast boards
+region slow 176 176 328 96 "slow lane — a person decides"
+box gates 190 196 140 60 "gates · reviews|decisions · releases"
+box config 348 196 140 60 "procedures · gates|configuration"
+arrow bb gates dashed
+note "the fast lane runs until the board is done; the slow lane is unreachable from it"

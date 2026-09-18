@@ -89,7 +89,7 @@
 <li>It follows <code>&lt;link rel=&quot;describedby&quot; href=&quot;/.well-known/knowledge-linkset&quot; type=&quot;application/linkset+json&quot;&gt;</code> in the head of a page (<a class="ref" href="/specs/06-surfaces/#AGSC-06-25">AGSC-06-25</a>).</li>
 <li>It follows the equivalent <code>Link</code> response header on <code>/</code> (<a class="ref" href="/specs/11-boundary/#AGSC-11-05">AGSC-11-05</a>).</li>
 </ul>
-<p><code>describedby</code> is a registered relation (RFC 6892). The media type and the profile say what kind of description the target is, so no new relation name is needed.</p>
+<p><code>describedby</code> is a registered relation (registered by the W3C POWDER Recommendation; RFC 6892 registers its inverse, <code>describes</code>). The media type and the profile say what kind of description the target is, so no new relation name is needed.</p>
 <h2 id="media-type-and-profile">Media type and profile</h2>
 <p>The document is served as <code>application/linkset+json</code> with the parameter <code>profile=&quot;https://w3id.org/agentic-system-core/profile/agentic-knowledge&quot;</code> (RFC 9264, section 5). Where a platform cannot carry a parameter, the node sends <code>Link: &lt;https://w3id.org/agentic-system-core/profile/agentic-knowledge&gt;; rel=&quot;profile&quot;</code> (RFC 6906) instead, and a reader accepts either (<a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-04">AGSC-11-04</a>).</p>
 <p>A client that ignores the profile still reads a valid link set: the profile adds target attributes and changes no semantics of the media type. No vendor media type, no new registry and no URI scheme is defined.</p>

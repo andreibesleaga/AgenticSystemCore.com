@@ -153,9 +153,9 @@ let REQ_IDS = new Set();    // PRD-nnn / NFR-nn ids that the requirements page d
 const RULES_WITHOUT_TRACE = []; // rules whose source carries no trailing trace bracket (reported at the end)
 // Rules and codes drafted for the next release candidate in the engine working tree: the guide may cite
 // them, rendered unlinked and marked, until the owner tags rc.4 and AGSC_SPEC_TAG moves (then empty this set).
-const PENDING_RULES = new Set(['AGSC-00-19', 'AGSC-01-36', 'AGSC-08-28', 'AGSC-08-29', 'AGSC-08-30', 'AGSC-10-16', 'AGSC-10-17', 'AGSC-10-18', 'AGSC-E509', 'AGSC-E510']);
+const PENDING_RULES = new Set(['AGSC-00-19', 'AGSC-00-20', 'AGSC-01-36', 'AGSC-01-37', 'AGSC-01-38', 'AGSC-08-28', 'AGSC-08-29', 'AGSC-08-30', 'AGSC-10-16', 'AGSC-10-17', 'AGSC-10-18', 'AGSC-E509', 'AGSC-E510', 'AGSC-E511', 'AGSC-E212']);
 const PENDING_VERSION = '1.0.0-rc.4';
-const PENDING_REQS = new Set(['PRD-063', 'PRD-064']);
+const PENDING_REQS = new Set(['PRD-063', 'PRD-064', 'PRD-065']);
 function idTarget(code, o) {
   if (!/^AGSC-(?:\d{2}-\d{2,3}[a-z]?|E\d{3})$/.test(code) || !RULE_INDEX.has(code)) return null;
   const page = RULE_INDEX.get(code);
@@ -726,7 +726,7 @@ const MODE_CARDS = [
   ['Live specifications', 'A project\'s decisions, specs, tasks and gates as one governed memory.', '/docs/modes/#mode-2-live-specifications-and-the-memory-of-a-software-project'],
   ['Evolving skills', 'Procedures become skill packs; improved skills come back as Procedures.', '/docs/modes/#mode-3-the-evolving-skills-library'],
   ['Runnable knowledge', 'Select Concepts, get a Harness of seven files a runtime can execute.', '/docs/modes/#mode-4-runnable-knowledge'],
-  ['The Blackboard', 'Agents and people plan, claim and finish a project\'s tasks on one shared board until it is done.', '/docs/modes/#mode-5-the-blackboard-self-driving-product-and-project-management'],
+  ['Self-driving live board', 'Agents and people pull, claim and finish a project\'s tasks on one shared board until it is done.', '/docs/modes/#mode-5-the-liveboard-self-driving-product-and-project-management'],
 ];
 addPage('/', {
   title: config.site.title, summary: summaryOf('/'), description: index.fm.description, section: null,
@@ -918,7 +918,7 @@ listPage('/clusters/', 'Clusters', 'The navigational groupings of this node.', c
 // the guide (site/docs/*.md, hand-authored, plus the tagged documents rendered through slots)
 const statusRows = [
   ['Specification <code>' + esc(SPEC_VERSION) + '</code>', 'Live', `Tagged on ${esc(SPEC_DATE)}; twelve sections at <a href="/specs/">/specs/</a>; the vocabulary and the vectors are frozen at the tag.`],
-  ['Specification <code>' + esc(PENDING_VERSION) + '</code>', 'In preparation', 'Drafted in the engine repository: the agent lane (spec/08 §8.6), Mode 5 the Blackboard (spec/10 §10.6), the <code>agents[]</code> configuration and three new vectors. The guide already describes both; their rule identifiers are shown marked until the release candidate is tagged and published here.'],
+  ['Specification <code>' + esc(PENDING_VERSION) + '</code>', 'In preparation', 'Drafted in the engine repository: the agent lane (spec/08 §8.6) with per-lane and node-wide monthly caps, the <code>.env</code> environment file, Mode 5 the LiveBoard (spec/10 §10.6), the <code>agents[]</code> and <code>budget</code> configuration, the declared scope by version (AGSC-00-20) and seven new vectors. The guide already describes them; their rule identifiers are shown marked until the release candidate is tagged and published here.'],
   ['This site as a Level-0 node', 'Live', `Items, <a href="/graph.jsonld"><code>graph.jsonld</code></a>, <a href="/llms.txt"><code>llms.txt</code></a> and the <a href="${WELLKNOWN}">discovery document</a> in its Level-0 form, checked by the Level-0 vectors and the discovery validator before every publish.`],
   ['Ontology files', 'Live', `Turtle, JSON-LD context, RDF/XML and N-Triples at <a href="/ns/">/ns/</a>.`],
   ['Namespace through w3id.org', STATUS.w3id ? 'Live' : 'Not yet resolving', regText.w3id],
@@ -944,7 +944,7 @@ const registrationsTable = `<div class="table-wrap" tabindex="0" role="region" a
 <tr><th scope="row">Profile URI <code>${PROFILE}</code></th><td>IANA Profile URIs registry (RFC 7284)</td><td>First Come First Served</td><td>${regText.profile}</td></tr>
 <tr><th scope="row">Internet-Draft on the discovery layer</th><td>IETF Datatracker, Independent Submission Stream</td><td>Reviewed by the Independent Submissions Editor</td><td>${regText.draft}</td></tr>
 <tr><th scope="row">Namespace <code>agentic-system-core</code></th><td>w3id.org permanent identifiers</td><td>Pull request reviewed by the w3id maintainers</td><td>${regText.w3id}</td></tr>
-<tr><th scope="row">Discovery link relation</th><td>IANA Link Relations registry</td><td>None needed: the registered relation <code>describedby</code> (RFC 6892) is used with the media type (<a class="ref" href="/specs/06-surfaces/#AGSC-06-25">AGSC-06-25</a>)</td><td>No request</td></tr>
+<tr><th scope="row">Discovery link relation</th><td>IANA Link Relations registry</td><td>None needed: the registered relation <code>describedby</code> (registered by W3C POWDER; RFC 6892 registers its inverse <code>describes</code>) is used with the media type (<a class="ref" href="/specs/06-surfaces/#AGSC-06-25">AGSC-06-25</a>)</td><td>No request</td></tr>
 <tr><th scope="row">MCP extension identifier <code>com.agenticsystemcore/knowledge</code></th><td>MCP extensions mechanism (SEP-2133)</td><td>Reverse-domain identifier declared by the server; no registry entry (<a class="ref" href="/specs/11-boundary/#AGSC-11-18">AGSC-11-18</a>)</td><td>Declared in the specification</td></tr>
 </tbody></table></div>
 `;

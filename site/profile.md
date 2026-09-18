@@ -10,7 +10,7 @@ A client finds the document in one of three ways:
 - It follows `<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">` in the head of a page (AGSC-06-25).
 - It follows the equivalent `Link` response header on `/` (AGSC-11-05).
 
-`describedby` is a registered relation (RFC 6892). The media type and the profile say what kind of description the target is, so no new relation name is needed.
+`describedby` is a registered relation (registered by the W3C POWDER Recommendation; RFC 6892 registers its inverse, `describes`). The media type and the profile say what kind of description the target is, so no new relation name is needed.
 
 ## Media type and profile
 

@@ -19,7 +19,7 @@ The specification is written for implementers and is exact by design. This guide
 | Page | What it answers |
 |---|---|
 | [Introduction](/docs/introduction/) | What is this, what is new about it, who is it for |
-| [The six modes](/docs/modes/) | Auto-wiki with an optional agent lane, distributed agentic memory, live specifications, evolving skills, runnable knowledge, the Blackboard |
+| [The six modes](/docs/modes/) | Auto-wiki with an optional agent lane, distributed agentic memory, live specifications, evolving skills, runnable knowledge, a self-driving live board |
 | [How it works](/docs/how-it-works/) | The build, the proposal lifecycle, discovery, import and export, determinism, safety |
 | [Data model](/docs/data-model/) | The six item types, the fourteen links, clusters, sources, provenance |
 | [Architecture](/docs/architecture/) | arc42 and C4 views, bounded contexts, ports, deployment, decisions, threat model |
