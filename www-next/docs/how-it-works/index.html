@@ -130,6 +130,43 @@
 </figure>
 <h2 id="the-agent-lane-when-a-model-drives">The agent lane, when a model drives</h2>
 <p>A node may declare agents (<a class="ref" href="/specs/01-bundle/#AGSC-01-36">AGSC-01-36</a>): each with a model, a budget, the tasks it may perform and the item types it may touch. Every value that is a secret or host-specific — a key, an agent's switch or budget — can be set in a <code>.env</code> file in the Bundle root that is never committed (<a class="ref" href="/specs/01-bundle/#AGSC-01-37">AGSC-01-37</a>). The node has one cap on model spend of every kind, ten dollars a month unless changed, and the enabled agents' budgets may not add up to more (<a class="ref" href="/specs/01-bundle/#AGSC-01-38">AGSC-01-38</a>); each lane creates at most <code>max_new_items</code> items per proposal and holds at most <code>max_claims</code> tasks at once (<a class="ref" href="/specs/09-conformance/#AGSC-E511">AGSC-E511</a>). An agent lane runs as the refresh verb or as a client of the tool server, reads the published surfaces, and opens proposals that carry its provenance and an episode with its cost; it can never write to the branch, never touch a procedure, a gate or the configuration, and stops for the month at its budget (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a>). <code>refresh --agent &lt;name&gt; --dry-run</code> shows the proposal it would open without opening it. With an automatic channel it makes the node self-driving under the standing ratification and every guard of the automatic lane (<a class="ref" href="/specs/08-governance/#AGSC-08-29">AGSC-08-29</a>); the build stays deterministic and model-free (<a class="ref" href="/specs/08-governance/#AGSC-08-30">AGSC-08-30</a>).</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 280" role="img" aria-label="The agent lane: a declared agent with a model, tasks, types, a channel and a budget runs as refresh, reads the published surfaces, and opens a proposal (highlighted) that carries provenance and an episode with its cost; the proposal passes the lints and the auto-merge guards, or is rejected before any lint runs when it steps outside its declared types" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-agent-lane" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="30" width="150" height="80" rx="6"/>
+<rect x="206" y="30" width="120" height="80" rx="6"/>
+<rect x="366" y="30" width="138" height="80" rx="6" class="acc" stroke-width="2.2"/>
+<path d="M170.0 70.0 L202.0 70.0" marker-end="url(#ar-agent-lane)"/>
+<path d="M330.0 70.0 L362.0 70.0" marker-end="url(#ar-agent-lane)"/>
+<rect x="206" y="150" width="120" height="60" rx="6"/>
+<rect x="366" y="150" width="138" height="60" rx="6"/>
+<rect x="16" y="150" width="150" height="60" rx="6"/>
+<path d="M370.2 112.2 L315.4 147.8" marker-end="url(#ar-agent-lane)"/>
+<path d="M330.0 180.0 L362.0 180.0" marker-end="url(#ar-agent-lane)"/>
+<path d="M202.0 180.0 L170.0 180.0" marker-end="url(#ar-agent-lane)"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="91" y="58.0" font-size="12">agents[] entry</text>
+<text x="91" y="74.0" font-size="12">model · tasks · types</text>
+<text x="91" y="90.0" font-size="12">channel · budget</text>
+<text x="266" y="58.0" font-size="12">refresh --agent</text>
+<text x="266" y="74.0" font-size="12">reads surfaces,</text>
+<text x="266" y="90.0" font-size="12">calls the model</text>
+<text x="435" y="58.0" font-size="12">proposal</text>
+<text x="435" y="74.0" font-size="12">prov: ai-generated</text>
+<text x="435" y="90.0" font-size="12">+ episode with usage</text>
+<text x="266" y="176.0" font-size="12">declared types</text>
+<text x="266" y="192.0" font-size="12">and tasks? budget?</text>
+<text x="435" y="176.0" font-size="12">lints at error,</text>
+<text x="435" y="192.0" font-size="12">auto-merge guards</text>
+<text x="91" y="176.0" font-size="12">rejected: E509</text>
+<text x="91" y="192.0" font-size="12">skipped: E510</text>
+<text x="260" y="268" font-size="11">never a write — every output is a proposal; the build stays model-free</text>
+</g>
+</svg>
+<figcaption>The highlighted proposal is the only thing an agent lane can produce; a write to the branch is impossible by construction, and the budget stops the lane for the month.</figcaption>
+</figure>
 <h2 id="discovery">Discovery</h2>
 <p>Every page carries a <code>describedby</code> link to <code>/.well-known/knowledge-linkset</code>, and the root route sends the same link as a header (<a class="ref" href="/specs/06-surfaces/#AGSC-06-25">AGSC-06-25</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-05">AGSC-11-05</a>). That document is an RFC 9264 link set: one context anchored at the Bundle, whose relations point at the graph, llms.txt, the licence page, the documentation, the ontology and its JSON-LD context, the declared surfaces and the peers (<a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a> to <a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>). At Level 2 and above every artefact link carries a SHA-256 digest, so a reader can check that what it fetched is what was published (<a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>). The profile URI, resolved through w3id.org, leads to the <a href="/specs/agentic-knowledge/">profile page</a> that explains the document.</p>
 <figure class="diagram">
@@ -219,8 +256,76 @@
 <p>Two conforming tools on two machines produce identical machine artefacts (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-24">AGSC-04-24</a>). That is what makes a digest in the discovery document a real integrity check, lets two nodes compare notes, lets a reader rebuild a site from its source and verify that nothing changed, and lets any language reimplement the format from the specification and its vectors alone (<a class="ref" href="/docs/requirements/#PRD-055">PRD-055</a>). The rules that make it true are in <a href="/specs/04-canonicalization/">canonicalization</a>: canonical JSON, NFC before sorting, fixed sort orders, one instant format, SHA-256.</p>
 <h2 id="federation-without-servers">Federation without servers</h2>
 <p>Nodes never call nodes. A node declares its peers; an agent, a validator or a browser does the walking, and the walk is bounded: HTTPS only, every private, loopback, link-local and special-purpose address refused in both address families, redirects re-checked hop by hop, a hop limit of three, a fan-out cap and a request budget (<a class="ref" href="/specs/11-boundary/#AGSC-11-06">AGSC-11-06</a> to <a class="ref" href="/specs/11-boundary/#AGSC-11-10">AGSC-11-10</a>). Everything that comes from a peer is marked untrusted with its origin (<a class="ref" href="/specs/11-boundary/#AGSC-11-11">AGSC-11-11</a>). The mutual-conformance check accepts two local files, so it runs offline (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a>).</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" role="img" aria-label="Boundary: this node declares its surfaces (highlighted: llms-txt, chunks, mcp, webmcp, a2a-card, solid, responder), its visibility and its retirement; a browser reads it cross-origin, and an agent walks peer nodes over HTTPS with a hop limit; nodes never call nodes" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-spec-11-boundary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="160" y="20" width="200" height="260" rx="8" stroke-dasharray="6 4"/>
+<rect x="174" y="40" width="172" height="100" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="174" y="156" width="172" height="44" rx="6"/>
+<rect x="174" y="216" width="172" height="44" rx="6"/>
+<rect x="16" y="60" width="110" height="50" rx="6"/>
+<path d="M130.0 86.6 L170.0 87.6" marker-end="url(#ar-spec-11-boundary)"/>
+<rect x="394" y="60" width="110" height="50" rx="6"/>
+<rect x="394" y="160" width="110" height="50" rx="6"/>
+<path d="M449.0 156.0 L449.0 114.0" marker-end="url(#ar-spec-11-boundary)"/>
+<path d="M390.1 174.1 L363.9 169.2" marker-end="url(#ar-spec-11-boundary)"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="260" y="14" font-size="11">this node</text>
+<text x="260" y="70.0" font-size="12">declared surfaces:</text>
+<text x="260" y="86.0" font-size="12">llms-txt · chunks · mcp</text>
+<text x="260" y="102.0" font-size="12">webmcp · a2a-card · solid</text>
+<text x="260" y="118.0" font-size="12">responder</text>
+<text x="260" y="182.0" font-size="12">public or restricted</text>
+<text x="260" y="242.0" font-size="12">retire · tombstone</text>
+<text x="71" y="81.0" font-size="12">browser</text>
+<text x="71" y="97.0" font-size="12">(cross-origin)</text>
+<text x="449" y="89.0" font-size="12">peer node</text>
+<text x="449" y="181.0" font-size="12">agent walks</text>
+<text x="449" y="197.0" font-size="12">peers</text>
+<text x="447" y="126" font-size="10">HTTPS only, hop limit 3</text>
+<text x="260" y="288" font-size="11">static and client-side: nodes never call nodes</text>
+</g>
+</svg>
+<figcaption>The highlighted declaration is the plugin contract: declare, pin, inherit, prove. Everything that crosses the dashed border is static and client-side.</figcaption>
+</figure>
 <h2 id="safety">Safety</h2>
 <p>Content that agents consume is data, never instruction. Four lints run on every build: an injection scan over bodies, headers at any depth, attachment text and every exported prose surface; a secrets check; a personal-data check; and a clean-room check (<a class="ref" href="/specs/08-governance/#AGSC-08-13">AGSC-08-13</a> to <a class="ref" href="/specs/08-governance/#AGSC-08-17">AGSC-08-17</a>). Every text handed to a model is marked untrusted (<a class="ref" href="/specs/08-governance/#AGSC-08-18">AGSC-08-18</a>). Tools take identifiers, never paths, URLs or shell strings. Skill packs are inert. And the specification states its own limit: these lints prove neither safety nor the absence of novel injection; hashes and attestations prove only that an artefact is what was published (<a class="ref" href="/specs/08-governance/#AGSC-08-19">AGSC-08-19</a>).</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" role="img" aria-label="Governance: an item with a provenance record becomes a proposal (a pull request), gates run as CI checks with four lints and no model, a human reviews and merges (highlighted), and the merge becomes an entry of the ledger derived from git history" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-spec-08-governance" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="30" width="120" height="50" rx="6"/>
+<rect x="176" y="30" width="120" height="50" rx="6"/>
+<rect x="336" y="30" width="150" height="50" rx="6"/>
+<rect x="176" y="110" width="310" height="60" rx="6"/>
+<rect x="16" y="110" width="120" height="60" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="16" y="200" width="470" height="50" rx="6"/>
+<path d="M140.0 55.0 L172.0 55.0" marker-end="url(#ar-spec-08-governance)"/>
+<path d="M300.0 55.0 L332.0 55.0" marker-end="url(#ar-spec-08-governance)"/>
+<path d="M384.7 82.9 L362.0 107.1" marker-end="url(#ar-spec-08-governance)"/>
+<path d="M172.0 140.0 L140.0 140.0" marker-end="url(#ar-spec-08-governance)"/>
+<path d="M139.6 170.9 L195.9 198.3" marker-end="url(#ar-spec-08-governance)"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="76" y="51.0" font-size="12">item + prov</text>
+<text x="76" y="67.0" font-size="12">(who made it)</text>
+<text x="236" y="51.0" font-size="12">proposal</text>
+<text x="236" y="67.0" font-size="12">(pull request)</text>
+<text x="411" y="51.0" font-size="12">gates → CI checks</text>
+<text x="411" y="67.0" font-size="12">lint, no model</text>
+<text x="331" y="136.0" font-size="12">four lints on every build:</text>
+<text x="331" y="152.0" font-size="12">injection · secrets · PII · clean-room</text>
+<text x="76" y="136.0" font-size="12">human review</text>
+<text x="76" y="152.0" font-size="12">then merge</text>
+<text x="251" y="221.0" font-size="12">derived ledger: a hash chain over git history</text>
+<text x="251" y="237.0" font-size="12">its head is pinned in the discovery document</text>
+<text x="260" y="288" font-size="11">every change has an author, a reviewer and a place in the chain</text>
+</g>
+</svg>
+<figcaption>The highlighted human review is the only approval the format admits; the ledger below records every merge in a hash chain whose head the discovery document pins.</figcaption>
+</figure>
 </main>
 <footer class="site">
 <p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>

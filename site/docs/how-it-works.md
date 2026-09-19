@@ -20,6 +20,8 @@ Nobody writes to the published branch directly, agents included. A change starts
 
 A node may declare agents (AGSC-01-36): each with a model, a budget, the tasks it may perform and the item types it may touch. Every value that is a secret or host-specific — a key, an agent's switch or budget — can be set in a `.env` file in the Bundle root that is never committed (AGSC-01-37). The node has one cap on model spend of every kind, ten dollars a month unless changed, and the enabled agents' budgets may not add up to more (AGSC-01-38); each lane creates at most `max_new_items` items per proposal and holds at most `max_claims` tasks at once (AGSC-E511). An agent lane runs as the refresh verb or as a client of the tool server, reads the published surfaces, and opens proposals that carry its provenance and an episode with its cost; it can never write to the branch, never touch a procedure, a gate or the configuration, and stops for the month at its budget (AGSC-08-28). `refresh --agent <name> --dry-run` shows the proposal it would open without opening it. With an automatic channel it makes the node self-driving under the standing ratification and every guard of the automatic lane (AGSC-08-29); the build stays deterministic and model-free (AGSC-08-30).
 
+{{diagram:agent-lane}}
+
 ## Discovery
 
 Every page carries a `describedby` link to `/.well-known/knowledge-linkset`, and the root route sends the same link as a header (AGSC-06-25, AGSC-11-05). That document is an RFC 9264 link set: one context anchored at the Bundle, whose relations point at the graph, llms.txt, the licence page, the documentation, the ontology and its JSON-LD context, the declared surfaces and the peers (AGSC-06-08 to AGSC-06-10). At Level 2 and above every artefact link carries a SHA-256 digest, so a reader can check that what it fetched is what was published (AGSC-06-08). The profile URI, resolved through w3id.org, leads to the [profile page](/specs/agentic-knowledge/) that explains the document.
@@ -40,6 +42,10 @@ Two conforming tools on two machines produce identical machine artefacts (AGSC-0
 
 Nodes never call nodes. A node declares its peers; an agent, a validator or a browser does the walking, and the walk is bounded: HTTPS only, every private, loopback, link-local and special-purpose address refused in both address families, redirects re-checked hop by hop, a hop limit of three, a fan-out cap and a request budget (AGSC-11-06 to AGSC-11-10). Everything that comes from a peer is marked untrusted with its origin (AGSC-11-11). The mutual-conformance check accepts two local files, so it runs offline (AGSC-10-12).
 
+{{diagram:spec-11-boundary}}
+
 ## Safety
 
 Content that agents consume is data, never instruction. Four lints run on every build: an injection scan over bodies, headers at any depth, attachment text and every exported prose surface; a secrets check; a personal-data check; and a clean-room check (AGSC-08-13 to AGSC-08-17). Every text handed to a model is marked untrusted (AGSC-08-18). Tools take identifiers, never paths, URLs or shell strings. Skill packs are inert. And the specification states its own limit: these lints prove neither safety nor the absence of novel injection; hashes and attestations prove only that an artefact is what was published (AGSC-08-19).
+
+{{diagram:spec-08-governance}}

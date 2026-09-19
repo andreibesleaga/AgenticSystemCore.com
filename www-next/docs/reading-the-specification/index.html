@@ -65,6 +65,26 @@
 <p>A vector is one JSON file with an input and an expected result, proving one rule (<a class="ref" href="/specs/09-conformance/#AGSC-09-04">AGSC-09-04</a>). Vectors are grouped by area; a required vector that is skipped counts as a failure; a withdrawn vector is kept for history and never run. Vectors are what a conformance claim asserts.</p>
 <h2 id="levels">Levels</h2>
 <p>An implementation claims exactly one Level: 0 publisher, 1 reader, 2 writer, 3 full engine (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-01">AGSC-10-01</a>). Each Level names the areas of vectors it must pass (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-02">AGSC-10-02</a> to <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-05">AGSC-10-05</a>), and each contains the one below. This site claims Level 0.</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 260" role="img" aria-label="Conformance levels as nested boxes: Level 0 publisher (highlighted, static files only) sits inside Level 1 reader, inside Level 2 writer, inside Level 3 full engine" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-levels" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="20" width="428" height="210" rx="8" stroke-dasharray="6 4"/>
+<rect x="40" y="50" width="380" height="160" rx="8" stroke-dasharray="6 4"/>
+<rect x="64" y="80" width="332" height="110" rx="8" stroke-dasharray="6 4"/>
+<rect x="100" y="110" width="260" height="50" rx="6" class="acc" stroke-width="2.2"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="230" y="14" font-size="11">Level 3 — full engine: composition, governance, CLI</text>
+<text x="230" y="44" font-size="11">Level 2 — writer: all surfaces, exports, chunks, boundary</text>
+<text x="230" y="74" font-size="11">Level 1 — reader: parse, validate, links</text>
+<text x="230" y="131.0" font-size="12">Level 0 — publisher: static files only</text>
+<text x="230" y="147.0" font-size="12">items, graph.jsonld, llms.txt, discovery</text>
+<text x="230" y="248" font-size="11">each Level contains the one below; a claim names one Level and its vectors</text>
+</g>
+</svg>
+<figcaption>The highlighted Level 0 is what this site claims: static files, no engine; each outer Level adds obligations and vectors.</figcaption>
+</figure>
 <h2 id="the-plain-language-boxes">The plain-language boxes</h2>
 <p>Each section page opens with a summary and a box headed <em>In plain language</em>. Those explain; they never decide. Where a box and a rule disagree, the rule is right and the box is wrong. The diagrams are drawn from the rules and are informative in the same way.</p>
 <h2 id="finding-things">Finding things</h2>

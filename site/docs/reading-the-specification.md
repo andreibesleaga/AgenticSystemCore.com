@@ -53,6 +53,8 @@ A vector is one JSON file with an input and an expected result, proving one rule
 
 An implementation claims exactly one Level: 0 publisher, 1 reader, 2 writer, 3 full engine (AGSC-10-01). Each Level names the areas of vectors it must pass (AGSC-10-02 to AGSC-10-05), and each contains the one below. This site claims Level 0.
 
+{{diagram:levels}}
+
 ## The plain-language boxes
 
 Each section page opens with a summary and a box headed *In plain language*. Those explain; they never decide. Where a box and a rule disagree, the rule is right and the box is wrong. The diagrams are drawn from the rules and are informative in the same way.
