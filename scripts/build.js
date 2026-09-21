@@ -391,6 +391,8 @@ const SPEC_VERSION = config.spec_version;
 const TERMS_ID = 'LicenseRef-AgenticSystemCore-Content-Use-1.0';
 const LICENSE_PROSE = config.bundle.license_prose || TERMS_ID;
 const PROFILE = 'https://w3id.org/agentic-system-core/profile/agentic-knowledge';
+const MCP_EXTENSION = 'com.agenticsystemcore/knowledge'; // the MCP extension identifier (AGSC-11-18)
+const MCP_REVISION = '2026-07-28';                       // the MCP revision the node targets (AGSC-11-16)
 const REL = 'https://w3id.org/agentic-system-core/rel#';
 const NS = 'https://w3id.org/agentic-system-core/ns#';
 const WELLKNOWN = '/.well-known/knowledge-linkset';
@@ -761,6 +763,8 @@ ${specPages.map(p => `<li><a href="${p.url}">${esc(p.h1.replace(/^AGSC-\d{2} —
 </ol>
 <h2 id="profile">Discovery profile</h2>
 <p><a href="/specs/agentic-knowledge/">The knowledge link set profile</a> documents the discovery document that every node serves at <code>${WELLKNOWN}</code>.</p>
+<h2 id="mcp-extension">MCP extension</h2>
+<p><a href="/specs/mcp/">The MCP knowledge extension</a> is the reference text of <code>${esc(MCP_EXTENSION)}</code>, the identifier by which a Model Context Protocol server says that the knowledge it serves is also published as a Bundle.</p>
 <h2 id="conformance">Conformance</h2>
 <p>A claim names exactly one Level, the <code>spec_version</code> and the vector set it passed (<a class="ref" href="/specs/00-overview/#AGSC-00-12">AGSC-00-12</a>, <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-01">AGSC-10-01</a>). This site claims <strong>Level 0</strong> against <code>${esc(SPEC_VERSION)}</code>.</p>
 ${figure('levels')}<h2 id="licence">Licence</h2>
@@ -858,6 +862,32 @@ ${figure('agentic-knowledge')}`,
   });
 }
 
+// the MCP extension note (the documentation route a node declaring the `mcp` surface points at, AGSC-11-16)
+{
+  const R = r => `<a class="ref" href="/specs/${RULE_INDEX.get(r)}/#${r}">${r}</a>`;
+  const slots = {
+    status: `<section class="status" aria-labelledby="status-heading">
+<h2 id="status-heading">Status</h2>
+<dl class="meta">
+<dt>Extension identifier</dt><dd><code>${esc(MCP_EXTENSION)}</code></dd>
+<dt>Protocol revision</dt><dd>Model Context Protocol <code>${esc(MCP_REVISION)}</code></dd>
+<dt>Standing</dt><dd>An unofficial extension under MCP SEP-2133, which says that "Unofficial extensions are not recognized by MCP governance and may be introduced and governed by developers outside the MCP organization". It needs no permission and has no registry entry, and it has not been submitted as an MCP SEP.</dd>
+<dt>Specification</dt><dd><code>${esc(SPEC_VERSION)}</code>, a release candidate. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
+<dt>This node</dt><dd>Does not declare the <code>mcp</code> surface: no tool server is published yet (${R('AGSC-11-16')}).</dd>
+</dl>
+</section>
+`,
+  };
+  const used = new Set(['main', 'status-heading']);
+  const src = read('site/mcp-extension.md');
+  checkText('site/mcp-extension.md', src);
+  addPage('/specs/mcp/', {
+    title: 'MCP knowledge extension', summary: summaryOf('/specs/mcp/'), description: `The reference text of ${MCP_EXTENSION}, the unofficial Model Context Protocol extension by which a server says that the knowledge it serves is also published as a static Bundle.`, section: '/specs/', wide: true,
+    jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: 'MCP knowledge extension', url: `${BASE}specs/mcp/`, identifier: MCP_EXTENSION, version: SPEC_VERSION, license: 'https://www.apache.org/licenses/LICENSE-2.0', author: { '@type': 'Person', name: config.site.author }, isPartOf: `${BASE}specs/` },
+    body: md(src, { ruleLinks: true, page: 'mcp', slots, used }),
+  });
+}
+
 // ontology pages and files
 function nsPage(url, versioned) {
   const rows = kind => ascSubjects.filter(s => kindOf(s) === kind).map(s => {
@@ -945,7 +975,7 @@ const registrationsTable = `<div class="table-wrap" tabindex="0" role="region" a
 <tr><th scope="row">Internet-Draft on the discovery layer</th><td>IETF Datatracker, Independent Submission Stream</td><td>Reviewed by the Independent Submissions Editor</td><td>${regText.draft}</td></tr>
 <tr><th scope="row">Namespace <code>agentic-system-core</code></th><td>w3id.org permanent identifiers</td><td>Pull request reviewed by the w3id maintainers</td><td>${regText.w3id}</td></tr>
 <tr><th scope="row">Discovery link relation</th><td>IANA Link Relations registry</td><td>None needed: the registered relation <code>describedby</code> (registered by W3C POWDER; RFC 6892 registers its inverse <code>describes</code>) is used with the media type (<a class="ref" href="/specs/06-surfaces/#AGSC-06-25">AGSC-06-25</a>)</td><td>No request</td></tr>
-<tr><th scope="row">MCP extension identifier <code>com.agenticsystemcore/knowledge</code></th><td>MCP extensions mechanism (SEP-2133)</td><td>Reverse-domain identifier declared by the server; no registry entry (<a class="ref" href="/specs/11-boundary/#AGSC-11-18">AGSC-11-18</a>)</td><td>Declared in the specification</td></tr>
+<tr><th scope="row">MCP extension identifier <code>${esc(MCP_EXTENSION)}</code></th><td>MCP extensions mechanism (SEP-2133)</td><td>Reverse-domain identifier declared by the server; no registry entry (<a class="ref" href="/specs/11-boundary/#AGSC-11-18">AGSC-11-18</a>)</td><td>Declared in the specification; the reference text is at <a href="/specs/mcp/">/specs/mcp/</a></td></tr>
 </tbody></table></div>
 `;
 const publicationsHtml = `<ul>
