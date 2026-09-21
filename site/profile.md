@@ -39,7 +39,7 @@ A Level-0 publisher, such as a CMS or wiki export, publishes the same link set w
 
 ## Related-system links
 
-A node MAY link related discovery documents and systems, such as an llms.txt file, a VoID or DCAT description, an Agent2Agent Agent Card, an MCP server card, or an ontology or SPARQL endpoint. It uses IANA-registered relations only: `describedby`, `alternate`, `related`, `service-desc`, `service-doc`, `service-meta`, `collection` and `item`, and each link carries `type`. A reader ignores a related-system link it does not understand, and none affects conformance, a digest, the peer check or a walk (AGSC-06-35).
+A node MAY link related discovery documents and systems, such as an llms.txt file, a VoID or DCAT description, an Agent2Agent Agent Card, an MCP server card, or an ontology or SPARQL endpoint. It uses IANA-registered relations only: `describedby`, `alternate`, `related`, `service-desc`, `service-doc`, `service-meta`, `collection` and `item`, and each link carries `type`. Since `1.0.0-rc.5` the rule that fixes the relation names admits all eight, so a validator accepts every one of them (AGSC-06-10, AGSC-06-35). A reader ignores a related-system link it does not understand, and none affects conformance, a digest, the peer check or a walk.
 
 ## Examples
 

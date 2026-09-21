@@ -81,20 +81,20 @@
 <h2 id="one-file-shape">One file shape</h2>
 <p>An item is one Markdown file with a YAML header between <code>---</code> lines (<a class="ref" href="/specs/02-item/#AGSC-02-01">AGSC-02-01</a>). The YAML is a small, safe subset: no anchors, no aliases, no tags, no flow mappings (<a class="ref" href="/specs/02-item/#AGSC-02-02">AGSC-02-02</a>). The body is CommonMark; headings become anchors and, for the chunk export, cut points; fenced code stays code (<a class="ref" href="/specs/02-item/#AGSC-02-20">AGSC-02-20</a>). Lengths are counted in Unicode code points (<a class="ref" href="/specs/02-item/#AGSC-02-24">AGSC-02-24</a>). Unknown keys are kept and reported as warnings, never errors (<a class="ref" href="/specs/02-item/#AGSC-02-05">AGSC-02-05</a>).</p>
 <h2 id="the-six-types">The six types</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 27"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
 <thead><tr><th scope="col">Type</th><th scope="col">What it records</th><th scope="col">Notes</th></tr></thead>
 <tbody>
 <tr><td>Concept</td><td>A unit of knowledge</td><td>Qualified by <code>kind</code>: <code>pattern</code>, <code>taxonomy</code>, <code>explainer</code>, <code>principle</code>, <code>decision</code>, <code>spec</code>, <code>task</code>, <code>term</code> (<a class="ref" href="/specs/02-item/#AGSC-02-12">AGSC-02-12</a>) or, since rc.3, <code>architecture</code> (<a class="ref" href="/specs/02-item/#AGSC-02-97">AGSC-02-97</a>)</td></tr>
 <tr><td>Episode</td><td>Something that happened: a session, a run, an incident</td><td>Start, actor, outcome</td></tr>
 <tr><td>Procedure</td><td>Steps a reader can run</td><td>Exports one-to-one to a skill file</td></tr>
-<tr><td>Lesson</td><td>Knowledge distilled from one or more Episodes</td><td>Carries a severity; the set of Lessons is the error book</td></tr>
+<tr><td>Lesson</td><td>Knowledge distilled from one or more Episodes</td><td>Carries a severity; the set of Lessons is the node's error record</td></tr>
 <tr><td>Cluster</td><td>A navigational grouping</td><td>Membership is authored on the item; at most one parent, at most three levels (<a class="ref" href="/specs/03-links/#AGSC-03-08">AGSC-03-08</a>)</td></tr>
 <tr><td>Gate</td><td>Checks a change must pass</td><td>Compiles to CI status checks (<a class="ref" href="/specs/08-governance/#AGSC-08-09">AGSC-08-09</a>); its runs are Episodes</td></tr>
 </tbody></table></div>
 <p>There is deliberately no common <code>Item</code> class in the ontology; &quot;item&quot; is a term of the specification only (<a class="ref" href="/specs/00-overview/#AGSC-00-05">AGSC-00-05</a>). Words like card, page, deck or note are never types (<a class="ref" href="/specs/00-overview/#AGSC-00-08">AGSC-00-08</a>).</p>
 <h2 id="the-fourteen-links">The fourteen links</h2>
 <p>A link is a header key whose values are slugs of other items in the same Bundle; a link never crosses Bundles (<a class="ref" href="/specs/03-links/#AGSC-03-01">AGSC-03-01</a>, <a class="ref" href="/specs/03-links/#AGSC-03-02">AGSC-03-02</a>). Inverses are computed at build and never authored (<a class="ref" href="/specs/03-links/#AGSC-03-04">AGSC-03-04</a>).</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
 <thead><tr><th scope="col">You write</th><th scope="col">The build adds</th><th scope="col">What it means</th><th scope="col">Effect in composition</th></tr></thead>
 <tbody>
 <tr><td><code>related</code></td><td><code>related</code></td><td>Loosely connected</td><td>Advisory only</td></tr>
@@ -122,6 +122,7 @@
 <h2 id="added-at-rc-3">Added at rc.3</h2>
 <p>Items may declare ports, <code>produces</code> and <code>consumes</code> type names, that the combiner wires (<a class="ref" href="/specs/02-item/#AGSC-02-96">AGSC-02-96</a>); a Concept of kind <code>architecture</code> stores a selection the combiner re-runs (<a class="ref" href="/specs/02-item/#AGSC-02-97">AGSC-02-97</a>); items may carry attachments under a safety allow-list, and a pattern's images must be SVG (<a class="ref" href="/specs/02-item/#AGSC-02-98">AGSC-02-98</a>); a task may carry one of the nine Agent2Agent task states verbatim (<a class="ref" href="/specs/02-item/#AGSC-02-99">AGSC-02-99</a>).</p>
 <p>Rules: <a href="/specs/02-item/">AGSC-02</a>, <a href="/specs/03-links/">AGSC-03</a>, <a href="/specs/05-graph/">AGSC-05</a>. Terms: the <a href="/docs/glossary/">glossary</a> and the <a href="/ns/">ontology</a>.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/data-model.md">Propose an edit</a> — opens <code>site/docs/data-model.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
 <p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>

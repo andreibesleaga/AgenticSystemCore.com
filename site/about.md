@@ -6,7 +6,7 @@ People start at the [guide](/docs/), then the [specification](/specs/) and the [
 
 ## Status
 
-The specification is at release candidate `1.0.0-rc.4`. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it. The reference engine is in preparation; this site is built without it, as a Level-0 node. The [status page](/docs/status/) lists what is live and what is not.
+The specification is at release candidate `1.0.0-rc.5`. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it. The reference engine is in preparation; this site is built without it, as a Level-0 node. The [status page](/docs/status/) lists what is live and what is not.
 
 ## Limits
 

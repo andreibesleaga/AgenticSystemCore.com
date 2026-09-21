@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://agenticsystemcore.com/specs/agentic-knowledge/">
 <meta property="og:title" content="Knowledge link set profile">
 <meta property="og:description" content="The profile of the application/linkset+json discovery document that an AgenticSystemCore node serves at /.well-known/knowledge-linkset.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Knowledge link set profile","url":"https://agenticsystemcore.com/specs/agentic-knowledge/","identifier":"https://w3id.org/agentic-system-core/profile/agentic-knowledge","version":"1.0.0-rc.4","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Knowledge link set profile","url":"https://agenticsystemcore.com/specs/agentic-knowledge/","identifier":"https://w3id.org/agentic-system-core/profile/agentic-knowledge","version":"1.0.0-rc.5","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"}}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -40,7 +40,7 @@
 <h2 id="status-heading">Status</h2>
 <dl class="meta">
 <dt>Profile URI</dt><dd><code>https://w3id.org/agentic-system-core/profile/agentic-knowledge</code></dd>
-<dt>Specification</dt><dd><code>1.0.0-rc.4</code>, a release candidate. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
+<dt>Specification</dt><dd><code>1.0.0-rc.5</code>, a release candidate. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
 <dt>Well-known URI</dt><dd>Not yet requested. The suffix <code>knowledge-linkset</code> will be requested for the Well-Known URIs registry (RFC 8615) through an Internet-Draft; it is not registered.</dd>
 <dt>Profile URI registration</dt><dd>Not yet filed in the Profile URIs registry (RFC 7284).</dd>
 <dt>Internet-Draft</dt><dd>Not yet posted.</dd>
@@ -110,22 +110,22 @@
 <tr><th scope="row"><code>license</code></th><td>The licence page of the node.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a></td></tr>
 <tr><th scope="row"><code>service-doc</code></th><td>Human documentation, such as <code>/specs/</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a></td></tr>
 <tr><th scope="row"><code>author</code></th><td>The author of the node.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a></td></tr>
-<tr><th scope="row"><code>related, service-desc, service-meta, collection, item</code></th><td>Related-system links, OPTIONAL, each carrying <code>type</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-35">AGSC-06-35</a></td></tr>
+<tr><th scope="row"><code>related, service-desc, service-meta, collection, item</code></th><td>Related-system links, OPTIONAL, each carrying <code>type</code>. Admitted by both rules since rc.5.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-35">AGSC-06-35</a></td></tr>
 </tbody></table></div>
 <p>Extension relations. Each URI <code>https://w3id.org/agentic-system-core/rel#&lt;name&gt;</code> resolves to its row below.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Extension relation"><table>
 <thead><tr><th scope="col">Extension relation</th><th scope="col">Target</th><th scope="col">Rules</th></tr></thead>
 <tbody>
-<tr id="rel-graph"><th scope="row"><span id="graph"></span><code>…/rel#graph</code></th><td>The RDF views of the Bundle, <code>/graph.ttl</code> and <code>/graph.nq</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/05-graph/#AGSC-05-06">AGSC-05-06</a></td></tr>
-<tr id="rel-ontology"><th scope="row"><span id="ontology"></span><code>…/rel#ontology</code></th><td>The vocabulary the graph uses, <code>/ns/</code> and its files.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-06">AGSC-06-06</a></td></tr>
-<tr id="rel-context"><th scope="row"><span id="context"></span><code>…/rel#context</code></th><td>The JSON-LD context file, <code>/ns/context.jsonld</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-32">AGSC-06-32</a></td></tr>
-<tr id="rel-now"><th scope="row"><span id="now"></span><code>…/rel#now</code></th><td>The generated state page, <code>/now/</code> and <code>/now.md</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-22">AGSC-06-22</a></td></tr>
-<tr id="rel-skills"><th scope="row"><span id="skills"></span><code>…/rel#skills</code></th><td>The skill packs exported from Procedures, <code>/skills/index.json</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-01">AGSC-06-01</a></td></tr>
-<tr id="rel-ledger"><th scope="row"><span id="ledger"></span><code>…/rel#ledger</code></th><td>The derived ledger, <code>/ledger.jsonl</code>, carrying <code>digest</code> and <code>agsc-ledger-head</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-11">AGSC-06-11</a></td></tr>
-<tr id="rel-peer"><th scope="row"><span id="peer"></span><code>…/rel#peer</code></th><td>Another node's discovery document, for the mutual-conformance check.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a></td></tr>
-<tr id="rel-surface"><th scope="row"><span id="surface"></span><code>…/rel#surface</code></th><td>An agent surface the node serves, such as <code>llms-txt</code>, <code>chunks</code> or <code>mcp</code>, with its access class.</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-16">AGSC-11-16</a></td></tr>
-<tr id="rel-contribute"><th scope="row"><span id="contribute"></span><code>…/rel#contribute</code></th><td>A contribution endpoint, with <code>agsc-contribute-mode</code>.</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-14">AGSC-11-14</a></td></tr>
-<tr id="rel-access"><th scope="row"><span id="access"></span><code>…/rel#access</code></th><td>Where a reader obtains credentials for a restricted node.</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-20">AGSC-11-20</a></td></tr>
+<tr id="graph"><th scope="row"><code>…/rel#graph</code></th><td>The RDF views of the Bundle, <code>/graph.ttl</code> and <code>/graph.nq</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/05-graph/#AGSC-05-06">AGSC-05-06</a></td></tr>
+<tr id="ontology"><th scope="row"><code>…/rel#ontology</code></th><td>The vocabulary the graph uses, <code>/ns/</code> and its files.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-06">AGSC-06-06</a></td></tr>
+<tr id="context"><th scope="row"><code>…/rel#context</code></th><td>The JSON-LD context file, <code>/ns/context.jsonld</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-32">AGSC-06-32</a></td></tr>
+<tr id="now"><th scope="row"><code>…/rel#now</code></th><td>The generated state page, <code>/now/</code> and <code>/now.md</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-22">AGSC-06-22</a></td></tr>
+<tr id="skills"><th scope="row"><code>…/rel#skills</code></th><td>The skill packs exported from Procedures, <code>/skills/index.json</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-01">AGSC-06-01</a></td></tr>
+<tr id="ledger"><th scope="row"><code>…/rel#ledger</code></th><td>The derived ledger, <code>/ledger.jsonl</code>, carrying <code>digest</code> and <code>agsc-ledger-head</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-11">AGSC-06-11</a></td></tr>
+<tr id="peer"><th scope="row"><code>…/rel#peer</code></th><td>Another node's discovery document, for the mutual-conformance check.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a></td></tr>
+<tr id="surface"><th scope="row"><code>…/rel#surface</code></th><td>An agent surface the node serves, such as <code>llms-txt</code>, <code>chunks</code> or <code>mcp</code>, with its access class.</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-16">AGSC-11-16</a></td></tr>
+<tr id="contribute"><th scope="row"><code>…/rel#contribute</code></th><td>A contribution endpoint, with <code>agsc-contribute-mode</code>.</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-14">AGSC-11-14</a></td></tr>
+<tr id="access"><th scope="row"><code>…/rel#access</code></th><td>Where a reader obtains credentials for a restricted node.</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-20">AGSC-11-20</a></td></tr>
 </tbody></table></div>
 <h2 id="target-attributes">Target attributes</h2>
 <p>Extension target attributes use the prefix <code>agsc-</code>, except <code>digest</code>. Every attribute value is an array of strings (<a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>).</p>
@@ -148,7 +148,7 @@
 <h2 id="levels">Levels</h2>
 <p>A Level-0 publisher, such as a CMS or wiki export, publishes the same link set with every <code>digest</code> and every bundle-fact <code>agsc-*</code> attribute omitted: it has no ledger, no N-Quads graph and no build instant (<a class="ref" href="/specs/06-surfaces/#AGSC-06-08a">AGSC-06-08a</a>). At Level 2 and above every artefact link carries <code>digest</code>, the <code>describedby</code> link to <code>graph.jsonld</code> carries the bundle facts, and the ledger link carries its head (<a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>). The surface, visibility, contribution and tombstone attributes apply at every Level.</p>
 <h2 id="related-system-links">Related-system links</h2>
-<p>A node MAY link related discovery documents and systems, such as an llms.txt file, a VoID or DCAT description, an Agent2Agent Agent Card, an MCP server card, or an ontology or SPARQL endpoint. It uses IANA-registered relations only: <code>describedby</code>, <code>alternate</code>, <code>related</code>, <code>service-desc</code>, <code>service-doc</code>, <code>service-meta</code>, <code>collection</code> and <code>item</code>, and each link carries <code>type</code>. A reader ignores a related-system link it does not understand, and none affects conformance, a digest, the peer check or a walk (<a class="ref" href="/specs/06-surfaces/#AGSC-06-35">AGSC-06-35</a>).</p>
+<p>A node MAY link related discovery documents and systems, such as an llms.txt file, a VoID or DCAT description, an Agent2Agent Agent Card, an MCP server card, or an ontology or SPARQL endpoint. It uses IANA-registered relations only: <code>describedby</code>, <code>alternate</code>, <code>related</code>, <code>service-desc</code>, <code>service-doc</code>, <code>service-meta</code>, <code>collection</code> and <code>item</code>, and each link carries <code>type</code>. Since <code>1.0.0-rc.5</code> the rule that fixes the relation names admits all eight, so a validator accepts every one of them (<a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-35">AGSC-06-35</a>). A reader ignores a related-system link it does not understand, and none affects conformance, a digest, the peer check or a walk.</p>
 <h2 id="examples">Examples</h2>
 <p>This node's own document, a Level-0 link set, shown pretty-printed:</p>
 <p>The live document is at <a href="/.well-known/knowledge-linkset"><code>/.well-known/knowledge-linkset</code></a>; a browser shows it as text. The same bytes, pretty-printed:</p>
@@ -174,10 +174,24 @@
           &quot;type&quot;: &quot;application/ld+json&quot;
         }
       ],
+      &quot;https://w3id.org/agentic-system-core/rel#contribute&quot;: [
+        {
+          &quot;agsc-contribute-mode&quot;: [
+            &quot;pr&quot;
+          ],
+          &quot;href&quot;: &quot;https://github.com/andreibesleaga/AgenticSystemCore.com&quot;
+        }
+      ],
       &quot;https://w3id.org/agentic-system-core/rel#ontology&quot;: [
         {
           &quot;href&quot;: &quot;https://agenticsystemcore.com/ns/agsc.ttl&quot;,
           &quot;type&quot;: &quot;text/turtle&quot;
+        }
+      ],
+      &quot;https://w3id.org/agentic-system-core/rel#peer&quot;: [
+        {
+          &quot;href&quot;: &quot;https://patterns.agenticsystemcore.com/.well-known/knowledge-linkset&quot;,
+          &quot;type&quot;: &quot;application/linkset+json&quot;
         }
       ],
       &quot;https://w3id.org/agentic-system-core/rel#surface&quot;: [
@@ -235,7 +249,7 @@
             &quot;2026-01-01T00:00:00Z&quot;
           ],
           &quot;agsc-spec-version&quot;: [
-            &quot;1.0.0-rc.4&quot;
+            &quot;1.0.0-rc.5&quot;
           ],
           &quot;digest&quot;: [
             &quot;sha-256=:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=:&quot;
@@ -282,6 +296,7 @@
 <li><strong>llms.txt</strong> gives agents a curated text entry point. A node's <code>/llms.txt</code> follows a fixed byte layout and is declared as a surface (<a class="ref" href="/specs/06-surfaces/#AGSC-06-13a">AGSC-06-13a</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-16">AGSC-11-16</a>).</li>
 <li><strong>DCAT</strong> catalogues may describe a Bundle as a dataset. No DCAT emission is required.</li>
 </ul>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/profile.md">Propose an edit</a> — opens <code>site/profile.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
 <p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>

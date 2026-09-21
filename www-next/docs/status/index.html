@@ -38,7 +38,7 @@
 <div class="table-wrap" tabindex="0" role="region" aria-label="Status"><table>
 <thead><tr><th scope="col">What</th><th scope="col">State</th><th scope="col">Detail</th></tr></thead>
 <tbody>
-<tr><th scope="row">Specification <code>1.0.0-rc.4</code></th><td>Live</td><td>Tagged on 2026-09-18; twelve sections at <a href="/specs/">/specs/</a>; the vocabulary and the vectors are frozen at the tag.</td></tr>
+<tr><th scope="row">Specification <code>1.0.0-rc.5</code></th><td>Live</td><td>Tagged on 2026-09-21; twelve sections at <a href="/specs/">/specs/</a>; the vocabulary and the vectors are frozen at the tag.</td></tr>
 <tr><th scope="row">This site as a Level-0 node</th><td>Live</td><td>Items, <a href="/graph.jsonld"><code>graph.jsonld</code></a>, <a href="/llms.txt"><code>llms.txt</code></a> and the <a href="/.well-known/knowledge-linkset">discovery document</a> in its Level-0 form, checked by the Level-0 vectors and the discovery validator before every publish.</td></tr>
 <tr><th scope="row">Ontology files</th><td>Live</td><td>Turtle, JSON-LD context, RDF/XML and N-Triples at <a href="/ns/">/ns/</a>.</td></tr>
 <tr><th scope="row">Namespace through w3id.org</th><td>Not yet resolving</td><td>The namespace <code>https://w3id.org/agentic-system-core/</code> does not resolve yet; the pull request to w3id.org has not been opened.</td></tr>
@@ -48,7 +48,8 @@
 <tr><th scope="row">Preprint</th><td>In preparation</td><td>In preparation; not yet published.</td></tr>
 <tr><th scope="row">Reference engine <code>agsc</code></th><td>In preparation</td><td>The engine that implements Levels 1 to 3 is not published. This site is generated without it.</td></tr>
 <tr><th scope="row">Independent validators</th><td>In preparation</td><td>One validator, for the discovery document, exists and checked this site; the validators ship with the reference implementation.</td></tr>
-<tr><th scope="row">Patterns catalogue as a second node</th><td>In preparation</td><td>The catalogue of agentic system patterns will be published as a second, editable node on this origin, peered with this one.</td></tr>
+<tr><th scope="row">Contribution channel</th><td>Live</td><td>Declared in the <a href="/.well-known/knowledge-linkset">discovery document</a> as a pull-request target (<a class="ref" href="/specs/11-boundary/#AGSC-11-14">AGSC-11-14</a>), and every page generated from a source file carries a <em>Propose an edit</em> link to that file. Nothing is written without a person merging it.</td></tr>
+<tr><th scope="row">Patterns catalogue as a second node</th><td>In preparation</td><td>The catalogue of agentic system patterns is being prepared as a second node at <code>patterns.agenticsystemcore.com</code>. This node already names it as a peer in the discovery document; the mutual check of <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a> passes once both are published.</td></tr>
 <tr><th scope="row">Papers</th><td>Planned</td><td>Journal and conference papers follow the preprint; none is submitted.</td></tr>
 </tbody></table></div>
 <h2 id="how-to-read-this-page">How to read this page</h2>
@@ -58,6 +59,7 @@
 <li><strong>Not requested</strong> and <strong>not filed</strong> mean that no registry, editor or publisher has been approached yet. <strong>Requested</strong> and <strong>filed</strong> mean a request is pending. <strong>Registered</strong> or <strong>published</strong> is written only after the body in question shows the entry.</li>
 </ul>
 <p>The specification is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it (<a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a> asks for a registration; it does not claim one).</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/status.md">Propose an edit</a> — opens <code>site/docs/status.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
 <p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>

@@ -6,7 +6,7 @@ Status: pre-launch (target 2026-10-10). Layout, config and workflows are generat
 
 ## Site v0 (added 2026-09-17, DS-7)
 
-The site is built without the engine, as a **Level-0 node** of the specification it publishes (AGSC-10-02). `scripts/build.js` (Node ≥ 22, standard library only) reads `content/`, `site/`, `assets/` and — from the engine repository checked out beside this one — `spec/`, `ontology/agsc.ttl` and `LICENSE-CONTENT` **at the release tag** (`1.0.0-rc.4`), and writes `www/`, which Cloudflare Pages serves as committed.
+The site is built without the engine, as a **Level-0 node** of the specification it publishes (AGSC-10-02). `scripts/build.js` (Node ≥ 22, standard library only) reads `content/`, `site/`, `assets/` and — from the engine repository checked out beside this one — `spec/`, `ontology/agsc.ttl` and `LICENSE-CONTENT` **at the release tag** (`1.0.0-rc.5`), and writes `www/`, which Cloudflare Pages serves as committed.
 
 ```bash
 node scripts/build.js      # writes www/ (SOURCE_DATE_EPOCH defaults to the tag's commit instant)
@@ -40,3 +40,14 @@ This repository carries both licence files at its root, copied from the engine r
 - `LICENSE-CONTENT` — the AgenticSystemCore Content Use Terms 1.0 (`LicenseRef-AgenticSystemCore-Content-Use-1.0`), for the published prose: the item bodies and descriptions in `content/` and `site/`, and the pages, text files and exports that carry that prose. The schemas, the ontology, the identifiers and the discovery document stay CC0-1.0, as the file says.
 
 Every generated page and both `llms` files already embed the Content Use Terms and link `/legal/`; these two files say the same thing at the root of the repository.
+
+## Moved to `1.0.0-rc.5` (added 2026-09-21)
+
+`agsc.config.json` and `content/index.md` name `1.0.0-rc.5`, and both scripts read the engine at that tag.
+
+- **`build.feed` is gone.** `feed` is a reserved name at rc.5 and a configuration that carries it is `AGSC-E004`; the generator now rejects any `build` member other than `out`.
+- **`peers[]`** names the patterns node's canonical well-known URL, and the generator emits it as one `…/rel#peer` link, so the mutual check of AGSC-10-12 passes in both directions (the patterns node already names this one).
+- **`contribute[]`** declares the pull-request channel, emitted as a `…/rel#contribute` link carrying `agsc-contribute-mode` (AGSC-11-14).
+- **"Propose an edit"** — every page generated from one source file carries a plain link to that file's edit-in-browser view on the forge: pages built from this repository link here, specification pages link to the engine repository. No script and no form; the CSP sets `form-action 'none'`.
+- The profile page's extension-relation anchors are named exactly as the relation URI's fragment (`#graph`, not `#rel-graph`), as AGSC-06-01 requires at rc.5.
+- The generator checks the authored single-line strings for control characters and line separators (AGSC-02-24 at rc.5), pins `LICENSE-CONTENT` by the SHA-256 that AGSC-06-18 now names, and fails on any authored page naming a release candidate other than the one being built.

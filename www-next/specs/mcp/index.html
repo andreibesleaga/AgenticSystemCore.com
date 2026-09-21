@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://agenticsystemcore.com/specs/mcp/">
 <meta property="og:title" content="MCP knowledge extension">
 <meta property="og:description" content="The reference text of com.agenticsystemcore/knowledge, the unofficial Model Context Protocol extension by which a server says that the knowledge it serves is also published as a static Bundle.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"MCP knowledge extension","url":"https://agenticsystemcore.com/specs/mcp/","identifier":"com.agenticsystemcore/knowledge","version":"1.0.0-rc.4","license":"https://www.apache.org/licenses/LICENSE-2.0","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"},"isPartOf":"https://agenticsystemcore.com/specs/"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"MCP knowledge extension","url":"https://agenticsystemcore.com/specs/mcp/","identifier":"com.agenticsystemcore/knowledge","version":"1.0.0-rc.5","license":"https://www.apache.org/licenses/LICENSE-2.0","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"},"isPartOf":"https://agenticsystemcore.com/specs/"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -42,7 +42,7 @@
 <dt>Extension identifier</dt><dd><code>com.agenticsystemcore/knowledge</code></dd>
 <dt>Protocol revision</dt><dd>Model Context Protocol <code>2026-07-28</code></dd>
 <dt>Standing</dt><dd>An unofficial extension under MCP SEP-2133, which says that "Unofficial extensions are not recognized by MCP governance and may be introduced and governed by developers outside the MCP organization". It needs no permission and has no registry entry, and it has not been submitted as an MCP SEP.</dd>
-<dt>Specification</dt><dd><code>1.0.0-rc.4</code>, a release candidate. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
+<dt>Specification</dt><dd><code>1.0.0-rc.5</code>, a release candidate. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
 <dt>This node</dt><dd>Does not declare the <code>mcp</code> surface: no tool server is published yet (<a class="ref" href="/specs/11-boundary/#AGSC-11-16">AGSC-11-16</a>).</dd>
 </dl>
 </section>
@@ -50,7 +50,8 @@
 <p>A connected client can list a server's tools. It cannot tell from the protocol whether the same content also exists as files it could fetch, cache, compare and verify without the server, nor check that a tool result matches what the publisher published. A server declaring this extension answers both questions: its knowledge is also published as a Bundle, and here is that Bundle's discovery document. The extension adds no method, no primitive and no message to the base protocol.</p>
 <h2 id="how-a-server-declares-it">How a server declares it</h2>
 <p>MCP carries optional extensions in the capabilities a party reports. The protocol says: &quot;Extensions are advertised in the <code>extensions</code> field of capabilities, which is a map of extension identifiers to per-extension settings objects&quot; (Model Context Protocol, <em>Versioning and Compatibility</em>, revision <code>2026-07-28</code>). A server declaring this extension puts the identifier in that map (<a class="ref" href="/specs/11-boundary/#AGSC-11-18">AGSC-11-18</a>).</p>
-<p>The settings object has one REQUIRED member, <code>linkset</code>: the absolute <code>https</code> URL of the server's <code>/.well-known/knowledge-linkset</code>. That document is served as <code>application/linkset+json</code> with the profile <code>https://w3id.org/agentic-system-core/profile/agentic-knowledge</code> (<a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-04">AGSC-11-04</a>), and the <a href="/specs/agentic-knowledge/">profile page</a> documents its shape.</p>
+<p>Under that revision there is no moment at which the two sides agree on extensions once and for all. The same page says &quot;There is no negotiation handshake. Every request carries its protocol version, and the server accepts or rejects each request independently&quot;, and &quot;Servers <strong>MUST</strong> implement <code>server/discover</code>&quot;. So a server declaring this extension carries the identifier in the capabilities of its <code>server/discover</code> result and in the capabilities it reports per request; an <code>initialize</code> handshake belongs to the earlier revisions the same page calls legacy.</p>
+<p>The settings object has exactly one member, <code>linkset</code>: the absolute <code>https</code> URL of the server's <code>/.well-known/knowledge-linkset</code>. A server must emit that member and must emit no other. That document is served as <code>application/linkset+json</code> with the profile <code>https://w3id.org/agentic-system-core/profile/agentic-knowledge</code> (<a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-04">AGSC-11-04</a>), and the <a href="/specs/agentic-knowledge/">profile page</a> documents its shape. Since <code>1.0.0-rc.5</code> the specification pins the object and the way it is carried, and two conformance vectors hold the bytes (<a class="ref" href="/specs/11-boundary/#AGSC-11-18">AGSC-11-18</a>).</p>
 <pre tabindex="0" data-lang="json"><code>{
   &quot;capabilities&quot;: {
     &quot;tools&quot;: {},
@@ -86,6 +87,7 @@
 <p>A surface never restates this floor. It inherits it (<a class="ref" href="/specs/11-boundary/#AGSC-11-18">AGSC-11-18</a>).</p>
 <h2 id="reference-implementation">Reference implementation</h2>
 <p>There is none yet for the extension itself. This node serves the discovery document and the static artefacts it names; the tool server that would advertise the extension is not published. The <a href="/docs/status/">status page</a> says what is live and what is not.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/mcp-extension.md">Propose an edit</a> — opens <code>site/mcp-extension.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
 <p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>

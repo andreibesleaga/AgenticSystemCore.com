@@ -10,7 +10,9 @@ A connected client can list a server's tools. It cannot tell from the protocol w
 
 MCP carries optional extensions in the capabilities a party reports. The protocol says: "Extensions are advertised in the `extensions` field of capabilities, which is a map of extension identifiers to per-extension settings objects" (Model Context Protocol, *Versioning and Compatibility*, revision `2026-07-28`). A server declaring this extension puts the identifier in that map (AGSC-11-18).
 
-The settings object has one REQUIRED member, `linkset`: the absolute `https` URL of the server's `/.well-known/knowledge-linkset`. That document is served as `application/linkset+json` with the profile `https://w3id.org/agentic-system-core/profile/agentic-knowledge` (AGSC-06-07, AGSC-11-04), and the [profile page](/specs/agentic-knowledge/) documents its shape.
+Under that revision there is no moment at which the two sides agree on extensions once and for all. The same page says "There is no negotiation handshake. Every request carries its protocol version, and the server accepts or rejects each request independently", and "Servers **MUST** implement `server/discover`". So a server declaring this extension carries the identifier in the capabilities of its `server/discover` result and in the capabilities it reports per request; an `initialize` handshake belongs to the earlier revisions the same page calls legacy.
+
+The settings object has exactly one member, `linkset`: the absolute `https` URL of the server's `/.well-known/knowledge-linkset`. A server must emit that member and must emit no other. That document is served as `application/linkset+json` with the profile `https://w3id.org/agentic-system-core/profile/agentic-knowledge` (AGSC-06-07, AGSC-11-04), and the [profile page](/specs/agentic-knowledge/) documents its shape. Since `1.0.0-rc.5` the specification pins the object and the way it is carried, and two conformance vectors hold the bytes (AGSC-11-18).
 
 ```json
 {

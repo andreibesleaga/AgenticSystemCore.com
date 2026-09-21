@@ -8,14 +8,14 @@
 //
 //   node scripts/build.js [--out <dir>]      (default: www)
 //   SOURCE_DATE_EPOCH=<seconds> node scripts/build.js
-//   AGSC_ENGINE=<path> AGSC_SPEC_TAG=<tag>   (defaults: ../agentic-system-core, 1.0.0-rc.4)
+//   AGSC_ENGINE=<path> AGSC_SPEC_TAG=<tag>   (defaults: ../agentic-system-core, 1.0.0-rc.5)
 'use strict';
 const fs = require('fs'), path = require('path'), crypto = require('crypto'), cp = require('child_process');
 const { compile: compileDiagram } = require('./diagram.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const ENGINE = path.resolve(ROOT, process.env.AGSC_ENGINE || '../agentic-system-core');
-const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.4';
+const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.5';
 // Output directory: `build.out` of agsc.config.json. It is `www-next` until launch so that the
 // repository can be pushed without Cloudflare Pages publishing the new site (Pages serves `www/`);
 // at launch the owner sets `build.out` to `www` (runbook §1a).
@@ -245,7 +245,9 @@ function headingId(text, used) {
 }
 // The trailing traceability record of a rule: "[PRD-002 ← D41, G04, research/16 §3.3]". It is
 // rendered as a separate small line (class trace) so that the rule sentence reads on its own.
-const TRACE_RE = /\s\[([^\[\]]{3,})\]\s*$/;
+// Since rc.5 a rule may close with an italic amendment note after its bracket — "[…] *(trace
+// corrected at rc.5, …)*" — so the note is allowed to follow and is kept where the author put it.
+const TRACE_RE = /\s\[([^\[\]]{3,})\]((?:\s*\*\(.*\)\*)?)\s*$/;
 // Mark the trace record of a rule: the trailing bracket group on the last prose line of the item
 // (never a table row, never a line inside a fenced block). Returns true when one was found.
 function markTrace(c) {
@@ -253,7 +255,7 @@ function markTrace(c) {
   c.forEach((ln, k) => { if (/^\s*(`{3,}|~{3,})/.test(ln)) { fenced = !fenced; return; } if (!fenced && ln.trim() && !/^\s*\|/.test(ln)) eligible.push(k); });
   const k = eligible[eligible.length - 1];
   if (k === undefined || !TRACE_RE.test(c[k])) return false;
-  c[k] = c[k].replace(TRACE_RE, ' \u0001$1\u0002'); return true;
+  c[k] = c[k].replace(TRACE_RE, ' \u0001$1\u0002$2'); return true;
 }
 function md(src, o = {}) {
   const used = o.used || new Set(), toc = o.toc || [];
@@ -362,7 +364,7 @@ function md(src, o = {}) {
     else {
       // On specification pages a paragraph that continues a rule after its table or code block carries the rule's trace bracket.
       const text = para.join('\n'), traced = o.ruleLinks && !o.inItem && TRACE_RE.test(text);
-      html += `<p>${mdInline(traced ? text.replace(TRACE_RE, ' \u0001$1\u0002') : text, o).replace(/\u0001([\s\S]*?)\u0002/, (_, t) => `<span class="trace">[${t}]</span>`)}</p>\n`;
+      html += `<p>${mdInline(traced ? text.replace(TRACE_RE, ' \u0001$1\u0002$2') : text, o).replace(/\u0001([\s\S]*?)\u0002/, (_, t) => `<span class="trace">[${t}]</span>`)}</p>\n`;
     }
   }
   return html;
@@ -399,6 +401,35 @@ const WELLKNOWN = '/.well-known/knowledge-linkset';
 const TAGS = new Set((config.tags || {}).allowed || []);
 const SUMMARIES = JSON.parse(read('site/summaries.json'));
 const CONTACT_URL = 'https://andreibesleaga.com/contact/';
+// The forges the "Propose an edit" links point at. The site's own repository is the contribution
+// target declared in `contribute[]`; the specification pages are generated from the engine
+// repository's files, so they link there (AGSC-11-14 names the channel, not the link).
+const FORGE = {
+  site: (config.contribute || []).find(c => c.mode === 'pr') ? config.contribute.find(c => c.mode === 'pr').target.replace(/\/$/, '') : null,
+  engine: 'https://github.com/andreibesleaga/agentic-system-core',
+};
+if (!FORGE.site) die('agsc.config.json: contribute[] needs one entry with mode "pr" (AGSC-11-14)');
+
+// rc.5 configuration guards, against schema/config.schema.json at the tag.
+// `build.feed` and `build.rdfxml` are RESERVED names of 1.1 and are rejected (AGSC-06-01, AGSC-01-18, R-15).
+for (const k of Object.keys(config.build || {})) if (k !== 'out') die(`agsc.config.json: build.${k} is a reserved name, AGSC-E004 (withdrawn at rc.5)`);
+const PEERS = config.peers || [];
+const PEER_RE = /^https:\/\/[^\x00-\x20/?#]+(?:\/[^\x00-\x20/?#]+)*\/\.well-known\/knowledge-linkset$/;
+for (const p of PEERS) if (!PEER_RE.test(p)) die(`agsc.config.json: peers[] entry is not a canonical well-known URL: ${p} (AGSC-10-12)`);
+if (new Set(PEERS).size !== PEERS.length) die('agsc.config.json: peers[] must be unique (AGSC-10-12)');
+const CONTRIBUTE = config.contribute || [];
+for (const c of CONTRIBUTE) {
+  if (!['pr', 'channel', 'form'].includes(c.mode)) die(`agsc.config.json: contribute[].mode ${c.mode} (AGSC-E209, AGSC-11-14)`);
+  const okTarget = c.mode === 'channel' ? /^(mailto:[^\x00-\x20]+|urn:agsc:channel:[a-z0-9-]+)$/.test(c.target) : /^https:\/\/[^\x00-\x20]+$/.test(c.target);
+  if (!okTarget) die(`agsc.config.json: contribute[].target ${c.target} does not match mode ${c.mode} (AGSC-E209, AGSC-11-14)`);
+  for (const k of Object.keys(c)) if (!['mode', 'target', 'channel'].includes(k)) die(`agsc.config.json: contribute[].${k} is not a member of this site's configuration`);
+}
+// AGSC-02-24 as amended at rc.5: an authored single-line string carries no C0 control, U+007F,
+// U+0085, U+2028 or U+2029, because a writer puts it on a line of a line-oriented text surface.
+const BAD_LINE_CP = c => c <= 0x1f || c === 0x7f || c === 0x85 || c === 0x2028 || c === 0x2029;
+const singleLine = (where, v) => { if (typeof v === 'string') for (const ch of v) if (BAD_LINE_CP(ch.codePointAt(0))) die(`${where}: U+${ch.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')} is a control character or line separator in a single-line string (AGSC-E204, AGSC-02-24 at rc.5)`); return v; };
+for (const [k, v] of Object.entries(config.site)) singleLine(`agsc.config.json: site.${k}`, v);
+for (const [k, v] of Object.entries(config.bundle)) singleLine(`agsc.config.json: bundle.${k}`, v);
 
 const index = splitFrontmatter(read('content/index.md'), 'content/index.md');
 for (const k of ['spec_version', 'okf_version', 'title', 'description', 'base']) if (!index.fm[k]) die(`content/index.md: ${k} missing (AGSC-01-04)`);
@@ -409,6 +440,17 @@ if (index.fm.spec_version !== SPEC_VERSION) die('spec_version differs between co
 const SPEC_FILES = git('ls-tree', '--name-only', `${SPEC_TAG}:spec`).split('\n').filter(f => /^\d{2}-[a-z0-9-]+\.md$/.test(f)).sort();
 const declared = (engineFile('spec/00-overview.md').match(/`spec_version: "([^"]+)"`/) || [])[1];
 if (declared !== SPEC_VERSION) die(`tag ${SPEC_TAG} declares spec_version ${declared}, config says ${SPEC_VERSION}`);
+
+// No authored page may name a release candidate other than the one being published: a stale
+// literal is how a site restates a version it no longer builds (AGSC-00-17).
+{
+  const walkSrc = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walkSrc(path.join(d, e.name)) : [path.join(d, e.name)]);
+  for (const f of [...walkSrc(path.join(ROOT, 'site')), ...walkSrc(path.join(ROOT, 'content'))].filter(f => /\.(md|json)$/.test(f)).sort()) {
+    for (const m of fs.readFileSync(f, 'utf8').matchAll(/\b1\.0\.0-rc\.\d+\b/g)) {
+      if (m[0] !== SPEC_VERSION) die(`${path.relative(ROOT, f)}: names ${m[0]} while this build publishes ${SPEC_VERSION} (AGSC-00-17)`);
+    }
+  }
+}
 
 const PLURAL = { concept: 'concepts', episode: 'episodes', procedure: 'procedures', lesson: 'lessons', cluster: 'clusters', gate: 'gates' };
 const KINDS = new Set(['pattern', 'taxonomy', 'explainer', 'principle', 'decision', 'spec', 'task', 'term', 'architecture']);
@@ -424,6 +466,9 @@ for (const [type, plural] of Object.entries(PLURAL)) {
     if (fm.type !== type) die(`${rel}: type does not match folder (AGSC-E205)`);
     if (!fm.title || cp_len(fm.title) < 3 || cp_len(fm.title) > 120) die(`${rel}: title 3-120 code points (AGSC-E204)`);
     if (fm.description !== undefined && (cp_len(fm.description) < 40 || cp_len(fm.description) > 200)) die(`${rel}: description 40-200 code points (AGSC-E204)`);
+    singleLine(`${rel}: title`, fm.title); singleLine(`${rel}: description`, fm.description);
+    for (const a of fm.aliases || []) singleLine(`${rel}: aliases[]`, a);
+    for (const s of fm.sources || []) for (const k of ['title', 'author']) singleLine(`${rel}: sources[].${k}`, s[k]);
     if ((type === 'concept' || type === 'cluster') && !fm.description) die(`${rel}: description required on ${type} for this site (AGSC-E408)`);
     if (type === 'concept' && !KINDS.has(fm.kind)) die(`${rel}: kind (AGSC-02-12)`);
     if (!fm.prov || !['human', 'ai-assisted', 'ai-generated', 'imported'].includes(fm.prov.origin)) die(`${rel}: prov.origin (AGSC-02-07)`);
@@ -532,8 +577,13 @@ const EXTERNAL = [
   ['skos:inScheme', '@id'], ['skos:member', '@id'], ['skos:broader', '@id'], ['skos:narrower', '@id'], ['skos:related', '@id'],
   ['dcterms:requires', '@id'], ['dcterms:isRequiredBy', '@id'], ['dcterms:replaces', '@id'], ['dcterms:isReplacedBy', '@id'],
   ['dcterms:source', null], ['dcterms:title', null], ['dcterms:creator', null], ['dcterms:date', null], ['dcterms:format', null],
-  ['dcterms:license', null], ['dcterms:created', null], ['dcterms:modified', null],
-  ['prov:wasDerivedFrom', '@id'], ['schema:license', null], ['schema:usageInfo', '@id'],
+  // rc.5 amendments (2026-09-21, NS-07): AGSC-05-26 gained `dcterms:created` and
+  // `dcterms:modified` as `xsd:dateTime` (V8-91/R-06), and AGSC-05-31(c) makes
+  // `schema:usageInfo` a literal, not an IRI (V9A-02). These three rows lagged, so
+  // this context and the engine's could not be the byte-identical copy AGSC-05-09
+  // asks for.
+  ['dcterms:license', null], ['dcterms:created', XSD + 'dateTime'], ['dcterms:modified', XSD + 'dateTime'],
+  ['prov:wasDerivedFrom', '@id'], ['schema:license', null], ['schema:usageInfo', null],
 ];
 const CONTEXT = (() => {
   const c = { '@protected': true, '@version': 1.1, asc: NS, dcterms: 'http://purl.org/dc/terms/', prov: 'http://www.w3.org/ns/prov#', rdfs: RDFS, schema: 'https://schema.org/', skos: 'http://www.w3.org/2004/02/skos/core#', xsd: XSD };
@@ -562,7 +612,11 @@ const GRAPH = (() => {
   const single = a => a.length === 1 ? a[0] : a;
   const nodes = [{
     '@id': BASE, '@type': 'Bundle', specVersion: SPEC_VERSION,
-    [ctxKey('schema:license')]: LICENSE_PROSE, [ctxKey('schema:usageInfo')]: `${BASE}legal/#content-use-terms`,
+    // AGSC-05-26 / AGSC-06-18 as amended at rc.5: `schema:usageInfo` carries the
+    // Content Use Terms IDENTIFIER as an `xsd:string` literal, not a link to the
+    // page that prints the terms — "a LicenseRef- or SPDX identifier is text, not
+    // an IRI" (2026-09-21, NS-07).
+    [ctxKey('schema:license')]: LICENSE_PROSE, [ctxKey('schema:usageInfo')]: TERMS_ID,
   }];
   const TYPE = { concept: 'Concept', procedure: 'Procedure', cluster: 'Cluster', episode: 'Episode', lesson: 'Lesson', gate: 'Gate' };
   for (const it of items) {
@@ -623,6 +677,11 @@ const WELLKNOWN_DOC = {
     [`${REL}context`]: [{ href: `${BASE}ns/context.jsonld`, type: 'application/ld+json' }],
     [`${REL}ontology`]: [{ href: `${BASE}ns/agsc.ttl`, type: 'text/turtle' }],
     [`${REL}surface`]: [{ 'agsc-access': ['none'], 'agsc-surface': ['llms-txt'], href: `${BASE}llms.txt` }],
+    // One `…/rel#contribute` link per `contribute[]` entry, carrying the mode (AGSC-11-14).
+    ...(CONTRIBUTE.length ? { [`${REL}contribute`]: CONTRIBUTE.map(c => ({ 'agsc-contribute-mode': [c.mode], href: c.target })).sort((a, b) => byCode(a.href, b.href)) } : {}),
+    // One `…/rel#peer` link per `peers[]` entry: another node's canonical well-known URL, for the
+    // mutual-conformance check of AGSC-10-12.
+    ...(PEERS.length ? { [`${REL}peer`]: [...PEERS].sort(byCode).map(href => ({ href, type: 'application/linkset+json' })) } : {}),
   }],
 };
 const WELLKNOWN_BYTES = jcs(WELLKNOWN_DOC) + '\n';
@@ -706,6 +765,12 @@ const statusBlock = () => `<section class="status" aria-labelledby="status-headi
 <p>Specification <code>${esc(SPEC_VERSION)}</code>, a release candidate tagged on ${esc(SPEC_DATE)}. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it. Released sections are immutable; a correction ships as a new version.</p>
 </section>
 `;
+// "Propose an edit": a plain link to the forge's edit-in-browser view of the page's own source
+// file. No script and no form (the CSP sets form-action 'none'): the forge opens its editor, and
+// a submitted change becomes a pull request that a person reviews and merges — the Proposal route
+// of AGSC-08-03/AGSC-11-14, which is the contribution channel this node declares.
+const editLink = (repo, file) => `<p class="edit"><a rel="noopener" href="${esc(`${FORGE[repo]}/edit/main/${file}`)}">Propose an edit</a> — opens <code>${esc(file)}</code>${repo === 'engine' ? ' in the specification repository' : ''}; a submitted change becomes a pull request a person reviews.</p>\n`;
+
 const regText = {
   wellknown: { 'not-requested': 'Not yet requested. The suffix <code>knowledge-linkset</code> will be requested for the Well-Known URIs registry (RFC 8615) through an Internet-Draft; it is not registered.', requested: 'Requested for the Well-Known URIs registry (RFC 8615); not yet registered.', registered: 'Registered in the Well-Known URIs registry (RFC 8615).' }[STATUS.wellknown],
   profile: { 'not-filed': 'Not yet filed in the Profile URIs registry (RFC 7284).', filed: 'Filed in the Profile URIs registry (RFC 7284); not yet registered.', registered: 'Registered in the Profile URIs registry (RFC 7284).' }[STATUS.profile],
@@ -749,7 +814,7 @@ ${figure('system-overview')}<h2 id="this-site">This site is a node of itself</h2
 <li><strong>Agents:</strong> <a href="${WELLKNOWN}"><code>${WELLKNOWN}</code></a> or <a href="/llms.txt"><code>/llms.txt</code></a>.</li>
 <li><strong>Publishers:</strong> <a href="/procedures/publish-a-level-0-node/">publish a Level-0 node</a> from any CMS or wiki export.</li>
 </ul>
-`,
+${editLink('site', 'content/index.md')}`,
 });
 
 // specification index and sections
@@ -784,7 +849,8 @@ for (const p of specPages) {
       + `<aside class="plain" aria-labelledby="plain"><h2 id="plain">In plain language</h2>\n${md(plainSrc, { ruleLinks: true, page: p.slug, used, tables })}<p class="id">This box explains; the rules below decide. New to the notation? See <a href="/docs/reading-the-specification/">how to read the specification</a>.</p>\n</aside>\n`
       + figure(SPEC_DIAGRAM[p.slug])
       + (toc.length ? `<nav class="toc" aria-labelledby="contents"><h2 id="contents">Contents</h2>\n<ol>\n${toc.map(t => `<li><a href="#${t.id}">${t.html}</a></li>`).join('\n')}\n</ol></nav>\n` : '')
-      + bodyHtml.slice(h1end),
+      + bodyHtml.slice(h1end)
+      + editLink('engine', `spec/${p.file}`),
   });
 }
 
@@ -809,7 +875,7 @@ for (const p of specPages) {
     ['license', 'The licence page of the node.', ['AGSC-06-10']],
     ['service-doc', 'Human documentation, such as <code>/specs/</code>.', ['AGSC-06-10']],
     ['author', 'The author of the node.', ['AGSC-06-10']],
-    ['related, service-desc, service-meta, collection, item', 'Related-system links, OPTIONAL, each carrying <code>type</code>.', ['AGSC-06-35']],
+    ['related, service-desc, service-meta, collection, item', 'Related-system links, OPTIONAL, each carrying <code>type</code>. Admitted by both rules since rc.5.', ['AGSC-06-10', 'AGSC-06-35']],
   ];
   const attrs = [
     ['digest', 'One string <code>sha-256=:&lt;base64&gt;:</code> over the bytes of the target (RFC 9530, RFC 9651). Level 2 and above.', ['AGSC-06-08']],
@@ -844,21 +910,24 @@ ${rows.map(r => `<tr${idOf ? ` id="${idOf(r)}"` : ''}><th scope="row">${nameCell
 </dl>
 </section>
 ${figure('agentic-knowledge')}`,
+    // AGSC-06-01 (amended at rc.5): each row's anchor is named exactly as the fragment of the
+    // relation URI — `#graph`, not `#rel-graph` — so a client that does follow `…/rel#graph`
+    // keeps that fragment and lands on this row.
     relations: `<p>Registered relations (IANA Link Relations registry):</p>\n` + table(['Relation', 'Meaning', 'Rules'], registered, null, r => `<code>${esc(r[0])}</code>`)
       + `<p>Extension relations. Each URI <code>${REL}&lt;name&gt;</code> resolves to its row below.</p>\n`
-      + table(['Extension relation', 'Target', 'Rules'], relations, r => `rel-${r[0]}`, r => `<span id="${r[0]}"></span><code>…/rel#${r[0]}</code>`),
+      + table(['Extension relation', 'Target', 'Rules'], relations, r => r[0], r => `<code>…/rel#${r[0]}</code>`),
     attributes: `<p>Extension target attributes use the prefix <code>agsc-</code>, except <code>digest</code>. Every attribute value is an array of strings (${R('AGSC-06-10')}).</p>\n`
       + table(['Attribute', 'Meaning', 'Rules'], attrs, r => `attr-${r[0]}`, r => `<code>${esc(r[0])}</code>`),
     'example-self': `<p>The live document is at <a href="${WELLKNOWN}"><code>${WELLKNOWN}</code></a>; a browser shows it as text. The same bytes, pretty-printed:</p>\n<pre tabindex="0" data-lang="json"><code>${esc(pretty(WELLKNOWN_DOC))}</code></pre>\n`,
     'example-level2': `<pre tabindex="0" data-lang="json"><code>${esc(pretty(level2))}</code></pre>\n`,
   };
-  const used = new Set(['main', 'status-heading', ...relations.map(r => r[0]), ...relations.map(r => `rel-${r[0]}`), ...attrs.map(r => `attr-${r[0]}`)]);
+  const used = new Set(['main', 'status-heading', ...relations.map(r => r[0]), ...attrs.map(r => `attr-${r[0]}`)]);
   const src = read('site/profile.md');
   checkText('site/profile.md', src);
   addPage('/specs/agentic-knowledge/', {
     title: 'Knowledge link set profile', summary: summaryOf('/specs/agentic-knowledge/'), description: 'The profile of the application/linkset+json discovery document that an AgenticSystemCore node serves at /.well-known/knowledge-linkset.', section: '/specs/agentic-knowledge/', wide: true,
     jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: 'Knowledge link set profile', url: `${BASE}specs/agentic-knowledge/`, identifier: PROFILE, version: SPEC_VERSION, author: { '@type': 'Person', name: config.site.author } },
-    body: md(src, { ruleLinks: true, page: 'agentic-knowledge', slots, used }),
+    body: md(src, { ruleLinks: true, page: 'agentic-knowledge', slots, used }) + editLink('site', 'site/profile.md'),
   });
 }
 
@@ -884,7 +953,7 @@ ${figure('agentic-knowledge')}`,
   addPage('/specs/mcp/', {
     title: 'MCP knowledge extension', summary: summaryOf('/specs/mcp/'), description: `The reference text of ${MCP_EXTENSION}, the unofficial Model Context Protocol extension by which a server says that the knowledge it serves is also published as a static Bundle.`, section: '/specs/', wide: true,
     jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: 'MCP knowledge extension', url: `${BASE}specs/mcp/`, identifier: MCP_EXTENSION, version: SPEC_VERSION, license: 'https://www.apache.org/licenses/LICENSE-2.0', author: { '@type': 'Person', name: config.site.author }, isPartOf: `${BASE}specs/` },
-    body: md(src, { ruleLinks: true, page: 'mcp', slots, used }),
+    body: md(src, { ruleLinks: true, page: 'mcp', slots, used }) + editLink('site', 'site/mcp-extension.md'),
   });
 }
 
@@ -934,7 +1003,7 @@ const itemPage = it => addPage(it.url, {
   jsonld: it.type === 'concept'
     ? { '@context': 'https://schema.org', '@type': 'DefinedTerm', name: it.fm.title, description: it.fm.description, url: it.iri, inDefinedTermSet: `${BASE}concepts/` }
     : { '@context': 'https://schema.org', '@type': 'TechArticle', headline: it.fm.title, description: it.fm.description, url: it.iri, author: { '@type': 'Person', name: config.site.author } },
-  body: `${itemMeta(it)}${it.fm.when ? `<p><strong>When:</strong> ${esc(it.fm.when)}</p>\n` : ''}${md(it.body, { ruleLinks: true, shift: 0 })}${it.type === 'cluster' ? `<h2 id="members">Members</h2>\n<ul>\n${members(it).map(m => `<li><a href="${m.url}">${esc(m.fm.title)}</a>: ${esc(m.fm.description || '')}</li>`).join('\n')}\n</ul>\n` : ''}${sourcesList(it)}`,
+  body: `${itemMeta(it)}${it.fm.when ? `<p><strong>When:</strong> ${esc(it.fm.when)}</p>\n` : ''}${md(it.body, { ruleLinks: true, shift: 0 })}${it.type === 'cluster' ? `<h2 id="members">Members</h2>\n<ul>\n${members(it).map(m => `<li><a href="${m.url}">${esc(m.fm.title)}</a>: ${esc(m.fm.description || '')}</li>`).join('\n')}\n</ul>\n` : ''}${sourcesList(it)}${editLink('site', it.rel)}`,
 });
 items.forEach(itemPage);
 const listPage = (url, title, description, list, section) => addPage(url, {
@@ -958,7 +1027,8 @@ const statusRows = [
   ['Preprint', STATUS.preprint ? 'Published' : 'In preparation', regText.preprint],
   ['Reference engine <code>agsc</code>', 'In preparation', 'The engine that implements Levels 1 to 3 is not published. This site is generated without it.'],
   ['Independent validators', 'In preparation', 'One validator, for the discovery document, exists and checked this site; the validators ship with the reference implementation.'],
-  ['Patterns catalogue as a second node', 'In preparation', 'The catalogue of agentic system patterns will be published as a second, editable node on this origin, peered with this one.'],
+  ['Contribution channel', 'Live', `Declared in the <a href="${WELLKNOWN}">discovery document</a> as a pull-request target (<a class="ref" href="/specs/11-boundary/#AGSC-11-14">AGSC-11-14</a>), and every page generated from a source file carries a <em>Propose an edit</em> link to that file. Nothing is written without a person merging it.`],
+  ['Patterns catalogue as a second node', 'In preparation', `The catalogue of agentic system patterns is being prepared as a second node at <code>patterns.agenticsystemcore.com</code>. ${PEERS.length ? 'This node already names it as a peer in the discovery document; the mutual check of <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a> passes once both are published.' : 'It is not declared as a peer yet.'}`],
   ['Papers', 'Planned', 'Journal and conference papers follow the preprint; none is submitted.'],
 ];
 const statusTable = `<div class="table-wrap" tabindex="0" role="region" aria-label="Status"><table>
@@ -1017,7 +1087,7 @@ for (const f of DOCS) {
   addPage(url, {
     title: fm.title, summary: fm.summary, description: fm.description, section: slug === 'standards' ? '/docs/standards/' : '/docs/', wide: WIDE_DOCS.has(slug),
     jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: fm.title, description: fm.description, url: ORIGIN + url, author: { '@type': 'Person', name: config.site.author }, isPartOf: `${BASE}docs/` },
-    body: md(body, { ...o, slots }),
+    body: md(body, { ...o, slots }) + editLink('site', `site/docs/${f}`),
   });
 }
 
@@ -1025,10 +1095,17 @@ for (const f of DOCS) {
 addPage('/about/', {
   title: 'About', summary: summaryOf('/about/'), description: 'Who writes AgenticSystemCore, how to read this node, the status of the specification and how to get in touch.', section: '/about/',
   jsonld: { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'About AgenticSystemCore', url: `${BASE}about/`, author: { '@type': 'Person', name: config.site.author, sameAs: ['https://orcid.org/0009-0001-3464-5283', 'https://github.com/andreibesleaga', CONTACT_URL] } },
-  body: md(read('site/about.md'), { ruleLinks: true }),
+  body: md(read('site/about.md'), { ruleLinks: true }) + editLink('site', 'site/about.md'),
 });
+// AGSC-06-18 as amended at rc.5 pins the text the identifier names: the file `LICENSE-CONTENT`
+// at the root of the specification's distribution, with this SHA-256 over its bytes. The Bundle
+// root carries its own copy; both are checked to be that text, or `/legal/` would publish terms
+// the identifier does not name.
+const TERMS_SHA256 = 'b2e8da62e6a41886296d2d2358fb4642cc7418e806eb4a29ada12b588ac32857';
 const TERMS_TEXT = engineFile('LICENSE-CONTENT');
 if (!TERMS_TEXT.includes(`SPDX-License-Identifier: ${TERMS_ID}`)) die('LICENSE-CONTENT does not carry the terms identifier');
+if (sha256hex(Buffer.from(TERMS_TEXT, 'utf8')) !== TERMS_SHA256) die(`LICENSE-CONTENT at tag ${SPEC_TAG} is not the text AGSC-06-18 pins (${TERMS_SHA256})`);
+if (sha256hex(fs.readFileSync(path.join(ROOT, 'LICENSE-CONTENT'))) !== TERMS_SHA256) die('the Bundle root LICENSE-CONTENT is not the text AGSC-06-18 pins');
 addPage('/legal/', {
   title: 'Legal and privacy', summary: summaryOf('/legal/'), description: 'The Content Use Terms, the licences of each kind of artefact, the machine-readable signals and the privacy notice of this node.', section: null,
   jsonld: { '@context': 'https://schema.org', '@type': 'WebPage', name: 'Legal and privacy', url: `${BASE}legal/` },
@@ -1041,6 +1118,7 @@ addPage('/legal/', {
 <tr><td>The specification text</td><td><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>, as published with the reference implementation</td></tr>
 </tbody></table></div>
 <h2 id="content-use-terms">Content Use Terms 1.0</h2>
+<p>The identifier <code>${TERMS_ID}</code> names this exact text, not a file name: the file <code>LICENSE-CONTENT</code> at the root of the specification's distribution, ${Buffer.byteLength(TERMS_TEXT)} bytes, SHA-256 <code>${TERMS_SHA256}</code> (<a class="ref" href="/specs/06-surfaces/#AGSC-06-18">AGSC-06-18</a>). A distribution that ships different wording must use a different identifier; a reader may check the hash.</p>
 <pre tabindex="0" class="terms"><code>${esc(TERMS_TEXT.replace(/\n$/, ''))}</code></pre>
 <h2 id="signals">Machine-readable signals</h2>
 <p>The same policy is stated three ways (<a class="ref" href="/specs/06-surfaces/#AGSC-06-18">AGSC-06-18</a>): the AI-usage signals of <a href="/robots.txt"><code>/robots.txt</code></a>, the TDM reservation in <a href="/.well-known/tdmrep.json"><code>/.well-known/tdmrep.json</code></a>, and the <code>schema:license</code> and <code>schema:usageInfo</code> members of <a href="/graph.jsonld"><code>/graph.jsonld</code></a> together with the provenance header of <a href="/llms.txt"><code>/llms.txt</code></a>.</p>
@@ -1176,7 +1254,13 @@ for (const [p, c] of files) {
   if (s !== null) {
     if (s.normalize('NFC') !== s) die(`${p}: output not NFC (AGSC-E604)`);
     if (!s.endsWith('\n') || s.endsWith('\n\n')) die(`${p}: output must end with exactly one LF`);
-    if (p.endsWith('.html') && Buffer.byteLength(s) > 100 * 1024) die(`${p}: ${Buffer.byteLength(s)} bytes exceeds the 100 KB page budget (AGSC-06-21)`);
+    if (p.endsWith('.html') && Buffer.byteLength(s) > 100 * 1000) die(`${p}: ${Buffer.byteLength(s)} bytes exceeds the 100 KB page budget (AGSC-06-21; KB is decimal at rc.5)`);
+    // AGSC-06-21 as amended at rc.5: ≤1 MB per index document, and `/search.json` carries the docs
+    // of at most 500 items before it becomes a manifest over `/search-<nn>.json` shards.
+    if (p === 'search.json') {
+      if (Buffer.byteLength(s) > 1000 * 1000) die(`search.json: ${Buffer.byteLength(s)} bytes exceeds the 1 MB index-document budget (AGSC-06-21)`);
+      if (items.length > 500) die(`search.json: ${items.length} items — the index must be sharded above 500 (AGSC-06-21, AGSC-06-31)`);
+    }
     const t = ALLOWED_QUOTES.reduce((x, q) => x.split(q).join(''), s);
     const hit = /wiley|companion|chapter \d|reading order/i.exec(t);
     // The specification's own clean-room rule names the framings it forbids, so spec pages and the

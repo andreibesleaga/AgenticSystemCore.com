@@ -11,7 +11,7 @@
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const ROOT = path.resolve(__dirname, '..');
 const ENGINE = path.resolve(ROOT, process.env.AGSC_ENGINE || '../agentic-system-core');
-const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.4';
+const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.5';
 const WWW = path.join(ROOT, (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www'); // www-next until launch (README)
 const fails = [];
 const NO_TRACE_IN_SOURCE = new Set(['AGSC-05-26']); // the one rule whose source ends in a table with no bracket
@@ -63,7 +63,7 @@ for (const f of files.filter(f => f.endsWith('.html'))) idsOf.set(f, new Set(ids
 for (const f of files.filter(f => f.endsWith('.html'))) {
   const r = rel(f), h = fs.readFileSync(f, 'utf8');
   const E = m => fails.push(`${r}: ${m}`);
-  if (Buffer.byteLength(h) > 100 * 1024) E('exceeds the 100 KB page budget (AGSC-06-21)');
+  if (Buffer.byteLength(h) > 100 * 1000) E("exceeds the 100 KB page budget (AGSC-06-21)");
   if (!h.startsWith('<!doctype html>\n<html lang="en">')) E('doctype or lang missing');
   if ((h.match(/<h1[\s>]/g) || []).length !== 1) E('must have exactly one h1');
   if (!/<title>[^<]{3,}<\/title>/.test(h)) E('title missing');
@@ -111,6 +111,9 @@ for (const f of files) {
   if (/\bWeb4\b|W3C (?:standard|Recommendation) for AgenticSystemCore/i.test(t)) fails.push(`${r}: forbidden claim`);
   if (/andrei\.besleaga\.nicolae@|abnmaster@|@gmail\.com/i.test(s)) fails.push(`${r}: the operator's e-mail address is published`);
 }
+// AGSC-06-21 as amended at rc.5: ≤1 MB per index document (decimal), sharded above 500 items.
+const searchJson = path.join(WWW, 'search.json');
+ok(exists(searchJson) && fs.statSync(searchJson).size <= 1000 * 1000, 'search.json missing or over the 1 MB index-document budget (AGSC-06-21)');
 const headers = exists(path.join(WWW, '_headers')) ? fs.readFileSync(path.join(WWW, '_headers'), 'utf8') : '';
 for (const need of [
   'Content-Type: application/linkset+json; profile="https://w3id.org/agentic-system-core/profile/agentic-knowledge"',
