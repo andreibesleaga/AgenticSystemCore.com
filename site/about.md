@@ -1,4 +1,4 @@
-AgenticSystemCore is written and maintained by Andrei Nicolae Besleaga, an independent researcher. The vocabulary and guide pages of this site were written with AI assistance and reviewed and published by the operator; every item says so in its provenance record.
+AgenticSystemCore is written and maintained by Andrei N. Besleaga. The vocabulary and guide pages of this site were written with AI assistance and reviewed and published by the operator; every item says so in its provenance record.
 
 ## How to read this node
 

@@ -49,6 +49,7 @@
     "/specs/08-governance/": "the normative text moved from release candidate 5 to release candidate 6: this page renders the specification source, so its words follow the source. Nothing about the page's design changed.",
     "/specs/09-conformance/": "the normative text moved from release candidate 5 to release candidate 6: this page renders the specification source, so its words follow the source. Nothing about the page's design changed.",
     "/specs/11-boundary/": "the normative text moved from release candidate 5 to release candidate 6: this page renders the specification source, so its words follow the source. Nothing about the page's design changed.",
-    "/specs/agentic-knowledge/": "this page shows the live discovery document as its example, so it changes whenever that document changes -- here by the digests of the two additive export files and by the bundle version, the counts and the bundle hash the engine stamps."
+    "/specs/agentic-knowledge/": "this page shows the live discovery document as its example, so it changes whenever that document changes -- here by the digests of the two additive export files and by the bundle version, the counts and the bundle hash the engine stamps.",
+    "/compose/webmcp.js": "LEGAL-2 (2026-09-23): the engine's generated browser scripts now open with an SPDX line naming their code licence (Apache-2.0); the code is unchanged"
   }
 }

@@ -5,6 +5,11 @@
       "route": "*",
       "pattern": "<p class=\"copyright\">.*?</p>\\n",
       "why": "the copyright and Content Use Terms line added to every page footer at rc.6 (the owner's legal pack of 2026-09-22; RC6-B hand-over item 5)"
+    },
+    {
+      "route": "*",
+      "pattern": "<p class=\"notice\">Written with AI assistance.*?</p>\\n",
+      "why": "the one-sentence AI-assistance and disclaimer notice added to every page footer at rc.6 (the owner's legal pack of 2026-09-22, M-12 and M-13; applied by LEGAL-2 on 2026-09-23), the same sentence the engine writes on engine-built pages"
     }
   ]
 }

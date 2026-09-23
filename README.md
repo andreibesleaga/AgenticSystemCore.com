@@ -51,3 +51,27 @@ Every generated page and both `llms` files already embed the Content Use Terms a
 - **"Propose an edit"** — every page generated from one source file carries a plain link to that file's edit-in-browser view on the forge: pages built from this repository link here, specification pages link to the engine repository. No script and no form; the CSP sets `form-action 'none'`.
 - The profile page's extension-relation anchors are named exactly as the relation URI's fragment (`#graph`, not `#rel-graph`), as AGSC-06-01 requires at rc.5.
 - The generator checks the authored single-line strings for control characters and line separators (AGSC-02-24 at rc.5), pins `LICENSE-CONTENT` by the SHA-256 that AGSC-06-18 now names, and fails on any authored page naming a release candidate other than the one being built.
+
+## How this is made
+
+This work is written and maintained by Andrei N. Besleaga with the help of AI
+assistants. A person decides what is written, an assistant drafts and checks it, and a
+person reads, edits and approves everything that is published and answers for it. Every
+published item records how its text was made and names the person accountable for it.
+Written with AI assistance, reviewed and published by a person.
+
+## What this does not claim
+
+This is the independent work of one person, published as it is, with no warranty of any
+kind and no liability for anything that follows from using it. Nothing in it is legal or
+professional advice. No standards body, foundation, company or institution named in this
+repository has reviewed, approved or is connected with this work, and it is not a document
+of the IETF, of the W3C or of any other body. Other product and organisation names are the
+marks of their owners and are used only to say what is being talked about. AgenticSystemCore™ is a trademark of Andrei N. Besleaga. Other names belong to their owners.
+Every right not expressly granted by the licences is reserved, and nothing here promises
+that the work or its addresses will stay available.
+
+---
+
+© 2026 Andrei N. Besleaga. Code: Apache-2.0. Schemas, ontology, identifiers and the
+discovery document: CC0-1.0. Prose: the Content Use Terms in `LICENSE-CONTENT`.

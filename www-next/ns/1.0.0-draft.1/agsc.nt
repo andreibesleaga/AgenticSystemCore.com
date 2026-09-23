@@ -269,9 +269,16 @@
 <https://w3id.org/agentic-system-core/ns#verifies> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
 <https://w3id.org/agentic-system-core/ns#verifies> <http://www.w3.org/2000/01/rdf-schema#label> "verifies"^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#verifies> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#isVerifiedBy> .
+<https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/creator> <https://orcid.org/0009-0001-3464-5283> .
 <https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/description> "Vocabulary for AgenticSystemCore Bundles: six item types plus Bundle, Source, Proposal, Review, Harness and (rc.3) Attachment, aligned to SKOS, PROV-O and DCTerms."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/issued> "2026-09-17"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/license> <https://creativecommons.org/publicdomain/zero/1.0/> .
+<https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/modified> "2026-09-23"^^<http://www.w3.org/2001/XMLSchema#date> .
+<https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/publisher> <https://orcid.org/0009-0001-3464-5283> .
 <https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/title> "AgenticSystemCore vocabulary"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns> <http://purl.org/vocab/vann/preferredNamespacePrefix> "asc"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns> <http://purl.org/vocab/vann/preferredNamespaceUri> <https://w3id.org/agentic-system-core/ns#> .
+<https://w3id.org/agentic-system-core/ns> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/vocommons/voaf#Vocabulary> .
 <https://w3id.org/agentic-system-core/ns> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
 <https://w3id.org/agentic-system-core/ns> <http://www.w3.org/2000/01/rdf-schema#label> "AgenticSystemCore vocabulary"^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/agentic-system-core/ns/1.0.0-draft.1> .

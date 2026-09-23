@@ -18,7 +18,7 @@
     "https://patterns.agenticsystemcore.com/.well-known/knowledge-linkset"
   ],
   "site": {
-    "author": "Andrei Nicolae Besleaga",
+    "author": "Andrei N. Besleaga",
     "base": "https://agenticsystemcore.com/",
     "tagline": "Auto-wiki, distributed agentic memory, live specifications, evolving skills, runnable architectures and a self-driving live board \u2014 one open format for people and agents. Reference Node Level-0 of the Agentic Knowledge Web.",
     "tdm_crawlers": [
