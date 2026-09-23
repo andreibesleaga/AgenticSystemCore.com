@@ -13,7 +13,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/specs/agentic-knowledge/">
 <meta property="og:title" content="Knowledge link set profile">
 <meta property="og:description" content="The profile of the application/linkset+json discovery document that an AgenticSystemCore node serves at /.well-known/knowledge-linkset.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Knowledge link set profile","url":"https://agenticsystemcore.com/specs/agentic-knowledge/","identifier":"https://w3id.org/agentic-system-core/profile/agentic-knowledge","version":"1.0.0-rc.5","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Knowledge link set profile","url":"https://agenticsystemcore.com/specs/agentic-knowledge/","identifier":"https://w3id.org/agentic-system-core/profile/agentic-knowledge","version":"1.0.0-rc.6","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"}}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -40,7 +43,7 @@
 <h2 id="status-heading">Status</h2>
 <dl class="meta">
 <dt>Profile URI</dt><dd><code>https://w3id.org/agentic-system-core/profile/agentic-knowledge</code></dd>
-<dt>Specification</dt><dd><code>1.0.0-rc.5</code>, a release candidate. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
+<dt>Specification</dt><dd><code>1.0.0-rc.6</code>, a release candidate. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
 <dt>Well-known URI</dt><dd>Not yet requested. The suffix <code>knowledge-linkset</code> will be requested for the Well-Known URIs registry (RFC 8615) through an Internet-Draft; it is not registered.</dd>
 <dt>Profile URI registration</dt><dd>Not yet filed in the Profile URIs registry (RFC 7284).</dd>
 <dt>Internet-Draft</dt><dd>Not yet posted.</dd>
@@ -157,6 +160,23 @@
     {
       &quot;alternate&quot;: [
         {
+          &quot;digest&quot;: [
+            &quot;sha-256=:KTuOiF02LtvFmnfL6UEuNPd0PRIB4K1BzK/fLkeqK3o=:&quot;
+          ],
+          &quot;href&quot;: &quot;https://agenticsystemcore.com/exports/chunks-index.toon&quot;,
+          &quot;type&quot;: &quot;text/plain&quot;
+        },
+        {
+          &quot;digest&quot;: [
+            &quot;sha-256=:RuPE1YNdvKoKRuBsEd8+r2x+nV7uR53TNRMB+bItYZA=:&quot;
+          ],
+          &quot;href&quot;: &quot;https://agenticsystemcore.com/exports/llms-ctx.txt&quot;,
+          &quot;type&quot;: &quot;text/plain&quot;
+        },
+        {
+          &quot;digest&quot;: [
+            &quot;sha-256=:44Hxr7ZpbxCc2i1+AGTI6lJtBFb6L3mwdQFF5MlD1UA=:&quot;
+          ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/llms.txt&quot;,
           &quot;type&quot;: &quot;text/plain&quot;
         }
@@ -164,12 +184,38 @@
       &quot;anchor&quot;: &quot;https://agenticsystemcore.com/&quot;,
       &quot;describedby&quot;: [
         {
+          &quot;agsc-bundle-hash&quot;: [
+            &quot;sha-256=:ocWvmS0gNcaF46PUrp/db7uKpiC+yP1zicklNzEGgwM=:&quot;
+          ],
+          &quot;agsc-bundle-version&quot;: [
+            &quot;0.0.0+16.g7a4caa38f407&quot;
+          ],
+          &quot;agsc-counts&quot;: [
+            &quot;clusters=2&quot;,
+            &quot;concepts=12&quot;,
+            &quot;episodes=0&quot;,
+            &quot;gates=0&quot;,
+            &quot;lessons=0&quot;,
+            &quot;procedures=1&quot;
+          ],
+          &quot;agsc-generated-at&quot;: [
+            &quot;2026-09-21T15:02:18Z&quot;
+          ],
+          &quot;agsc-spec-version&quot;: [
+            &quot;1.0.0-rc.6&quot;
+          ],
+          &quot;digest&quot;: [
+            &quot;sha-256=:f45//Qk2pdKssm6tVyMIaLEVb2UnBD4lUVWrOBmd828=:&quot;
+          ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/graph.jsonld&quot;,
           &quot;type&quot;: &quot;application/ld+json&quot;
         }
       ],
       &quot;https://w3id.org/agentic-system-core/rel#context&quot;: [
         {
+          &quot;digest&quot;: [
+            &quot;sha-256=:jyXy0lDbMJokYsYqJOd2v7RQJS785jGxeDL1JlhDgDA=:&quot;
+          ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/ns/context.jsonld&quot;,
           &quot;type&quot;: &quot;application/ld+json&quot;
         }
@@ -182,8 +228,36 @@
           &quot;href&quot;: &quot;https://github.com/andreibesleaga/AgenticSystemCore.com&quot;
         }
       ],
+      &quot;https://w3id.org/agentic-system-core/rel#graph&quot;: [
+        {
+          &quot;digest&quot;: [
+            &quot;sha-256=:2jJbN/i66vvh4m/V6DpfIkssFQRYu1Ko9x+IzWgYMuY=:&quot;
+          ],
+          &quot;href&quot;: &quot;https://agenticsystemcore.com/graph.nq&quot;,
+          &quot;type&quot;: &quot;application/n-quads&quot;
+        },
+        {
+          &quot;digest&quot;: [
+            &quot;sha-256=:wSkPfPXjMW7xe1OyeLzdirXsZMb66k8oda+bcm/wlOE=:&quot;
+          ],
+          &quot;href&quot;: &quot;https://agenticsystemcore.com/graph.ttl&quot;,
+          &quot;type&quot;: &quot;text/turtle&quot;
+        }
+      ],
+      &quot;https://w3id.org/agentic-system-core/rel#now&quot;: [
+        {
+          &quot;digest&quot;: [
+            &quot;sha-256=:/SEmFollFi/YpDZ6YqrzbHCEt4XIrwbUM1TNSbNEhg4=:&quot;
+          ],
+          &quot;href&quot;: &quot;https://agenticsystemcore.com/now.md&quot;,
+          &quot;type&quot;: &quot;text/markdown&quot;
+        }
+      ],
       &quot;https://w3id.org/agentic-system-core/rel#ontology&quot;: [
         {
+          &quot;digest&quot;: [
+            &quot;sha-256=:x8bM0/I2049N8dRVBLXcm6xS8saPI72PRycrY6kbYIM=:&quot;
+          ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/ns/agsc.ttl&quot;,
           &quot;type&quot;: &quot;text/turtle&quot;
         }
@@ -194,7 +268,37 @@
           &quot;type&quot;: &quot;application/linkset+json&quot;
         }
       ],
+      &quot;https://w3id.org/agentic-system-core/rel#skills&quot;: [
+        {
+          &quot;digest&quot;: [
+            &quot;sha-256=:buz0ilwUqK6Rvs7XwMs4tlF4j7Dtv/z3NjiX/iNE1pU=:&quot;
+          ],
+          &quot;href&quot;: &quot;https://agenticsystemcore.com/skills/index.json&quot;,
+          &quot;type&quot;: &quot;application/json&quot;
+        }
+      ],
       &quot;https://w3id.org/agentic-system-core/rel#surface&quot;: [
+        {
+          &quot;agsc-access&quot;: [
+            &quot;none&quot;
+          ],
+          &quot;agsc-surface&quot;: [
+            &quot;chunks&quot;
+          ],
+          &quot;href&quot;: &quot;https://agenticsystemcore.com/chunks.jsonl&quot;
+        },
+        {
+          &quot;agsc-access&quot;: [
+            &quot;consent&quot;
+          ],
+          &quot;agsc-surface&quot;: [
+            &quot;webmcp&quot;
+          ],
+          &quot;agsc-surface-version&quot;: [
+            &quot;2026-09-15&quot;
+          ],
+          &quot;href&quot;: &quot;https://agenticsystemcore.com/compose/&quot;
+        },
         {
           &quot;agsc-access&quot;: [
             &quot;none&quot;
@@ -249,7 +353,7 @@
             &quot;2026-01-01T00:00:00Z&quot;
           ],
           &quot;agsc-spec-version&quot;: [
-            &quot;1.0.0-rc.5&quot;
+            &quot;1.0.0-rc.6&quot;
           ],
           &quot;digest&quot;: [
             &quot;sha-256=:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=:&quot;
@@ -299,6 +403,7 @@
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/profile.md">Propose an edit</a> — opens <code>site/profile.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
+<p class="copyright">&#169; 2026 Andrei Nicolae Besleaga. All rights reserved. The prose is published under the <a href="/legal/#content-use-terms">Content Use Terms</a>; you may cite and link. See <a href="/legal/">/legal/</a>.</p>
 <p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>
 <p><a href="/legal/">Legal and privacy</a> · <a href="/docs/compliance/">Compliance and security</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery document</a> · <a href="/llms.txt">llms.txt</a> · <a rel="me" href="https://orcid.org/0009-0001-3464-5283">ORCID 0009-0001-3464-5283</a></p>
 </footer>

@@ -1,3 +1,32 @@
+# This node reserves text and data mining rights. The same policy is stated in
+# /.well-known/tdmrep.json, in the Content Use Terms at /legal/, and here.
+# Crawlers that collect material to train models: please do not.
+# Assistants fetching a page for a person, and search indexers: welcome.
+
+User-agent: Applebot-Extended
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Disallow: /
+
+User-agent: CCBot
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Disallow: /
+
+User-agent: ClaudeBot
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Disallow: /
+
+User-agent: GPTBot
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Disallow: /
+
+User-agent: Google-Extended
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Disallow: /
+
+User-agent: meta-externalagent
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Disallow: /
+
 User-agent: *
 # Content Signals Policy (contentsignals.org): the same policy as /.well-known/tdmrep.json and /legal/
 Content-Signal: search=yes, ai-input=yes, ai-train=no

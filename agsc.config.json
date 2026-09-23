@@ -20,10 +20,18 @@
   "site": {
     "author": "Andrei Nicolae Besleaga",
     "base": "https://agenticsystemcore.com/",
-    "tagline": "Auto-wiki, distributed agentic memory, live specifications, evolving skills, runnable architectures and a self-driving live board — one open format for people and agents. Reference Node Level-0 of the Agentic Knowledge Web.",
+    "tagline": "Auto-wiki, distributed agentic memory, live specifications, evolving skills, runnable architectures and a self-driving live board \u2014 one open format for people and agents. Reference Node Level-0 of the Agentic Knowledge Web.",
+    "tdm_crawlers": [
+      "Applebot-Extended",
+      "CCBot",
+      "ClaudeBot",
+      "GPTBot",
+      "Google-Extended",
+      "meta-externalagent"
+    ],
     "title": "AgenticSystemCore"
   },
-  "spec_version": "1.0.0-rc.5",
+  "spec_version": "1.0.0-rc.6",
   "tags": {
     "allowed": [
       "discovery",
@@ -31,5 +39,6 @@
       "specification",
       "vocabulary"
     ]
-  }
+  },
+  "x-patterns-node": true
 }

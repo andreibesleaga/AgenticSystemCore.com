@@ -1,13 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF
-  xmlns:asc="https://w3id.org/agentic-system-core/ns#"
-  xmlns:dcterms="http://purl.org/dc/terms/"
-  xmlns:owl="http://www.w3.org/2002/07/owl#"
-  xmlns:prov="http://www.w3.org/ns/prov#"
-  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+    xmlns:asc="https://w3id.org/agentic-system-core/ns#"
+    xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:prov="http://www.w3.org/ns/prov#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:schema="https://schema.org/"
+    xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns">
     <dcterms:description>Vocabulary for AgenticSystemCore Bundles: six item types plus Bundle, Source, Proposal, Review, Harness and (rc.3) Attachment, aligned to SKOS, PROV-O and DCTerms.</dcterms:description>
     <dcterms:license rdf:resource="https://creativecommons.org/publicdomain/zero/1.0/"/>

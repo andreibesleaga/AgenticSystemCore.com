@@ -1,5 +1,5 @@
 Contact: https://andreibesleaga.com/contact/
-Expires: 2027-09-20T10:03:11Z
+Expires: 2027-09-20T15:02:18Z
 Preferred-Languages: en
 Canonical: https://agenticsystemcore.com/.well-known/security.txt
 Policy: https://agenticsystemcore.com/docs/compliance/

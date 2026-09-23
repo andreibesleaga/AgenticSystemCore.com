@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AGSC-02 — Item: frontmatter contract per type — AgenticSystemCore</title>
-<meta name="description" content="AGSC-02 — Item: frontmatter contract per type — section 02 of the AgenticSystemCore specification 1.0.0-rc.5.">
+<meta name="description" content="AGSC-02 — Item: frontmatter contract per type — section 02 of the AgenticSystemCore specification 1.0.0-rc.6.">
 <link rel="canonical" href="https://agenticsystemcore.com/specs/02-item/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
 <link rel="stylesheet" href="/assets/site.css">
@@ -12,8 +12,8 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/specs/02-item/">
 <meta property="og:title" content="AGSC-02 — Item: frontmatter contract per type">
-<meta property="og:description" content="AGSC-02 — Item: frontmatter contract per type — section 02 of the AgenticSystemCore specification 1.0.0-rc.5.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AGSC-02 — Item: frontmatter contract per type","url":"https://agenticsystemcore.com/specs/02-item/","version":"1.0.0-rc.5","license":"https://www.apache.org/licenses/LICENSE-2.0","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"},"isPartOf":"https://agenticsystemcore.com/specs/"}</script>
+<meta property="og:description" content="AGSC-02 — Item: frontmatter contract per type — section 02 of the AgenticSystemCore specification 1.0.0-rc.6.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AGSC-02 — Item: frontmatter contract per type","url":"https://agenticsystemcore.com/specs/02-item/","version":"1.0.0-rc.6","license":"https://www.apache.org/licenses/LICENSE-2.0","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"},"isPartOf":"https://agenticsystemcore.com/specs/"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -37,7 +37,7 @@
 <p class="summary"><strong>Summary</strong>One Markdown file with a small YAML header: the keys every item has, what each of the six types adds, the body rules, and the rc.3 additions for ports, architectures, attachments and tasks.</p>
 <section class="status" aria-labelledby="status-heading">
 <h2 id="status-heading">Status of this document</h2>
-<p>Specification <code>1.0.0-rc.5</code>, a release candidate tagged on 2026-09-21. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it. Released sections are immutable; a correction ships as a new version.</p>
+<p>Specification <code>1.0.0-rc.6</code>, a release candidate tagged on 2026-09-21. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it. Released sections are immutable; a correction ships as a new version.</p>
 </section>
 <aside class="plain" aria-labelledby="plain"><h2 id="plain">In plain language</h2>
 <p><strong>One file.</strong> An item is a Markdown file that starts with a YAML block between <code>---</code> lines. The YAML is a small, safe subset: no anchors, no aliases, no custom tags.</p>
@@ -83,7 +83,7 @@
 <h2 id="section-2-1">2.1 Frontmatter syntax</h2>
 <ul>
 <li id="AGSC-02-01" class="rule-item"><a class="rule" href="#AGSC-02-01"><strong>AGSC-02-01</strong></a> A file MUST begin on line 1 with <code>---</code>, contain YAML, and close with a line <code>---</code>. A file with no such opening line is <a class="ref" href="/specs/09-conformance/#AGSC-E101"><code>AGSC-E101</code></a>; an opening line whose block is never closed by a later <code>---</code> is <a class="ref" href="/specs/09-conformance/#AGSC-E102"><code>AGSC-E102</code></a> (both codes were registered against this rule and raised by no sentence until rc.5, V8-107). No <code>...</code> terminator and no second document (<a class="ref" href="/specs/09-conformance/#AGSC-E107"><code>AGSC-E107</code></a>). <span class="trace">[research/12 §P rule 5]</span></li>
-<li id="AGSC-02-02" class="rule-item"><a class="rule" href="#AGSC-02-02"><strong>AGSC-02-02</strong></a> The YAML subset is: block mappings, block sequences, flow sequences of scalars, single/double-quoted and plain scalars, <code>|</code> and <code>&gt;</code> block scalars. Anchors, aliases, tags, merge keys, complex keys, flow mappings and duplicate keys MUST be rejected (<a class="ref" href="/specs/09-conformance/#AGSC-E103"><code>AGSC-E103</code></a>…<a class="ref" href="/specs/09-conformance/#AGSC-E106"><code>AGSC-E106</code></a>). <span class="trace">[research/12 §P rule 6]</span></li>
+<li id="AGSC-02-02" class="rule-item"><a class="rule" href="#AGSC-02-02"><strong>AGSC-02-02</strong></a> The YAML subset is: block mappings, block sequences, flow sequences of scalars, single/double-quoted and plain scalars, <code>|</code> and <code>&gt;</code> block scalars. Anchors, aliases, tags, merge keys, complex keys, flow mappings and duplicate keys MUST be rejected, each under its own code: an anchor or an alias is <a class="ref" href="/specs/09-conformance/#AGSC-E103"><code>AGSC-E103</code></a>, a tag or a merge key is <a class="ref" href="/specs/09-conformance/#AGSC-E104"><code>AGSC-E104</code></a>, a flow mapping or a complex key is <a class="ref" href="/specs/09-conformance/#AGSC-E105"><code>AGSC-E105</code></a>, and a duplicate key is <a class="ref" href="/specs/09-conformance/#AGSC-E106"><code>AGSC-E106</code></a> <em>(the four were written as the range <a class="ref" href="/specs/09-conformance/#AGSC-E103"><code>AGSC-E103</code></a>…<a class="ref" href="/specs/09-conformance/#AGSC-E106"><code>AGSC-E106</code></a> until rc.6, ENG4-04: two of the codes were then named by no rule sentence anywhere, so a port reading the rules alone could not learn which construct takes which)</em>. <span class="trace">[research/12 §P rule 6]</span></li>
 <li id="AGSC-02-03" class="rule-item"><a class="rule" href="#AGSC-02-03"><strong>AGSC-02-03</strong></a> A reader MUST parse with the YAML <strong>failsafe</strong> schema — every scalar is a string — and MUST apply types from <code>schema/item.schema.json</code>. <code>yes</code>, <code>no</code>, <code>on</code>, <code>off</code>, <code>~</code>, <code>1e3</code>, <code>0x1F</code> and bare dates are strings. <span class="trace">[research/12 §2, §P rules 6–7]</span></li>
 <li id="AGSC-02-04" class="rule-item"><a class="rule" href="#AGSC-02-04"><strong>AGSC-02-04</strong></a> Booleans MUST be written <code>true</code>/<code>false</code>; numbers MUST be plain decimal; dates and instants MUST be quoted strings. <span class="trace">[research/12 §P rule 7]</span></li>
 <li id="AGSC-02-05" class="rule-item"><a class="rule" href="#AGSC-02-05"><strong>AGSC-02-05</strong></a> Key names MUST match <code>^[a-z][a-z0-9_-]*$</code>. Unknown keys MUST be preserved and reported as warnings (<a class="ref" href="/specs/09-conformance/#AGSC-E207"><code>AGSC-E207</code></a>), never as errors. A key name that does not match this pattern is <a class="ref" href="/specs/09-conformance/#AGSC-E204"><code>AGSC-E204</code></a> (a pattern violation), distinct from an <em>unknown but well-formed</em> key, which is the <a class="ref" href="/specs/09-conformance/#AGSC-E207"><code>AGSC-E207</code></a> warning; the schema does not enforce the pattern, because <code>propertyNames</code> would turn the warning into an error. <span class="trace">[research/12 §P rule 11, OKF]</span></li>
@@ -171,6 +171,7 @@
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/agentic-system-core/edit/main/spec/02-item.md">Propose an edit</a> — opens <code>spec/02-item.md</code> in the specification repository; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
+<p class="copyright">&#169; 2026 Andrei Nicolae Besleaga. All rights reserved. The prose is published under the <a href="/legal/#content-use-terms">Content Use Terms</a>; you may cite and link. See <a href="/legal/">/legal/</a>.</p>
 <p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>
 <p><a href="/legal/">Legal and privacy</a> · <a href="/docs/compliance/">Compliance and security</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery document</a> · <a href="/llms.txt">llms.txt</a> · <a rel="me" href="https://orcid.org/0009-0001-3464-5283">ORCID 0009-0001-3464-5283</a></p>
 </footer>

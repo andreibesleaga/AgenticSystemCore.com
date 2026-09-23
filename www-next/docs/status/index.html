@@ -14,6 +14,9 @@
 <meta property="og:title" content="Status">
 <meta property="og:description" content="Status of AgenticSystemCore: what is live, what is in preparation, and the state of every registration, draft and publication.">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Status","description":"Status of AgenticSystemCore: what is live, what is in preparation, and the state of every registration, draft and publication.","url":"https://agenticsystemcore.com/docs/status/","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -38,16 +41,17 @@
 <div class="table-wrap" tabindex="0" role="region" aria-label="Status"><table>
 <thead><tr><th scope="col">What</th><th scope="col">State</th><th scope="col">Detail</th></tr></thead>
 <tbody>
-<tr><th scope="row">Specification <code>1.0.0-rc.5</code></th><td>Live</td><td>Tagged on 2026-09-21; twelve sections at <a href="/specs/">/specs/</a>; the vocabulary and the vectors are frozen at the tag.</td></tr>
-<tr><th scope="row">This site as a Level-0 node</th><td>Live</td><td>Items, <a href="/graph.jsonld"><code>graph.jsonld</code></a>, <a href="/llms.txt"><code>llms.txt</code></a> and the <a href="/.well-known/knowledge-linkset">discovery document</a> in its Level-0 form, checked by the Level-0 vectors and the discovery validator before every publish.</td></tr>
+<tr><th scope="row">Specification <code>1.0.0-rc.6</code></th><td>Live</td><td>Tagged on 2026-09-21; twelve sections at <a href="/specs/">/specs/</a>; the vocabulary and the vectors are frozen at the tag.</td></tr>
+<tr><th scope="row">This site as a node of its own specification</th><td>Live</td><td>Items, <a href="/graph.jsonld"><code>graph.jsonld</code></a> with <a href="/graph.nq"><code>graph.nq</code></a> and <a href="/graph.ttl"><code>graph.ttl</code></a>, <a href="/llms.txt"><code>llms.txt</code></a>, <a href="/chunks.jsonl"><code>chunks.jsonl</code></a>, the <a href="/skills/">skill packs</a>, the <a href="/now/">NOW page</a> and the <a href="/.well-known/knowledge-linkset">discovery document</a>. The discovery validator passes it at Level 0 and at Level 2 before every publish, and every digest it declares is compared with the bytes served.</td></tr>
+<tr><th scope="row">The machine files, written by the reference engine</th><td>Live</td><td>Every file above is emitted by <code>agsc build</code> over this repository's own content, and this site republishes those bytes rather than deriving them a second time. The pages themselves are still written by this repository's generator: the engine's page template has no place for a stylesheet, a header or a footer. See <a href="/exports/">the list of machine-readable files</a>.</td></tr>
 <tr><th scope="row">Ontology files</th><td>Live</td><td>Turtle, JSON-LD context, RDF/XML and N-Triples at <a href="/ns/">/ns/</a>.</td></tr>
 <tr><th scope="row">Namespace through w3id.org</th><td>Not yet resolving</td><td>The namespace <code>https://w3id.org/agentic-system-core/</code> does not resolve yet; the pull request to w3id.org has not been opened.</td></tr>
 <tr><th scope="row">Well-known URI <code>knowledge-linkset</code></th><td>Not requested</td><td>Not yet requested. The suffix <code>knowledge-linkset</code> will be requested for the Well-Known URIs registry (RFC 8615) through an Internet-Draft; it is not registered.</td></tr>
 <tr><th scope="row">Profile URI</th><td>Not filed</td><td>Not yet filed in the Profile URIs registry (RFC 7284).</td></tr>
 <tr><th scope="row">Internet-Draft</th><td>Not yet posted</td><td>Not yet posted. It will describe the discovery layer only and request two registrations: the well-known suffix and the profile URI.</td></tr>
 <tr><th scope="row">Preprint</th><td>In preparation</td><td>In preparation; not yet published.</td></tr>
-<tr><th scope="row">Reference engine <code>agsc</code></th><td>In preparation</td><td>The engine that implements Levels 1 to 3 is not published. This site is generated without it.</td></tr>
-<tr><th scope="row">Independent validators</th><td>In preparation</td><td>One validator, for the discovery document, exists and checked this site; the validators ship with the reference implementation.</td></tr>
+<tr><th scope="row">Reference engine <code>agsc</code></th><td>In preparation</td><td>The engine is written, and it builds this site: every machine-readable file here is emitted by <code>agsc build</code> over this repository&#39;s own content. The package itself is not published yet, and the pages are still written by this repository&#39;s own generator.</td></tr>
+<tr><th scope="row">Independent validators</th><td>In preparation</td><td>Nine of them &#8212; seven validators and two generators (<a class="ref" href="/specs/09-conformance/#AGSC-09-90">AGSC-09-90</a>) &#8212; exist in the reference distribution, which is not published yet. One, for the discovery document, checks this site at Level 0 and at Level 2 before every publish.</td></tr>
 <tr><th scope="row">Contribution channel</th><td>Live</td><td>Declared in the <a href="/.well-known/knowledge-linkset">discovery document</a> as a pull-request target (<a class="ref" href="/specs/11-boundary/#AGSC-11-14">AGSC-11-14</a>), and every page generated from a source file carries a <em>Propose an edit</em> link to that file. Nothing is written without a person merging it.</td></tr>
 <tr><th scope="row">Patterns catalogue as a second node</th><td>In preparation</td><td>The catalogue of agentic system patterns is being prepared as a second node at <code>patterns.agenticsystemcore.com</code>. This node already names it as a peer in the discovery document; the mutual check of <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a> passes once both are published.</td></tr>
 <tr><th scope="row">Papers</th><td>Planned</td><td>Journal and conference papers follow the preprint; none is submitted.</td></tr>
@@ -62,6 +66,7 @@
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/status.md">Propose an edit</a> — opens <code>site/docs/status.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
+<p class="copyright">&#169; 2026 Andrei Nicolae Besleaga. All rights reserved. The prose is published under the <a href="/legal/#content-use-terms">Content Use Terms</a>; you may cite and link. See <a href="/legal/">/legal/</a>.</p>
 <p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>
 <p><a href="/legal/">Legal and privacy</a> · <a href="/docs/compliance/">Compliance and security</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery document</a> · <a href="/llms.txt">llms.txt</a> · <a rel="me" href="https://orcid.org/0009-0001-3464-5283">ORCID 0009-0001-3464-5283</a></p>
 </footer>

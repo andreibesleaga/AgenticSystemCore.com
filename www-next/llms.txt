@@ -4,8 +4,10 @@
 bundle: https://agenticsystemcore.com/
 license: LicenseRef-AgenticSystemCore-Content-Use-1.0
 terms: LicenseRef-AgenticSystemCore-Content-Use-1.0
-spec_version: 1.0.0-rc.5
-generated_at: 2026-09-21T10:03:11Z
+spec_version: 1.0.0-rc.6
+bundle_version: 0.0.0+16.g7a4caa38f407
+generated_at: 2026-09-21T15:02:18Z
+assistance: content may be AI-assisted; each item states its origin in prov.origin and each accepted contribution carries an Assisted-by: trailer
 -->
 
 > An open specification for knowledge that people and software agents can both read, verify and build on, published here as a node of itself.

@@ -11,10 +11,27 @@
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const ROOT = path.resolve(__dirname, '..');
 const ENGINE = path.resolve(ROOT, process.env.AGSC_ENGINE || '../agentic-system-core');
-const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.5';
+const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.6';
+// The same parameter scripts/build.js reads: the vectors come from the release tag, and from the
+// engine's working tree while the candidate has not been tagged yet (SITE-4).
+const tagExists = cp.spawnSync('git', ['-C', ENGINE, 'rev-parse', '-q', '--verify', `${SPEC_TAG}^{commit}`], { stdio: 'ignore' }).status === 0;
+const SPEC_SOURCE = process.env.AGSC_SPEC_SOURCE || (tagExists ? 'tag' : 'worktree');
+const engineFile = p => SPEC_SOURCE === 'tag'
+  ? cp.execFileSync('git', ['-C', ENGINE, 'show', `${SPEC_TAG}:${p}`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
+  : fs.readFileSync(path.join(ENGINE, p), 'utf8');
 const WWW = path.join(ROOT, (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www'); // www-next until launch (README)
 const fails = [];
 const NO_TRACE_IN_SOURCE = new Set(['AGSC-05-26']); // the one rule whose source ends in a table with no bracket
+// AGSC-06-05/06-17: the only <script> elements any page may carry — all same-origin, all classic,
+// all deferred, none inline. The four page-tool files are the engine's own emitted bytes (D108);
+// `node scripts/page-tools-check.js` proves that and runs them.
+const ALLOWED_SCRIPTS = new Set([
+  '<script src="/assets/search.js" defer>',
+  '<script src="/compose/agsc-core.js" defer>',
+  '<script src="/compose/agsc-page-tools.js" defer>',
+  '<script src="/compose/agsc-compose.js" defer>',
+  '<script src="/compose/webmcp.js" defer>',
+]);
 const ok = (c, m) => { if (!c) fails.push(m); };
 const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]).sort();
 const rel = f => path.relative(WWW, f).split(path.sep).join('/');
@@ -31,21 +48,64 @@ ok(d2 === true, `committed output directory differs from a fresh build — run n
 
 // (2) llms vectors
 const llms = require('./llms.js');
-for (const f of ['disc-0006-llms-txt-byte-layout', 'disc-0007-llms-full-and-primary-cluster']) {
-  const v = JSON.parse(cp.execFileSync('git', ['-C', ENGINE, 'show', `${SPEC_TAG}:tests/vectors/discovery/${f}.json`], { encoding: 'utf8' }));
+const provenanceLines = require(path.join(ENGINE, 'src/knowledge/provenance-header.js')).provenanceLines;
+// disc-0006 and disc-0007 were WITHDRAWN at rc.6 and replaced by the pair below, which carries
+// the `bundle_version:` and `assistance:` lines. A withdrawn vector has no expected output, so a
+// build that still named the old pair would have proved nothing at all.
+for (const f of ['disc-0013-llms-txt-byte-layout-with-content-version', 'disc-0014-llms-full-with-content-version']) {
+  const v = JSON.parse(engineFile(`tests/vectors/discovery/${f}.json`));
+  ok(v.expected.withdrawn === undefined, `llms vector ${f} is withdrawn — name the vector that replaced it`);
   const i = v.input;
-  const out = llms({ title: i.bundle.title, base: i.bundle.base, description: i.bundle.description, license_prose: i.bundle.license_prose, terms: 'LicenseRef-AgenticSystemCore-Content-Use-1.0', spec_version: i.spec_version, generated_at: i.generated_at, clusters: i.clusters || [], items: i.items.map(x => ({ ...x, type: 'concept', iri: `${i.bundle.base}concepts/${x.slug}/` })) });
+  const out = llms({ title: i.bundle.title, base: i.bundle.base, description: i.bundle.description, license_prose: i.bundle.license_prose, terms: 'LicenseRef-AgenticSystemCore-Content-Use-1.0', spec_version: i.spec_version, bundle_version: i.bundle_version, generated_at: i.generated_at, clusters: i.clusters || [], items: i.items.map(x => ({ ...x, type: 'concept', iri: `${i.bundle.base}concepts/${x.slug}/` })), provenanceLines });
   const exp = v.expected.output !== undefined ? { index: v.expected.output } : { index: v.expected.llms_txt, full: v.expected.llms_full_txt };
-  for (const k of Object.keys(exp)) ok(out[k] === exp[k], `llms layout fails vector ${v.id} (${k})`);
+  for (const k of Object.keys(exp)) ok(out[k] === exp[k], `llms layout fails vector ${v.id || f} (${k})`);
 }
 
 // (3) discovery document
 const validator = path.join(ENGINE, 'tools', 'validate-wellknown');
 if (!fs.existsSync(validator)) fails.push(`validator not found: ${validator}`);
 else {
-  const r = cp.spawnSync(process.execPath, [validator, path.join(WWW, '.well-known', 'knowledge-linkset'), '--level', '0', '--json'], { encoding: 'utf8' });
-  let env = null; try { env = JSON.parse(r.stdout); } catch { /* reported below */ }
-  ok(r.status === 0 && env && env.status === 'pass', `validate-wellknown --level 0 failed: ${r.stdout}${r.stderr}`);
+  // SITE-4: at Level 0 as before, AND at Level 2, which the document now satisfies because the
+  // node publishes the graph in three serialisations, the NOW page, the chunk export and the
+  // skill packs, and carries the RFC 9530 digest of every artefact it links.
+  for (const level of ['0', '2']) {
+    const r = cp.spawnSync(process.execPath, [validator, path.join(WWW, '.well-known', 'knowledge-linkset'), '--level', level, '--json'], { encoding: 'utf8' });
+    let env = null; try { env = JSON.parse(r.stdout); } catch { /* reported below */ }
+    ok(r.status === 0 && env && env.status === 'pass', `validate-wellknown --level ${level} failed: ${r.stdout}${r.stderr}`);
+  }
+  // AGSC-06-08a: a declared digest must be the digest of the bytes actually served. A document
+  // that says `sha-256=:…:` about a file nobody compared is a promise, not a check.
+  const doc = JSON.parse(fs.readFileSync(path.join(WWW, '.well-known', 'knowledge-linkset'), 'utf8'));
+  let checked = 0;
+  for (const links of Object.values(doc.linkset[0])) {
+    if (!Array.isArray(links)) continue;
+    for (const link of links) {
+      if (!link || !Array.isArray(link.digest) || typeof link.href !== 'string') continue;
+      const route = link.href.replace(/^https:\/\/agenticsystemcore\.com/, '');
+      const f = path.join(WWW, route.replace(/\/$/, '/index.html'));
+      if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) { fails.push(`the discovery document declares a digest for ${route}, which this build does not serve`); continue; }
+      const want = `sha-256=:${require('crypto').createHash('sha256').update(fs.readFileSync(f)).digest('base64')}:`;
+      ok(link.digest[0] === want, `the declared digest of ${route} is not the digest of the bytes served (AGSC-06-08a)`);
+      checked++;
+    }
+  }
+  ok(checked >= 8, `only ${checked} declared digests were checked — the discovery document should carry one per artefact link (AGSC-06-08a)`);
+}
+
+// (3a) the vocabulary documents, against the engine's own generator (SITE-4)
+// `tools/gen-ns` derives /ns/context.jsonld, /ns/agsc.ttl and /ns/agsc.rdf from ontology/agsc.ttl
+// and, with --check, compares them with the bytes a site publishes. Zero errors AND zero warnings
+// is the bar: a warning here means this site carries a second derivation of a file the engine
+// already derives, which is exactly the drift SITE-4 removed.
+{
+  const gen = path.join(ENGINE, 'tools', 'gen-ns');
+  if (!fs.existsSync(gen)) fails.push(`generator not found: ${gen}`);
+  else {
+    const r = cp.spawnSync(process.execPath, [gen, '--check', path.join(WWW, 'ns'), '--json', ENGINE], { encoding: 'utf8' });
+    let env = null; try { env = JSON.parse(r.stdout); } catch { /* reported below */ }
+    ok(r.status === 0 && env && env.status === 'pass' && env.counts.error === 0 && env.counts.warn === 0,
+      `gen-ns --check on /ns/ is not clean: ${r.stdout}${r.stderr}`);
+  }
 }
 
 // (4) HTML pages
@@ -73,7 +133,7 @@ for (const f of files.filter(f => f.endsWith('.html'))) {
   if (!h.includes('<a class="skip" href="#main">') || !h.includes('<main id="main"')) E('skip link or main landmark missing');
   const ids = idsIn(h); const dup = ids.filter((x, i) => ids.indexOf(x) !== i);
   if (dup.length) E(`duplicate ids: ${[...new Set(dup)].slice(0, 5).join(', ')}`);
-  for (const m of h.matchAll(/<script(?![^>]*type="application\/ld\+json")[^>]*>/g)) if (m[0] !== '<script src="/assets/search.js" defer>') E(`script other than the same-origin search script: ${m[0]} (AGSC-06-05, CSP)`);
+  for (const m of h.matchAll(/<script(?![^>]*type="application\/ld\+json")[^>]*>/g)) if (!ALLOWED_SCRIPTS.has(m[0])) E(`script other than the same-origin search and page-tool scripts: ${m[0]} (AGSC-06-05, CSP)`);
   if (!/<p class="summary"><strong>Summary<\/strong>[^<]{20,}<\/p>/.test(h)) E('summary line missing after the heading');
   for (const m of h.matchAll(/<figure class="diagram">([\s\S]*?)<\/figure>/g)) { if (!/<svg [^>]*role="img" aria-label="[^"]{20,}"/.test(m[1])) E('diagram without an accessible name'); if (!/<figcaption>[^<]{20,}<\/figcaption>/.test(m[1])) E('diagram without a caption'); }
   // Every rule carries a trailing trace bracket in the source except the ones listed (their source has none), so a missing trace line is a rendering defect.
@@ -116,6 +176,14 @@ const searchJson = path.join(WWW, 'search.json');
 ok(exists(searchJson) && fs.statSync(searchJson).size <= 1000 * 1000, 'search.json missing or over the 1 MB index-document budget (AGSC-06-21)');
 const headers = exists(path.join(WWW, '_headers')) ? fs.readFileSync(path.join(WWW, '_headers'), 'utf8') : '';
 for (const need of [
+  '/pages/*.md\n  Content-Type: text/markdown; charset=utf-8; variant=GFM',
+  '/pages/*.jsonld\n  Content-Type: application/ld+json; charset=utf-8',
+  '/chunks.jsonl\n  Content-Type: application/jsonl; charset=utf-8',
+  '/graph.nq\n  Content-Type: application/n-quads; charset=utf-8',
+  '/graph.ttl\n  Content-Type: text/turtle; charset=utf-8',
+  '/now.md\n  Content-Type: text/markdown; charset=utf-8; variant=GFM',
+  '/skills/*.md\n  Content-Type: text/markdown; charset=utf-8; variant=GFM',
+  '/exports/*\n  Content-Type: text/plain; charset=utf-8',
   'Content-Type: application/linkset+json; profile="https://w3id.org/agentic-system-core/profile/agentic-knowledge"',
   'Link: <https://w3id.org/agentic-system-core/profile/agentic-knowledge>; rel="profile"',
   "Content-Security-Policy: default-src 'none'; script-src 'self'",
@@ -129,8 +197,39 @@ const sitemap = exists(path.join(WWW, 'sitemap.xml')) ? fs.readFileSync(path.joi
 const locs = [...sitemap.matchAll(/<loc>https:\/\/agenticsystemcore\.com(\/[^<]*)<\/loc>/g)].map(m => m[1]);
 ok(locs.length > 0 && locs.join('\n') === [...locs].sort().join('\n'), 'sitemap empty or not ordered by URL (AGSC-06-19)');
 for (const l of locs) ok(targetFile(l), `sitemap URL has no page: ${l}`);
-for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt', '.well-known/tdmrep.json', 'graph.jsonld', 'llms.txt', 'llms-full.txt', 'search.json', 'assets/search-site.json', 'assets/search.js', 'robots.txt', '404.html', 'ns/context.jsonld', 'ns/agsc.ttl', 'specs/agentic-knowledge/index.html', 'specs/mcp/index.html', 'legal/index.html', 'docs/index.html', 'docs/introduction/index.html', 'docs/modes/index.html', 'docs/requirements/index.html', 'docs/standards/index.html', 'docs/compliance/index.html', 'docs/status/index.html', 'search/index.html'])
+for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt', '.well-known/tdmrep.json', 'graph.jsonld', 'llms.txt', 'llms-full.txt', 'search.json', 'assets/search-site.json', 'assets/search.js', 'robots.txt', '404.html', 'ns/context.jsonld', 'ns/agsc.ttl', 'specs/agentic-knowledge/index.html', 'specs/mcp/index.html', 'legal/index.html', 'docs/index.html', 'docs/introduction/index.html', 'docs/modes/index.html', 'docs/requirements/index.html', 'docs/standards/index.html', 'docs/compliance/index.html', 'docs/status/index.html', 'search/index.html',
+  // AGSC-06-01/06-02/09-16: the page-tool route family (D108).
+  'compose/index.html', 'compose/agsc-core.js', 'compose/agsc-page-tools.js', 'compose/agsc-compose.js', 'compose/webmcp.js',
+  // SITE-4: the surfaces the engine now builds for this node.
+  'chunks.jsonl', 'graph.nq', 'graph.ttl', 'now.md', 'now/index.html', 'skills/index.json', 'skills/index.html',
+  'tags/index.html', 'tags/vocabulary/index.html', 'exports/index.html',
+  'exports/chunks-index.toon', 'exports/llms-ctx.txt'])
   ok(exists(path.join(WWW, need)), `missing route: /${need}`);
+// (7) the page tools: their inputs, their declaration, and the tools themselves RUN.
+{
+  const index = exists(searchJson) ? JSON.parse(fs.readFileSync(searchJson, 'utf8')) : { docs: [] };
+  ok(Array.isArray(index.docs) && index.docs.length > 0 && index.terms && typeof index.terms === 'object',
+    'search.json is not the engine-shaped index {docs, terms} the page tools read (AGSC-06-16)');
+  for (const d of index.docs || []) {
+    ok(exists(path.join(WWW, 'pages', `${d.slug}.md`)), `missing route: /pages/${d.slug}.md (AGSC-06-02)`);
+    ok(exists(path.join(WWW, 'pages', `${d.slug}.jsonld`)), `missing route: /pages/${d.slug}.jsonld (AGSC-06-02)`);
+  }
+  for (const f of files.filter(x => /^pages\//.test(rel(x)) && x.endsWith('.md'))) {
+    ok(fs.readFileSync(f, 'utf8').startsWith('---\n'), `${rel(f)}: the Markdown machine view must begin with the frontmatter block (AGSC-05-07)`);
+  }
+  // AGSC-11-16/11-19: /compose/ is emitted, so the `webmcp` surface must be DECLARED.
+  const linkset = JSON.parse(fs.readFileSync(path.join(WWW, '.well-known', 'knowledge-linkset'), 'utf8'));
+  const surfaces = (linkset.linkset || [])[0]['https://w3id.org/agentic-system-core/rel#surface'] || [];
+  const webmcp = surfaces.find(x => (x['agsc-surface'] || [])[0] === 'webmcp');
+  ok(webmcp !== undefined, 'the discovery document declares no `webmcp` surface although /compose/ is emitted (AGSC-11-19)');
+  if (webmcp) {
+    ok((webmcp['agsc-access'] || [])[0] === 'consent', 'the `webmcp` surface must declare the access class `consent` (AGSC-11-16)');
+    ok(/^\d{4}-\d{2}-\d{2}$/.test((webmcp['agsc-surface-version'] || [])[0] || ''), 'the `webmcp` surface must declare the Draft Community Group Report date it targets (AGSC-11-16)');
+    ok(String(webmcp.href).endsWith('/compose/'), `the webmcp surface points at ${webmcp.href}`);
+  }
+  const r = cp.spawnSync(process.execPath, [path.join(__dirname, 'page-tools-check.js'), '--out', WWW], { encoding: 'utf8' });
+  ok(r.status === 0, `page-tools-check failed:\n${r.stdout}${r.stderr}`);
+}
 
 // (6) contrast (WCAG 2.2 SC 1.4.3: 4.5:1 for body text)
 {
@@ -151,4 +250,4 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
 
 fs.rmSync(tmp, { recursive: true, force: true });
 if (fails.length) { process.stderr.write(fails.map(f => `FAIL ${f}`).join('\n') + `\ncheck: ${fails.length} failure(s)\n`); process.exit(1); }
-process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, validate-wellknown level 0, links and fragments, headers, contrast\n`);
+process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, headers, contrast\n`);

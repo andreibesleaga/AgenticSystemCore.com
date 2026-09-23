@@ -1,0 +1,356 @@
+@prefix asc: <https://w3id.org/agentic-system-core/ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <https://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://agenticsystemcore.com/> a asc:Bundle ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:specVersion "1.0.0-rc.6" .
+
+<https://agenticsystemcore.com/clusters/guides/> a asc:Cluster ;
+    skos:definition "Procedures for publishing and reading a node, each step naming the rule or the check that proves it."@en ;
+    skos:member <https://agenticsystemcore.com/procedures/publish-a-level-0-node/> ;
+    skos:prefLabel "Guides"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" .
+
+<https://agenticsystemcore.com/clusters/vocabulary/> a asc:Cluster ;
+    skos:definition "The terms of the specification's ubiquitous language: the six item types and the words that complete them."@en ;
+    skos:member <https://agenticsystemcore.com/concepts/bundle/> , <https://agenticsystemcore.com/concepts/cluster/> , <https://agenticsystemcore.com/concepts/concept/> , <https://agenticsystemcore.com/concepts/episode/> , <https://agenticsystemcore.com/concepts/gate/> , <https://agenticsystemcore.com/concepts/harness/> , <https://agenticsystemcore.com/concepts/item/> , <https://agenticsystemcore.com/concepts/lesson/> , <https://agenticsystemcore.com/concepts/link/> , <https://agenticsystemcore.com/concepts/now/> , <https://agenticsystemcore.com/concepts/procedure/> , <https://agenticsystemcore.com/concepts/source/> ;
+    skos:prefLabel "Vocabulary"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" .
+
+<https://agenticsystemcore.com/concepts/bundle/> a asc:Concept ;
+    skos:definition "One directory tree of Markdown items plus exactly one agsc.config.json: the unit of publication and of conformance."@en ;
+    skos:inScheme <https://agenticsystemcore.com/> ;
+    skos:prefLabel "Bundle"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:kind "term" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/concepts/bundle/#source-1> , <https://agenticsystemcore.com/concepts/bundle/#source-2> , <https://agenticsystemcore.com/concepts/bundle/#source-3> , <https://agenticsystemcore.com/concepts/bundle/#source-4> .
+
+<https://agenticsystemcore.com/concepts/bundle/#source-1> dcterms:source "https://agenticsystemcore.com/specs/00-overview/#AGSC-00-04" ;
+    dcterms:title "AGSC-00-04" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/bundle/#source-2> dcterms:source "https://agenticsystemcore.com/specs/01-bundle/#AGSC-01-01" ;
+    dcterms:title "AGSC-01-01" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/bundle/#source-3> dcterms:source "https://agenticsystemcore.com/specs/01-bundle/#AGSC-01-04" ;
+    dcterms:title "AGSC-01-04" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/bundle/#source-4> dcterms:source "https://agenticsystemcore.com/specs/05-graph/#AGSC-05-03" ;
+    dcterms:title "AGSC-05-03" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/cluster/> a asc:Concept ;
+    skos:definition "A navigational grouping of items. Membership is authored on the item, and nesting is expressed as membership."@en ;
+    skos:inScheme <https://agenticsystemcore.com/> ;
+    skos:prefLabel "Cluster"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:kind "term" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/concepts/cluster/#source-1> , <https://agenticsystemcore.com/concepts/cluster/#source-2> , <https://agenticsystemcore.com/concepts/cluster/#source-3> , <https://agenticsystemcore.com/concepts/cluster/#source-4> .
+
+<https://agenticsystemcore.com/concepts/cluster/#source-1> dcterms:source "https://agenticsystemcore.com/specs/02-item/#AGSC-02-17" ;
+    dcterms:title "AGSC-02-17" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/cluster/#source-2> dcterms:source "https://agenticsystemcore.com/specs/02-item/#AGSC-02-19" ;
+    dcterms:title "AGSC-02-19" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/cluster/#source-3> dcterms:source "https://agenticsystemcore.com/specs/05-graph/#AGSC-05-18" ;
+    dcterms:title "AGSC-05-18" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/cluster/#source-4> dcterms:source "https://agenticsystemcore.com/specs/05-graph/#AGSC-05-19" ;
+    dcterms:title "AGSC-05-19" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/concept/> a asc:Concept ;
+    skos:definition "A unit of knowledge in a Bundle, qualified by kind: pattern, taxonomy, explainer, principle, decision, spec, task, term or architecture."@en ;
+    skos:inScheme <https://agenticsystemcore.com/> ;
+    skos:prefLabel "Concept"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:kind "term" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/concepts/concept/#source-1> , <https://agenticsystemcore.com/concepts/concept/#source-2> , <https://agenticsystemcore.com/concepts/concept/#source-3> .
+
+<https://agenticsystemcore.com/concepts/concept/#source-1> dcterms:source "https://agenticsystemcore.com/specs/02-item/#AGSC-02-12" ;
+    dcterms:title "AGSC-02-12" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/concept/#source-2> dcterms:source "https://agenticsystemcore.com/specs/05-graph/#AGSC-05-12" ;
+    dcterms:title "AGSC-05-12" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/concept/#source-3> dcterms:source "https://agenticsystemcore.com/specs/05-graph/#AGSC-05-17" ;
+    dcterms:title "AGSC-05-17" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/episode/> a asc:Concept ;
+    skos:definition "A recorded occurrence, such as a session, a run or an incident, with a start instant, an actor and an outcome."@en ;
+    skos:inScheme <https://agenticsystemcore.com/> ;
+    skos:prefLabel "Episode"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:kind "term" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/concepts/episode/#source-1> , <https://agenticsystemcore.com/concepts/episode/#source-2> .
+
+<https://agenticsystemcore.com/concepts/episode/#source-1> dcterms:source "https://agenticsystemcore.com/specs/02-item/#AGSC-02-14" ;
+    dcterms:title "AGSC-02-14" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/episode/#source-2> dcterms:source "https://agenticsystemcore.com/specs/05-graph/#AGSC-05-12" ;
+    dcterms:title "AGSC-05-12" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/gate/> a asc:Concept ;
+    skos:definition "A declared set of checks that a change must pass, at level L1 or L2. Its runs are recorded as episodes."@en ;
+    skos:inScheme <https://agenticsystemcore.com/> ;
+    skos:prefLabel "Gate"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:kind "term" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/concepts/gate/#source-1> , <https://agenticsystemcore.com/concepts/gate/#source-2> .
+
+<https://agenticsystemcore.com/concepts/gate/#source-1> dcterms:source "https://agenticsystemcore.com/specs/02-item/#AGSC-02-18" ;
+    dcterms:title "AGSC-02-18" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/gate/#source-2> dcterms:source "https://agenticsystemcore.com/specs/05-graph/#AGSC-05-12" ;
+    dcterms:title "AGSC-05-12" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/harness/> a asc:Concept ;
+    skos:definition "Generated output: the file map a valid composition of selected items produces. A Harness is never authored."@en ;
+    skos:inScheme <https://agenticsystemcore.com/> ;
+    skos:prefLabel "Harness"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:kind "term" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/concepts/harness/#source-1> , <https://agenticsystemcore.com/concepts/harness/#source-2> , <https://agenticsystemcore.com/concepts/harness/#source-3> .
+
+<https://agenticsystemcore.com/concepts/harness/#source-1> dcterms:source "https://agenticsystemcore.com/specs/00-overview/#AGSC-00-06" ;
+    dcterms:title "AGSC-00-06" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/harness/#source-2> dcterms:source "https://agenticsystemcore.com/specs/07-composition/#AGSC-07-01" ;
+    dcterms:title "AGSC-07-01" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/harness/#source-3> dcterms:source "https://agenticsystemcore.com/specs/07-composition/#AGSC-07-12" ;
+    dcterms:title "AGSC-07-12" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/item/> a asc:Concept ;
+    skos:definition "One Markdown file with YAML frontmatter whose type is concept, episode, procedure, lesson, cluster or gate."@en ;
+    skos:inScheme <https://agenticsystemcore.com/> ;
+    skos:prefLabel "Item"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:kind "term" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/concepts/item/#source-1> , <https://agenticsystemcore.com/concepts/item/#source-2> , <https://agenticsystemcore.com/concepts/item/#source-3> , <https://agenticsystemcore.com/concepts/item/#source-4> .
+
+<https://agenticsystemcore.com/concepts/item/#source-1> dcterms:source "https://agenticsystemcore.com/specs/00-overview/#AGSC-00-05" ;
+    dcterms:title "AGSC-00-05" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/item/#source-2> dcterms:source "https://agenticsystemcore.com/specs/01-bundle/#AGSC-01-11" ;
+    dcterms:title "AGSC-01-11" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/item/#source-3> dcterms:source "https://agenticsystemcore.com/specs/02-item/#AGSC-02-07" ;
+    dcterms:title "AGSC-02-07" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/item/#source-4> dcterms:source "https://agenticsystemcore.com/specs/05-graph/#AGSC-05-13" ;
+    dcterms:title "AGSC-05-13" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/lesson/> a asc:Concept ;
+    skos:definition "Knowledge distilled from one or more episodes, carrying a severity of info, warn or block."@en ;
+    skos:inScheme <https://agenticsystemcore.com/> ;
+    skos:prefLabel "Lesson"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:kind "term" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/concepts/lesson/#source-1> , <https://agenticsystemcore.com/concepts/lesson/#source-2> , <https://agenticsystemcore.com/concepts/lesson/#source-3> .
+
+<https://agenticsystemcore.com/concepts/lesson/#source-1> dcterms:source "https://agenticsystemcore.com/specs/02-item/#AGSC-02-16" ;
+    dcterms:title "AGSC-02-16" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/lesson/#source-2> dcterms:source "https://agenticsystemcore.com/specs/02-item/#AGSC-02-21" ;
+    dcterms:title "AGSC-02-21" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/lesson/#source-3> dcterms:source "https://agenticsystemcore.com/specs/05-graph/#AGSC-05-12" ;
+    dcterms:title "AGSC-05-12" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/link/> a asc:Concept ;
+    skos:definition "A typed relation between two items of one Bundle, written as a frontmatter key whose values are slugs."@en ;
+    skos:inScheme <https://agenticsystemcore.com/> ;
+    skos:prefLabel "Link"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:kind "term" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/concepts/link/#source-1> , <https://agenticsystemcore.com/concepts/link/#source-2> , <https://agenticsystemcore.com/concepts/link/#source-3> .
+
+<https://agenticsystemcore.com/concepts/link/#source-1> dcterms:source "https://agenticsystemcore.com/specs/03-links/#AGSC-03-01" ;
+    dcterms:title "AGSC-03-01" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/link/#source-2> dcterms:source "https://agenticsystemcore.com/specs/03-links/#AGSC-03-02" ;
+    dcterms:title "AGSC-03-02" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/link/#source-3> dcterms:source "https://agenticsystemcore.com/specs/11-boundary/#AGSC-11-12" ;
+    dcterms:title "AGSC-11-12" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/now/> a asc:Concept ;
+    skos:definition "Generated context about the current state of a Bundle, such as counts and last build. NOW is never an item."@en ;
+    skos:inScheme <https://agenticsystemcore.com/> ;
+    skos:prefLabel "NOW"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:kind "term" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/concepts/now/#source-1> , <https://agenticsystemcore.com/concepts/now/#source-2> .
+
+<https://agenticsystemcore.com/concepts/now/#source-1> dcterms:source "https://agenticsystemcore.com/specs/00-overview/#AGSC-00-07" ;
+    dcterms:title "AGSC-00-07" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/now/#source-2> dcterms:source "https://agenticsystemcore.com/specs/06-surfaces/#AGSC-06-22" ;
+    dcterms:title "AGSC-06-22" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/procedure/> a asc:Concept ;
+    skos:definition "A plan a reader can execute: a trigger, steps and checks. A procedure exports one to one to a skill file."@en ;
+    skos:inScheme <https://agenticsystemcore.com/> ;
+    skos:prefLabel "Procedure"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:kind "term" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/concepts/procedure/#source-1> , <https://agenticsystemcore.com/concepts/procedure/#source-2> , <https://agenticsystemcore.com/concepts/procedure/#source-3> .
+
+<https://agenticsystemcore.com/concepts/procedure/#source-1> dcterms:source "https://agenticsystemcore.com/specs/02-item/#AGSC-02-15" ;
+    dcterms:title "AGSC-02-15" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/procedure/#source-2> dcterms:source "https://agenticsystemcore.com/specs/02-item/#AGSC-02-21" ;
+    dcterms:title "AGSC-02-21" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/procedure/#source-3> dcterms:source "https://agenticsystemcore.com/specs/05-graph/#AGSC-05-12" ;
+    dcterms:title "AGSC-05-12" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/source/> a asc:Concept ;
+    skos:definition "An external work cited by an item, written inline as a sources[] entry and published under a fragment IRI."@en ;
+    skos:inScheme <https://agenticsystemcore.com/> ;
+    skos:prefLabel "Source"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:kind "term" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/concepts/source/#source-1> , <https://agenticsystemcore.com/concepts/source/#source-2> .
+
+<https://agenticsystemcore.com/concepts/source/#source-1> dcterms:source "https://agenticsystemcore.com/specs/02-item/#AGSC-02-10" ;
+    dcterms:title "AGSC-02-10" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/source/#source-2> dcterms:source "https://agenticsystemcore.com/specs/05-graph/#AGSC-05-14" ;
+    dcterms:title "AGSC-05-14" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/procedures/publish-a-level-0-node/> a asc:Procedure ;
+    skos:definition "Turn an existing CMS, wiki or static-site export into a conforming Level-0 node without running an engine."@en ;
+    skos:prefLabel "Publish a Level-0 node"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/procedures/publish-a-level-0-node/#source-1> , <https://agenticsystemcore.com/procedures/publish-a-level-0-node/#source-2> .
+
+<https://agenticsystemcore.com/procedures/publish-a-level-0-node/#source-1> dcterms:source "https://agenticsystemcore.com/specs/10-implementation-profiles/#AGSC-10-02" ;
+    dcterms:title "AGSC-10-02" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/procedures/publish-a-level-0-node/#source-2> dcterms:source "https://agenticsystemcore.com/specs/agentic-knowledge/" ;
+    dcterms:title "Knowledge link set profile" ;
+    a asc:Source ;
+    asc:grade "primary" .

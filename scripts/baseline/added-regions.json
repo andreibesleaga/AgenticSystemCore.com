@@ -1,0 +1,10 @@
+{
+  "_": "Regions SITE-4 adds to pages that already existed. scripts/compare-baseline.js deletes each one before comparing a page with its baseline, so that an addition is never mistaken for a change of the design. A pattern that matches nothing is a gate failure, so this list cannot become a set of excuses.",
+  "regions": [
+    {
+      "route": "*",
+      "pattern": "<p class=\"copyright\">.*?</p>\\n",
+      "why": "the copyright and Content Use Terms line added to every page footer at rc.6 (the owner's legal pack of 2026-09-22; RC6-B hand-over item 5)"
+    }
+  ]
+}

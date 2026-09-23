@@ -17,6 +17,14 @@
   Access-Control-Allow-Origin: *
   Access-Control-Expose-Headers: Link, ETag, Content-Type
 
+/graph.nq
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/graph.ttl
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
 /llms.txt
   Access-Control-Allow-Origin: *
   Access-Control-Expose-Headers: Link, ETag, Content-Type
@@ -29,7 +37,31 @@
   Access-Control-Allow-Origin: *
   Access-Control-Expose-Headers: Link, ETag, Content-Type
 
+/pages/*.md
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/pages/*.jsonld
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
 /ns/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/chunks.jsonl
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/now.md
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/skills/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/exports/*
   Access-Control-Allow-Origin: *
   Access-Control-Expose-Headers: Link, ETag, Content-Type
 
@@ -49,6 +81,33 @@
 
 /search.json
   Content-Type: application/json; charset=utf-8
+
+/pages/*.md
+  Content-Type: text/markdown; charset=utf-8; variant=GFM
+
+/pages/*.jsonld
+  Content-Type: application/ld+json; charset=utf-8
+
+/graph.nq
+  Content-Type: application/n-quads; charset=utf-8
+
+/graph.ttl
+  Content-Type: text/turtle; charset=utf-8
+
+/chunks.jsonl
+  Content-Type: application/jsonl; charset=utf-8
+
+/now.md
+  Content-Type: text/markdown; charset=utf-8; variant=GFM
+
+/skills/index.json
+  Content-Type: application/json; charset=utf-8
+
+/skills/*.md
+  Content-Type: text/markdown; charset=utf-8; variant=GFM
+
+/exports/*
+  Content-Type: text/plain; charset=utf-8
 
 /llms.txt
   Content-Type: text/plain; charset=utf-8

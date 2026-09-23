@@ -49,4 +49,4 @@ These are claims about the specification's text and its vectors, not performance
 
 ## What exists today
 
-This site is a Level-0 node of the specification it publishes: the specification text, the vocabulary, the ontology and the discovery document are live and checkable. The reference engine, the patterns catalogue as a second node, the Internet-Draft and the registrations follow. The [status page](/docs/status/) says exactly what is live and what is not, and it never says "registered" before a registry does.
+This site is a node of the specification it publishes: the specification text, the vocabulary, the ontology and the discovery document are live and checkable, and every machine-readable file is emitted by the reference engine from this repository's own content. The reference engine, the patterns catalogue as a second node, the Internet-Draft and the registrations follow. The [status page](/docs/status/) says exactly what is live and what is not, and it never says "registered" before a registry does.

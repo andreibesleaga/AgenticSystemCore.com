@@ -5,6 +5,7 @@
 <url><loc>https://agenticsystemcore.com/clusters/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/clusters/guides/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/clusters/vocabulary/</loc><lastmod>2026-09-21</lastmod></url>
+<url><loc>https://agenticsystemcore.com/compose/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/concepts/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/concepts/bundle/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/concepts/cluster/</loc><lastmod>2026-09-21</lastmod></url>
@@ -31,12 +32,15 @@
 <url><loc>https://agenticsystemcore.com/docs/scenarios/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/docs/standards/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/docs/status/</loc><lastmod>2026-09-21</lastmod></url>
+<url><loc>https://agenticsystemcore.com/exports/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/legal/</loc><lastmod>2026-09-21</lastmod></url>
+<url><loc>https://agenticsystemcore.com/now/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/ns/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/ns/1.0.0-draft.1/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/procedures/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/procedures/publish-a-level-0-node/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/search/</loc><lastmod>2026-09-21</lastmod></url>
+<url><loc>https://agenticsystemcore.com/skills/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/specs/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/specs/00-overview/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/specs/01-bundle/</loc><lastmod>2026-09-21</lastmod></url>
@@ -52,4 +56,9 @@
 <url><loc>https://agenticsystemcore.com/specs/11-boundary/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/specs/agentic-knowledge/</loc><lastmod>2026-09-21</lastmod></url>
 <url><loc>https://agenticsystemcore.com/specs/mcp/</loc><lastmod>2026-09-21</lastmod></url>
+<url><loc>https://agenticsystemcore.com/tags/</loc><lastmod>2026-09-21</lastmod></url>
+<url><loc>https://agenticsystemcore.com/tags/discovery/</loc><lastmod>2026-09-21</lastmod></url>
+<url><loc>https://agenticsystemcore.com/tags/procedure/</loc><lastmod>2026-09-21</lastmod></url>
+<url><loc>https://agenticsystemcore.com/tags/specification/</loc><lastmod>2026-09-21</lastmod></url>
+<url><loc>https://agenticsystemcore.com/tags/vocabulary/</loc><lastmod>2026-09-21</lastmod></url>
 </urlset>

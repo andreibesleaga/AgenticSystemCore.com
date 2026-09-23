@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AGSC-03 — Links: the fourteen keys, inverses, combiner semantics — AgenticSystemCore</title>
+<meta name="description" content="AGSC-03 — Links: the fourteen keys, inverses, combiner semantics — section 03 of the AgenticSystemCore specification 1.0.0-rc.X.">
+<link rel="canonical" href="https://agenticsystemcore.com/specs/03-links/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/specs/03-links/">
+<meta property="og:title" content="AGSC-03 — Links: the fourteen keys, inverses, combiner semantics">
+<meta property="og:description" content="AGSC-03 — Links: the fourteen keys, inverses, combiner semantics — section 03 of the AgenticSystemCore specification 1.0.0-rc.X.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AGSC-03 — Links: the fourteen keys, inverses, combiner semantics","url":"https://agenticsystemcore.com/specs/03-links/","version":"1.0.0-rc.X","license":"https://www.apache.org/licenses/LICENSE-2.0","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"},"isPartOf":"https://agenticsystemcore.com/specs/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/" aria-current="page">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+</nav>
+</header>
+<main id="main" class="wide">
+<h1>AGSC-03 — Links: the fourteen keys, inverses, combiner semantics</h1>
+<p class="summary"><strong>Summary</strong>The fourteen typed links between items, the inverses the build computes, the integrity checks, and which links the combiner reads.</p>
+<section class="status" aria-labelledby="status-heading">
+<h2 id="status-heading">Status of this document</h2>
+<p>Specification <code>1.0.0-rc.X</code>, a release candidate tagged on 2026-09-21. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it. Released sections are immutable; a correction ships as a new version.</p>
+</section>
+<aside class="plain" aria-labelledby="plain"><h2 id="plain">In plain language</h2>
+<p><strong>Fourteen names, no more.</strong> Nine core keys — <code>related</code>, <code>broader</code>, <code>narrower</code>, <code>uses</code>, <code>requires</code>, <code>excludes</code>, <code>derived-from</code>, <code>contradicts</code>, <code>supersedes</code> — and five engineering keys — <code>implements</code>, <code>verifies</code>, <code>covers</code>, <code>blocked-by</code>, <code>decided-by</code>. A link value is always a slug in the same Bundle; a URL in a link is an error. Citing another node is done through <code>sources</code>, never through a link.</p>
+<p><strong>Inverses are computed.</strong> You write <code>uses</code>; the graph gets <code>usedBy</code> for free. You never author an inverse.</p>
+<p><strong>Integrity.</strong> Cycles in <code>requires</code> and <code>broader</code> are errors; orphans are reported; an unresolved target is an error.</p>
+<p><strong>Inline links.</strong> A Markdown link between items becomes an untyped <em>mentions</em> edge; a wikilink is the same thing.</p>
+<p><strong>What the combiner reads.</strong> Only the nine core keys carry composition meaning: <code>requires</code> pulls items in, <code>supersedes</code> hides, <code>excludes</code> forbids, <code>contradicts</code> warns. The five engineering keys are navigation and provenance only.</p>
+<p class="id">This box explains; the rules below decide. New to the notation? See <a href="/docs/reading-the-specification/">how to read the specification</a>.</p>
+</aside>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 280" role="img" aria-label="Links: item A authors requires: [b] (highlighted arrow to item B) and the build computes the inverse required-by from B back to A; the nine core keys drive composition, the five Mode-2 keys are navigation and provenance" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-spec-03-links" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="60" width="120" height="50" rx="6"/>
+<rect x="300" y="60" width="120" height="50" rx="6"/>
+<path d="M140.0 85.0 L296.0 85.0" marker-end="url(#ar-spec-03-links)" class="acc" stroke-width="2.2"/>
+<path d="M360.0 110.0 L360 150 L76 150 L76.0 110.0" marker-end="url(#ar-spec-03-links)" stroke-dasharray="4 3"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="76" y="81.0" font-size="12">item A</text>
+<text x="76" y="97.0" font-size="12">requires: [b]</text>
+<text x="360" y="89.0" font-size="12">item B</text>
+<text x="218" y="78" font-size="11">requires (authored)</text>
+<text x="218" y="166" font-size="11">required-by (computed inverse)</text>
+<text x="230" y="214" font-size="11">core nine: related · broader · narrower · uses · requires</text>
+<text x="230" y="232" font-size="11">excludes · derived-from · contradicts · supersedes — drive composition</text>
+<text x="230" y="250" font-size="11">Mode-2 five: implements · verifies · covers · blocked-by · decided-by</text>
+</g>
+</svg>
+<figcaption>Only the highlighted direction is ever written; the dashed inverse is computed at build, so no file can disagree with another.</figcaption>
+</figure>
+<nav class="toc" aria-labelledby="contents"><h2 id="contents">Contents</h2>
+<ol>
+<li><a href="#section-3-1">3.1 The closed vocabulary</a></li>
+<li><a href="#section-3-2">3.2 Inverses</a></li>
+<li><a href="#section-3-3">3.3 Cycles and integrity</a></li>
+<li><a href="#section-3-4">3.4 Inline links and wikilinks</a></li>
+<li><a href="#section-3-5">3.5 Combiner semantics (normative for §07)</a></li>
+<li><a href="#section-3-6">3.6 Import mapping</a></li>
+</ol></nav>
+<h2 id="section-3-1">3.1 The closed vocabulary</h2>
+<ul>
+<li id="AGSC-03-01" class="rule-item"><a class="rule" href="#AGSC-03-01"><strong>AGSC-03-01</strong></a> Typed Links MUST be frontmatter arrays whose key is one of exactly <strong>fourteen</strong> names — the <strong>nine core</strong> keys <code>related</code>, <code>broader</code>, <code>narrower</code>, <code>uses</code>, <code>requires</code>, <code>excludes</code>, <code>derived-from</code>, <code>contradicts</code>, <code>supersedes</code>, plus the <strong>five Mode-2</strong> keys <code>implements</code>, <code>verifies</code>, <code>covers</code>, <code>blocked-by</code>, <code>decided-by</code>. Only the core nine carry composition semantics (§3.5, §07); the Mode-2 five are navigational and provenance edges whose combiner semantics is <code>none</code>. No fifteenth key exists at <code>spec_version</code> 1.x; new keys arrive only through the <code>links_ext</code> registry of a future MINOR (docs/SPEC.md §8). <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-002">PRD-002</a> ← D41, G04, research/16 §3.3]</span></li>
+<li id="AGSC-03-02" class="rule-item"><a class="rule" href="#AGSC-03-02"><strong>AGSC-03-02</strong></a> Each value MUST be a slug, optionally <code>&lt;slug&gt;#&lt;anchor&gt;</code>. Targets MUST resolve by exact slug — no suffix search, no case folding, no path guessing. An unresolved target is <a class="ref" href="/specs/09-conformance/#AGSC-E301"><code>AGSC-E301</code></a>. <span class="trace">[research/12 §P rules 10, 16]</span></li>
+<li id="AGSC-03-03" class="rule-item"><a class="rule" href="#AGSC-03-03"><strong>AGSC-03-03</strong></a> An unknown link-shaped key MUST be preserved and reported as a warning (<a class="ref" href="/specs/09-conformance/#AGSC-E304"><code>AGSC-E304</code></a>); it MUST NOT be treated as one of the fourteen. <span class="trace">[research/12 §P rule 10]</span></li>
+</ul>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 1"><table>
+<thead><tr><th scope="col">Key (authored)</th><th scope="col">Inverse (computed)</th><th scope="col">Symmetric</th><th scope="col">RDF property</th><th scope="col">Combiner</th><th scope="col">Lint</th></tr></thead>
+<tbody>
+<tr><td><code>related</code></td><td><code>related</code></td><td>yes</td><td><code>skos:related</code></td><td>advisory</td><td>—</td></tr>
+<tr><td><code>broader</code></td><td><code>narrower</code></td><td>no</td><td><code>skos:broader</code></td><td>none</td><td>no cycles</td></tr>
+<tr><td><code>narrower</code></td><td><code>broader</code></td><td>no</td><td><code>skos:narrower</code></td><td>none</td><td>no cycles</td></tr>
+<tr><td><code>uses</code></td><td><code>used-by</code></td><td>no</td><td><code>asc:uses</code> (no super-property)</td><td>soft: warn if target absent</td><td>—</td></tr>
+<tr><td><code>requires</code></td><td><code>required-by</code></td><td>no</td><td><code>dcterms:requires</code> / <code>dcterms:isRequiredBy</code></td><td>hard: closure adds target</td><td>no cycles</td></tr>
+<tr><td><code>excludes</code></td><td><code>excludes</code></td><td>yes</td><td><code>asc:excludes</code></td><td>hard: mutex after closure</td><td>—</td></tr>
+<tr><td><code>derived-from</code></td><td><code>derivation-of</code></td><td>no</td><td><code>prov:wasDerivedFrom</code></td><td>none</td><td>target must exist</td></tr>
+<tr><td><code>contradicts</code></td><td><code>contradicts</code></td><td>yes</td><td><code>asc:contradicts</code></td><td>warn if both selected</td><td>—</td></tr>
+<tr><td><code>supersedes</code></td><td><code>superseded-by</code></td><td>no</td><td><code>dcterms:replaces</code> / <code>dcterms:isReplacedBy</code></td><td>superseded item hidden</td><td>target must exist</td></tr>
+<tr><td><code>implements</code></td><td><code>implemented-by</code></td><td>no</td><td><code>asc:implements</code></td><td>none</td><td>target must exist</td></tr>
+<tr><td><code>verifies</code></td><td><code>verified-by</code></td><td>no</td><td><code>asc:verifies</code></td><td>none</td><td>target must exist</td></tr>
+<tr><td><code>covers</code></td><td><code>covered-by</code></td><td>no</td><td><code>asc:covers</code></td><td>none</td><td>target must exist</td></tr>
+<tr><td><code>blocked-by</code></td><td><code>blocks</code></td><td>no</td><td><code>asc:blockedBy</code></td><td>none</td><td>target must exist</td></tr>
+<tr><td><code>decided-by</code></td><td><code>decides</code></td><td>no</td><td><code>asc:decidedBy</code></td><td>none</td><td>target must exist</td></tr>
+</tbody></table></div>
+<h2 id="section-3-2">3.2 Inverses</h2>
+<ul>
+<li id="AGSC-03-04" class="rule-item"><a class="rule" href="#AGSC-03-04"><strong>AGSC-03-04</strong></a> Inverses MUST be computed at build and MUST NOT be authored. A file carrying an inverse name (<code>narrower</code> is authored; <code>used-by</code>, <code>required-by</code>, <code>derivation-of</code>, <code>superseded-by</code>, <code>implemented-by</code>, <code>verified-by</code>, <code>covered-by</code>, <code>blocks</code>, <code>decides</code> are not) as a key MUST be reported (<a class="ref" href="/specs/09-conformance/#AGSC-E306"><code>AGSC-E306</code></a>). <span class="trace">[audit/D §1.3, <a class="ref" href="/docs/requirements/#PRD-002">PRD-002</a>]</span></li>
+<li id="AGSC-03-05" class="rule-item"><a class="rule" href="#AGSC-03-05"><strong>AGSC-03-05</strong></a> For symmetric keys (<code>related</code>, <code>excludes</code>, <code>contradicts</code>) the engine MUST materialize the edge in both directions even when only one side authored it. <span class="trace">[audit/D §1.3]</span></li>
+<li id="AGSC-03-06" class="rule-item"><a class="rule" href="#AGSC-03-06"><strong>AGSC-03-06</strong></a> <code>broader</code> and <code>narrower</code> are mutual inverses; asserting both directions between the same pair MUST be idempotent, not duplicated. <span class="trace">[audit/D §1.3]</span></li>
+</ul>
+<h2 id="section-3-3">3.3 Cycles and integrity</h2>
+<ul>
+<li id="AGSC-03-07" class="rule-item"><a class="rule" href="#AGSC-03-07"><strong>AGSC-03-07</strong></a> <code>requires</code> MUST be acyclic. A cycle is error <a class="ref" href="/specs/09-conformance/#AGSC-E302"><code>AGSC-E302</code></a> and MUST name every slug on the cycle in discovery order. <span class="trace">[audit/D §1.3, <a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a>]</span></li>
+<li id="AGSC-03-08" class="rule-item"><a class="rule" href="#AGSC-03-08"><strong>AGSC-03-08</strong></a> <code>broader</code>/<code>narrower</code> MUST be acyclic (<a class="ref" href="/specs/09-conformance/#AGSC-E303"><code>AGSC-E303</code></a>). A cluster MUST have at most one <code>broader</code>; the mono-parent tree it forms MUST be at most 3 levels deep (family › deck › sub-deck). Neither bound follows from the other, so both are checked separately, after the acyclicity check: nesting deeper than 3 levels (a chain of <code>broader</code> ancestors longer than 2) is error <a class="ref" href="/specs/09-conformance/#AGSC-E307"><code>AGSC-E307</code></a> naming the chain root-first; more than one <code>broader</code> value is error <a class="ref" href="/specs/09-conformance/#AGSC-E308"><code>AGSC-E308</code></a> naming every parent slug in code-point order, and the schema enforces this second bound as <code>maxItems: 1</code> on the cluster branch. <em>(<a class="ref" href="#AGSC-03-22">AGSC-03-22</a> merged here at rc.3, M4.)</em> <span class="trace">[audit/D §1.3, research/16 §3.5]</span></li>
+<li id="AGSC-03-09" class="rule-item"><a class="rule" href="#AGSC-03-09"><strong>AGSC-03-09</strong></a> <code>derived-from</code> and <code>supersedes</code> targets MUST exist; a dangling target is <a class="ref" href="/specs/09-conformance/#AGSC-E301"><code>AGSC-E301</code></a>, not a warning. <span class="trace">[audit/D §1.3]</span></li>
+<li id="AGSC-03-10" class="rule-item"><a class="rule" href="#AGSC-03-10"><strong>AGSC-03-10</strong></a> An item with no inbound Link and no <code>clusters[]</code> entry MUST be reported as an orphan warning (<a class="ref" href="/specs/09-conformance/#AGSC-E305"><code>AGSC-E305</code></a>). A <code>clusters[]</code> entry <strong>is</strong> an inbound reference to the cluster it names, so a cluster that at least one item lists is never an orphan (stated at rc.5, R-03: the rule left it open and both readings were defensible). <span class="trace">[research/16 §3.4 CQ7]</span></li>
+<li id="AGSC-03-22" class="rule-item retired"><a class="rule" href="#AGSC-03-22"><strong>AGSC-03-22</strong></a> <em>(retired at rc.3, 2026-09-17, V6-B minimality pass confirmed by D81: one rule stated two bounds, the next attached the codes (M4) — merged into <a class="ref" href="#AGSC-03-08">AGSC-03-08</a>; the id is reserved under <a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a> and never reused.)</em></li>
+</ul>
+<h2 id="section-3-4">3.4 Inline links and wikilinks</h2>
+<ul>
+<li id="AGSC-03-11" class="rule-item"><a class="rule" href="#AGSC-03-11"><strong>AGSC-03-11</strong></a> Inline Markdown links between items produce untyped graph edges <code>asc:mentions</code>. <code>mentions</code> is not a Link key and MUST NOT appear in frontmatter. A relative Markdown link or image whose target is <strong>inside</strong> the Bundle MUST resolve to an existing item, an existing asset under <code>content/assets/</code>, or an existing anchor of one of them; an unresolved internal target is <strong><a class="ref" href="/specs/09-conformance/#AGSC-E310"><code>AGSC-E310</code></a></strong> (error), and this is the check that the <code>links</code> value of <a class="ref" href="/specs/08-governance/#AGSC-08-11">AGSC-08-11</a>'s gate compiles to. Two resolution questions the rule left open are settled at rc.5: a target <strong>without a file extension</strong> resolves — both <code>&lt;slug&gt;</code> and <code>&lt;slug&gt;.md</code> name the same item, and the extension-less form is the one wikilink normalisation produces (R-04) — and a target containing <code>..</code> segments is resolved relative to the file that carries it, <a class="ref" href="/specs/09-conformance/#AGSC-E902"><code>AGSC-E902</code></a> only when what it resolves to escapes the Bundle root and <a class="ref" href="/specs/09-conformance/#AGSC-E310"><code>AGSC-E310</code></a> when it stays inside and does not exist (R-01, <a class="ref" href="/specs/01-bundle/#AGSC-01-35">AGSC-01-35</a> as amended at rc.5). A link to an external origin is never resolved at build time — it is checked only by <code>refresh</code> (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-11">AGSC-04-11</a>) — and a reference reported as <a class="ref" href="/specs/09-conformance/#AGSC-E507"><code>AGSC-E507</code></a> during adoption (<a class="ref" href="/specs/02-item/#AGSC-02-95">AGSC-02-95</a>) is <a class="ref" href="/specs/09-conformance/#AGSC-E310"><code>AGSC-E310</code></a> on every subsequent build, since adoption is a one-time warning and the Bundle is thereafter authored. <span class="trace">[audit/D §1.3, research/16 §3.3 ← V5-3 S3-02, <a class="ref" href="/specs/08-governance/#AGSC-08-11">AGSC-08-11</a>]</span></li>
+<li id="AGSC-03-12" class="rule-item"><a class="rule" href="#AGSC-03-12"><strong>AGSC-03-12</strong></a> Wikilinks <code>[[target(#anchor)?(|alias)?]]</code> MAY appear in authored files and MUST be normalized by <code>lint --fix</code> to relative Markdown links <code>[alias](../&lt;type-plural&gt;/&lt;slug&gt;.md#anchor)</code>. <code>![[…]]</code> embeds MUST be converted to images or removed. Dendron's reversed <code>[[alias|note]]</code> order MUST NOT be assumed without an explicit import flag. <span class="trace">[research/12 §P rule 15]</span></li>
+<li id="AGSC-03-13" class="rule-item"><a class="rule" href="#AGSC-03-13"><strong>AGSC-03-13</strong></a> Heading anchors MUST be computed as: NFC → ASCII lowercase → remove characters outside <code>[a-z0-9 -]</code> → spaces to <code>-</code> → collapse repeated <code>-</code> → <strong>trim leading and trailing <code>-</code></strong>; an empty result becomes <code>section-&lt;n&gt;</code>, <code>&lt;n&gt;</code> being the 1-based document order of the heading among the headings whose anchor is empty. A duplicate anchor takes the suffix <code>-2</code>, then <code>-3</code>, … in document order, re-checking after each suffix and taking the next free one, so a suffixed anchor never collides with a naturally occurring anchor. Every anchor produced by this algorithm therefore matches <code>^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$</code> — no leading or trailing <code>-</code>, and never <code>--</code> — the <code>link_target</code> grammar of <a class="ref" href="#AGSC-03-02">AGSC-03-02</a>. <span class="trace">[research/12 §P rule 17, D48(7)]</span></li>
+</ul>
+<h2 id="section-3-5">3.5 Combiner semantics (normative for §07)</h2>
+<ul>
+<li id="AGSC-03-14" class="rule-item"><a class="rule" href="#AGSC-03-14"><strong>AGSC-03-14</strong></a> <code>requires</code> is the only key that adds items to a selection (transitive closure). <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a> ← R6]</span></li>
+<li id="AGSC-03-15" class="rule-item retired"><a class="rule" href="#AGSC-03-15"><strong>AGSC-03-15</strong></a> <em>(retired at rc.3, 2026-09-17, V6-B minimality pass confirmed by D81: <a class="ref" href="/specs/07-composition/#AGSC-07-06">AGSC-07-06</a> with the order of <a class="ref" href="/specs/07-composition/#AGSC-07-08">AGSC-07-08</a> says it entirely (R3) — merged into <a class="ref" href="/specs/07-composition/#AGSC-07-06">AGSC-07-06</a>; the id is reserved under <a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a> and never reused.)</em></li>
+<li id="AGSC-03-16" class="rule-item retired"><a class="rule" href="#AGSC-03-16"><strong>AGSC-03-16</strong></a> <em>(retired at rc.3, 2026-09-17, V6-B minimality pass confirmed by D81: <a class="ref" href="/specs/07-composition/#AGSC-07-07">AGSC-07-07</a> says it entirely (R4) — merged into <a class="ref" href="/specs/07-composition/#AGSC-07-07">AGSC-07-07</a>; the id is reserved under <a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a> and never reused.)</em></li>
+<li id="AGSC-03-17" class="rule-item retired"><a class="rule" href="#AGSC-03-17"><strong>AGSC-03-17</strong></a> <em>(retired at rc.3, 2026-09-17, V6-B minimality pass confirmed by D81: near-verbatim, and the spec asserted set-identity (R5) — merged into <a class="ref" href="/specs/07-composition/#AGSC-07-05">AGSC-07-05</a>; the id is reserved under <a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a> and never reused.)</em></li>
+<li id="AGSC-03-18" class="rule-item"><a class="rule" href="#AGSC-03-18"><strong>AGSC-03-18</strong></a> <code>related</code>, <code>broader</code>, <code>narrower</code>, <code>derived-from</code> and the five Mode-2 keys (<code>implements</code>, <code>verifies</code>, <code>covers</code>, <code>blocked-by</code>, <code>decided-by</code>) MUST NOT change a composition; they are navigational or provenance edges. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a>, D43(4), D53]</span></li>
+</ul>
+<h2 id="section-3-6">3.6 Import mapping</h2>
+<ul>
+<li id="AGSC-03-19" class="rule-item"><a class="rule" href="#AGSC-03-19"><strong>AGSC-03-19</strong></a> Foreign link names MUST be mapped on import, not added to the vocabulary: <code>refines</code> → <code>narrower</code>; <code>alternative-to</code>, <code>conflicts-with</code> → <code>excludes</code>; <code>composed-of</code> → <code>uses</code>; <code>mitigates</code> → <code>related</code>; combiner <code>oneOf</code> → pairwise <code>excludes</code>; <code>recommends</code> → <code>uses</code>. <span class="trace">[audit/D §1.3, G04]</span></li>
+<li id="AGSC-03-20" class="rule-item"><a class="rule" href="#AGSC-03-20"><strong>AGSC-03-20</strong></a> The Mode-2 typed links are <strong>defined at 1.0</strong> as keys 10–14 (<a class="ref" href="#AGSC-03-01">AGSC-03-01</a>, D53): <code>implements</code>, <code>verifies</code>, <code>covers</code>, <code>blocked-by</code>, <code>decided-by</code>. Foreign spellings MUST be mapped on import — <code>blockedBy</code> → <code>blocked-by</code>, <code>decidedBy</code> → <code>decided-by</code>, <code>tests</code> → <code>verifies</code>, <code>traces-to</code> → <code>covers</code> — and their targets MUST exist (<a class="ref" href="/specs/09-conformance/#AGSC-E301"><code>AGSC-E301</code></a>); they never affect a composition (<a class="ref" href="#AGSC-03-18">AGSC-03-18</a>, <a class="ref" href="/specs/07-composition/#AGSC-07-10">AGSC-07-10</a>). <span class="trace">[audit/D §1.3, G06 ← D53]</span></li>
+<li id="AGSC-03-21" class="rule-item"><a class="rule" href="#AGSC-03-21"><strong>AGSC-03-21</strong></a> Links are the only stored relations. Embeddings, spreading activation, transclusion and bi-temporal edges MUST NOT be introduced. <span class="trace">[D43(4)]</span></li>
+</ul>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/agentic-system-core/edit/main/spec/03-links.md">Propose an edit</a> — opens <code>spec/03-links.md</code> in the specification repository; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>
+<p><a href="/legal/">Legal and privacy</a> · <a href="/docs/compliance/">Compliance and security</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery document</a> · <a href="/llms.txt">llms.txt</a> · <a rel="me" href="https://orcid.org/0009-0001-3464-5283">ORCID 0009-0001-3464-5283</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How it works — AgenticSystemCore</title>
+<meta name="description" content="How AgenticSystemCore works: the build pipeline, the proposal lifecycle, discovery, import and export, determinism, federation and agent safety.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/how-it-works/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/how-it-works/">
+<meta property="og:title" content="How it works">
+<meta property="og:description" content="How AgenticSystemCore works: the build pipeline, the proposal lifecycle, discovery, import and export, determinism, federation and agent safety.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"How it works","description":"How AgenticSystemCore works: the build pipeline, the proposal lifecycle, discovery, import and export, determinism, federation and agent safety.","url":"https://agenticsystemcore.com/docs/how-it-works/","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+</nav>
+</header>
+<main id="main">
+<h1>How it works</h1>
+<p class="summary"><strong>Summary</strong>Files go in, every surface comes out, and nothing is published until a deterministic build has proved itself twice: this page walks through the build, the proposal lifecycle, discovery, import and export, and the safety rules.</p>
+<h2 id="the-build">The build</h2>
+<p>A build is a function of four inputs and nothing else: the content tree, the configuration file, the build instant and, for the ledger head only, the git history (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-01">AGSC-04-01</a>, <a class="ref" href="/specs/04-canonicalization/#AGSC-04-18">AGSC-04-18</a>). It discovers the files, parses their headers, validates them against the schema, resolves the fourteen link keys and computes their inverses, emits the graph, the search index, the pages, the discovery document and the NOW page, and then builds a second time and compares the bytes (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-02">AGSC-04-02</a>). A difference fails the build. Budgets are enforced on the way: at most 100 KB per page, a bounded search index, no external request from any page (<a class="ref" href="/specs/06-surfaces/#AGSC-06-21">AGSC-06-21</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-05">AGSC-06-05</a>).</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" role="img" aria-label="Build pipeline: discover files, parse frontmatter, validate against the schema, resolve links, emit the graph, the search index, the pages, the discovery document and the NOW page, then build twice and compare bytes (highlighted) before www/ is published" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-build-pipeline" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="40" width="96" height="44" rx="6"/>
+<rect x="128" y="40" width="96" height="44" rx="6"/>
+<rect x="240" y="40" width="96" height="44" rx="6"/>
+<rect x="352" y="40" width="96" height="44" rx="6"/>
+<rect x="16" y="130" width="96" height="44" rx="6"/>
+<rect x="128" y="130" width="96" height="44" rx="6"/>
+<rect x="240" y="130" width="96" height="44" rx="6"/>
+<rect x="352" y="130" width="96" height="44" rx="6"/>
+<rect x="16" y="220" width="96" height="44" rx="6"/>
+<rect x="128" y="220" width="140" height="44" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="300" y="220" width="200" height="44" rx="6"/>
+<path d="M116.0 62.0 L124.0 62.0" marker-end="url(#ar-build-pipeline)"/>
+<path d="M228.0 62.0 L236.0 62.0" marker-end="url(#ar-build-pipeline)"/>
+<path d="M340.0 62.0 L348.0 62.0" marker-end="url(#ar-build-pipeline)"/>
+<path d="M400.0 84.0 L400 107 L64 107 L64.0 130.0" marker-end="url(#ar-build-pipeline)"/>
+<path d="M116.0 152.0 L124.0 152.0" marker-end="url(#ar-build-pipeline)"/>
+<path d="M228.0 152.0 L236.0 152.0" marker-end="url(#ar-build-pipeline)"/>
+<path d="M340.0 152.0 L348.0 152.0" marker-end="url(#ar-build-pipeline)"/>
+<path d="M400.0 174.0 L400 197 L64 197 L64.0 220.0" marker-end="url(#ar-build-pipeline)"/>
+<path d="M116.0 242.0 L124.0 242.0" marker-end="url(#ar-build-pipeline)"/>
+<path d="M272.0 242.0 L296.0 242.0" marker-end="url(#ar-build-pipeline)"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="64" y="58.0" font-size="12">discover</text>
+<text x="64" y="74.0" font-size="12">files</text>
+<text x="176" y="58.0" font-size="12">parse</text>
+<text x="176" y="74.0" font-size="12">frontmatter</text>
+<text x="288" y="58.0" font-size="12">validate</text>
+<text x="288" y="74.0" font-size="12">schema</text>
+<text x="400" y="58.0" font-size="12">resolve</text>
+<text x="400" y="74.0" font-size="12">links</text>
+<text x="64" y="148.0" font-size="12">graph</text>
+<text x="64" y="164.0" font-size="12">(RDF views)</text>
+<text x="176" y="148.0" font-size="12">search</text>
+<text x="176" y="164.0" font-size="12">index</text>
+<text x="288" y="148.0" font-size="12">render</text>
+<text x="288" y="164.0" font-size="12">pages</text>
+<text x="400" y="148.0" font-size="12">discovery</text>
+<text x="400" y="164.0" font-size="12">document</text>
+<text x="64" y="246.0" font-size="12">NOW page</text>
+<text x="198" y="238.0" font-size="12">build twice,</text>
+<text x="198" y="254.0" font-size="12">compare bytes</text>
+<text x="400" y="246.0" font-size="11">www/ — published as committed</text>
+<text x="260" y="288" font-size="11">every step is deterministic; the double build is the proof</text>
+</g>
+</svg>
+<figcaption>The highlighted double build is the proof of determinism: two builds must agree byte for byte before anything is published.</figcaption>
+</figure>
+<h2 id="the-proposal-lifecycle">The proposal lifecycle</h2>
+<p>Nobody writes to the published branch directly, agents included. A change starts as an edit with a provenance record: who or what made it and who is accountable for it (<a class="ref" href="/specs/08-governance/#AGSC-08-01">AGSC-08-01</a>). The <code>propose</code> verb writes a local patch and a pull-request body and prints the commands a person runs; it performs no network write (<a class="ref" href="/specs/08-governance/#AGSC-08-04">AGSC-08-04</a>). The pull request carries a sign-off trailer (<a class="ref" href="/specs/08-governance/#AGSC-08-06">AGSC-08-06</a>). CI runs the lint gates with no model call on any gating lane (<a class="ref" href="/specs/08-governance/#AGSC-08-27">AGSC-08-27</a>). A person reviews, records the review as a <code>verified</code> entry (<a class="ref" href="/specs/08-governance/#AGSC-08-03">AGSC-08-03</a>) and merges. The merge rebuilds and deploys the site, and the ledger, a hash chain derived from git history, gains an entry whose head is pinned in the discovery document (<a class="ref" href="/specs/08-governance/#AGSC-08-20">AGSC-08-20</a>, <a class="ref" href="/specs/08-governance/#AGSC-08-24">AGSC-08-24</a>).</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 280" role="img" aria-label="Proposal lifecycle: an edit becomes a local patch, then a signed pull request, CI runs the lint gates without a model, a human reviews (highlighted) and merges, the site rebuilds and deploys, and the ledger is derived from git history" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-proposal-lifecycle" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="40" width="110" height="44" rx="6"/>
+<rect x="156" y="40" width="110" height="44" rx="6"/>
+<rect x="296" y="40" width="110" height="44" rx="6"/>
+<rect x="296" y="130" width="110" height="44" rx="6"/>
+<rect x="156" y="130" width="110" height="44" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="16" y="130" width="110" height="44" rx="6"/>
+<rect x="156" y="210" width="250" height="40" rx="6"/>
+<path d="M130.0 62.0 L152.0 62.0" marker-end="url(#ar-proposal-lifecycle)"/>
+<path d="M270.0 62.0 L292.0 62.0" marker-end="url(#ar-proposal-lifecycle)"/>
+<path d="M351.0 88.0 L351.0 126.0" marker-end="url(#ar-proposal-lifecycle)"/>
+<path d="M292.0 152.0 L270.0 152.0" marker-end="url(#ar-proposal-lifecycle)"/>
+<path d="M152.0 152.0 L130.0 152.0" marker-end="url(#ar-proposal-lifecycle)"/>
+<path d="M129.7 173.8 L223.4 208.6" marker-end="url(#ar-proposal-lifecycle)"/>
+<path d="M176.8 130.0 L141 107 L71 107 L71.0 84.0" marker-end="url(#ar-proposal-lifecycle)" stroke-dasharray="4 3"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="71" y="58.0" font-size="12">edit an item</text>
+<text x="71" y="74.0" font-size="12">human or agent</text>
+<text x="211" y="58.0" font-size="12">propose:</text>
+<text x="211" y="74.0" font-size="12">local patch</text>
+<text x="351" y="58.0" font-size="12">pull request</text>
+<text x="351" y="74.0" font-size="12">+ sign-off</text>
+<text x="351" y="148.0" font-size="12">CI lint gates</text>
+<text x="351" y="164.0" font-size="12">(no model)</text>
+<text x="211" y="156.0" font-size="12">human review</text>
+<text x="71" y="148.0" font-size="12">merge → rebuild</text>
+<text x="71" y="164.0" font-size="12">+ deploy</text>
+<text x="281" y="234.0" font-size="11">ledger derived from git, head published</text>
+<text x="260" y="268" font-size="11">nobody writes to the published branch directly; a human ratifies every change</text>
+</g>
+</svg>
+<figcaption>The highlighted human review is the only gate that can publish; the dashed return is a change request, which starts a new proposal.</figcaption>
+</figure>
+<h2 id="the-agent-lane-when-a-model-drives">The agent lane, when a model drives</h2>
+<p>A node may declare agents (<a class="ref" href="/specs/01-bundle/#AGSC-01-36">AGSC-01-36</a>): each with a model, a budget, the tasks it may perform and the item types it may touch. Every value that is a secret or host-specific — a key, an agent's switch or budget — can be set in a <code>.env</code> file in the Bundle root that is never committed (<a class="ref" href="/specs/01-bundle/#AGSC-01-37">AGSC-01-37</a>). The node has one cap on model spend of every kind, ten dollars a month unless changed, and the enabled agents' budgets may not add up to more (<a class="ref" href="/specs/01-bundle/#AGSC-01-38">AGSC-01-38</a>); each lane creates at most <code>max_new_items</code> items per proposal and holds at most <code>max_claims</code> tasks at once (<a class="ref" href="/specs/09-conformance/#AGSC-E511">AGSC-E511</a>). An agent lane runs as the refresh verb or as a client of the tool server, reads the published surfaces, and opens proposals that carry its provenance and an episode with its cost; it can never write to the branch, never touch a procedure, a gate or the configuration, and stops for the month at its budget (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a>). <code>refresh --agent &lt;name&gt; --dry-run</code> shows the proposal it would open without opening it. With an automatic channel it makes the node self-driving under the standing ratification and every guard of the automatic lane (<a class="ref" href="/specs/08-governance/#AGSC-08-29">AGSC-08-29</a>); the build stays deterministic and model-free (<a class="ref" href="/specs/08-governance/#AGSC-08-30">AGSC-08-30</a>).</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 280" role="img" aria-label="The agent lane: a declared agent with a model, tasks, types, a channel and a budget runs as refresh, reads the published surfaces, and opens a proposal (highlighted) that carries provenance and an episode with its cost; the proposal passes the lints and the auto-merge guards, or is rejected before any lint runs when it steps outside its declared types" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-agent-lane" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="30" width="150" height="80" rx="6"/>
+<rect x="206" y="30" width="120" height="80" rx="6"/>
+<rect x="366" y="30" width="138" height="80" rx="6" class="acc" stroke-width="2.2"/>
+<path d="M170.0 70.0 L202.0 70.0" marker-end="url(#ar-agent-lane)"/>
+<path d="M330.0 70.0 L362.0 70.0" marker-end="url(#ar-agent-lane)"/>
+<rect x="206" y="150" width="120" height="60" rx="6"/>
+<rect x="366" y="150" width="138" height="60" rx="6"/>
+<rect x="16" y="150" width="150" height="60" rx="6"/>
+<path d="M370.2 112.2 L315.4 147.8" marker-end="url(#ar-agent-lane)"/>
+<path d="M330.0 180.0 L362.0 180.0" marker-end="url(#ar-agent-lane)"/>
+<path d="M202.0 180.0 L170.0 180.0" marker-end="url(#ar-agent-lane)"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="91" y="58.0" font-size="12">agents[] entry</text>
+<text x="91" y="74.0" font-size="12">model · tasks · types</text>
+<text x="91" y="90.0" font-size="12">channel · budget</text>
+<text x="266" y="58.0" font-size="12">refresh --agent</text>
+<text x="266" y="74.0" font-size="12">reads surfaces,</text>
+<text x="266" y="90.0" font-size="12">calls the model</text>
+<text x="435" y="58.0" font-size="12">proposal</text>
+<text x="435" y="74.0" font-size="12">prov: ai-generated</text>
+<text x="435" y="90.0" font-size="12">+ episode with usage</text>
+<text x="266" y="176.0" font-size="12">declared types</text>
+<text x="266" y="192.0" font-size="12">and tasks? budget?</text>
+<text x="435" y="176.0" font-size="12">lints at error,</text>
+<text x="435" y="192.0" font-size="12">auto-merge guards</text>
+<text x="91" y="176.0" font-size="12">rejected: E509</text>
+<text x="91" y="192.0" font-size="12">skipped: E510</text>
+<text x="260" y="268" font-size="11">never a write — every output is a proposal; the build stays model-free</text>
+</g>
+</svg>
+<figcaption>The highlighted proposal is the only thing an agent lane can produce; a write to the branch is impossible by construction, and the budget stops the lane for the month.</figcaption>
+</figure>
+<h2 id="discovery">Discovery</h2>
+<p>Every page carries a <code>describedby</code> link to <code>/.well-known/knowledge-linkset</code>, and the root route sends the same link as a header (<a class="ref" href="/specs/06-surfaces/#AGSC-06-25">AGSC-06-25</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-05">AGSC-11-05</a>). That document is an RFC 9264 link set: one context anchored at the Bundle, whose relations point at the graph, llms.txt, the licence page, the documentation, the ontology and its JSON-LD context, the declared surfaces and the peers (<a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a> to <a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>). At Level 2 and above every artefact link carries a SHA-256 digest, so a reader can check that what it fetched is what was published (<a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>). The profile URI, resolved through w3id.org, leads to the <a href="/specs/agentic-knowledge/">profile page</a> that explains the document.</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" role="img" aria-label="Discovery flow: a describedby link in any page head or a Link header on the root leads to the well-known discovery document (highlighted), which points at graph.jsonld, llms.txt, the ontology, the licence and the specification; its profile URI resolves to the profile page" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-discovery-flow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="40" width="130" height="50" rx="6"/>
+<rect x="16" y="120" width="130" height="50" rx="6"/>
+<rect x="190" y="70" width="150" height="60" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="380" y="20" width="124" height="34" rx="6"/>
+<rect x="380" y="64" width="124" height="34" rx="6"/>
+<rect x="380" y="108" width="124" height="34" rx="6"/>
+<rect x="380" y="152" width="124" height="34" rx="6"/>
+<rect x="380" y="196" width="124" height="34" rx="6"/>
+<rect x="190" y="190" width="150" height="50" rx="6"/>
+<path d="M149.9 78.1 L186.1 85.0" marker-end="url(#ar-discovery-flow)"/>
+<path d="M149.9 128.2 L186.1 119.3" marker-end="url(#ar-discovery-flow)"/>
+<path d="M343.8 72.0 L390.5 55.3" marker-end="url(#ar-discovery-flow)"/>
+<path d="M344.0 91.5 L376.0 88.1" marker-end="url(#ar-discovery-flow)"/>
+<path d="M344.0 111.2 L376.0 115.7" marker-end="url(#ar-discovery-flow)"/>
+<path d="M343.7 130.7 L394.7 150.5" marker-end="url(#ar-discovery-flow)"/>
+<path d="M315.4 132.2 L412.0 193.8" marker-end="url(#ar-discovery-flow)"/>
+<path d="M265.0 134.0 L265.0 186.0" marker-end="url(#ar-discovery-flow)"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="81" y="61.0" font-size="12">any HTML page</text>
+<text x="81" y="77.0" font-size="12">rel=describedby</text>
+<text x="81" y="149.0" font-size="12">Link header on /</text>
+<text x="265" y="96.0" font-size="12">/.well-known/</text>
+<text x="265" y="112.0" font-size="12">knowledge-linkset</text>
+<text x="442" y="41.0" font-size="12">graph.jsonld</text>
+<text x="442" y="85.0" font-size="12">llms.txt</text>
+<text x="442" y="129.0" font-size="12">ontology (/ns/)</text>
+<text x="442" y="173.0" font-size="12">licence (/legal/)</text>
+<text x="442" y="217.0" font-size="12">specification</text>
+<text x="265" y="211.0" font-size="12">profile URI (w3id)</text>
+<text x="265" y="227.0" font-size="12">→ profile page</text>
+<text x="260" y="288" font-size="11">one document lists every machine artefact; the profile URI says how to read it</text>
+</g>
+</svg>
+<figcaption>The highlighted document is the single entry point: every machine artefact is one hop from it, and its profile URI explains how to read it.</figcaption>
+</figure>
+<h2 id="import-and-export">Import and export</h2>
+<p>Bare Markdown without headers is adopted in place: minimal headers are inserted, bodies stay byte for byte, and the result passes the build (<a class="ref" href="/specs/02-item/#AGSC-02-93">AGSC-02-93</a>, <a class="ref" href="/specs/02-item/#AGSC-02-94">AGSC-02-94</a>). Foreign Open Knowledge Format bundles are accepted with unknown types and keys tolerated (<a class="ref" href="/specs/01-bundle/#AGSC-01-22">AGSC-01-22</a>). Skill files map to Procedures (<a class="ref" href="/docs/requirements/#PRD-034">PRD-034</a>). On the way out, Markdown and OKF exports are lossless and open as a plain folder in any editor or vault tool (<a class="ref" href="/specs/01-bundle/#AGSC-01-26">AGSC-01-26</a>); JSON-LD export is byte-identical to the published graph; steer files, skill packs, llms.txt, the chunk export and Harnesses are derived surfaces. Every export that carries prose carries the Content Use Terms with it (<a class="ref" href="/specs/01-bundle/#AGSC-01-29">AGSC-01-29</a>).</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 280" role="img" aria-label="Import and export: plain Markdown, OKF bundles, SKILL.md packs, JSON-LD and JSONL come into the Bundle (highlighted); Markdown or OKF, JSON-LD, JSONL and RDF, steer files, skill packs, llms.txt, chunks and Harnesses go out" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-import-export" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="198" y="100" width="124" height="70" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="16" y="24" width="146" height="34" rx="6"/>
+<rect x="16" y="72" width="146" height="34" rx="6"/>
+<rect x="16" y="120" width="146" height="34" rx="6"/>
+<rect x="16" y="168" width="146" height="34" rx="6"/>
+<rect x="364" y="24" width="140" height="34" rx="6"/>
+<rect x="364" y="72" width="140" height="34" rx="6"/>
+<rect x="364" y="120" width="140" height="34" rx="6"/>
+<rect x="364" y="168" width="140" height="34" rx="6"/>
+<rect x="364" y="216" width="140" height="34" rx="6"/>
+<path d="M123.4 59.9 L194.5 99.0" marker-end="url(#ar-import-export)"/>
+<path d="M156.1 107.0 L194.1 117.3" marker-end="url(#ar-import-export)"/>
+<path d="M166.0 136.1 L194.0 135.8" marker-end="url(#ar-import-export)"/>
+<path d="M151.0 166.9 L194.2 154.3" marker-end="url(#ar-import-export)"/>
+<path d="M325.5 99.6 L399.0 59.9" marker-end="url(#ar-import-export)"/>
+<path d="M325.9 117.6 L365.8 107.0" marker-end="url(#ar-import-export)"/>
+<path d="M326.0 135.8 L360.0 136.1" marker-end="url(#ar-import-export)"/>
+<path d="M325.8 153.9 L371.0 166.9" marker-end="url(#ar-import-export)"/>
+<path d="M325.5 171.9 L400.3 214.0" marker-end="url(#ar-import-export)"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="260" y="131.0" font-size="12">Bundle</text>
+<text x="260" y="147.0" font-size="12">(Markdown + YAML)</text>
+<text x="89" y="45.0" font-size="12">bare Markdown (adopt)</text>
+<text x="89" y="93.0" font-size="12">OKF bundle</text>
+<text x="89" y="141.0" font-size="12">SKILL.md packs</text>
+<text x="89" y="189.0" font-size="12">JSON-LD, JSONL</text>
+<text x="434" y="45.0" font-size="12">Markdown / OKF</text>
+<text x="434" y="93.0" font-size="12">JSON-LD, JSONL, RDF</text>
+<text x="434" y="141.0" font-size="11">steer files (AGENTS.md)</text>
+<text x="434" y="189.0" font-size="12">skill packs</text>
+<text x="434" y="237.0" font-size="11">llms.txt, chunks, Harness</text>
+<text x="260" y="268" font-size="11">lossless in and out; every prose export carries the Content Use Terms</text>
+</g>
+</svg>
+<figcaption>The highlighted Bundle is the only store; every format on the left comes in without loss and every format on the right is derived from it.</figcaption>
+</figure>
+<h2 id="why-determinism-matters">Why determinism matters</h2>
+<p>Two conforming tools on two machines produce identical machine artefacts (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-24">AGSC-04-24</a>). That is what makes a digest in the discovery document a real integrity check, lets two nodes compare notes, lets a reader rebuild a site from its source and verify that nothing changed, and lets any language reimplement the format from the specification and its vectors alone (<a class="ref" href="/docs/requirements/#PRD-055">PRD-055</a>). The rules that make it true are in <a href="/specs/04-canonicalization/">canonicalization</a>: canonical JSON, NFC before sorting, fixed sort orders, one instant format, SHA-256.</p>
+<h2 id="federation-without-servers">Federation without servers</h2>
+<p>Nodes never call nodes. A node declares its peers; an agent, a validator or a browser does the walking, and the walk is bounded: HTTPS only, every private, loopback, link-local and special-purpose address refused in both address families, redirects re-checked hop by hop, a hop limit of three, a fan-out cap and a request budget (<a class="ref" href="/specs/11-boundary/#AGSC-11-06">AGSC-11-06</a> to <a class="ref" href="/specs/11-boundary/#AGSC-11-10">AGSC-11-10</a>). Everything that comes from a peer is marked untrusted with its origin (<a class="ref" href="/specs/11-boundary/#AGSC-11-11">AGSC-11-11</a>). The mutual-conformance check accepts two local files, so it runs offline (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a>).</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" role="img" aria-label="Boundary: this node declares its surfaces (highlighted: llms-txt, chunks, mcp, webmcp, a2a-card, solid, responder), its visibility and its retirement; a browser reads it cross-origin, and an agent walks peer nodes over HTTPS with a hop limit; nodes never call nodes" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-spec-11-boundary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="160" y="20" width="200" height="260" rx="8" stroke-dasharray="6 4"/>
+<rect x="174" y="40" width="172" height="100" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="174" y="156" width="172" height="44" rx="6"/>
+<rect x="174" y="216" width="172" height="44" rx="6"/>
+<rect x="16" y="60" width="110" height="50" rx="6"/>
+<path d="M130.0 86.6 L170.0 87.6" marker-end="url(#ar-spec-11-boundary)"/>
+<rect x="394" y="60" width="110" height="50" rx="6"/>
+<rect x="394" y="160" width="110" height="50" rx="6"/>
+<path d="M449.0 156.0 L449.0 114.0" marker-end="url(#ar-spec-11-boundary)"/>
+<path d="M390.1 174.1 L363.9 169.2" marker-end="url(#ar-spec-11-boundary)"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="260" y="14" font-size="11">this node</text>
+<text x="260" y="70.0" font-size="12">declared surfaces:</text>
+<text x="260" y="86.0" font-size="12">llms-txt · chunks · mcp</text>
+<text x="260" y="102.0" font-size="12">webmcp · a2a-card · solid</text>
+<text x="260" y="118.0" font-size="12">responder</text>
+<text x="260" y="182.0" font-size="12">public or restricted</text>
+<text x="260" y="242.0" font-size="12">retire · tombstone</text>
+<text x="71" y="81.0" font-size="12">browser</text>
+<text x="71" y="97.0" font-size="12">(cross-origin)</text>
+<text x="449" y="89.0" font-size="12">peer node</text>
+<text x="449" y="181.0" font-size="12">agent walks</text>
+<text x="449" y="197.0" font-size="12">peers</text>
+<text x="447" y="126" font-size="10">HTTPS only, hop limit 3</text>
+<text x="260" y="288" font-size="11">static and client-side: nodes never call nodes</text>
+</g>
+</svg>
+<figcaption>The highlighted declaration is the plugin contract: declare, pin, inherit, prove. Everything that crosses the dashed border is static and client-side.</figcaption>
+</figure>
+<h2 id="safety">Safety</h2>
+<p>Content that agents consume is data, never instruction. Four lints run on every build: an injection scan over bodies, headers at any depth, attachment text and every exported prose surface; a secrets check; a personal-data check; and a clean-room check (<a class="ref" href="/specs/08-governance/#AGSC-08-13">AGSC-08-13</a> to <a class="ref" href="/specs/08-governance/#AGSC-08-17">AGSC-08-17</a>). Every text handed to a model is marked untrusted (<a class="ref" href="/specs/08-governance/#AGSC-08-18">AGSC-08-18</a>). Tools take identifiers, never paths, URLs or shell strings. Skill packs are inert. And the specification states its own limit: these lints prove neither safety nor the absence of novel injection; hashes and attestations prove only that an artefact is what was published (<a class="ref" href="/specs/08-governance/#AGSC-08-19">AGSC-08-19</a>).</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" role="img" aria-label="Governance: an item with a provenance record becomes a proposal (a pull request), gates run as CI checks with four lints and no model, a human reviews and merges (highlighted), and the merge becomes an entry of the ledger derived from git history" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-spec-08-governance" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="30" width="120" height="50" rx="6"/>
+<rect x="176" y="30" width="120" height="50" rx="6"/>
+<rect x="336" y="30" width="150" height="50" rx="6"/>
+<rect x="176" y="110" width="310" height="60" rx="6"/>
+<rect x="16" y="110" width="120" height="60" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="16" y="200" width="470" height="50" rx="6"/>
+<path d="M140.0 55.0 L172.0 55.0" marker-end="url(#ar-spec-08-governance)"/>
+<path d="M300.0 55.0 L332.0 55.0" marker-end="url(#ar-spec-08-governance)"/>
+<path d="M384.7 82.9 L362.0 107.1" marker-end="url(#ar-spec-08-governance)"/>
+<path d="M172.0 140.0 L140.0 140.0" marker-end="url(#ar-spec-08-governance)"/>
+<path d="M139.6 170.9 L195.9 198.3" marker-end="url(#ar-spec-08-governance)"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="76" y="51.0" font-size="12">item + prov</text>
+<text x="76" y="67.0" font-size="12">(who made it)</text>
+<text x="236" y="51.0" font-size="12">proposal</text>
+<text x="236" y="67.0" font-size="12">(pull request)</text>
+<text x="411" y="51.0" font-size="12">gates → CI checks</text>
+<text x="411" y="67.0" font-size="12">lint, no model</text>
+<text x="331" y="136.0" font-size="12">four lints on every build:</text>
+<text x="331" y="152.0" font-size="12">injection · secrets · PII · clean-room</text>
+<text x="76" y="136.0" font-size="12">human review</text>
+<text x="76" y="152.0" font-size="12">then merge</text>
+<text x="251" y="221.0" font-size="12">derived ledger: a hash chain over git history</text>
+<text x="251" y="237.0" font-size="12">its head is pinned in the discovery document</text>
+<text x="260" y="288" font-size="11">every change has an author, a reviewer and a place in the chain</text>
+</g>
+</svg>
+<figcaption>The highlighted human review is the only approval the format admits; the ledger below records every merge in a hash chain whose head the discovery document pins.</figcaption>
+</figure>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/how-it-works.md">Propose an edit</a> — opens <code>site/docs/how-it-works.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>
+<p><a href="/legal/">Legal and privacy</a> · <a href="/docs/compliance/">Compliance and security</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery document</a> · <a href="/llms.txt">llms.txt</a> · <a rel="me" href="https://orcid.org/0009-0001-3464-5283">ORCID 0009-0001-3464-5283</a></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AGSC-07 — Composition: the closure algebra and the Harness — AgenticSystemCore</title>
+<meta name="description" content="AGSC-07 — Composition: the closure algebra and the Harness — section 07 of the AgenticSystemCore specification 1.0.0-rc.X.">
+<link rel="canonical" href="https://agenticsystemcore.com/specs/07-composition/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/specs/07-composition/">
+<meta property="og:title" content="AGSC-07 — Composition: the closure algebra and the Harness">
+<meta property="og:description" content="AGSC-07 — Composition: the closure algebra and the Harness — section 07 of the AgenticSystemCore specification 1.0.0-rc.X.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AGSC-07 — Composition: the closure algebra and the Harness","url":"https://agenticsystemcore.com/specs/07-composition/","version":"1.0.0-rc.X","license":"https://www.apache.org/licenses/LICENSE-2.0","author":{"@type":"Person","name":"Andrei Nicolae Besleaga"},"isPartOf":"https://agenticsystemcore.com/specs/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/" aria-current="page">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+</nav>
+</header>
+<main id="main" class="wide">
+<h1>AGSC-07 — Composition: the closure algebra and the Harness</h1>
+<p class="summary"><strong>Summary</strong>How a selection of items becomes a verdict and a Harness: the five steps in their fixed order, the seven Harness files, skill packs, ports and saved architectures.</p>
+<section class="status" aria-labelledby="status-heading">
+<h2 id="status-heading">Status of this document</h2>
+<p>Specification <code>1.0.0-rc.X</code>, a release candidate tagged on 2026-09-21. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it. Released sections are immutable; a correction ships as a new version.</p>
+</section>
+<aside class="plain" aria-labelledby="plain"><h2 id="plain">In plain language</h2>
+<p><strong>Pick items, get a harness.</strong> You select items (by slug, or by re-running a saved architecture). The combiner runs five steps in a fixed order: pull in everything <code>requires</code> reaches (breadth-first), hide what is <code>superseded</code>, refuse any surviving <code>excludes</code> pair, warn on <code>contradicts</code> and missing <code>uses</code>, then wire ports — matching what one item <code>produces</code> to what another <code>consumes</code>.</p>
+<p><strong>The verdict.</strong> Valid or not, with the hidden items, the conflicts and the warnings listed. Step 5 never changes the verdict; it only adds wiring.</p>
+<p><strong>The Harness.</strong> A valid composition yields exactly seven files — a JSON-LD record, a Structurizr model, a Mermaid diagram, an arc42 skeleton, decision records, a gate checklist and a skills manifest — byte-identical whether produced by the CLI or in the browser, and keyed by the ordered selection. Runtime emitters (GABBE, kaiban-distributed, CrewAI, LangGraph, ADK, n8n) are renderings of those seven files.</p>
+<p><strong>Skill packs.</strong> Procedures export to <code>SKILL.md</code> files that can be installed into agent tool trees and imported back.</p>
+<p class="id">This box explains; the rules below decide. New to the notation? See <a href="/docs/reading-the-specification/">how to read the specification</a>.</p>
+</aside>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 300" role="img" aria-label="Composition: a selection of slugs runs through five fixed steps (closure over requires, hiding of superseded items, mutual exclusion, warnings, port wiring); steps one to four give the verdict, and only a valid verdict yields the Harness of seven files (highlighted)" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-spec-07-composition" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="110" width="96" height="50" rx="6"/>
+<rect x="126" y="110" width="72" height="50" rx="6"/>
+<rect x="208" y="110" width="72" height="50" rx="6"/>
+<rect x="290" y="110" width="72" height="50" rx="6"/>
+<rect x="372" y="110" width="72" height="50" rx="6"/>
+<rect x="454" y="110" width="72" height="50" rx="6"/>
+<path d="M116.0 135.0 L122.0 135.0" marker-end="url(#ar-spec-07-composition)"/>
+<path d="M202.0 135.0 L204.0 135.0" marker-end="url(#ar-spec-07-composition)"/>
+<path d="M284.0 135.0 L286.0 135.0" marker-end="url(#ar-spec-07-composition)"/>
+<path d="M366.0 135.0 L368.0 135.0" marker-end="url(#ar-spec-07-composition)"/>
+<path d="M448.0 135.0 L450.0 135.0" marker-end="url(#ar-spec-07-composition)"/>
+<rect x="126" y="220" width="160" height="44" rx="6"/>
+<rect x="340" y="220" width="186" height="44" rx="6" class="acc" stroke-width="2.2"/>
+<path d="M368.5 155.9 L251.1 218.1" marker-end="url(#ar-spec-07-composition)"/>
+<path d="M290.0 242.0 L336.0 242.0" marker-end="url(#ar-spec-07-composition)"/>
+<path d="M474.8 163.5 L446.6 216.5" marker-end="url(#ar-spec-07-composition)"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="64" y="131.0" font-size="12">selection</text>
+<text x="64" y="147.0" font-size="12">(slugs)</text>
+<text x="162" y="139.0" font-size="12">1 closure</text>
+<text x="244" y="139.0" font-size="12">2 hiding</text>
+<text x="326" y="139.0" font-size="12">3 mutex</text>
+<text x="408" y="139.0" font-size="12">4 warnings</text>
+<text x="490" y="139.0" font-size="12">5 wiring</text>
+<text x="162" y="178" font-size="10">requires</text>
+<text x="244" y="178" font-size="10">supersedes</text>
+<text x="326" y="178" font-size="10">excludes</text>
+<text x="408" y="178" font-size="10">contradicts</text>
+<text x="490" y="178" font-size="10">ports</text>
+<text x="206" y="246.0" font-size="12">verdict (valid?)</text>
+<text x="433" y="246.0" font-size="12">Harness: seven files</text>
+<text x="280" y="288" font-size="11">order is fixed; an invalid selection yields the verdict alone and no Harness</text>
+</g>
+</svg>
+<figcaption>The highlighted Harness is produced only after the verdict; the order of the five steps is fixed because reversing it changes verdicts.</figcaption>
+</figure>
+<nav class="toc" aria-labelledby="contents"><h2 id="contents">Contents</h2>
+<ol>
+<li><a href="#section-7-1">7.1 Inputs</a></li>
+<li><a href="#section-7-2">7.2 The algebra, in this order</a></li>
+<li><a href="#section-7-3">7.3 The Harness</a></li>
+<li><a href="#section-7-4">7.4 Skill packs</a></li>
+<li><a href="#section-7-5">7.5 Step 5 — ports and wiring; saved architectures (added at rc.3, 2026-09-16 — D67 Q56, D71 Q71)</a></li>
+</ol></nav>
+<h2 id="section-7-1">7.1 Inputs</h2>
+<ul>
+<li id="AGSC-07-01" class="rule-item"><a class="rule" href="#AGSC-07-01"><strong>AGSC-07-01</strong></a> A composition takes an ordered selection of item slugs and the resolved graph, and produces a verdict plus a Harness file map. It MUST NOT require a network, a key or a server. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-038">PRD-038</a> ← R12, D11]</span></li>
+<li id="AGSC-07-02" class="rule-item retired"><a class="rule" href="#AGSC-07-02"><strong>AGSC-07-02</strong></a> <em>(retired at rc.3, 2026-09-17, V6-B minimality pass confirmed by D81: the same byte-identity claim, now stated once (M7) — merged into <a class="ref" href="#AGSC-07-13">AGSC-07-13</a>; the id is reserved under <a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a> and never reused.)</em></li>
+<li id="AGSC-07-03" class="rule-item"><a class="rule" href="#AGSC-07-03"><strong>AGSC-07-03</strong></a> A slug not present in the graph is <a class="ref" href="/specs/09-conformance/#AGSC-E802"><code>AGSC-E802</code></a>. A selection MUST be de-duplicated preserving first-occurrence order. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a>]</span></li>
+</ul>
+<h2 id="section-7-2">7.2 The algebra, in this order</h2>
+<ul>
+<li id="AGSC-07-04" class="rule-item"><a class="rule" href="#AGSC-07-04"><strong>AGSC-07-04</strong></a> <strong>Step 1 — closure.</strong> Compute the transitive closure of <code>requires</code> over the selection. Each added item MUST record an explanation path — the chain of <code>(source, key, target)</code> steps that pulled it in. The traversal MUST be <strong>breadth-first</strong> from the de-duplicated selection, expanding each frontier in code-point slug order and each item's <code>requires</code> targets in code-point order; the path recorded for an item is the first one discovered by that traversal (a shortest path, ties broken by the lexicographically least slug sequence). Depth-first traversal is non-conforming: it records different <code>path[]</code> chains for the same input, and <code>path[]</code> is byte-compared (<a class="ref" href="/docs/requirements/#PRD-038">PRD-038</a>). <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a> ← R6, D48(2)]</span></li>
+<li id="AGSC-07-05" class="rule-item"><a class="rule" href="#AGSC-07-05"><strong>AGSC-07-05</strong></a> <strong>Step 2 — hiding.</strong> Remove from the result any item that a member of the result <code>supersedes</code>, whether that item was selected directly or added by Step 1 (formerly <a class="ref" href="/specs/03-links/#AGSC-03-17">AGSC-03-17</a>). A superseded item MUST NOT be re-added by a later step, appears in <code>hidden[]</code>, and MUST NOT appear in <code>added[]</code> even when Step 1 had added it. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a>, <a class="ref" href="/specs/03-links/#AGSC-03-17">AGSC-03-17</a> (retired), D48(2)]</span> <em>(trace corrected at rc.5, V8-103: the bracket cited this rule itself.)</em></li>
+<li id="AGSC-07-05a" class="rule-item"><a class="rule" href="#AGSC-07-05a"><strong>AGSC-07-05a</strong></a> <strong>Step 2, hard-dependency guard.</strong> When an item removed by Step 2 is the <code>requires</code> target of an item that survives Step 2, the composition is <strong>invalid</strong> with <a class="ref" href="/specs/09-conformance/#AGSC-E802"><code>AGSC-E802</code></a> — message form &quot;required item superseded — select <code>&lt;superseding&gt;</code>&quot; — naming the requiring item, the hidden target and the superseding item. Closure MUST NOT be re-run and the superseding item MUST NOT be substituted: the selection is the author's, and a hard dependency is never silently dropped. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a> ← D48(2)]</span></li>
+<li id="AGSC-07-06" class="rule-item"><a class="rule" href="#AGSC-07-06"><strong>AGSC-07-06</strong></a> <strong>Step 3 — mutex.</strong> Evaluate <code>excludes</code> over the surviving set. One or more surviving <code>excludes</code> pairs make the composition <strong>invalid</strong>; the verdict MUST name every violating pair and the explanation path of each side (<a class="ref" href="/specs/09-conformance/#AGSC-E801"><code>AGSC-E801</code></a>). <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a>]</span></li>
+<li id="AGSC-07-07" class="rule-item"><a class="rule" href="#AGSC-07-07"><strong>AGSC-07-07</strong></a> <strong>Step 4 — warnings.</strong> Emit the warning <a class="ref" href="/specs/09-conformance/#AGSC-E803"><code>AGSC-E803</code></a> for every <code>contradicts</code> pair inside the result, and for every <code>uses</code> target that is not in the result (the code was registered against this rule and named by no sentence until rc.5, V8-107). Warnings MUST NOT invalidate a composition. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a>]</span></li>
+<li id="AGSC-07-08" class="rule-item"><a class="rule" href="#AGSC-07-08"><strong>AGSC-07-08</strong></a> (amended at rc.3) Steps MUST run exactly once each, in the order 1→5 — closure, then <code>supersedes</code> hiding (with the <a class="ref" href="#AGSC-07-05a">AGSC-07-05a</a> guard), then <code>excludes</code> mutex, then warnings, then port wiring (<a class="ref" href="#AGSC-07-23">AGSC-07-23</a>). Step 5 is verdict-neutral: it reads the surviving set and writes only <code>wiring[]</code> and warnings, so every verdict member of <a class="ref" href="#AGSC-07-09">AGSC-07-09</a> other than <code>warnings[]</code> is byte-identical whether or not any item carries a port, and <code>warnings[]</code> differs only by its <a class="ref" href="/specs/09-conformance/#AGSC-E804"><code>AGSC-E804</code></a> entries (V7-04). Closure MUST NOT be re-run after hiding, and mutex MUST NOT be evaluated before hiding: evaluating <code>excludes</code> over a set that still contains superseded items reverses verdicts (an item hidden at Step 2 can be one half of an <code>excludes</code> pair). <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a>, D48(2)]</span></li>
+<li id="AGSC-07-09" class="rule-item"><a class="rule" href="#AGSC-07-09"><strong>AGSC-07-09</strong></a> The verdict object MUST be JCS-canonical with members <code>added[]</code>, <code>conflicts[]</code>, <code>warnings[]</code>, <code>hidden[]</code>, <code>selection[]</code> and <code>valid</code> (boolean). <code>selection[]</code> is the <strong>surviving post-Step-2 set</strong> — the closed selection minus the hidden items — in code-point slug order; <code>hidden[]</code> is code-point ordered; <code>added[]</code> is ordered by <code>slug</code>; <code>conflicts[]</code> sort element-wise over the internally sorted <code>pair</code>, then by <code>code</code>; <code>warnings[]</code> sort element-wise over <code>(source, target)</code>, then by <code>code</code> and <code>key</code>; every comparison is code-point. Each <code>added</code> entry carries <code>slug</code> and <code>path[]</code>; each <code>conflicts[]</code> entry carries <code>code</code>, <code>key</code> and <code>pair</code> (plus <code>superseding</code> for <a class="ref" href="/specs/09-conformance/#AGSC-E802"><code>AGSC-E802</code></a>); each <code>warnings[]</code> entry carries <code>code</code>, <code>key</code>, <code>source</code> and <code>target</code>. Input order therefore never reaches the verdict, which is why order-independence holds (formerly <a class="ref" href="#AGSC-07-11">AGSC-07-11</a>). <span class="trace">[<a class="ref" href="/specs/04-canonicalization/#AGSC-04-04">AGSC-04-04</a>, D48(2)]</span></li>
+<li id="AGSC-07-10" class="rule-item"><a class="rule" href="#AGSC-07-10"><strong>AGSC-07-10</strong></a> <code>related</code>, <code>broader</code>, <code>narrower</code>, <code>derived-from</code> and <code>mentions</code> MUST NOT affect any step. <span class="trace">[<a class="ref" href="/specs/03-links/#AGSC-03-18">AGSC-03-18</a>, D43(4)]</span></li>
+<li id="AGSC-07-11" class="rule-item retired"><a class="rule" href="#AGSC-07-11"><strong>AGSC-07-11</strong></a> <em>(retired at rc.3, 2026-09-17, V6-B minimality pass confirmed by D81: derivable: <a class="ref" href="#AGSC-07-09">AGSC-07-09</a> fixes every order and says so, <a class="ref" href="#AGSC-07-04">AGSC-07-04</a> fixes iteration order (R1) — merged into <a class="ref" href="#AGSC-07-09">AGSC-07-09</a>; the id is reserved under <a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a> and never reused.)</em></li>
+</ul>
+<h2 id="section-7-3">7.3 The Harness</h2>
+<ul>
+<li id="AGSC-07-12" class="rule-item"><a class="rule" href="#AGSC-07-12"><strong>AGSC-07-12</strong></a> A valid composition MUST emit exactly these seven file kinds, and no others (two of them one file per selected item — AR2-71), under <code>dist/harness/&lt;name&gt;/</code> — never under <code>content/</code> (formerly <a class="ref" href="/specs/01-bundle/#AGSC-01-09">AGSC-01-09</a>) — or as an equivalent in-memory map for download:</li>
+</ul>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 1"><table>
+<thead><tr><th scope="col">File</th><th scope="col">Content</th></tr></thead>
+<tbody>
+<tr><td><code>harness.jsonld</code></td><td>selection, closure with explanation paths, links, verdict — JCS-canonical</td></tr>
+<tr><td><code>AGENTS.md</code></td><td>item summaries and constraints, as context only</td></tr>
+<tr><td><code>workspace.dsl</code></td><td>Structurizr: one container per selected Concept, relationships from Links</td></tr>
+<tr><td><code>diagram.mmd</code></td><td>Mermaid flowchart of the same relationships, emitted as text</td></tr>
+<tr><td><code>arc42.md</code></td><td>arc42 skeleton seeded from the selection</td></tr>
+<tr><td><code>decisions/0001-&lt;slug&gt;.md</code></td><td>one MADR record per selected Concept, numbered in selection order</td></tr>
+<tr><td><code>skills/&lt;slug&gt;/SKILL.md</code></td><td>one skill file per selected Procedure</td></tr>
+</tbody></table></div>
+<p>[<a class="ref" href="/docs/requirements/#PRD-037">PRD-037</a> ← D35, audit/D §3(e), G11]</p>
+<p><code>decisions/NNNN-&lt;slug&gt;.md</code> is numbered in the de-duplicated first-occurrence input order of <a class="ref" href="#AGSC-07-03">AGSC-07-03</a> restricted to the survivors — the one place where input order is still meaningful; the verdict itself is order-free (<a class="ref" href="#AGSC-07-09">AGSC-07-09</a>). <code>harness.jsonld</code> is a JSON document in JCS form, <strong>not</strong> an RDF export: <a class="ref" href="/specs/05-graph/#AGSC-05-08">AGSC-05-08</a> and <a class="ref" href="/specs/09-conformance/#AGSC-E605"><code>AGSC-E605</code></a> do not apply to its nested <code>selection</code>/<code>closure</code>/<code>links</code>/<code>verdict</code> objects, which carry no <code>@id</code>. <span class="trace">[D48(6)]</span></p>
+<p><code>&lt;name&gt;</code> is the first sixteen lowercase-hex characters of the <strong>selection digest</strong>: the SHA-256 of the JCS form (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-05">AGSC-04-05</a>) of the verdict's <code>selection[]</code> — the surviving set in code-point order (<a class="ref" href="#AGSC-07-09">AGSC-07-09</a>) — so a Harness is addressed by its member set alone, two different selections never share a directory, and the input order of <a class="ref" href="#AGSC-07-03">AGSC-07-03</a> does not reach the name. That same digest is the selection digest the emitted files carry under <a class="ref" href="#AGSC-07-16">AGSC-07-16</a>. A writer MUST derive <code>&lt;name&gt;</code> from that digest and from nothing else — never from a path, a clock or a host — because the digest reaches the emitted bytes, and a name one host could compute and another could not would make <a class="ref" href="#AGSC-07-13">AGSC-07-13</a>'s byte-identity unattainable; the directory the files are actually written into is <code>compose --out</code>'s (<a class="ref" href="/specs/09-conformance/#AGSC-09-09">AGSC-09-09</a>) and MUST NOT reach any emitted byte. Vector <code>compose-0015</code>. <em>(stated at rc.5, ENG2-05: neither <code>&lt;name&gt;</code> nor the digest was defined by any rule of §7.3, while <a class="ref" href="#AGSC-07-13">AGSC-07-13</a> requires both to be computable in a browser that has no path at all.)</em></p>
+<ul>
+<li id="AGSC-07-13" class="rule-item"><a class="rule" href="#AGSC-07-13"><strong>AGSC-07-13</strong></a> The algorithm MUST be identical in every host: Harness output computed in a browser MUST be byte-identical to the equivalent CLI invocation and MUST be reproducible from the graph plus the selection plus <code>SOURCE_DATE_EPOCH</code>. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-037">PRD-037</a>, <a class="ref" href="/docs/requirements/#PRD-038">PRD-038</a>]</span></li>
+<li id="AGSC-07-14" class="rule-item retired"><a class="rule" href="#AGSC-07-14"><strong>AGSC-07-14</strong></a> <em>(retired at rc.3, 2026-09-17, V6-B minimality pass confirmed by D81: strictly implied by the general rule <a class="ref" href="/specs/01-bundle/#AGSC-01-29">AGSC-01-29</a>, which now names the Harness files (R18) — merged into <a class="ref" href="/specs/01-bundle/#AGSC-01-29">AGSC-01-29</a>; the id is reserved under <a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a> and never reused.)</em></li>
+<li id="AGSC-07-15" class="rule-item"><a class="rule" href="#AGSC-07-15"><strong>AGSC-07-15</strong></a> A Harness MUST NOT contain scripts, executables, symlinks, an <code>allowed-tools</code> key (the seven-file closure is <a class="ref" href="#AGSC-07-12">AGSC-07-12</a>'s — M6); nor MUST a published skill pack (§7.4). A violation is <a class="ref" href="/specs/09-conformance/#AGSC-E407"><code>AGSC-E407</code></a> (the code was registered against this rule and named by no sentence until rc.5, V8-107). <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-035">PRD-035</a> ← N9, Art. XIV]</span></li>
+<li id="AGSC-07-16" class="rule-item"><a class="rule" href="#AGSC-07-16"><strong>AGSC-07-16</strong></a> Harness structure is CC0 to the user; the prose it quotes travels under the Content Use Terms. Both facts MUST be stated in the emitted files. <span class="trace">[D39, <a class="ref" href="/docs/requirements/#NFR-10">NFR-10</a>]</span></li>
+<li id="AGSC-07-17" class="rule-item"><a class="rule" href="#AGSC-07-17"><strong>AGSC-07-17</strong></a> An invalid composition MUST NOT emit a Harness. The verdict alone is returned, with exit code 1 from the CLI. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a>, <a class="ref" href="/specs/09-conformance/#AGSC-09-08">AGSC-09-08</a>]</span> <em>(trace corrected at rc.5, V8-102: the bracket cited <a class="ref" href="/specs/09-conformance/#AGSC-09-06">AGSC-09-06</a>, which governs vector-file encoding; exit codes are <a class="ref" href="/specs/09-conformance/#AGSC-09-08">AGSC-09-08</a>.)</em></li>
+<li id="AGSC-07-18" class="rule-item"><a class="rule" href="#AGSC-07-18"><strong>AGSC-07-18</strong></a> Runtime emitters (GABBE, kaiban-distributed, CrewAI, LangGraph, ADK/MS-AF, n8n) are <strong>target renderings of the seven files of <a class="ref" href="#AGSC-07-12">AGSC-07-12</a></strong>, selected by <code>compose --emit &lt;target&gt;</code> and written outside <code>dist/harness/&lt;name&gt;/</code>; adding one MUST NOT change the seven files, MUST NOT add a file inside the Harness directory, and MUST be a single template plus a registry row. <span class="trace">[D35, D53, audit/D §3(e), V4-A A-78]</span></li>
+</ul>
+<h2 id="section-7-4">7.4 Skill packs</h2>
+<p>The packs of this section are the <strong>published</strong> packs of the route set (<a class="ref" href="/specs/06-surfaces/#AGSC-06-01">AGSC-06-01</a>), one per Cluster. They are a <strong>different artefact</strong> from the per-Procedure <code>skills/&lt;slug&gt;/SKILL.md</code> files inside a Harness (<a class="ref" href="#AGSC-07-12">AGSC-07-12</a>), which are never published and never installed; both are correct, both are needed, and no rule of §7.3 and §7.4 refers to the other's artefact (V5-3 S3-19).</p>
+<ul>
+<li id="AGSC-07-19" class="rule-item"><a class="rule" href="#AGSC-07-19"><strong>AGSC-07-19</strong></a> One skill pack MUST be emitted per Cluster, plus <code>/skills/index.json</code>. Each pack's directory name MUST equal its <code>name</code> field and MUST satisfy the slug grammar including the no-<code>--</code> rule; <code>description</code> MUST be ≤1024 characters. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-032">PRD-032</a> ← D33, audit/G §1 Agent Skills row]</span></li>
+<li id="AGSC-07-20" class="rule-item"><a class="rule" href="#AGSC-07-20"><strong>AGSC-07-20</strong></a> Each pack MUST declare its licence and MUST be accompanied by a SHA-256 lockfile over its files; an install MUST verify the lockfile and MUST show a diff on update. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-035">PRD-035</a> ← N9]</span></li>
+<li id="AGSC-07-21" class="rule-item"><a class="rule" href="#AGSC-07-21"><strong>AGSC-07-21</strong></a> Install targets are <code>.claude/skills</code>, <code>.agents/skills</code> and <code>.github/skills</code>; installation MUST be idempotent. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-033">PRD-033</a> ← G12]</span></li>
+<li id="AGSC-07-22" class="rule-item"><a class="rule" href="#AGSC-07-22"><strong>AGSC-07-22</strong></a> <code>skills import</code> MUST map a <code>SKILL.md</code> to a <code>procedure</code> item, round-tripping without loss of the declared fields. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-034">PRD-034</a>]</span></li>
+</ul>
+<h2 id="section-7-5">7.5 Step 5 — ports and wiring; saved architectures (added at rc.3, 2026-09-16 — D67 Q56, D71 Q71)</h2>
+<ul>
+<li id="AGSC-07-23" class="rule-item"><a class="rule" href="#AGSC-07-23"><strong>AGSC-07-23</strong></a> <strong>Step 5 — wiring.</strong> After Step 4, over the surviving set only: for every survivor and every name in its <code>consumes[]</code>, the producers are the survivors whose <code>produces[]</code> contains that name, in code-point slug order. Emit <code>wiring[]</code> into <code>harness.jsonld</code> as objects <code>{consumer, port, producers}</code> sorted by <code>(consumer, port)</code>; emit one Structurizr relationship per producer–consumer pair, labelled <code>produces &lt;name&gt;</code>, into <code>workspace.dsl</code>, and the equivalent edge into <code>diagram.mmd</code>, both ordered by <code>(producer, consumer, port)</code> with every comparison by code point. A name with no producer among the survivors is a warning appended to <code>warnings[]</code> in the <a class="ref" href="#AGSC-07-09">AGSC-07-09</a> shape — <code>{code: &quot;AGSC-E804&quot;, key: &quot;consumes&quot;, source: &lt;consumer slug&gt;, target: &lt;port name&gt;}</code>; it MUST NOT invalidate the composition. Verdict-neutrality and ordering are stated once, in <a class="ref" href="#AGSC-07-08">AGSC-07-08</a>. <span class="trace">[D67 Q56, <a class="ref" href="/docs/requirements/#PRD-057">PRD-057</a>, D72 §1]</span></li>
+<li id="AGSC-07-24" class="rule-item"><a class="rule" href="#AGSC-07-24"><strong>AGSC-07-24</strong></a> <code>compose --from &lt;slug&gt;</code> MUST take the selection from the <code>yaml agsc-selection</code> block of a <code>kind: architecture</code> item (<a class="ref" href="/specs/02-item/#AGSC-02-97">AGSC-02-97</a>) and run Steps 1–5 exactly as for an explicit selection; the item page MUST expose the same composition through <code>/compose/?from=&lt;slug&gt;</code> and the page tools. When the item carries <code>verdict_digest</code> and the recomputed JCS verdict's SHA-256 differs, lint reports <a class="ref" href="/specs/09-conformance/#AGSC-E805"><code>AGSC-E805</code></a> (warning) and the page shows the stored and current verdicts. The seven-file rule (<a class="ref" href="#AGSC-07-12">AGSC-07-12</a>/15) is unchanged: wiring lives inside <code>harness.jsonld</code>, <code>workspace.dsl</code> and <code>diagram.mmd</code>. <span class="trace">[D71 Q71]</span></li>
+</ul>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/agentic-system-core/edit/main/spec/07-composition.md">Propose an edit</a> — opens <code>spec/07-composition.md</code> in the specification repository; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>
+<p><a href="/legal/">Legal and privacy</a> · <a href="/docs/compliance/">Compliance and security</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery document</a> · <a href="/llms.txt">llms.txt</a> · <a rel="me" href="https://orcid.org/0009-0001-3464-5283">ORCID 0009-0001-3464-5283</a></p>
+</footer>
+</body>
+</html>

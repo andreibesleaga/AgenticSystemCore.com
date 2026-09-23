@@ -3,11 +3,15 @@
   "/404.html": "There is no page at this address.",
   "/about/": "Who writes AgenticSystemCore, how people and agents read this node, the status of the specification and how to get in touch.",
   "/clusters/": "The groupings this node uses to organise its items.",
+  "/compose/": "Select items from this node and compute a runnable Harness in the browser; the same page offers the seven tools to a browser assistant.",
   "/concepts/": "The twelve terms of the specification, each on its own page with the rules that define it.",
+  "/exports/": "Every machine-readable file this node publishes, what each is for, and which are pinned by a rule.",
   "/legal/": "The licence of each kind of artefact, the Content Use Terms in full, the machine-readable signals and the privacy notice.",
+  "/now/": "The state of this node as the build found it: the content version, the fingerprint of the graph, the item counts and the monthly model spend.",
   "/ns/": "The vocabulary the graph uses: every class and property with its definition, in Turtle, JSON-LD, RDF/XML and N-Triples.",
   "/procedures/": "Step-by-step procedures derived from the specification, each step naming the rule or the check that proves it.",
   "/search/": "Search every page and every rule of this site. The index is built with the site, and nothing you type leaves your browser.",
+  "/skills/": "The skill packs this node publishes: one per cluster, each a single SKILL.md an agent runtime can load, with a lockfile of their digests.",
   "/specs/": "The twelve sections of the specification, the discovery profile and what a conformance claim is.",
   "/specs/00-overview/": "What the specification covers, the words it uses, what it means to conform, and how versions change.",
   "/specs/01-bundle/": "The directory that holds a node's knowledge: its layout, slugs, encoding, the one configuration file, the optional agent-lane declarations, and how foreign content comes in and goes out.",
@@ -22,5 +26,6 @@
   "/specs/10-implementation-profiles/": "The four Levels of conformance, how an existing wiki or CMS becomes a node, how two nodes check each other, project mode with tasks and boards, and the live board.",
   "/specs/11-boundary/": "Where a node meets the outside: cross-origin access, the nine parts of federation, the plugin contract for every agent surface, visibility, retirement and tombstones.",
   "/specs/agentic-knowledge/": "The profile of the discovery document: how a client finds it, what it looks like, the relations and attributes it may carry, and how it relates to other work.",
-  "/specs/mcp/": "The reference text of the MCP extension identifier com.agenticsystemcore/knowledge: what a server says by declaring it, how it declares it, the seven tools and the security floor they inherit."
+  "/specs/mcp/": "The reference text of the MCP extension identifier com.agenticsystemcore/knowledge: what a server says by declaring it, how it declares it, the seven tools and the security floor they inherit.",
+  "/tags/": "The tags items of this node carry, and what each one gathers."
 }
