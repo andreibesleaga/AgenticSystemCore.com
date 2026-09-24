@@ -276,17 +276,16 @@ ok(oneProcedure.type === 'verdict' && oneProcedure.body.valid === true, 'compose
 const emptyCompose = call('compose', { selection: [] });
 ok(emptyCompose.type === 'verdict', `compose over an empty selection answered ${emptyCompose.type}`);
 
-// propose — prepared text only, and no write. The payload is the published source file
-// reassembled by the rule both transports use: the frontmatter BLOCK byte for byte, then the
-// blank line `mcp-tools.js#propose` puts between the block and the body, then the body. (The
-// engine's own CLI inserts that same extra blank line, so the two transports agree with each
-// other while neither is byte-equal to `/pages/<slug>.md`; recorded for the engine, not fixed here.)
+// propose — prepared text only, and no write. The payload is the published source file's own
+// bytes: the frontmatter BLOCK byte for byte, exactly one blank line, then the body — the rule
+// both transports use (`mcp-tools.js#propose` and the page tool), so `/pages/<slug>.md` and the
+// payload are equal whenever the published body opens with its blank line.
 for (const slug of ITEMS) {
   const r = envelope(call('propose', { slug }), 'propose');
   ok(r.type === 'proposal', `propose(${slug}): type ${r.type}`);
   const published = files.get(`/pages/${slug}.md`);
   const split = enginePageTools.pageSplitFrontmatter(published);
-  ok(r.body.markdown === `${split.block}\n${split.body}`,
+  ok(r.body.markdown === `${split.block}${split.body.startsWith('\n') ? '' : '\n'}${split.body}`,
     `propose(${slug}) did not return the published source file's own bytes`);
   ok(r.body.markdown.startsWith(split.block), `propose(${slug}): the frontmatter block is not the published one`);
   ok(Object.keys(r.body).every(k => ['iri', 'markdown', 'slug'].includes(k)), `propose(${slug}): unexpected member in the payload`);
@@ -321,7 +320,12 @@ async function asynchronousPath() {
   const s = plain(await tools.call('search', { query: 'bundle' }));
   ok(s.type === 'items' && s.body.hits.length > 0, 'the asynchronously loaded page found nothing for "bundle"');
   ok(page.refused.length === 0, `the page tried to reach ${page.refused.join(', ')}`);
-  const wanted = new Set(['/.well-known/knowledge-linkset', '/search.json', ...ITEMS.map(s2 => `/pages/${s2}.md`)]);
+  // AGSC-10-13 / AGSC-10-17: on a node with a live board the page tools also read the board
+  // exports, whose derived `claimed_by` a claim is checked against — and nothing else.
+  const boardRoutes = files.has('/boards/index.json')
+    ? ['/boards/index.json', ...JSON.parse(files.get('/boards/index.json')).boards.map(b => `/boards/${b.cluster}.json`)]
+    : [];
+  const wanted = new Set(['/.well-known/knowledge-linkset', '/search.json', ...ITEMS.map(s2 => `/pages/${s2}.md`), ...boardRoutes]);
   const unexpected = page.fetched.filter(route => !wanted.has(route));
   ok(unexpected.length === 0, `the page fetched routes the tools have no business reading: ${unexpected.join(', ')}`);
   const notFetched = [...wanted].filter(route => !page.fetched.includes(route));

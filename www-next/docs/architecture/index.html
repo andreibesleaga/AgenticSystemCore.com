@@ -87,7 +87,7 @@
 </tbody></table></div>
 <blockquote>
 <p><strong>Amendment 2026-09-18 (ADR-019).</strong> The &quot;zero runtime dependencies&quot; constraint (C1, ADR-002) is superseded. The reference engine uses actively maintained, permissively licensed libraries at exact pinned versions for the standard formats and protocols it reads and writes, with a committed lockfile, <code>npm ci</code> installs and an <code>npm audit</code> gate; only what the specification pins byte-for-byte and no library produces is written by hand. The specification itself never required zero dependencies; a port from the vectors alone (<a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a>) and every determinism rule are unchanged.</p>
-<p><strong>Amendment 2026-09-18.</strong> The reference engine is CommonJS and its floor is Node 22.12; the browser bundle stays ESM. The module system is a property of this one implementation, not of the specification — a conforming engine may be written in any language and any module system, and is judged only by the conformance vectors.</p>
+<p><strong>Amendment 2026-09-18.</strong> The reference engine is CommonJS and its floor is Node 22.12; the browser bundle stays ESM. The module system is a property of this one implementation, not of the specification — a conforming engine may be written in any language and any module system, and is judged only by the conformance vectors. <em>Note 2026-09-24: the floor was raised to Node 22.13.0, the first 22.x release that requires an ES-module library without printing a warning.</em></p>
 </blockquote>
 <h2 id="4-context">4. Context</h2>
 <figure class="diagram">
@@ -226,7 +226,7 @@
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table 32"><table>
 <thead><tr><th scope="col">Container</th><th scope="col">What it is</th></tr></thead>
 <tbody>
-<tr><td><code>agsc</code> CLI</td><td>Node ≥ 22.12, CommonJS, a small set of pinned and audited libraries; sixteen verbs, exit codes 0, 1 and 2, <code>--json</code> everywhere; five context directories under <code>src/</code> plus ports and Node adapters</td></tr>
+<tr><td><code>agsc</code> CLI</td><td>Node ≥ 22.13, CommonJS, a small set of pinned and audited libraries; sixteen verbs, exit codes 0, 1 and 2, <code>--json</code> everywhere; five context directories under <code>src/</code> plus ports and Node adapters</td></tr>
 <tr><td><code>agsc mcp</code></td><td>A local stdio JSON-RPC server exposing seven tools: search, read, links, compose, propose, ask, remember</td></tr>
 <tr><td>Browser bundle</td><td><code>www/js/agsc-core.js</code>: the same composition modules with no Node imports, plus the WebMCP page tools</td></tr>
 <tr><td>GitHub Actions</td><td><code>ci.yml</code>, <code>release.yml</code>, <code>refresh.yml</code>: the only backend</td></tr>
@@ -356,9 +356,11 @@
 <tr><td>Refresh and channel ingest</td><td>Weekly cron; per-channel schedule</td><td>Read plus issue creation; the ingest job has no repository write of its own</td><td>Staleness and link checks producing at most one issue and never a commit; channel ingest under the guards of <a class="ref" href="/specs/01-bundle/#AGSC-01-30">AGSC-01-30</a> and <a class="ref" href="/specs/08-governance/#AGSC-08-26">AGSC-08-26</a></td></tr>
 </tbody></table></div>
 <p>Every action is pinned by commit hash; <code>pull_request_target</code> is never used; there is no cache step; each secret lives only in the job that needs it and expires within ninety days. Content negotiation for the namespace is a fixed table in the w3id <code>.htaccess</code> mapping <code>Accept</code> to same-origin static files, with immutable versioned copies; until the w3id pull request merges, the namespace simply does not resolve, which blocks nothing else.</p>
+<h3 id="where-a-node-can-live">Where a node can live</h3>
+<p><em>Added 2026-09-24.</em> A node is a set of files, and so is its build; neither depends on a transport. It can be served from a web host, a laptop or a small device, a clone of its repository, IPFS behind an HTTP gateway, or a web interface in front of a store anchored in a ledger. What the rules ask of the place is fixed: an HTTPS origin that serves the discovery document and the routes with the response headers the build wrote (<a class="ref" href="/specs/06-surfaces/#AGSC-06-01">AGSC-06-01</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-17">AGSC-06-17</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-05">AGSC-11-05</a>). How each kind of place is told is a <em>hosting profile</em>, one of the plugin kinds (<a class="ref" href="/specs/00-overview/#AGSC-00-24">AGSC-00-24</a>): the reference engine's <code>agsc-host</code> command carries seven, from Cloudflare Pages (the reference, and this site's host) to nginx and Apache, GitHub Pages behind a proxy, a local server, a clone, IPFS and a ledger anchor that records the bundle hash and the content version of each build (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-25">AGSC-04-25</a>). Each profile states what its place cannot do, and a conformance claim names its profile. No rule of version 1.x pins a transport other than HTTP.</p>
 <h2 id="9-crosscutting-concepts">9. Crosscutting concepts</h2>
 <ul>
-<li><strong>Determinism.</strong> Canonical JSON, sorted keys, LF, NFC, UTC seconds, <code>SOURCE_DATE_EPOCH</code>, code-point file ordering, no blank nodes; <code>verify</code> blocks merges (<a href="/specs/04-canonicalization/">AGSC-04</a>).</li>
+<li><strong>Determinism.</strong> Canonical JSON, sorted keys, LF, NFC, UTC seconds, <code>SOURCE_DATE_EPOCH</code>, code-point file ordering, no blank nodes; <code>verify</code> blocks merges (<a class="ref" href="/specs/04-canonicalization/">AGSC-04</a>).</li>
 <li><strong>Agent safety, four mitigations.</strong> Trust marking: every tool result is <code>{source, trust: &quot;untrusted&quot;, license, type, body}</code>, and skill packs, steer bundles and llms.txt fence prose as data. Structural lints against agent-directed imperatives, hidden text, long encoded blobs and unusual URL schemes, warning for humans and failing for agent-authored proposals. Least agency: tools take identifiers, never paths, URLs or shell strings; <code>propose</code> writes locally. Inert artefacts: content-only skills with a hash lockfile. Hashes and attestations prove tampering, not injection (<a href="/specs/08-governance/#section-8-4">AGSC-08 §8.4</a>).</li>
 <li><strong>Error handling.</strong> Exit 0 for success, 1 for findings or a failed gate, 2 for a usage error; diagnostics as JSON lines on standard error sorted by file, line, column and code; one code format, <code>AGSC-E&lt;nnn&gt;</code> (<a href="/specs/09-conformance/#section-9-3">AGSC-09 §9.3</a>).</li>
 <li><strong>Configuration.</strong> Exactly one schema-validated <code>agsc.config.json</code>; precedence flags, then environment, then project, then user; unknown keys are errors.</li>
@@ -444,7 +446,7 @@
     implementer = person &quot;Standards / port implementer&quot; &quot;P10, P11, S13&quot;
 
     asc = softwareSystem &quot;AgenticSystemCore&quot; &quot;Compiles a Markdown Bundle into a wiki, an RDF graph, agent memory, skills and Harnesses&quot; {
-      cli = container &quot;agsc CLI&quot; &quot;Node &gt;=22.12, CommonJS, pinned audited dependencies&quot; &quot;Node.js&quot; {
+      cli = container &quot;agsc CLI&quot; &quot;Node &gt;=22.13, CommonJS, pinned audited dependencies&quot; &quot;Node.js&quot; {
         knowledge = component &quot;Knowledge&quot; &quot;parse, validate, link, ontology, graph&quot; &quot;src/knowledge/&quot;
         governance = component &quot;Provenance &amp; Governance&quot; &quot;prov, Gates, Proposals, lints, ledger&quot; &quot;src/governance/&quot;
         composition = component &quot;Composition&quot; &quot;closure algebra + Harness emitters&quot; &quot;src/composition/&quot;
@@ -496,7 +498,7 @@
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/architecture.md">Propose an edit</a> — opens <code>site/docs/architecture.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>, all rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">patterns.agenticsystemcore.com</a></p>
 </footer>
 </body>
 </html>

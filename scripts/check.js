@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Site v0 gate. Run before every commit: `node scripts/check.js`. Exit 0 pass, 1 fail.
 // No network. Checks: (0) every page has a summary line, every diagram a name and a caption, every rule its trace line, no e-mail address; (1) determinism — two builds are byte-identical and equal the committed
-// www/; (2) the llms layout against vectors disc-0006/disc-0007 of the tagged specification;
+// www/; (2) the llms layout against vectors disc-0013/disc-0014 of the specification;
 // (3) the discovery document with the engine's tools/validate-wellknown at Level 0;
 // (4) every HTML page: structure, accessibility basics, unique ids, internal links and
 // fragments, no third-party loads, CSP-compatible markup, the 100 KB budget; (5) machine
@@ -39,6 +39,8 @@ const rel = f => path.relative(WWW, f).split(path.sep).join('/');
 
 // (1) determinism
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'agsc-site-'));
+// Removed on every way out — a failed build throws before the end of this file.
+process.on('exit', () => fs.rmSync(tmp, { recursive: true, force: true }));
 const build = out => cp.execFileSync(process.execPath, [path.join(__dirname, 'build.js'), '--out', out], { stdio: ['ignore', 'pipe', 'inherit'], env: process.env });
 build(path.join(tmp, 'a')); build(path.join(tmp, 'b'));
 const same = (x, y) => { try { cp.execFileSync('diff', ['-r', x, y], { stdio: 'pipe' }); return true; } catch (e) { return e.stdout.toString().split('\n').slice(0, 5).join('\n'); } };
@@ -270,6 +272,5 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
     }
 }
 
-fs.rmSync(tmp, { recursive: true, force: true });
 if (fails.length) { process.stderr.write(fails.map(f => `FAIL ${f}`).join('\n') + `\ncheck: ${fails.length} failure(s)\n`); process.exit(1); }
 process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, headers, contrast, public hygiene\n`);

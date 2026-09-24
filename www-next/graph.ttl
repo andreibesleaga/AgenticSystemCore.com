@@ -20,6 +20,15 @@
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" .
 
+<https://agenticsystemcore.com/clusters/project-board/> a asc:Cluster ;
+    skos:definition "The open work on the specification itself, kept as task items of this node, so the project's own plan is published the way the live board publishes any team's."@en ;
+    skos:member <https://agenticsystemcore.com/concepts/release-version-1-0-0/> ;
+    skos:prefLabel "Project board"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" .
+
 <https://agenticsystemcore.com/clusters/vocabulary/> a asc:Cluster ;
     skos:definition "The terms of the specification's ubiquitous language: the six item types and the words that complete them."@en ;
     skos:member <https://agenticsystemcore.com/concepts/bundle/> , <https://agenticsystemcore.com/concepts/cluster/> , <https://agenticsystemcore.com/concepts/concept/> , <https://agenticsystemcore.com/concepts/episode/> , <https://agenticsystemcore.com/concepts/gate/> , <https://agenticsystemcore.com/concepts/harness/> , <https://agenticsystemcore.com/concepts/item/> , <https://agenticsystemcore.com/concepts/lesson/> , <https://agenticsystemcore.com/concepts/link/> , <https://agenticsystemcore.com/concepts/now/> , <https://agenticsystemcore.com/concepts/procedure/> , <https://agenticsystemcore.com/concepts/source/> ;
@@ -312,6 +321,28 @@
 
 <https://agenticsystemcore.com/concepts/procedure/#source-3> dcterms:source "https://agenticsystemcore.com/specs/05-graph/#AGSC-05-12" ;
     dcterms:title "AGSC-05-12" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/release-version-1-0-0/> a asc:Concept ;
+    skos:definition "Apply the items recorded against the release candidate, run the whole vector set with the reference engine, and tag version 1.0.0, at which the reference engine may first claim a conformance Level."@en ;
+    skos:inScheme <https://agenticsystemcore.com/> ;
+    skos:prefLabel "Release version 1.0.0 of the specification"@en ;
+    schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:kind "task" ;
+    asc:operator "human:andreibesleaga" ;
+    asc:origin "ai-assisted" ;
+    asc:source <https://agenticsystemcore.com/concepts/release-version-1-0-0/#source-1> , <https://agenticsystemcore.com/concepts/release-version-1-0-0/#source-2> ;
+    asc:taskState "TASK_STATE_SUBMITTED" .
+
+<https://agenticsystemcore.com/concepts/release-version-1-0-0/#source-1> dcterms:source "https://agenticsystemcore.com/specs/10-implementation-profiles/#AGSC-10-05" ;
+    dcterms:title "AGSC-10-05" ;
+    a asc:Source ;
+    asc:grade "primary" .
+
+<https://agenticsystemcore.com/concepts/release-version-1-0-0/#source-2> dcterms:source "https://agenticsystemcore.com/specs/00-overview/#AGSC-00-16" ;
+    dcterms:title "AGSC-00-16" ;
     a asc:Source ;
     asc:grade "primary" .
 

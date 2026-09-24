@@ -8,6 +8,7 @@ The specification is written for implementers and is exact by design. This guide
 
 ## Reading paths
 
+- **Not sure where to begin?** The [start page](/docs/start-here/) has one path for each kind of reader: the curious, the developer, the implementer and the agent.
 - **New here?** Read the [introduction](/docs/introduction/), then the [six modes](/docs/modes/), then [how it works](/docs/how-it-works/).
 - **Architect or engineer?** Start with the [data model](/docs/data-model/) and the [architecture](/docs/architecture/), then the [requirements](/docs/requirements/) and the [scenarios](/docs/scenarios/).
 - **Implementing the standard?** Read [how to read the specification](/docs/reading-the-specification/), then the [specification](/specs/) itself, the [discovery profile](/specs/agentic-knowledge/) and the [ontology](/ns/).
@@ -18,6 +19,7 @@ The specification is written for implementers and is exact by design. This guide
 
 | Page | What it answers |
 |---|---|
+| [Start here](/docs/start-here/) | One reading path per kind of reader |
 | [Introduction](/docs/introduction/) | What is this, what is new about it, who is it for |
 | [The six modes](/docs/modes/) | Auto-wiki with an optional agent lane, distributed agentic memory, live specifications, evolving skills, runnable knowledge, the live board — a self-driving shared board |
 | [How it works](/docs/how-it-works/) | The build, the proposal lifecycle, discovery, import and export, determinism, safety |

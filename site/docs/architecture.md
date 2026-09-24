@@ -53,7 +53,7 @@ Two floors are never traded: the licence stack (NFR-10) and the clean-room rule 
 
 > **Amendment 2026-09-18 (ADR-019).** The "zero runtime dependencies" constraint (C1, ADR-002) is superseded. The reference engine uses actively maintained, permissively licensed libraries at exact pinned versions for the standard formats and protocols it reads and writes, with a committed lockfile, `npm ci` installs and an `npm audit` gate; only what the specification pins byte-for-byte and no library produces is written by hand. The specification itself never required zero dependencies; a port from the vectors alone (NFR-02) and every determinism rule are unchanged.
 >
-> **Amendment 2026-09-18.** The reference engine is CommonJS and its floor is Node 22.12; the browser bundle stays ESM. The module system is a property of this one implementation, not of the specification — a conforming engine may be written in any language and any module system, and is judged only by the conformance vectors.
+> **Amendment 2026-09-18.** The reference engine is CommonJS and its floor is Node 22.12; the browser bundle stays ESM. The module system is a property of this one implementation, not of the specification — a conforming engine may be written in any language and any module system, and is judged only by the conformance vectors. *Note 2026-09-24: the floor was raised to Node 22.13.0, the first 22.x release that requires an ES-module library without printing a warning.*
 
 
 ## 4. Context
@@ -86,7 +86,7 @@ The context map: Knowledge feeds Distribution as a conformist supplier (Distribu
 
 | Container | What it is |
 |---|---|
-| `agsc` CLI | Node ≥ 22.12, CommonJS, a small set of pinned and audited libraries; sixteen verbs, exit codes 0, 1 and 2, `--json` everywhere; five context directories under `src/` plus ports and Node adapters |
+| `agsc` CLI | Node ≥ 22.13, CommonJS, a small set of pinned and audited libraries; sixteen verbs, exit codes 0, 1 and 2, `--json` everywhere; five context directories under `src/` plus ports and Node adapters |
 | `agsc mcp` | A local stdio JSON-RPC server exposing seven tools: search, read, links, compose, propose, ask, remember |
 | Browser bundle | `www/js/agsc-core.js`: the same composition modules with no Node imports, plus the WebMCP page tools |
 | GitHub Actions | `ci.yml`, `release.yml`, `refresh.yml`: the only backend |
@@ -137,6 +137,10 @@ One bounded context corresponds to one `src/` directory, one specification secti
 | Refresh and channel ingest | Weekly cron; per-channel schedule | Read plus issue creation; the ingest job has no repository write of its own | Staleness and link checks producing at most one issue and never a commit; channel ingest under the guards of AGSC-01-30 and AGSC-08-26 |
 
 Every action is pinned by commit hash; `pull_request_target` is never used; there is no cache step; each secret lives only in the job that needs it and expires within ninety days. Content negotiation for the namespace is a fixed table in the w3id `.htaccess` mapping `Accept` to same-origin static files, with immutable versioned copies; until the w3id pull request merges, the namespace simply does not resolve, which blocks nothing else.
+
+### Where a node can live
+
+*Added 2026-09-24.* A node is a set of files, and so is its build; neither depends on a transport. It can be served from a web host, a laptop or a small device, a clone of its repository, IPFS behind an HTTP gateway, or a web interface in front of a store anchored in a ledger. What the rules ask of the place is fixed: an HTTPS origin that serves the discovery document and the routes with the response headers the build wrote (AGSC-06-01, AGSC-06-17, AGSC-11-05). How each kind of place is told is a *hosting profile*, one of the plugin kinds (AGSC-00-24): the reference engine's `agsc-host` command carries seven, from Cloudflare Pages (the reference, and this site's host) to nginx and Apache, GitHub Pages behind a proxy, a local server, a clone, IPFS and a ledger anchor that records the bundle hash and the content version of each build (AGSC-04-25). Each profile states what its place cannot do, and a conformance claim names its profile. No rule of version 1.x pins a transport other than HTTP.
 
 ## 9. Crosscutting concepts
 
@@ -231,7 +235,7 @@ workspace "AgenticSystemCore" "Distributed Ontological Agentic Memory engine —
     implementer = person "Standards / port implementer" "P10, P11, S13"
 
     asc = softwareSystem "AgenticSystemCore" "Compiles a Markdown Bundle into a wiki, an RDF graph, agent memory, skills and Harnesses" {
-      cli = container "agsc CLI" "Node >=22.12, CommonJS, pinned audited dependencies" "Node.js" {
+      cli = container "agsc CLI" "Node >=22.13, CommonJS, pinned audited dependencies" "Node.js" {
         knowledge = component "Knowledge" "parse, validate, link, ontology, graph" "src/knowledge/"
         governance = component "Provenance & Governance" "prov, Gates, Proposals, lints, ledger" "src/governance/"
         composition = component "Composition" "closure algebra + Harness emitters" "src/composition/"

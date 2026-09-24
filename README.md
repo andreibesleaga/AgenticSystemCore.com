@@ -1,60 +1,67 @@
 # AgenticSystemCore.com
 
-Content and static site of the first public **AgenticSystemCore** node (agenticsystemcore.com): the specification's own pages and guide, and a small Bundle of vocabulary Concepts and Clusters, compiled with the reference engine (npm `agentic-system-core`) into a static site, RDF graph exports, `llms.txt`, the discovery document `/.well-known/knowledge-linkset` (reached through the registered link relation `describedby`; `agentic-knowledge` is only the profile-URI suffix), skill packs, a derived ledger and a generated NOW page. The agentic-system patterns live on their own node, in the patterns repository. Cloudflare serves static files.
+The source of **agenticsystemcore.com**, the first public AgenticSystemCore node: the
+specification's own pages and plain-language guide, and a small Bundle of vocabulary
+Concepts, Clusters, one procedure and the project's own board. It is a node of the
+specification it publishes: its discovery document, graph, text files for agents, skill
+packs, boards and ledger are written by the reference engine, and the site is checked at
+Level 2 before every publish. Cloudflare Pages serves the static files.
 
-Status: pre-launch; the site is built into `www-next/` and published at launch. Prose: All Rights Reserved + Content Use Terms v1; schema/ontology CC0; code Apache-2.0.
+**Who this is for:** a contributor to the site's content or its generator. Readers of
+the site want [the site itself](https://agenticsystemcore.com); implementers want the
+[engine repository](https://github.com/andreibesleaga/agentic-system-core).
 
-## Site v0 (added 2026-09-17)
+## How it is built
 
-*Superseded in part, 2026-09-24: every machine file is now built by the engine (`scripts/engine.js`), the generator reads the engine's working tree until the specification tag exists, and it writes `www-next/` until launch (see below). The paragraph under this heading is the record of v0.*
-
-The site is built without the engine, as a **Level-0 node** of the specification it publishes (AGSC-10-02). `scripts/build.js` (Node ≥ 22, standard library only) reads `content/`, `site/`, `assets/` and — from the engine repository checked out beside this one — `spec/`, `ontology/agsc.ttl` and `LICENSE-CONTENT` **at the release tag** (`1.0.0-rc.5`), and writes `www/`, which Cloudflare Pages serves as committed.
+`scripts/build.js` writes the HTML pages (their look is the engine's default theme,
+`assets/site.css`) and hands the Bundle to the engine (`scripts/engine.js`), which writes
+every machine file whose bytes a rule pins. It reads the engine repository checked out
+beside this one — `spec/`, `docs/`, `features/`, `ontology/` — from the working tree
+until the specification's tag exists, and says which in its first output line.
+[docs/BUILD.md](docs/BUILD.md) has the picture.
 
 ```bash
-node scripts/build.js      # writes www/ (SOURCE_DATE_EPOCH defaults to the tag's commit instant)
-node scripts/check.js      # the gate: reproducible build, llms vectors, validate-wellknown level 0, links, headers, contrast
+node scripts/build.js      # writes build.out (www-next/ until launch)
+node scripts/check.js      # the gate: reproducible build, llms vectors, discovery at Level 2,
+                           # links, headers, contrast, page tools, public hygiene
 ```
 
-Edit content in `content/` (items) and `site/` (about, privacy, profile page source); never edit `www/` by hand. The registration status shown on `/specs/agentic-knowledge/` is the `STATUS` object at the top of `scripts/build.js`. The generator is replaced by the engine's writer at site v0.1.
+Needs Node 22.13 or later and the engine repository at `../agentic-system-core` (or
+`AGSC_ENGINE=<path>`), with its `npm ci` done. `SOURCE_DATE_EPOCH` fixes the build
+instant; without it the instant comes from the last commit.
 
-## Site v0.2 — the human layer (added 2026-09-17)
+Optional browser lanes, with `playwright-core` and `axe-core` installed **outside** this
+repository (see each file's header):
 
-The site now carries a plain-language layer beside the normative one, built by the same generator:
+```bash
+NODE_PATH=<dir>/node_modules CHROME_EXE=<chromium> node scripts/a11y.js   # both colour schemes, 0 violations expected
+node scripts/page-tools-check.js                                        # the seven page tools, no browser needed
+```
 
-- `site/docs/*.md` — the guide: introduction, the six modes, how it works, data model, architecture (arc42/C4), requirements (the tagged PRD, trace column omitted), scenarios (the tagged feature files), glossary (generated at the tag), reading the specification, standards and references, compliance and security, status. Pages have frontmatter `title`, `summary`, `description`; `{{diagram:<id>}}` inlines a diagram; other `{{slot}}` placeholders are filled by `scripts/build.js` from the tagged documents.
-- `site/diagrams/*.diagram` + `scripts/diagram.js` — deterministic diagram sources compiled to inline SVG (the retired pattern site's compiler, ported); each needs a `label` (accessible name), a `caption` and exactly one `acc` element.
-- `site/summaries.json` — the one-sentence summary every generated page opens with (guide pages carry theirs in frontmatter, items use their description).
-- Specification pages open with the summary, an "In plain language" box (`docs/plain/` at the tag) and a diagram; rule identifiers are chips, cross-references are small, the bracketed trace record is a separate grey line, retired rules are dimmed.
-- `/search/` with `assets/search.js` (same-origin, no dependencies) over `assets/search-site.json` (every page, section, rule and error code) and `search.json` (the AGSC-06-16 index, proven against the tagged `build-000{1,2,3}` vectors); without JavaScript the page lists every page.
-- `scripts/a11y.js` — optional browser lane (Playwright + axe-core, installed outside the repository; see the file header).
+## Where things are
 
-The gate additionally checks: a summary on every page, a name and a caption on every diagram, the trace line on every rule that has one in the source, no operator e-mail address, and no script other than this site's own same-origin scripts (search, theme, compose and the in-page tools).
+| Folder | What it holds |
+|---|---|
+| [content/](content/README.md) | the Bundle's items: vocabulary Concepts, Clusters, a procedure, the project board |
+| [site/](site/README.md) | the authored pages that are not items: the guide, about, privacy, the profile page, diagrams, summaries |
+| [scripts/](scripts/README.md) | the generator, the gate and the optional lanes |
+| `assets/` | the stylesheet (the engine's default theme, byte for byte), the search script, the icon |
+| [docs/](docs/BUILD.md) | how the site is built, with a diagram |
+| `www-next/` | the built site, committed; `www/` is what is live until launch |
 
-## Output directory until launch (added 2026-09-17)
+## Two switches
 
-`build.out` in `agsc.config.json` is **`www-next`**: the generated site is committed there and Cloudflare Pages keeps serving the minimal `www/` that is live today, so the repository can be pushed at any time without publishing. At launch set `build.out` to `"www"`, rebuild, run the gate, commit and push. `scripts/check.js` and `scripts/a11y.js` read the directory from the configuration.
+- **Output directory.** `build.out` in `agsc.config.json` is `www-next`, so the repository
+  can be pushed at any time without publishing. At launch it becomes `www`: rebuild, run
+  the gate, commit, push.
+- **The patterns node.** `"x-patterns-node": false` in `agsc.config.json` drops the peer
+  link and the two sentences that promise the second node; `true` (or absent) keeps them.
 
-## Licences (added 2026-09-18)
+## Contributing
 
-This repository carries both licence files at its root, copied from the engine repository so that the terms are readable where the content lives:
-
-- `LICENSE` — Apache-2.0, for the generator (`scripts/`) and everything else in this repository that is software.
-- `LICENSE-CONTENT` — the AgenticSystemCore Content Use Terms 1.0 (`LicenseRef-AgenticSystemCore-Content-Use-1.0`), for the published prose: the item bodies and descriptions in `content/` and `site/`, and the pages, text files and exports that carry that prose. The schemas, the ontology, the identifiers and the discovery document stay CC0-1.0, as the file says.
-
-Every generated page and both `llms` files already embed the Content Use Terms and link `/legal/`; these two files say the same thing at the root of the repository.
-
-## Moved to `1.0.0-rc.5` (added 2026-09-21)
-
-*Since 2026-09-22 both files name `1.0.0-rc.6`, which is drafted and not yet tagged; until the tag exists the scripts read the engine's working tree and say so in the build line.*
-
-`agsc.config.json` and `content/index.md` name `1.0.0-rc.5`, and both scripts read the engine at that tag.
-
-- **`build.feed` is gone.** `feed` is a reserved name at rc.5 and a configuration that carries it is `AGSC-E004`; the generator now rejects any `build` member other than `out`.
-- **`peers[]`** names the patterns node's canonical well-known URL, and the generator emits it as one `…/rel#peer` link, so the mutual check of AGSC-10-12 passes in both directions (the patterns node already names this one).
-- **`contribute[]`** declares the pull-request channel, emitted as a `…/rel#contribute` link carrying `agsc-contribute-mode` (AGSC-11-14).
-- **"Propose an edit"** — every page generated from one source file carries a plain link to that file's edit-in-browser view on the forge: pages built from this repository link here, specification pages link to the engine repository. No script and no form; the CSP sets `form-action 'none'`.
-- The profile page's extension-relation anchors are named exactly as the relation URI's fragment (`#graph`, not `#rel-graph`), as AGSC-06-01 requires at rc.5.
-- The generator checks the authored single-line strings for control characters and line separators (AGSC-02-24 at rc.5), pins `LICENSE-CONTENT` by the SHA-256 that AGSC-06-18 now names, and fails on any authored page naming a release candidate other than the one being built.
+Edit `content/` or `site/`, never the built output. Every page carries a "Propose an edit"
+link to its source file here; a change arrives as a pull request, the gate runs, and a
+person merges it. Security reports: the engine repository's `SECURITY.md`.
 
 ## How this is made
 
@@ -81,5 +88,5 @@ AgenticSystemCore™ is a trademark of Andrei N. Besleaga. Other names belong to
 
 ---
 
-© 2026 Andrei N. Besleaga. Code: Apache-2.0. Schemas, ontology, identifiers and the
-discovery document: CC0-1.0. Prose: the Content Use Terms in `LICENSE-CONTENT`.
+© 2026 Andrei N. Besleaga. Code: Apache-2.0 (`LICENSE`). Schemas, ontology, identifiers and
+the discovery document: CC0-1.0. Prose: the Content Use Terms in `LICENSE-CONTENT`.
