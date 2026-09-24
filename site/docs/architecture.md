@@ -44,7 +44,7 @@ Two floors are never traded: the licence stack (NFR-10) and the clean-room rule 
 | C2 | The deployed system is static files plus CI: no servers, databases or queues | CI is the only backend; every write path ends in a pull request |
 | C3 | Cloudflare Pages, deployed from `www/` | The output directory is `www/`; `_headers` and `_redirects` are generated |
 | C4 | Content negotiation for `/ns/` through the w3id `.htaccess`, with no project-owned server code | Negotiation is a configuration file in a foreign repository |
-| C5 | The owner runs every git write and every credentialed publish | `propose` writes patches and prints commands; CI never commits content |
+| C5 | The maintainer runs every git write and every credentialed publish | `propose` writes patches and prints commands; CI never commits content |
 | C6 | At most 10 dollars a month of model spend; the gating lanes stay lint-only | No model call on `ci`, `review` or anything reachable from them; the optional review lane never gates a merge |
 | C7 | Clean room: the invariants are held outside every repository | One `clean-room` lint enforces the public derivations (AGSC-08-17): no book framing, no imposed sequence of pages, no whole-corpus emitter |
 | C8 | The capability plane is language-independent: files and ontologies define the system | No behaviour may exist that the specification and the vectors do not pin |

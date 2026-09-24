@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// The seven in-page tools, PROVED against the artefact this site actually ships (D108, AGSC-09-16).
+// The seven in-page tools, PROVED against the artefact this site actually ships (AGSC-09-16).
 //
 //   node scripts/page-tools-check.js [--out <dir>] [--json]
 //
@@ -71,12 +71,12 @@ const digests = {};
 for (const [route, expected] of Object.entries(EXPECTED)) {
   const served = files.get(route);
   ok(served !== undefined, `${route} is not published`);
-  ok(served === expected, `${route} is not the engine's emitted bytes — this repository must hold no second implementation (D108)`);
+  ok(served === expected, `${route} is not the engine's emitted bytes — this repository must hold no second implementation`);
   digests[route] = { bytes: Buffer.byteLength(served || ''), sha256: sha256(served || '') };
 }
 // A script anywhere else would be a second implementation by another name.
 for (const route of [...files.keys()]) {
-  if (route.endsWith('.js') && !route.startsWith('/compose/') && route !== '/assets/search.js') {
+  if (route.endsWith('.js') && !route.startsWith('/compose/') && route !== '/assets/search.js' && route !== '/assets/theme.js') {
     fails.push(`${route}: an unexpected script — the page tools are the engine's four /compose/ files only`);
   }
 }

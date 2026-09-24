@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Optional browser lane (not part of the zero-dependency gate): one full-page screenshot of
-// every page of the built site, in both colour schemes, at two widths. Written for SITE-4's
+// every page of the built site, in both colour schemes, at two widths. Written for's
 // "the site must look the same" gate (R97): capture a set before a change and a set after,
 // then `node scripts/compare-baseline.js --shots <before> <after>` compares them pixel by pixel.
 //

@@ -1,5 +1,5 @@
 'use strict';
-// THE ENGINE BUILDS THIS BUNDLE (SITE-4, D110).
+// THE ENGINE BUILDS THIS BUNDLE.
 //
 // Everything on this site whose bytes a rule pins, and which carries no design of its own, is
 // now emitted by the reference engine rather than by scripts/build.js. This module is how: it
@@ -23,7 +23,7 @@
 // place for a stylesheet, an icon, a site header, a skip link or this site's footer — `shell()` in
 // its `distribution/html.js` emits `<nav>`, `<main>` and a bare `<footer>` and nothing else — so
 // an engine-built page of this site would be an unstyled document. Per-Bundle page templates are
-// a specification item (SITE4-01), and until they exist the HTML stays this generator's.
+// a specification item, and until they exist the HTML stays this generator's.
 
 const fs = require('fs'), path = require('path'), cp = require('child_process');
 

@@ -1,5 +1,5 @@
-Contact: https://andreibesleaga.com/contact/
-Expires: 2027-09-22T06:49:48Z
+Contact: https://github.com/andreibesleaga/AgenticSystemCore.com/issues
+Expires: 2027-09-22T10:03:39Z
 Preferred-Languages: en
 Canonical: https://agenticsystemcore.com/.well-known/security.txt
 Policy: https://agenticsystemcore.com/docs/compliance/

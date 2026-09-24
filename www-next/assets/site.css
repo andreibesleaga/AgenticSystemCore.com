@@ -4,11 +4,19 @@
   --link: #245a9c; --code-bg: #efefeb; --focus: #245a9c; --accent: #245a9c;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0f1115; --bg-alt: #171a20; --fg: #e8e8e6; --muted: #a3a3a0; --rule: #30343b;
     --link: #8ab4f8; --code-bg: #1b1e25; --focus: #8ab4f8; --accent: #8ab4f8;
   }
 }
+/* The visitor's own choice (the header's theme switcher) overrides the system theme. */
+:root[data-theme="dark"] {
+  --bg: #0f1115; --bg-alt: #171a20; --fg: #e8e8e6; --muted: #a3a3a0; --rule: #30343b;
+  --link: #8ab4f8; --code-bg: #1b1e25; --focus: #8ab4f8; --accent: #8ab4f8;
+}
+:root { color-scheme: light dark; }
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
@@ -26,6 +34,11 @@ header.site ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wr
 header.site a { display: inline-block; padding: 0.25rem 0; min-height: 24px; text-decoration: none; }
 header.site a[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 2px; }
 .brand { font-weight: 650; color: var(--fg); }
+/* Theme switcher: shown only when the script runs; without it the page follows the system theme. */
+.theme { margin-left: auto; display: inline-flex; align-items: center; }
+.theme[hidden] { display: none; }
+.theme select { font: inherit; font-size: 0.85rem; color: var(--fg); background: var(--bg); border: 1px solid var(--rule); border-radius: 4px; padding: 0.1rem 0.25rem; min-height: 24px; cursor: pointer; }
+.theme select:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 main { max-width: 46rem; margin: 0 auto; padding: 2rem 1rem 3rem; }
 main.wide { max-width: 62rem; }
 /* Prose keeps a readable measure even on wide pages; tables and figures may use the full width. */
@@ -104,4 +117,4 @@ form.search button { font: inherit; padding: 0.45rem 0.9rem; border: 1px solid v
 .edit code { font-size: 0.9em; }
 @media (max-width: 36rem) { dl.meta { grid-template-columns: 1fr; } dl.meta dd { margin-bottom: 0.5rem; } }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
-@media print { header.site, .skip, footer.site p:last-child, form.search { display: none; } main, main.wide { max-width: none; } }
+@media print { header.site, .skip, .theme, form.search { display: none; } main, main.wide { max-width: none; } }

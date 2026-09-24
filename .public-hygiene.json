@@ -1,0 +1,68 @@
+{
+  "_": "Allow-list of tools/public-hygiene (in the engine repository) for this site. Every entry says why the hit is public by intent.",
+  "built": [
+    "www-next",
+    "www"
+  ],
+  "skip": [
+    {
+      "path": "scripts/baseline/**",
+      "reason": "regression captures of the previous build, compared byte for byte by scripts/compare-baseline.js and never published; they still carry the retired pages' wording and are scheduled to move out of the repository with the baseline recapture"
+    }
+  ],
+  "allow": [
+    {
+      "check": "process",
+      "path": "www-next/specs/**",
+      "reason": "the frozen specification rendered verbatim; its trace tags change only at 1.0.0"
+    },
+    {
+      "check": "internal-note",
+      "path": "www-next/specs/**",
+      "reason": "the frozen specification rendered verbatim; its rationale notes change only at 1.0.0"
+    },
+    {
+      "check": "process",
+      "path": "www-next/ns/**",
+      "reason": "the frozen ontology rendered verbatim; its comments carry the rules' trace tags"
+    },
+    {
+      "check": "process",
+      "path": "www-next/assets/search-site.json",
+      "reason": "the site search index quotes the frozen specification's rules, trace tags included"
+    },
+    {
+      "check": "personal",
+      "path": "www-next/assets/search-site.json",
+      "text": "Andrei N. B\"",
+      "reason": "a search excerpt cut after 'Andrei N. B' of the canonical name"
+    },
+    {
+      "check": "process",
+      "path": "www-next/docs/requirements/index.html",
+      "text": "auto-disable runbook",
+      "reason": "NFR-09 is a product requirement that a node ships a restore runbook (rendered from the engine's PRD)"
+    },
+    {
+      "check": "wording",
+      "path": "www-next/docs/requirements/index.html",
+      "text": "NFR-12",
+      "reason": "NFR-12 names the forbidden framings in order to forbid them"
+    },
+    {
+      "check": "wording",
+      "path": "scripts/build.js",
+      "reason": "the build's forbidden-wording guard: the words it refuses to emit"
+    },
+    {
+      "check": "wording",
+      "path": "scripts/check.js",
+      "reason": "the gate's forbidden-wording list: the words it refuses on the site"
+    },
+    {
+      "check": "wording",
+      "path": "scripts/legacy/*.js",
+      "reason": "the frozen previous generator's forbidden-wording guard"
+    }
+  ]
+}

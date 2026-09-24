@@ -13,7 +13,7 @@ const ROOT = path.resolve(__dirname, '..');
 const ENGINE = path.resolve(ROOT, process.env.AGSC_ENGINE || '../agentic-system-core');
 const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.6';
 // The same parameter scripts/build.js reads: the vectors come from the release tag, and from the
-// engine's working tree while the candidate has not been tagged yet (SITE-4).
+// engine's working tree while the candidate has not been tagged yet.
 const tagExists = cp.spawnSync('git', ['-C', ENGINE, 'rev-parse', '-q', '--verify', `${SPEC_TAG}^{commit}`], { stdio: 'ignore' }).status === 0;
 const SPEC_SOURCE = process.env.AGSC_SPEC_SOURCE || (tagExists ? 'tag' : 'worktree');
 const engineFile = p => SPEC_SOURCE === 'tag'
@@ -23,9 +23,10 @@ const WWW = path.join(ROOT, (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.co
 const fails = [];
 const NO_TRACE_IN_SOURCE = new Set(['AGSC-05-26']); // the one rule whose source ends in a table with no bracket
 // AGSC-06-05/06-17: the only <script> elements any page may carry — all same-origin, all classic,
-// all deferred, none inline. The four page-tool files are the engine's own emitted bytes (D108);
+// all deferred, none inline. The four page-tool files are the engine's own emitted bytes;
 // `node scripts/page-tools-check.js` proves that and runs them.
 const ALLOWED_SCRIPTS = new Set([
+  '<script src="/assets/theme.js">', // the theme switcher (engine default theme)
   '<script src="/assets/search.js" defer>',
   '<script src="/compose/agsc-core.js" defer>',
   '<script src="/compose/agsc-page-tools.js" defer>',
@@ -65,7 +66,7 @@ for (const f of ['disc-0013-llms-txt-byte-layout-with-content-version', 'disc-00
 const validator = path.join(ENGINE, 'tools', 'validate-wellknown');
 if (!fs.existsSync(validator)) fails.push(`validator not found: ${validator}`);
 else {
-  // SITE-4: at Level 0 as before, AND at Level 2, which the document now satisfies because the
+  // at Level 0 as before, AND at Level 2, which the document now satisfies because the
   // node publishes the graph in three serialisations, the NOW page, the chunk export and the
   // skill packs, and carries the RFC 9530 digest of every artefact it links.
   for (const level of ['0', '2']) {
@@ -92,11 +93,11 @@ else {
   ok(checked >= 8, `only ${checked} declared digests were checked — the discovery document should carry one per artefact link (AGSC-06-08a)`);
 }
 
-// (3a) the vocabulary documents, against the engine's own generator (SITE-4)
+// (3a) the vocabulary documents, against the engine's own generator
 // `tools/gen-ns` derives /ns/context.jsonld, /ns/agsc.ttl and /ns/agsc.rdf from ontology/agsc.ttl
 // and, with --check, compares them with the bytes a site publishes. Zero errors AND zero warnings
 // is the bar: a warning here means this site carries a second derivation of a file the engine
-// already derives, which is exactly the drift SITE-4 removed.
+// already derives, which is exactly the drift removed.
 {
   const gen = path.join(ENGINE, 'tools', 'gen-ns');
   if (!fs.existsSync(gen)) fails.push(`generator not found: ${gen}`);
@@ -109,6 +110,19 @@ else {
 }
 
 // (4) HTML pages
+// Public means clean: the engine's hygiene sweep over this repository and its built
+// output (private paths and names, process vocabulary, secrets, e-mail addresses,
+// personal data, forbidden wording, owner-addressed files, links to absent files).
+// The allowed hits and their reasons are in `.public-hygiene.json`.
+{
+  const hygiene = path.join(ENGINE, 'tools', 'public-hygiene');
+  if (!fs.existsSync(hygiene)) fails.push(`hygiene sweep not found: ${hygiene}`);
+  else {
+    const r = cp.spawnSync(process.execPath, [hygiene, ROOT], { encoding: 'utf8' });
+    if (r.status !== 0) fails.push(`public-hygiene: exit ${r.status}\n${(r.stderr || '').split('\n').slice(0, 20).join('\n')}`);
+  }
+}
+
 const files = fs.existsSync(WWW) ? walk(WWW) : [];
 const exists = p => fs.existsSync(p) && fs.statSync(p).isFile();
 const targetFile = urlPath => {
@@ -198,9 +212,9 @@ const locs = [...sitemap.matchAll(/<loc>https:\/\/agenticsystemcore\.com(\/[^<]*
 ok(locs.length > 0 && locs.join('\n') === [...locs].sort().join('\n'), 'sitemap empty or not ordered by URL (AGSC-06-19)');
 for (const l of locs) ok(targetFile(l), `sitemap URL has no page: ${l}`);
 for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt', '.well-known/tdmrep.json', 'graph.jsonld', 'llms.txt', 'llms-full.txt', 'search.json', 'assets/search-site.json', 'assets/search.js', 'robots.txt', '404.html', 'ns/context.jsonld', 'ns/agsc.ttl', 'specs/agentic-knowledge/index.html', 'specs/mcp/index.html', 'legal/index.html', 'docs/index.html', 'docs/introduction/index.html', 'docs/modes/index.html', 'docs/requirements/index.html', 'docs/standards/index.html', 'docs/compliance/index.html', 'docs/status/index.html', 'search/index.html',
-  // AGSC-06-01/06-02/09-16: the page-tool route family (D108).
+  // AGSC-06-01/06-02/09-16: the page-tool route family.
   'compose/index.html', 'compose/agsc-core.js', 'compose/agsc-page-tools.js', 'compose/agsc-compose.js', 'compose/webmcp.js',
-  // SITE-4: the surfaces the engine now builds for this node.
+  // the surfaces the engine now builds for this node.
   'chunks.jsonl', 'graph.nq', 'graph.ttl', 'now.md', 'now/index.html', 'skills/index.json', 'skills/index.html',
   'tags/index.html', 'tags/vocabulary/index.html', 'exports/index.html',
   'exports/chunks-index.toon', 'exports/llms-ctx.txt'])
@@ -250,4 +264,4 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
 
 fs.rmSync(tmp, { recursive: true, force: true });
 if (fails.length) { process.stderr.write(fails.map(f => `FAIL ${f}`).join('\n') + `\ncheck: ${fails.length} failure(s)\n`); process.exit(1); }
-process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, headers, contrast\n`);
+process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, headers, contrast, public hygiene\n`);

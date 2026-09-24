@@ -10,7 +10,8 @@
 const http = require('http'), fs = require('fs'), path = require('path');
 const { chromium } = require('playwright-core');
 if (!process.env.CHROME_EXE) { console.error('a11y: set CHROME_EXE to a Chromium binary'); process.exit(2); }
-const WWW = path.resolve(__dirname, '..', (JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'agsc.config.json'), 'utf8')).build || {}).out || 'www');
+// AGSC_A11Y_WWW runs the same lane over another built node (e.g. the patterns site's www/).
+const WWW = process.env.AGSC_A11Y_WWW ? path.resolve(process.env.AGSC_A11Y_WWW) : path.resolve(__dirname, '..', (JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'agsc.config.json'), 'utf8')).build || {}).out || 'www');
 const AXE = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 const headers = fs.readFileSync(path.join(WWW, '_headers'), 'utf8');
 const CSP = /Content-Security-Policy: (.*)/.exec(headers)[1];
@@ -28,8 +29,11 @@ srv.listen(0, async () => {
   const port = srv.address().port, base = `http://127.0.0.1:${port}`;
   const browser = await chromium.launch({ executablePath: process.env.CHROME_EXE, headless: true });
   let violations = 0, cspViol = 0, thirdParty = 0, problems = [];
-  for (const scheme of ['light', 'dark']) {
-    const ctx = await browser.newContext({ colorScheme: scheme, viewport: { width: 1200, height: 900 } });
+  // 'light' and 'dark' follow the system scheme; 'chosen-dark' is a light system with the
+  // visitor's stored switcher choice 'dark' (the manual override of the theme switcher).
+  for (const scheme of ['light', 'dark', 'chosen-dark']) {
+    const ctx = await browser.newContext({ colorScheme: scheme === 'chosen-dark' ? 'light' : scheme, viewport: { width: 1200, height: 900 } });
+    if (scheme === 'chosen-dark') await ctx.addInitScript(() => { try { localStorage.setItem('agsc-theme', 'dark'); } catch (e) {} });
     for (const p of pages) {
       const page = await ctx.newPage();
       page.on('console', m => { if (/Content Security Policy/.test(m.text())) { cspViol++; problems.push(`${scheme} ${p}: CSP ${m.text().slice(0, 100)}`); } });
@@ -38,7 +42,10 @@ srv.listen(0, async () => {
       await page.addScriptTag({ url: base + '/__axe.js' });
       const res = await page.evaluate(() => axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'] } }));
       for (const v of res.violations) { violations++; problems.push(`${scheme} ${p}: ${v.id} (${v.impact}) ${v.nodes.length}x — ${v.nodes[0].target[0]}`); }
+      if (scheme === 'chosen-dark' && await page.evaluate(() => document.documentElement.getAttribute('data-theme')) !== 'dark') problems.push(`${p}: the stored theme choice is not applied`);
       if (scheme === 'light') {
+        const sw = await page.evaluate(() => { const b = document.getElementById('theme'); const s = b && b.querySelector('select'); const n = s && s.getAttribute('aria-label'); const ul = document.querySelector('header.site ul'); const same = !ul || innerWidth < 1000 || Math.abs(s.getBoundingClientRect().top - ul.getBoundingClientRect().top) < 12; return !!(b && !b.hidden && s && n && same); });
+        if (!sw) problems.push(`${p}: theme switcher missing, hidden, unnamed or not on the navigation line`);
         await page.keyboard.press('Tab');
         const first = await page.evaluate(() => { const a = document.activeElement; return a && a.className === 'skip' && getComputedStyle(a).top !== '-48px'; });
         if (!first) problems.push(`${p}: first Tab does not reveal the skip link`);
@@ -51,9 +58,24 @@ srv.listen(0, async () => {
     }
     await ctx.close();
   }
-  // search page behaviour
+  // the theme switcher by keyboard alone: focus it, pick "Dark", reload, the choice holds
+  {
+    const kctx = await browser.newContext({ colorScheme: 'light' });
+    const kp = await kctx.newPage();
+    await kp.goto(base + '/', { waitUntil: 'load' });
+    await kp.focus('#theme-select'); await kp.keyboard.press('ArrowDown'); await kp.keyboard.press('ArrowDown');
+    await kp.selectOption('#theme-select', await kp.evaluate(() => document.getElementById('theme-select').value));
+    const t1 = await kp.evaluate(() => document.documentElement.getAttribute('data-theme'));
+    await kp.reload({ waitUntil: 'load' });
+    const t2 = await kp.evaluate(() => [document.documentElement.getAttribute('data-theme'), document.getElementById('theme-select').value, getComputedStyle(document.body).backgroundColor].join(' '));
+    console.log(`theme switcher by keyboard: after choice ${t1}; after reload ${t2}`);
+    if (t1 !== 'dark' || !t2.startsWith('dark dark')) problems.push(`theme switcher by keyboard failed: ${t1} / ${t2}`);
+    await kctx.close();
+  }
+  // search page behaviour (this site's own search page only)
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
+  if (!process.env.AGSC_A11Y_WWW) {
   await page.goto(base + '/search/?q=digest', { waitUntil: 'load' });
   await page.waitForTimeout(600);
   const n = await page.evaluate(() => document.querySelectorAll('#results li').length);
@@ -64,9 +86,10 @@ srv.listen(0, async () => {
   await page.fill('#q', 'AGSC-03-01'); await page.waitForTimeout(400);
   const t = await page.evaluate(() => document.querySelector('#results li a') && document.querySelector('#results li a').textContent);
   console.log(`search "AGSC-03-01": first result ${t}`);
+  }
   const r404 = await page.goto(base + '/no/such/page/'); console.log(`unknown path -> HTTP ${r404.status()}`);
   await browser.close(); srv.close();
-  console.log(`pages: ${pages.length} × 2 schemes; axe violations: ${violations}; CSP violations: ${cspViol}; third-party requests: ${thirdParty}`);
+  console.log(`pages: ${pages.length} × 3 schemes (system light, system dark, chosen dark); axe violations: ${violations}; CSP violations: ${cspViol}; third-party requests: ${thirdParty}`);
   if (problems.length) { console.log(problems.join('\n')); process.exit(1); }
   console.log('a11y pass: OK');
 });

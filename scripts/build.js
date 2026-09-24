@@ -19,12 +19,12 @@ const ENGINE = path.resolve(ROOT, process.env.AGSC_ENGINE || '../agentic-system-
 const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.6';
 // Output directory: `build.out` of agsc.config.json. It is `www-next` until launch so that the
 // repository can be pushed without Cloudflare Pages publishing the new site (Pages serves `www/`);
-// at launch the owner sets `build.out` to `www` (runbook §1a).
+// at launch the maintainer sets `build.out` to `www`.
 const CONFIG_OUT = (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www';
 const OUT = path.resolve(ROOT, (() => { const i = process.argv.indexOf('--out'); return i > 0 ? process.argv[i + 1] : CONFIG_OUT; })());
 
 // Status of the external steps. Update these, rebuild and redeploy after each step (the
-// owner's filing runbook, status-refresh section). Never write "registered" before the IANA
+// filing procedure, status-refresh section). Never write "registered" before the IANA
 // registry shows the entry (AGSC-06-07), and never a DOI before it resolves.
 const STATUS = {
   wellknown: 'not-requested',   // not-requested | requested | registered
@@ -54,7 +54,7 @@ const pretty = (v, ind = '') => { // sorted keys, two-space indent: for display 
 const byCode = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8');
 const git = (...args) => cp.execFileSync('git', ['-C', ENGINE, ...args], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-// WHERE THE NORMATIVE TEXT COMES FROM (SITE-4). The site publishes the tagged standard, so the
+// WHERE THE NORMATIVE TEXT COMES FROM. The site publishes the tagged standard, so the
 // default is the release tag and the launch build reads `git show <tag>:<path>`. A candidate that
 // has not been tagged yet cannot be read that way, so the source is a PARAMETER: `tag` or
 // `worktree`, defaulting to the tag when it exists and to the engine's working tree when it does
@@ -79,7 +79,7 @@ const checkText = (name, s) => {
 };
 const stripH1 = s => s.replace(/^# .*\n+/, '');
 
-// ------------------------------------------------------------------ the engine's own emitters (D108)
+// ------------------------------------------------------------------ the engine's own emitters
 // The seven in-page tools of AGSC-09-13/AGSC-09-16 are the ENGINE's implementation, not a second
 // one written here. The four scripts this site serves under /compose/ are produced by the engine's
 // own emitters, required from the sibling repository at build time, so their bytes are exactly the
@@ -95,6 +95,7 @@ const engineBrowser = engineModule('src/composition/browser.js');
 const enginePageTools = engineModule('src/distribution/page-tools.js');
 const engineWebmcp = engineModule('src/distribution/webmcp.js');
 const engineComposePage = engineModule('src/distribution/compose-page.js');
+const engineTheme = engineModule('src/distribution/theme.js');
 const engineSurfaces = engineModule('src/boundary/surfaces.js');
 const engineAdopt = engineModule('src/knowledge/adopt.js');
 const engineFrontmatter = engineModule('src/knowledge/frontmatter.js');
@@ -231,7 +232,7 @@ let RULE_INDEX = new Map(); // rule id or error code -> spec page slug
 let REQ_IDS = new Set();    // PRD-nnn / NFR-nn ids that the requirements page defines
 const RULES_WITHOUT_TRACE = []; // rules whose source carries no trailing trace bracket (reported at the end)
 // Rules and codes drafted for the next release candidate in the engine working tree: the guide may cite
-// them, rendered unlinked and marked, until the owner tags the next candidate and AGSC_SPEC_TAG moves
+// them, rendered unlinked and marked, until the next candidate is tagged and AGSC_SPEC_TAG moves
 // (then empty this set again). Emptied when rc.4 was tagged and published: every identifier drafted for
 // it is now in the published specification.
 const PENDING_RULES = new Set();
@@ -480,6 +481,8 @@ const WELLKNOWN = '/.well-known/knowledge-linkset';
 const TAGS = new Set((config.tags || {}).allowed || []);
 const SUMMARIES = JSON.parse(read('site/summaries.json'));
 const CONTACT_URL = 'https://andreibesleaga.com/contact/';
+// security.txt Contact (RFC 9116): the repository's issue tracker (owner, 2026-09-23). The privacy contact stays CONTACT_URL.
+const SECURITY_CONTACT_URL = 'https://github.com/andreibesleaga/AgenticSystemCore.com/issues';
 // The forges the "Propose an edit" links point at. The site's own repository is the contribution
 // target declared in `contribute[]`; the specification pages are generated from the engine
 // repository's files, so they link there (AGSC-11-14 names the channel, not the link).
@@ -492,7 +495,7 @@ if (!FORGE.site) die('agsc.config.json: contribute[] needs one entry with mode "
 // rc.5 configuration guards, against schema/config.schema.json at the tag.
 // `build.feed` and `build.rdfxml` are RESERVED names of 1.1 and are rejected (AGSC-06-01, AGSC-01-18, R-15).
 for (const k of Object.keys(config.build || {})) if (k !== 'out') die(`agsc.config.json: build.${k} is a reserved name, AGSC-E004 (withdrawn at rc.5)`);
-// D106 — THE PATTERNS-NODE SWITCH. One setting turns the second node on or off for this
+// THE PATTERNS-NODE SWITCH. One setting turns the second node on or off for this
 // site: `"x-patterns-node": false` in agsc.config.json. It lives in the vendor-extension
 // namespace the FROZEN config schema reserves (`^x-[a-z0-9]+(-[a-z0-9]+)+$`, verified in
 // schema/config.schema.json at tag 1.0.0-rc.5), which is the only place a setting no rule
@@ -568,7 +571,7 @@ if (declared !== SPEC_VERSION) die(`tag ${SPEC_TAG} declares spec_version ${decl
     const src = fs.readFileSync(f, 'utf8');
     for (const m of src.matchAll(/\b1\.0\.0-rc\.\d+\b/g)) {
       if (m[0] === SPEC_VERSION) continue;
-      // The historical-note carve-out RC6-B gave the engine's own checker, in the same words:
+      // The historical-note carve-out gave the engine's own checker, in the same words:
       // "Since `1.0.0-rc.5` the specification pins …" is a statement ABOUT an earlier candidate,
       // not a claim that this build publishes it. Only the phrase `Since <version>` carves out,
       // and only the literal that phrase introduces.
@@ -678,7 +681,7 @@ const ntTerm = o => {
 };
 const NT = [...new Set(onto.triples.map(t => `<${t.s}> <${t.p}> ${ntTerm(t.o)} .`))].sort((a, b) => Buffer.compare(Buffer.from(a), Buffer.from(b))).join('\n') + '\n';
 
-// SITE-4: exactly the prefix set, the order, the declaration case and the indentation of the
+// exactly the prefix set, the order, the declaration case and the indentation of the
 // engine's own `tools/gen-ns`, so that `gen-ns --check www-next/ns` reports nothing at all. The
 // `schema` prefix is declared and used by no triple of this vocabulary, as it is there: a
 // declared prefix nothing uses is legal RDF/XML, and agreeing byte for byte with the checker is
@@ -710,7 +713,7 @@ const EXTERNAL = [
   ['dcterms:requires', '@id'], ['dcterms:isRequiredBy', '@id'], ['dcterms:replaces', '@id'], ['dcterms:isReplacedBy', '@id'],
   ['dcterms:source', null], ['dcterms:title', null], ['dcterms:creator', null], ['dcterms:date', null], ['dcterms:format', null],
   // rc.5 amendments (2026-09-21, NS-07): AGSC-05-26 gained `dcterms:created` and
-  // `dcterms:modified` as `xsd:dateTime` (V8-91/R-06), and AGSC-05-31(c) makes
+  // `dcterms:modified` as `xsd:dateTime` (/R-06), and AGSC-05-31(c) makes
   // `schema:usageInfo` a literal, not an IRI (V9A-02). These three rows lagged, so
   // this context and the engine's could not be the byte-identical copy AGSC-05-09
   // asks for.
@@ -804,13 +807,13 @@ for (const vf of ['build-0001-search-tokenizer', 'build-0002-tokenizer-non-latin
 const SEARCH_JSON = jcs(searchIndex(items.map(it => ({ slug: it.slug, title: it.fm.title, description: it.fm.description, tags: it.fm.tags, clusters: it.fm.clusters, body: it.body })))) + '\n';
 
 // ------------------------------------------------------------------ the engine builds the Bundle
-// SITE-4 / D110. Everything whose bytes a rule pins and which carries no design of its own comes
+// /. Everything whose bytes a rule pins and which carries no design of its own comes
 // from a real `agsc build` over this repository's own content — the same engine, the same rules
 // and the same bytes as the patterns node. `scripts/engine.js` says how and why; the routes this
 // generator ADOPTS and the routes it still writes itself are the two lists below, and a route in
 // neither list is a build error, so a surface the engine gains cannot be quietly ignored.
 const SECURITY_TXT = [
-  `Contact: ${CONTACT_URL}`,
+  `Contact: ${SECURITY_CONTACT_URL}`,
   `Expires: ${iso(EPOCH + 364 * 86400)}`,
   'Preferred-Languages: en',
   `Canonical: ${BASE}.well-known/security.txt`,
@@ -829,7 +832,7 @@ const ADOPTED = [
 const ADOPTED_PREFIX = ['/pages/', '/skills/', '/boards/', '/graph/fragments/'];
 // The routes the engine emits that this generator writes itself, with the reason. An HTML page is
 // here because the engine's page shell has no slot for this site's stylesheet, header or footer
-// (specification item SITE4-01); the rest are named one by one.
+// (specification item); the rest are named one by one.
 const ENGINE_ROUTES_KEPT = new Map([
   ['/llms.txt', 'this site states its own section order and the site generator is proved against the tagged vectors; only the provenance block is the engine\'s'],
   ['/llms-full.txt', 'as /llms.txt'],
@@ -840,7 +843,9 @@ const ENGINE_ROUTES_KEPT = new Map([
   ['/sitemap.xml', 'this site has 54 pages the scratch Bundle has no idea about'],
   ['/_headers', 'the deployment profile carries this site\'s own content types'],
   ['/_redirects', 'as _headers'],
-  ['/404.html', 'an HTML page (SITE4-01)'],
+  ['/404.html', 'an HTML page'],
+  ['/assets/site.css', 'the engine default theme; this site publishes the same bytes from assets/site.css (checked below)'],
+  ['/assets/theme.js', 'the engine theme switcher; this site publishes the engine\'s own bytes'],
   ['/ns/1.0.0-draft.1/context.jsonld', 'emitted here beside the other versioned vocabulary documents this namespace site serves'],
 ]);
 {
@@ -851,7 +856,7 @@ const ENGINE_ROUTES_KEPT = new Map([
 }
 
 // ------------------------------------------------------------------ the discovery document (AGSC-06-07…10, 06-08a, 11-16)
-// SITE-4: the document is the ENGINE's, for this Bundle, with two additions this site owns.
+// the document is the ENGINE's, for this Bundle, with two additions this site owns.
 // It is a strict superset of what this generator used to write by hand: it declares the graph in
 // its three serialisations, the NOW page and the skill packs — relations that had no target here
 // before — and it carries the RFC 9530 digest of every linked file, the item counts, the bundle
@@ -881,11 +886,11 @@ const WELLKNOWN_DOC = (() => {
     { digest: digest(ENGINE_BUILD.exports.get('chunks-index.toon')), href: `${BASE}exports/chunks-index.toon`, type: 'text/plain' },
     { digest: digest(ENGINE_BUILD.exports.get('llms-ctx.txt')), href: `${BASE}exports/llms-ctx.txt`, type: 'text/plain' },
   ].sort((a, b) => byCode(a.href, b.href));
-  // D106 — the patterns-node switch, applied to the emitted document. With the switch off this
+  // the patterns-node switch, applied to the emitted document. With the switch off this
   // node declares no peer, and `peers[]` deliberately STAYS in the configuration so that turning
   // the second node back on is one word. The engine reads that configuration and declares the
   // peers, rightly, so the switch is applied here, to the document, and the guard below then
-  // compares what is emitted with what the switch allows. (Found by SITE-4's two-position test:
+  // compares what is emitted with what the switch allows. (Found by's two-position test:
   // before this line the build died in the off position, because the engine's document named a
   // peer the switch had removed.)
   if (!PATTERNS_NODE) delete set[`${REL}peer`];
@@ -938,6 +943,7 @@ function page({ url, title, heading, summary, description, body, jsonld, section
 <link rel="canonical" href="${esc(canonical)}">
 <link rel="describedby" href="${WELLKNOWN}" type="application/linkset+json">
 <link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="${url === '/' ? 'website' : 'article'}">
 <meta property="og:url" content="${esc(canonical)}">
@@ -952,6 +958,7 @@ ${ld}${js}</head>
 <ul>
 ${NAV.map(([h, t]) => `<li><a href="${h}"${section === h ? ' aria-current="page"' : ''}>${t}</a></li>`).join('\n')}
 </ul>
+${engineTheme.SWITCHER}
 </nav>
 </header>
 <main id="main"${wide ? ' class="wide"' : ''}>
@@ -959,10 +966,7 @@ ${NAV.map(([h, t]) => `<li><a href="${h}"${section === h ? ' aria-current="page"
 <p class="summary"><strong>Summary</strong>${esc(summary)}</p>
 ${body}</main>
 <footer class="site">
-<p class="copyright">&#169; ${esc(FOOTER_YEAR)} ${esc(config.site.author)}. All rights reserved. The prose is published under the <a href="/legal/#content-use-terms">Content Use Terms</a>; you may cite and link. See <a href="/legal/">/legal/</a>.</p>
-<p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>
-<p class="notice">Written with AI assistance, reviewed and published by a person. Independent work, published as it is, with no warranty and no liability; not advice; no organisation named here is connected with it; other names are their owners&#39; marks. <a href="/legal/">Full terms</a>.</p>
-<p><a href="/legal/">Legal and privacy</a> · <a href="/docs/compliance/">Compliance and security</a> · <a href="/docs/status/">Status</a> · <a href="${WELLKNOWN}">Discovery document</a> · <a href="/llms.txt">llms.txt</a> · <a rel="me" href="https://orcid.org/0009-0001-3464-5283">ORCID 0009-0001-3464-5283</a></p>
+<p class="copyright">&#169; ${esc(FOOTER_YEAR)} ${esc(config.site.author)}. Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>, all rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="${WELLKNOWN}">Discovery</a> · <a href="/llms.txt">llms.txt</a></p>
 </footer>
 </body>
 </html>
@@ -996,7 +1000,7 @@ const regText = {
   preprint: STATUS.preprint ? `Published: <a href="https://doi.org/${esc(STATUS.preprint.doi)}">${esc(STATUS.preprint.title)}</a> (${esc(STATUS.preprint.date)}), DOI <code>${esc(STATUS.preprint.doi)}</code>.` : 'In preparation; not yet published.',
 };
 
-// ------------------------------------------------------------------ the page tools (AGSC-09-16, D108)
+// ------------------------------------------------------------------ the page tools (AGSC-09-16)
 // The three scripts an ITEM, GUIDE or PROFILE page loads, in the engine's own load order: the
 // composition algebra (which the `compose` tool runs), the seven page tools, and the WebMCP
 // registration. They are referenced absolutely, so one copy is fetched once for the whole site,
@@ -1267,7 +1271,7 @@ const pageMarkdown = it => {
   const split = engineFrontmatter.split(it.src);
   return engineAdopt.serialize(engineYaml.parse(split.yamlText)) + split.body;
 };
-// SITE-4: both views are now the ENGINE's own emitted bytes rather than this generator's — the
+// both views are now the ENGINE's own emitted bytes rather than this generator's — the
 // engine built the same Bundle and its `/pages/<slug>.md` and `.jsonld` are taken as they are.
 // The Markdown this generator would have written is still produced and COMPARED, because the two
 // agreeing byte for byte is what proves that the item source this repository holds and the item
@@ -1282,7 +1286,7 @@ for (const it of items) {
 
 // ------------------------------------------------------------------ /compose/ (AGSC-06-01, AGSC-09-16)
 // The combiner in the browser, and the route the `webmcp` surface declaration points at. The four
-// scripts are the ENGINE's own emitted bytes (D108): the algebra, the seven page tools, this
+// scripts are the ENGINE's own emitted bytes: the algebra, the seven page tools, this
 // page's controller and the WebMCP registration. No inline script, no third-party origin, no key,
 // no upload — the page fetches only this node's own published routes.
 put('compose/agsc-core.js', engineBrowser.bundle({ specVersion: SPEC_VERSION }));
@@ -1293,7 +1297,7 @@ addPage('/compose/', {
   title: 'Compose', summary: summaryOf('/compose/'), description: 'Select items and compute a Harness in this page — no server, no key, no upload; the same seven tools a browser assistant sees.', section: null,
   scripts: ['/compose/agsc-core.js', '/compose/agsc-page-tools.js', '/compose/agsc-compose.js', '/compose/webmcp.js'],
   jsonld: { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Compose', url: `${BASE}compose/`, applicationCategory: 'DeveloperApplication', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' }, author: { '@type': 'Person', name: config.site.author } },
-  body: `<p>Tick the items you want. The closure algebra of <a class="ref" href="/specs/07-composition/#AGSC-07-01">AGSC-07-01</a> runs <em>in this page</em>: no request leaves this origin, no key is needed and nothing is uploaded. The seven Harness files are offered one download per file.</p>
+  body: `<p>Tick the items you want. The closure algebra of <a class="ref" href="/specs/07-composition/#AGSC-07-01">AGSC-07-01</a> runs <em>in this page</em>: no request leaves this origin, no key is needed and nothing is uploaded. The seven Harness files are offered one download per file, or all together as one .zip.</p>
 <p>This page also offers the seven tools of <a class="ref" href="/specs/09-conformance/#AGSC-09-13">AGSC-09-13</a> to a browser assistant that supports them, as every item and guide page does. See <a href="/about/#tools-for-browser-assistants">Tools for browser assistants</a>.</p>
 <h2 id="items-heading">Items</h2>
 <ul id="items" aria-labelledby="items-heading"><li>Loading the published graph…</li></ul>
@@ -1307,6 +1311,7 @@ addPage('/compose/', {
 <h2 id="harness">Harness</h2>
 <p><button id="download" type="button" disabled>Build the Harness</button></p>
 <ul id="files"></ul>
+<p id="archive" aria-live="polite"></p>
 `,
 });
 
@@ -1445,7 +1450,7 @@ ${md(read('site/privacy.md'))}<p>Operator of this site: ${esc(config.site.author
 });
 
 // ------------------------------------------------------------------ the new machine surfaces
-// SITE-4 / D110. Four pages AGSC-06-01 names and this site did not have. Every fact on them is
+// /. Four pages AGSC-06-01 names and this site did not have. Every fact on them is
 // read from what the ENGINE emitted for this Bundle — the NOW state, the skill-pack index, the
 // tag pages — and only the page shell is this site's, so nothing here is a second derivation.
 
@@ -1595,7 +1600,7 @@ SITE_INDEX.sort((a, b) => byCode(a.url, b.url) || byCode(a.title, b.title));
 put('assets/search-site.json', JSON.stringify(SITE_INDEX) + '\n');
 
 // machine files
-// SITE-4: the RDF views are the ENGINE's. `/graph.nq` and `/graph.ttl` are new here; they are
+// the RDF views are the ENGINE's. `/graph.nq` and `/graph.ttl` are new here; they are
 // the same graph in the two other serialisations AGSC-06-01 names, and a reader that wants
 // triples no longer has to parse JSON-LD to get them.
 const GRAPH_BYTES = String(putEngine('/graph.jsonld'));
@@ -1615,7 +1620,7 @@ for (const r of BOARD_ROUTES) putEngine(r);
 // `scripts/check.js` proves against the tagged vectors disc-0013 and disc-0014 on every run — is
 // still produced and COMPARED, so the vector lane keeps meaning something: `/llms.txt` must be
 // identical, and `/llms-full.txt` may differ ONLY by the blank line the engine keeps at the top of
-// each fenced body, which is the leading newline of the item body it does not strip (SITE4-03).
+// each fenced body, which is the leading newline of the item body it does not strip.
 {
   const engineIndex = String(putEngine('/llms.txt'));
   if (engineIndex !== LLMS.index) die('llms.txt: the engine\'s bytes and this generator\'s differ');
@@ -1638,7 +1643,7 @@ put('.well-known/tdmrep.json', JSON.stringify(TDM) + '\n');
 // the crawlers it reserves against, one blocked group per RFC 9309 product token, BEFORE the
 // default group; everything not named — an assistant fetching a page for a person, a search
 // crawler — stays invited by the default group. The tokens are the publisher's, in
-// `site.tdm_crawlers[]`, never this generator's: each one RC6-B verified on 2026-09-22 against
+// `site.tdm_crawlers[]`, never this generator's: each one verified on 2026-09-22 against
 // the operator's own documentation. An empty list with a reservation published is a build error,
 // because the published terms would then say something untrue.
 const TDM_CRAWLERS = (config.site.tdm_crawlers || []).slice().sort();
@@ -1756,6 +1761,10 @@ put('_redirects', `# Generated by scripts/build.js — do not hand-edit (AGSC-06
 
 // assets
 for (const f of ['assets/site.css', 'assets/search.js', 'favicon.svg']) { const s = read(`assets/${path.basename(f)}`); checkText(f, s); put(f, s); }
+// The stylesheet is also the engine's default theme (src/distribution/theme.js), so every
+// engine-built node looks like this site; the two copies must be the same bytes.
+if (read('assets/site.css') !== engineTheme.stylesheet()) die('assets/site.css differs from the engine default theme (src/distribution/theme.js): change both together');
+put('assets/theme.js', engineTheme.script());
 for (const id of DIAGRAMS.keys()) if (!usedDiagrams.has(id)) die(`diagram ${id} is compiled but shown on no page`);
 
 // ------------------------------------------------------------------ budgets and final checks, then write

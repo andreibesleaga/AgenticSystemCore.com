@@ -1,7 +1,7 @@
 # The previous generator, frozen
 
 This directory holds the site generator as it stood **before the reference engine built this
-site** (SITE-4, 2026-09-23), so that the site can still be produced the old way while the new
+site**, so that the site can still be produced the old way while the new
 build is being watched. It is a fallback, not a second generator to maintain.
 
 Four files, copied from commit `7a4caa3` and not developed further:

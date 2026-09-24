@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// FROZEN COPY — the generator as it stood before the engine built this site (SITE-4, 2026-09-23).
+// FROZEN COPY — the generator as it stood before the engine built this site.
 // Do not develop this file. Read scripts/legacy/README.md before running it. It is kept only so the
 // site can still be built the old way until launch + 30 days, and it is deleted after that.
 // Site v0 gate. Run before every commit: `node scripts/check.js`. Exit 0 pass, 1 fail.
@@ -12,7 +12,7 @@
 // (6) WCAG contrast of the colour tokens in both schemes.
 'use strict';
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
-const ROOT = path.resolve(__dirname, '..', '..'); // scripts/legacy/ -> the repository root (the one line SITE-4 changed when this copy was frozen)
+const ROOT = path.resolve(__dirname, '..', '..'); // scripts/legacy/ -> the repository root (the one line changed when this copy was frozen)
 const ENGINE = path.resolve(ROOT, process.env.AGSC_ENGINE || '../agentic-system-core');
 const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.5';
 const WWW = path.join(ROOT, (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www'); // www-next until launch (README)

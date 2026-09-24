@@ -15,7 +15,7 @@ node scripts/check.js      # the gate: reproducible build, llms vectors, validat
 
 Edit content in `content/` (items) and `site/` (about, privacy, profile page source); never edit `www/` by hand. The registration status shown on `/specs/agentic-knowledge/` is the `STATUS` object at the top of `scripts/build.js`. The generator is replaced by the engine's writer at site v0.1.
 
-## Site v0.2 — the human layer (added 2026-09-17, session 25)
+## Site v0.2 — the human layer (added 2026-09-17)
 
 The site now carries a plain-language layer beside the normative one, built by the same generator:
 
@@ -28,9 +28,9 @@ The site now carries a plain-language layer beside the normative one, built by t
 
 The gate additionally checks: a summary on every page, a name and a caption on every diagram, the trace line on every rule that has one in the source, no operator e-mail address, only the search script.
 
-## Output directory until launch (added 2026-09-17, session 25)
+## Output directory until launch (added 2026-09-17)
 
-`build.out` in `agsc.config.json` is **`www-next`**: the generated site is committed there and Cloudflare Pages keeps serving the minimal `www/` that is live today, so the repository can be pushed at any time without publishing. At launch (runbook §1a) set `build.out` to `"www"`, rebuild, run the gate, commit and push. `scripts/check.js` and `scripts/a11y.js` read the directory from the configuration.
+`build.out` in `agsc.config.json` is **`www-next`**: the generated site is committed there and Cloudflare Pages keeps serving the minimal `www/` that is live today, so the repository can be pushed at any time without publishing. At launch set `build.out` to `"www"`, rebuild, run the gate, commit and push. `scripts/check.js` and `scripts/a11y.js` read the directory from the configuration.
 
 ## Licences (added 2026-09-18)
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// FROZEN COPY — the generator as it stood before the engine built this site (SITE-4, 2026-09-23).
+// FROZEN COPY — the generator as it stood before the engine built this site.
 // Do not develop this file. Read scripts/legacy/README.md before running it. It is kept only so the
 // site can still be built the old way until launch + 30 days, and it is deleted after that.
 // Site generator for AgenticSystemCore.com — a Level-0 node of its own specification
@@ -16,17 +16,17 @@
 const fs = require('fs'), path = require('path'), crypto = require('crypto'), cp = require('child_process');
 const { compile: compileDiagram } = require('./diagram.js');
 
-const ROOT = path.resolve(__dirname, '..', '..'); // scripts/legacy/ -> the repository root (the one line SITE-4 changed when this copy was frozen)
+const ROOT = path.resolve(__dirname, '..', '..'); // scripts/legacy/ -> the repository root (the one line changed when this copy was frozen)
 const ENGINE = path.resolve(ROOT, process.env.AGSC_ENGINE || '../agentic-system-core');
 const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.5';
 // Output directory: `build.out` of agsc.config.json. It is `www-next` until launch so that the
 // repository can be pushed without Cloudflare Pages publishing the new site (Pages serves `www/`);
-// at launch the owner sets `build.out` to `www` (runbook §1a).
+// at launch the maintainer sets `build.out` to `www`.
 const CONFIG_OUT = (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www';
 const OUT = path.resolve(ROOT, (() => { const i = process.argv.indexOf('--out'); return i > 0 ? process.argv[i + 1] : CONFIG_OUT; })());
 
 // Status of the external steps. Update these, rebuild and redeploy after each step (the
-// owner's filing runbook, status-refresh section). Never write "registered" before the IANA
+// filing procedure, status-refresh section). Never write "registered" before the IANA
 // registry shows the entry (AGSC-06-07), and never a DOI before it resolves.
 const STATUS = {
   wellknown: 'not-requested',   // not-requested | requested | registered
@@ -155,7 +155,7 @@ let RULE_INDEX = new Map(); // rule id or error code -> spec page slug
 let REQ_IDS = new Set();    // PRD-nnn / NFR-nn ids that the requirements page defines
 const RULES_WITHOUT_TRACE = []; // rules whose source carries no trailing trace bracket (reported at the end)
 // Rules and codes drafted for the next release candidate in the engine working tree: the guide may cite
-// them, rendered unlinked and marked, until the owner tags the next candidate and AGSC_SPEC_TAG moves
+// them, rendered unlinked and marked, until the next candidate is tagged and AGSC_SPEC_TAG moves
 // (then empty this set again). Emptied when rc.4 was tagged and published: every identifier drafted for
 // it is now in the published specification.
 const PENDING_RULES = new Set();
@@ -581,7 +581,7 @@ const EXTERNAL = [
   ['dcterms:requires', '@id'], ['dcterms:isRequiredBy', '@id'], ['dcterms:replaces', '@id'], ['dcterms:isReplacedBy', '@id'],
   ['dcterms:source', null], ['dcterms:title', null], ['dcterms:creator', null], ['dcterms:date', null], ['dcterms:format', null],
   // rc.5 amendments (2026-09-21, NS-07): AGSC-05-26 gained `dcterms:created` and
-  // `dcterms:modified` as `xsd:dateTime` (V8-91/R-06), and AGSC-05-31(c) makes
+  // `dcterms:modified` as `xsd:dateTime` (/R-06), and AGSC-05-31(c) makes
   // `schema:usageInfo` a literal, not an IRI (V9A-02). These three rows lagged, so
   // this context and the engine's could not be the byte-identical copy AGSC-05-09
   // asks for.

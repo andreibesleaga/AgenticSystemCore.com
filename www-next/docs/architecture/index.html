@@ -8,6 +8,7 @@
 <link rel="canonical" href="https://agenticsystemcore.com/docs/architecture/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
 <link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/docs/architecture/">
@@ -33,6 +34,7 @@
 <li><a href="/about/">About</a></li>
 <li><a href="/search/">Search</a></li>
 </ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
 </nav>
 </header>
 <main id="main" class="wide">
@@ -76,7 +78,7 @@
 <tr><td>C2</td><td>The deployed system is static files plus CI: no servers, databases or queues</td><td>CI is the only backend; every write path ends in a pull request</td></tr>
 <tr><td>C3</td><td>Cloudflare Pages, deployed from <code>www/</code></td><td>The output directory is <code>www/</code>; <code>_headers</code> and <code>_redirects</code> are generated</td></tr>
 <tr><td>C4</td><td>Content negotiation for <code>/ns/</code> through the w3id <code>.htaccess</code>, with no project-owned server code</td><td>Negotiation is a configuration file in a foreign repository</td></tr>
-<tr><td>C5</td><td>The owner runs every git write and every credentialed publish</td><td><code>propose</code> writes patches and prints commands; CI never commits content</td></tr>
+<tr><td>C5</td><td>The maintainer runs every git write and every credentialed publish</td><td><code>propose</code> writes patches and prints commands; CI never commits content</td></tr>
 <tr><td>C6</td><td>At most 10 dollars a month of model spend; the gating lanes stay lint-only</td><td>No model call on <code>ci</code>, <code>review</code> or anything reachable from them; the optional review lane never gates a merge</td></tr>
 <tr><td>C7</td><td>Clean room: the invariants are held outside every repository</td><td>One <code>clean-room</code> lint enforces the public derivations (<a class="ref" href="/specs/08-governance/#AGSC-08-17">AGSC-08-17</a>): no book framing, no imposed sequence of pages, no whole-corpus emitter</td></tr>
 <tr><td>C8</td><td>The capability plane is language-independent: files and ontologies define the system</td><td>No behaviour may exist that the specification and the vectors do not pin</td></tr>
@@ -494,10 +496,7 @@
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/architecture.md">Propose an edit</a> — opens <code>site/docs/architecture.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved. The prose is published under the <a href="/legal/#content-use-terms">Content Use Terms</a>; you may cite and link. See <a href="/legal/">/legal/</a>.</p>
-<p>Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>. Schemas, ontology, identifiers and the discovery document: CC0 1.0. Specification text: Apache License 2.0.</p>
-<p class="notice">Written with AI assistance, reviewed and published by a person. Independent work, published as it is, with no warranty and no liability; not advice; no organisation named here is connected with it; other names are their owners&#39; marks. <a href="/legal/">Full terms</a>.</p>
-<p><a href="/legal/">Legal and privacy</a> · <a href="/docs/compliance/">Compliance and security</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery document</a> · <a href="/llms.txt">llms.txt</a> · <a rel="me" href="https://orcid.org/0009-0001-3464-5283">ORCID 0009-0001-3464-5283</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. Prose: <a href="/legal/#content-use-terms">Content Use Terms 1.0</a>, all rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a></p>
 </footer>
 </body>
 </html>

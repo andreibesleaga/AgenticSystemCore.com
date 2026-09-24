@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// The "it still looks the same" gate (SITE-4, owner rule R97).
+// The "it still looks the same" gate.
 //
 // A build of this site may add routes and may change prose, but it may not change how the
 // site LOOKS. This script pins that: it captures a baseline from a built output, and on every
