@@ -76,7 +76,7 @@
 <https://w3id.org/agentic-system-core/ns#consumes> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#contradicts> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/agentic-system-core/ns#contradicts> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#SymmetricProperty> .
-<https://w3id.org/agentic-system-core/ns#contradicts> <http://www.w3.org/2000/01/rdf-schema#comment> "Asserts that two items cannot both be true. Selecting both in a composition is a warning, never a failure. No domain or range is declared: any item type may author this key, and declaring asc:Concept would entail a Concept typing for Procedures, Episodes and Gates (D48, V1-28)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#contradicts> <http://www.w3.org/2000/01/rdf-schema#comment> "Asserts that two items cannot both be true. Selecting both in a composition is a warning, never a failure. No domain or range is declared: any item type may author this key, and declaring asc:Concept would entail a Concept typing for Procedures, Episodes and Gates."^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#contradicts> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
 <https://w3id.org/agentic-system-core/ns#contradicts> <http://www.w3.org/2000/01/rdf-schema#label> "contradicts"^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#coveredBy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
@@ -242,7 +242,7 @@
 <https://w3id.org/agentic-system-core/ns#usedBy> <http://www.w3.org/2000/01/rdf-schema#label> "used by"^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#usedBy> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#uses> .
 <https://w3id.org/agentic-system-core/ns#uses> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
-<https://w3id.org/agentic-system-core/ns#uses> <http://www.w3.org/2000/01/rdf-schema#comment> "Soft dependency: the subject draws on the object. A composition warns when a used item is absent. No domain, range or super-property is declared: skos:related is a sub-property of skos:semanticRelation, whose domain and range are skos:Concept (S19/S20), so a super-property axiom would re-introduce the unintended Concept typing and the S37 contradiction for Clusters (AGSC-05-26a, V3-06)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#uses> <http://www.w3.org/2000/01/rdf-schema#comment> "Soft dependency: the subject draws on the object. A composition warns when a used item is absent. No domain, range or super-property is declared: skos:related is a sub-property of skos:semanticRelation, whose domain and range are skos:Concept (S19/S20), so a super-property axiom would re-introduce the unintended Concept typing and the S37 contradiction for Clusters (AGSC-05-26a)."^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#uses> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
 <https://w3id.org/agentic-system-core/ns#uses> <http://www.w3.org/2000/01/rdf-schema#label> "uses"^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#uses> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#usedBy> .
@@ -273,7 +273,7 @@
 <https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/description> "Vocabulary for AgenticSystemCore Bundles: six item types plus Bundle, Source, Proposal, Review, Harness and (rc.3) Attachment, aligned to SKOS, PROV-O and DCTerms."^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/issued> "2026-09-17"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/license> <https://creativecommons.org/publicdomain/zero/1.0/> .
-<https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/modified> "2026-09-23"^^<http://www.w3.org/2001/XMLSchema#date> .
+<https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/modified> "2026-09-24"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/publisher> <https://orcid.org/0009-0001-3464-5283> .
 <https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/title> "AgenticSystemCore vocabulary"^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns> <http://purl.org/vocab/vann/preferredNamespacePrefix> "asc"^^<http://www.w3.org/2001/XMLSchema#string> .

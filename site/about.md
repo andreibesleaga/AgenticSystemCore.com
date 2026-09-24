@@ -18,7 +18,7 @@ Every item page, every guide page and the [compose page](/compose/) offer seven 
 
 ## Status
 
-The specification is at release candidate `1.0.0-rc.6`. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it. Every machine-readable file on this site is now written by the reference engine itself, from this repository's own content: the graph in its three forms, the search index, the chunk export, the skill packs, the item source views, the NOW state and the discovery document. The pages you are reading are written by this repository's own generator, because the engine's page templates do not yet take a site's stylesheet and header. The [status page](/docs/status/) lists what is live and what is not.
+The specification is at release candidate `1.0.0-rc.6`. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no standards body has reviewed or adopted it. Every machine-readable file on this site is written by the reference engine, from this repository's own content: the graph in its three forms, the search index, the chunk export, the skill packs, the item source views, the NOW state, the derived ledger and the discovery document. The pages you are reading are written by this repository's own generator, which keeps this site's own page layout. The [status page](/docs/status/) lists what is live and what is not.
 
 ## Limits
 
@@ -26,9 +26,15 @@ The specification states its own limit (AGSC-08-19):
 
 > These lints prove neither safety nor the absence of novel injection; hashes and attestations prove only that an artefact is what was published. An implementation MUST NOT claim more.
 
+## Who stands behind this
+
+AgenticSystemCore is maintained by one person, with no company, no funding and no organisation behind it. What you can rely on: the specification, the schemas, the vocabulary and the conformance vectors are published under licences that let you continue without anyone's permission, and conformance is defined by published bytes, not by anyone's opinion. What you cannot rely on: a release schedule, a support channel, or a quick answer. Depend on the format and the vectors, which survive this project, and treat the reference implementation as one implementation among the ones that could exist.
+
+How decisions are made, what is promised and what happens if the maintainer stops are set out in [the governance file](https://github.com/andreibesleaga/agentic-system-core/blob/main/GOVERNANCE.md). How the name may be used is in [the trademark policy](https://github.com/andreibesleaga/agentic-system-core/blob/main/TRADEMARK-POLICY.md), and the exact sentence for saying that an implementation conforms is in [how to state conformance](https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONFORMANCE-STATEMENTS.md). The [code of conduct](https://github.com/andreibesleaga/agentic-system-core/blob/main/CODE_OF_CONDUCT.md) applies to everyone taking part.
+
 ## Contact
 
 - Web: [andreibesleaga.com/contact](https://andreibesleaga.com/contact/)
 - ORCID: [0009-0001-3464-5283](https://orcid.org/0009-0001-3464-5283)
 - GitHub: [andreibesleaga](https://github.com/andreibesleaga)
-- Security reports: see [security.txt](/.well-known/security.txt)
+- Security reports: privately, through the project repository's vulnerability reporting, or the contact page; both are in [security.txt](/.well-known/security.txt)

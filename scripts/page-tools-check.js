@@ -294,15 +294,15 @@ for (const slug of ITEMS) {
 
 // remember — a conforming new item handed back, nothing written, no clock read
 const remembered = envelope(call('remember', {
-  at: '2026-01-01T00:00:00Z', body: 'A note taken while reading this node.', kind: 'episode',
+  actor: 'process:ci', at: '2026-01-01T00:00:00Z', body: 'A note taken while reading this node.', kind: 'episode',
   title: 'A Recorded Run', sources: [{ id: 's1', resource: 'not a url' }],
 }), 'remember');
 ok(remembered.type === 'proposal', `remember: type ${remembered.type}`);
 ok(remembered.body.path.startsWith('content/'), `remember: path ${remembered.body.path}`);
 ok(remembered.body.frontmatter.prov.origin === 'ai-generated', 'remember did not mark the origin as machine-generated');
 ok((remembered.body.findings || []).some(f => f.code === 'AGSC-E506'), 'remember did not drop the malformed source with AGSC-E506');
-const twice = call('remember', { at: '2026-01-01T00:00:00Z', body: 'A note.', kind: 'episode', title: 'A Recorded Run' });
-ok(JSON.stringify(plain(twice)) === JSON.stringify(plain(call('remember', { at: '2026-01-01T00:00:00Z', body: 'A note.', kind: 'episode', title: 'A Recorded Run' }))),
+const twice = call('remember', { actor: 'process:ci', at: '2026-01-01T00:00:00Z', body: 'A note.', kind: 'episode', title: 'A Recorded Run' });
+ok(JSON.stringify(plain(twice)) === JSON.stringify(plain(call('remember', { actor: 'process:ci', at: '2026-01-01T00:00:00Z', body: 'A note.', kind: 'episode', title: 'A Recorded Run' }))),
   'remember is not deterministic for the same input');
 ok(item.networkCalls === 0, `the write tools made ${item.networkCalls} network call(s) — a page performs no write (AGSC-08-04)`);
 
@@ -337,7 +337,7 @@ async function asynchronousPath() {
   const composeTools = composePage.sandbox.AGSC_TOOLS;
   for (const name of SEVEN) {
     const answer = plain(await composeTools.call(name, {
-      at: '2026-01-01T00:00:00Z', body: 'A note.', kind: 'episode', question: 'bundle',
+      actor: 'process:ci', at: '2026-01-01T00:00:00Z', body: 'A note.', kind: 'episode', question: 'bundle',
       query: 'bundle', selection: [ITEMS[0]], slug: ITEMS[0], title: 'A Recorded Run',
     }));
     ok(answer.type !== 'error', `/compose/: ${name} answered ${JSON.stringify(answer.body).slice(0, 160)}`);

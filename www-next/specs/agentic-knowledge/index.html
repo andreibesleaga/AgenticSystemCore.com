@@ -115,7 +115,7 @@
 <tr><th scope="row"><code>license</code></th><td>The licence page of the node.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a></td></tr>
 <tr><th scope="row"><code>service-doc</code></th><td>Human documentation, such as <code>/specs/</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a></td></tr>
 <tr><th scope="row"><code>author</code></th><td>The author of the node.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a></td></tr>
-<tr><th scope="row"><code>related, service-desc, service-meta, collection, item</code></th><td>Related-system links, OPTIONAL, each carrying <code>type</code>. Admitted by both rules since rc.5.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-35">AGSC-06-35</a></td></tr>
+<tr><th scope="row"><code>related, service-desc, service-meta, collection, item, cite-as</code></th><td>Related-system links, OPTIONAL, each carrying <code>type</code>. Admitted by both rules since rc.5; <code>cite-as</code> since rc.6.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-35">AGSC-06-35</a></td></tr>
 </tbody></table></div>
 <p>Extension relations. Each URI <code>https://w3id.org/agentic-system-core/rel#&lt;name&gt;</code> resolves to its row below.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Extension relation"><table>
@@ -131,6 +131,7 @@
 <tr id="surface"><th scope="row"><code>…/rel#surface</code></th><td>An agent surface the node serves, such as <code>llms-txt</code>, <code>chunks</code> or <code>mcp</code>, with its access class.</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-16">AGSC-11-16</a></td></tr>
 <tr id="contribute"><th scope="row"><code>…/rel#contribute</code></th><td>A contribution endpoint, with <code>agsc-contribute-mode</code>.</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-14">AGSC-11-14</a></td></tr>
 <tr id="access"><th scope="row"><code>…/rel#access</code></th><td>Where a reader obtains credentials for a restricted node.</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-20">AGSC-11-20</a></td></tr>
+<tr id="signature"><th scope="row"><code>…/rel#signature</code></th><td>A detached signature over the canonical bytes of the discovery document. OPTIONAL: at 1.x no rule pins the signature format, no Level requires the link, and a reader ignores it.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a></td></tr>
 </tbody></table></div>
 <h2 id="target-attributes">Target attributes</h2>
 <p>Extension target attributes use the prefix <code>agsc-</code>, except <code>digest</code>. Every attribute value is an array of strings (<a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>).</p>
@@ -142,6 +143,7 @@
 <tr id="attr-agsc-generated-at"><th scope="row"><code>agsc-generated-at</code></th><td>The build instant, derived from <code>SOURCE_DATE_EPOCH</code>. Level 2 and above.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-11">AGSC-06-11</a></td></tr>
 <tr id="attr-agsc-counts"><th scope="row"><code>agsc-counts</code></th><td>One <code>&lt;type-plural&gt;=&lt;n&gt;</code> string per item type, over the published set. Level 2 and above.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a></td></tr>
 <tr id="attr-agsc-bundle-hash"><th scope="row"><code>agsc-bundle-hash</code></th><td>The bundle hash, in RFC 9530 syntax. Level 2 and above.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a></td></tr>
+<tr id="attr-agsc-bundle-version"><th scope="row"><code>agsc-bundle-version</code></th><td>The content version of the Bundle, the name its publisher gives the published state (for example <code>v1.0.0</code>). On the <code>describedby</code> link to <code>graph.jsonld</code>; Level 2 and above.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-08a">AGSC-06-08a</a>, <a class="ref" href="/specs/04-canonicalization/#AGSC-04-25">AGSC-04-25</a></td></tr>
 <tr id="attr-agsc-ledger-head"><th scope="row"><code>agsc-ledger-head</code></th><td>The lowercase hex head of the derived ledger, on the ledger link. Level 2 and above.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-11">AGSC-06-11</a></td></tr>
 <tr id="attr-agsc-surface"><th scope="row"><code>agsc-surface</code></th><td>The surface name on a <code>…/rel#surface</code> link. Any Level.</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-16">AGSC-11-16</a></td></tr>
 <tr id="attr-agsc-surface-version"><th scope="row"><code>agsc-surface-version</code></th><td>The external revision a surface targets; required for <code>mcp</code>, <code>webmcp</code>, <code>a2a-card</code>, <code>solid</code> and <code>responder</code>. Any Level.</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-16">AGSC-11-16</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-21">AGSC-11-21</a></td></tr>
@@ -155,7 +157,7 @@
 <h2 id="related-system-links">Related-system links</h2>
 <p>A node MAY link related discovery documents and systems, such as an llms.txt file, a VoID or DCAT description, an Agent2Agent Agent Card, an MCP server card, or an ontology or SPARQL endpoint. It uses IANA-registered relations only: <code>describedby</code>, <code>alternate</code>, <code>related</code>, <code>service-desc</code>, <code>service-doc</code>, <code>service-meta</code>, <code>collection</code> and <code>item</code>, and each link carries <code>type</code>. Since <code>1.0.0-rc.5</code> the rule that fixes the relation names admits all eight, so a validator accepts every one of them (<a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-35">AGSC-06-35</a>). A reader ignores a related-system link it does not understand, and none affects conformance, a digest, the peer check or a walk.</p>
 <h2 id="examples">Examples</h2>
-<p>This node's own document, a Level-0 link set, shown pretty-printed:</p>
+<p>This node's own document, shown pretty-printed (the Level-2 form: every artefact link carries a digest, and the ledger head is declared):</p>
 <p>The live document is at <a href="/.well-known/knowledge-linkset"><code>/.well-known/knowledge-linkset</code></a>; a browser shows it as text. The same bytes, pretty-printed:</p>
 <pre tabindex="0" data-lang="json"><code>{
   &quot;linkset&quot;: [
@@ -170,14 +172,14 @@
         },
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:UU3aRYWnILGuXxTLB3/3/czgBamr23HIRRaTMtcZOlc=:&quot;
+            &quot;sha-256=:GLEXDAjWmkeY0a61hetvzN+4k1k9tCtZnV8b/WziEag=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/exports/llms-ctx.txt&quot;,
           &quot;type&quot;: &quot;text/plain&quot;
         },
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:g1Ugr3SoxuOqV4ssyeeoC2PHJ6N55Xm88BnxHqrxgXM=:&quot;
+            &quot;sha-256=:cXdvoeWAFBlqeUL8JxwvtW1hRJzx1u6lY4RX9h3zh/4=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/llms.txt&quot;,
           &quot;type&quot;: &quot;text/plain&quot;
@@ -187,10 +189,10 @@
       &quot;describedby&quot;: [
         {
           &quot;agsc-bundle-hash&quot;: [
-            &quot;sha-256=:dvmXaSiWFUkol/WnTEduf7qrO81cMGPLm+uWyaNaRhw=:&quot;
+            &quot;sha-256=:A+W8nHgr8x2bHbb/BsKIdeQuA1OfT7N3DCKdH2OXyIc=:&quot;
           ],
           &quot;agsc-bundle-version&quot;: [
-            &quot;0.0.0+18.g350befca5415&quot;
+            &quot;0.0.0+19.g69a106adbf43&quot;
           ],
           &quot;agsc-counts&quot;: [
             &quot;clusters=2&quot;,
@@ -201,7 +203,7 @@
             &quot;procedures=1&quot;
           ],
           &quot;agsc-generated-at&quot;: [
-            &quot;2026-09-23T10:03:39Z&quot;
+            &quot;2026-09-24T04:51:54Z&quot;
           ],
           &quot;agsc-spec-version&quot;: [
             &quot;1.0.0-rc.6&quot;
@@ -246,10 +248,22 @@
           &quot;type&quot;: &quot;text/turtle&quot;
         }
       ],
+      &quot;https://w3id.org/agentic-system-core/rel#ledger&quot;: [
+        {
+          &quot;agsc-ledger-head&quot;: [
+            &quot;65e301beff74bb8eded9c3bbf861922655dc22fd7442dbad37ac47b8f38c3647&quot;
+          ],
+          &quot;digest&quot;: [
+            &quot;sha-256=:Th0nC7R2afza8HyQUqE2qGXMp0HLJvUaq0vvbawsThI=:&quot;
+          ],
+          &quot;href&quot;: &quot;https://agenticsystemcore.com/ledger.jsonl&quot;,
+          &quot;type&quot;: &quot;application/jsonl&quot;
+        }
+      ],
       &quot;https://w3id.org/agentic-system-core/rel#now&quot;: [
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:3HFoHU3i9MnBbQ/M2fKM9yM2+juEuCH86Gk7RS9mNbk=:&quot;
+            &quot;sha-256=:4K1HeuQCtWT1dyYJWgqkK6uAQqJWrJ4Cw4COptu6N9g=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/now.md&quot;,
           &quot;type&quot;: &quot;text/markdown&quot;
@@ -258,7 +272,7 @@
       &quot;https://w3id.org/agentic-system-core/rel#ontology&quot;: [
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:RPKIduPyWiBPMMa3kEzyfLBXDVq3bleguzIef1gKhos=:&quot;
+            &quot;sha-256=:ecFTGaDEAocjf9LdXyqGVa3OCus5BOldiC/1hRcmf5I=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/ns/agsc.ttl&quot;,
           &quot;type&quot;: &quot;text/turtle&quot;
@@ -273,7 +287,7 @@
       &quot;https://w3id.org/agentic-system-core/rel#skills&quot;: [
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:7SU74Fhq2tt+GG5UlWiJAnJhkVIvZE8UcueVgfc6Uso=:&quot;
+            &quot;sha-256=:Qg4E3Wj2wfbGEHB3/C7H/c2dJ+BEU6AMuw61tO7Dn94=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/skills/index.json&quot;,
           &quot;type&quot;: &quot;application/json&quot;

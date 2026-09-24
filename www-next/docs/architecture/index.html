@@ -40,7 +40,7 @@
 <main id="main" class="wide">
 <h1>Architecture</h1>
 <p class="summary"><strong>Summary</strong>The architecture of the reference implementation in the arc42 and C4 forms: quality goals, constraints, the system in its context, containers, five bounded contexts and their ports, the runtime sequences, deployment, the decisions of record and the threat model.</p>
-<p>This page restates the frozen architecture document of the project (its S02 artefact, arc42 with C4 views and ISO 42010 correspondence rules) for readers who are not going to read the engine's source. It adds nothing to it. The architecture satisfies the <a href="/docs/requirements/">requirements</a> and never overrides a rule of the <a href="/specs/">specification</a>; where this page and a rule disagree, the rule wins.</p>
+<p>This page restates the frozen architecture document of the project (its first architecture baseline, arc42 with C4 views and ISO 42010 correspondence rules) for readers who are not going to read the engine's source. It adds nothing to it. The architecture satisfies the <a href="/docs/requirements/">requirements</a> and never overrides a rule of the <a href="/specs/">specification</a>; where this page and a rule disagree, the rule wins.</p>
 <h2 id="1-quality-goals-ranked">1. Quality goals, ranked</h2>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
 <thead><tr><th scope="col">#</th><th scope="col">Quality goal</th><th scope="col">Meaning here</th><th scope="col">Requirements</th></tr></thead>
@@ -67,7 +67,7 @@
 <tr><td>Owner as operator</td><td>A green site with zero maintenance and unattended crons</td></tr>
 <tr><td>Port implementer</td><td>A normative specification plus vectors that make the reference code irrelevant</td></tr>
 <tr><td>Standards implementer</td><td>One well-known file, registered relations, content negotiation</td></tr>
-<tr><td>Owner as rights holder and approver</td><td>Every git write is the owner's; the licence stack; the clean room; the cost ceiling</td></tr>
+<tr><td>Maintainer as rights holder and approver</td><td>Every git write is the maintainer's; the licence stack; the clean room; the cost ceiling</td></tr>
 <tr><td>Future port implementers in other languages</td><td>No hidden behaviour in the JavaScript; byte-level vectors; no build step</td></tr>
 </tbody></table></div>
 <h2 id="3-constraints">3. Constraints</h2>
@@ -86,8 +86,8 @@
 <tr><td>C10</td><td>Determinism: canonical JSON, sorted keys, LF, NFC, UTC seconds, <code>SOURCE_DATE_EPOCH</code></td><td><code>verify</code> is a double build with a byte comparison, and it blocks merges</td></tr>
 </tbody></table></div>
 <blockquote>
-<p><strong>Amendment 2026-09-18 (D94, ADR-019).</strong> The &quot;zero runtime dependencies&quot; constraint (C1, ADR-002) is superseded. The reference engine uses actively maintained, permissively licensed libraries at exact pinned versions for the standard formats and protocols it reads and writes, with a committed lockfile, <code>npm ci</code> installs and an <code>npm audit</code> gate; only what the specification pins byte-for-byte and no library produces is written by hand. The specification itself never required zero dependencies; a port from the vectors alone (<a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a>) and every determinism rule are unchanged.</p>
-<p><strong>Amendment 2026-09-18 (D97).</strong> The reference engine is CommonJS and its floor is Node 22.12; the browser bundle stays ESM. The module system is a property of this one implementation, not of the specification — a conforming engine may be written in any language and any module system, and is judged only by the conformance vectors.</p>
+<p><strong>Amendment 2026-09-18 (ADR-019).</strong> The &quot;zero runtime dependencies&quot; constraint (C1, ADR-002) is superseded. The reference engine uses actively maintained, permissively licensed libraries at exact pinned versions for the standard formats and protocols it reads and writes, with a committed lockfile, <code>npm ci</code> installs and an <code>npm audit</code> gate; only what the specification pins byte-for-byte and no library produces is written by hand. The specification itself never required zero dependencies; a port from the vectors alone (<a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a>) and every determinism rule are unchanged.</p>
+<p><strong>Amendment 2026-09-18.</strong> The reference engine is CommonJS and its floor is Node 22.12; the browser bundle stays ESM. The module system is a property of this one implementation, not of the specification — a conforming engine may be written in any language and any module system, and is judged only by the conformance vectors.</p>
 </blockquote>
 <h2 id="4-context">4. Context</h2>
 <figure class="diagram">
@@ -226,7 +226,7 @@
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table 32"><table>
 <thead><tr><th scope="col">Container</th><th scope="col">What it is</th></tr></thead>
 <tbody>
-<tr><td><code>agsc</code> CLI</td><td>Node ≥ 22.12, CommonJS, a small set of pinned and audited libraries (D94, D97); sixteen verbs, exit codes 0, 1 and 2, <code>--json</code> everywhere; five context directories under <code>src/</code> plus ports and Node adapters</td></tr>
+<tr><td><code>agsc</code> CLI</td><td>Node ≥ 22.12, CommonJS, a small set of pinned and audited libraries; sixteen verbs, exit codes 0, 1 and 2, <code>--json</code> everywhere; five context directories under <code>src/</code> plus ports and Node adapters</td></tr>
 <tr><td><code>agsc mcp</code></td><td>A local stdio JSON-RPC server exposing seven tools: search, read, links, compose, propose, ask, remember</td></tr>
 <tr><td>Browser bundle</td><td><code>www/js/agsc-core.js</code>: the same composition modules with no Node imports, plus the WebMCP page tools</td></tr>
 <tr><td>GitHub Actions</td><td><code>ci.yml</code>, <code>release.yml</code>, <code>refresh.yml</code>: the only backend</td></tr>
@@ -351,7 +351,7 @@
 <thead><tr><th scope="col">Lane</th><th scope="col">Trigger</th><th scope="col">Permissions</th><th scope="col">Result</th></tr></thead>
 <tbody>
 <tr><td>Engine CI</td><td>Push, pull request</td><td>Read only</td><td>Tests with a fixed clock and no network, coverage, self-lint, vectors, every independent validator</td></tr>
-<tr><td>Engine release</td><td>A version tag pushed by the owner</td><td>Identity token and attestation write</td><td>Trusted publishing of the packages to npm with provenance attestations</td></tr>
+<tr><td>Engine release</td><td>A version tag pushed by the maintainer</td><td>Identity token and attestation write</td><td>Trusted publishing of the packages to npm with provenance attestations</td></tr>
 <tr><td>Content CI and deploy</td><td>Push to the main branch, pull request</td><td>Read only; the deploy job holds the host token</td><td>The pipeline, then publication of <code>www/</code> to Cloudflare Pages</td></tr>
 <tr><td>Refresh and channel ingest</td><td>Weekly cron; per-channel schedule</td><td>Read plus issue creation; the ingest job has no repository write of its own</td><td>Staleness and link checks producing at most one issue and never a commit; channel ingest under the guards of <a class="ref" href="/specs/01-bundle/#AGSC-01-30">AGSC-01-30</a> and <a class="ref" href="/specs/08-governance/#AGSC-08-26">AGSC-08-26</a></td></tr>
 </tbody></table></div>
@@ -370,12 +370,12 @@
 <thead><tr><th scope="col">ADR</th><th scope="col">Decision</th></tr></thead>
 <tbody>
 <tr><td>001</td><td>Agent safety by structural defence, not by a classifier and not by sandboxing: trust-marked results, fenced prose, deterministic lints, identifier-only tools, inert skills, human merge; with the honest limit that hashes prove tampering, not safety</td></tr>
-<tr><td>002</td><td>Zero runtime dependencies, forever: Node built-ins only; a trivially auditable supply chain and portability to other runtimes — superseded 2026-09-18 by ADR-019 (D94)</td></tr>
+<tr><td>002</td><td>Zero runtime dependencies, forever: Node built-ins only; a trivially auditable supply chain and portability to other runtimes — superseded 2026-09-18 by ADR-019</td></tr>
 <tr><td>003</td><td>Static only: Cloudflare Pages from <code>www/</code>, no servers, databases, queues or Workers; CI is the only backend</td></tr>
 <tr><td>004</td><td>One vocabulary, fourteen links: six item types with a <code>kind</code> qualifier on Concept, nine core keys with composition meaning and five Mode-2 keys for navigation</td></tr>
 <tr><td>005</td><td>Namespace content negotiation through the w3id <code>.htaccess</code>: zero project-owned server code and permanent addresses independent of the domain</td></tr>
 <tr><td>006</td><td>A derived, hash-chained ledger recomputed from git history on every build, never appended, with its head published in the discovery document</td></tr>
-<tr><td>007</td><td>The Content Use Terms travel inside every export that carries prose</td></tr>
+<tr><td>007</td><td>The Content Use Terms — or the prose licence the node names in their place — travel inside every export that carries prose</td></tr>
 <tr><td>008</td><td>JavaScript with JSDoc types and a language-independent capability plane: the definition is the specification, the schemas, the ontology and the vectors</td></tr>
 <tr><td>009</td><td>Five contexts rather than four; deferred, to be reopened only if the Interchange and Distribution boundary leaks</td></tr>
 <tr><td>010</td><td>Part II scope under the simplicity rule: <code>run</code> and <code>trace</code> opt-in and off by default, <code>conform</code> a thin verb over the vector runner, federation as a validator flag, runtime emitters as template renderings of the seven Harness files</td></tr>
@@ -399,7 +399,7 @@
 <tr><td><a class="ref" href="/docs/requirements/#NFR-07">NFR-07</a> agent safety</td><td>The lint lane, tool-shape tests and the skills-inertness test</td></tr>
 <tr><td><a class="ref" href="/docs/requirements/#NFR-08">NFR-08</a> WCAG 2.2 AA</td><td>An accessibility lane over the golden build, with alt text asserted</td></tr>
 <tr><td><a class="ref" href="/docs/requirements/#NFR-09">NFR-09</a> unattended operation</td><td>An idempotence test for the refresh workflow and a restore-from-zero drill before launch</td></tr>
-<tr><td><a class="ref" href="/docs/requirements/#NFR-10">NFR-10</a> licence stack</td><td>A REUSE and SPDX lint and a terms-embedded assertion on every prose export</td></tr>
+<tr><td><a class="ref" href="/docs/requirements/#NFR-10">NFR-10</a> licence stack</td><td>An SPDX header on every browser script and a terms-embedded assertion on every prose export (a REUSE layout is a 1.1 item)</td></tr>
 <tr><td><a class="ref" href="/docs/requirements/#NFR-11">NFR-11</a> cost ceiling</td><td>No model call reachable from the launch lanes, asserted by grep, and a spend line on the NOW page</td></tr>
 <tr><td><a class="ref" href="/docs/requirements/#NFR-12">NFR-12</a> clean room</td><td>The clean-room lint and an importer that refuses book references</td></tr>
 <tr><td><a class="ref" href="/docs/requirements/#NFR-13">NFR-13</a> offline and cross-platform</td><td>A portability checklist on three operating systems</td></tr>
@@ -440,7 +440,7 @@
   model {
     reader = person &quot;Human reader / contributor&quot; &quot;P1, P2&quot;
     agent = person &quot;Agent (reader, proposer, integrator)&quot; &quot;P3, P4, P6, P8&quot;
-    owner = person &quot;Owner (approver, git-write authority)&quot; &quot;S12, P9&quot;
+    owner = person &quot;Maintainer (approver, git-write authority)&quot; &quot;S12, P9&quot;
     implementer = person &quot;Standards / port implementer&quot; &quot;P10, P11, S13&quot;
 
     asc = softwareSystem &quot;AgenticSystemCore&quot; &quot;Compiles a Markdown Bundle into a wiki, an RDF graph, agent memory, skills and Harnesses&quot; {

@@ -10,11 +10,11 @@ The operator's standing rule for this project is that the standard, the referenc
 
 ## What this site does
 
-- **No personal data collected by this site.** No cookies, no analytics, no forms, no third-party requests, no script other than the same-origin search script, which sends nothing anywhere (AGSC-06-05). Cloudflare, which serves the site, processes the technical data of each request under its own policy; the operator keeps no logs. Details are on the [legal page](/legal/#privacy).
+- **No personal data collected by this site.** No cookies, no analytics, no forms, no third-party requests, no script other than this site's own same-origin scripts (search, theme, compose and the in-page tools), none of which sends anything anywhere (AGSC-06-05). The theme control keeps a light or dark choice in the browser's local storage under one key, `agsc-theme`, and never sends it. Cloudflare, which serves the site, processes the technical data of each request under its own policy; the operator keeps no logs. Details are on the [legal page](/legal/#privacy).
 - **Accessibility.** Every page is checked against WCAG 2.2 AA with automated tooling in both colour schemes before it is published (AGSC-06-20); every diagram carries a text description and a caption.
 - **AI assistance is disclosed.** Every item on this site carries a provenance record. The vocabulary and guide items were written with AI assistance and reviewed and published by the operator, and say so in their `prov` block (AGSC-08-01); the specification's own documents record the models that drafted them.
 - **Content signals.** One licence policy is stated in three machine-readable ways: the AI-usage signals in `robots.txt`, the TDM reservation at `/.well-known/tdmrep.json`, and the licence members of the graph together with the provenance header of `llms.txt` (AGSC-06-18).
-- **Security reports.** `/.well-known/security.txt` (RFC 9116) says where to report a vulnerability.
+- **Security reports.** `/.well-known/security.txt` (RFC 9116) names the two routes for reporting a vulnerability: the private vulnerability reporting of the project's repository first, the contact page second.
 
 ## Compliance crosswalk
 

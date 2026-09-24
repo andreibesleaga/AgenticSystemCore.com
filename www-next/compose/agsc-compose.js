@@ -47,6 +47,8 @@
     var why = el('explanations');
     if (why) {
       why.textContent = '';
+      why.hidden = result.added.length === 0;
+      if (el('explanations-heading')) el('explanations-heading').hidden = why.hidden;
       for (var i = 0; i < result.added.length; i += 1) {
         var entry = result.added[i];
         var li = document.createElement('li');
@@ -59,6 +61,8 @@
     var problems = el('conflicts');
     if (problems) {
       problems.textContent = '';
+      problems.hidden = result.conflicts.length === 0;
+      if (el('conflicts-heading')) el('conflicts-heading').hidden = problems.hidden;
       for (var c = 0; c < result.conflicts.length; c += 1) {
         var conflict = result.conflicts[c];
         var row = document.createElement('li');
@@ -109,7 +113,7 @@
     });
   }
 
-  /** D49: per-file download. One link per Harness file, no archive writer. */
+  /** Per-file download. One link per Harness file, no archive writer. */
   function emitHarness() {
     var result = state.verdict || CORE.compose(state.items, state.selection);
     if (!result.valid) return Promise.resolve(null);

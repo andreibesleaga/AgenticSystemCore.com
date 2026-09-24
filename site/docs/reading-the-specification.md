@@ -16,18 +16,15 @@ MUST, MUST NOT, REQUIRED, SHALL, SHOULD, SHOULD NOT and MAY are used as defined 
 
 ## The small bracketed references
 
-Every rule ends with a bracketed note such as `[PRD-002 ← D41, G04, research/16 §3.3]`. It is the rule's traceability record: why the rule exists and where it came from. It is shown small and grey on this site because it is not part of what the rule requires. Its parts are:
+Most rules end with a bracketed note such as `[PRD-002]` or `[PRD-022, RFC 9264]`. It is the rule's traceability record: the requirement the rule serves and, where there is one, the external document it follows. It is shown small and grey on this site because it is not part of what the rule requires. Its parts are:
 
 | Form | Meaning | Where to find it |
 |---|---|---|
 | `PRD-nnn`, `NFR-nn` | A product requirement, or a non-functional requirement, in EARS form | Published on the [requirements page](/docs/requirements/); the identifiers link there |
-| `Dnn`, `D41(4)` | A numbered decision of the project's decision register, sometimes with a sub-item | The editors' internal working record; not published |
-| `Rnn`, `Gnn`, `Vn-nn`, `AR2-nn`, `SO-nn`, `Mn`, `Un` | Findings of review, gap, verification, adversarial and minimality passes over earlier drafts | The editors' internal working record; not published |
-| `audit/X §n`, `research/nn §n` | Sections of the project's audit and research memos | The editors' internal working record; not published |
-| `Art. XI` | An article of the project's development constitution | The editors' internal working record; not published |
 | `OKF v0.2`, `RFC 9264`, `A2A §8.4` | An external document the rule follows | The [standards page](/docs/standards/) lists each with its version and the date it was checked |
+| `design` | The rule records a design choice of this specification rather than a requirement or an external document | The rule text itself |
 
-A reader who wants to implement the specification needs none of the internal references: the rule text, the schemas, the ontology and the vectors are complete on their own (AGSC-00-01). The references exist so that the editors can show, for every rule, what requirement it serves and which review put it there.
+Earlier release candidates also carried, in these notes, identifiers of the editors' internal working records — decisions, review findings and research memos. They were removed from the text of the current candidate; the earlier tagged candidates keep them unchanged, because a tag never moves. A reader who wants to implement the specification needs none of them: the rule text, the schemas, the ontology and the vectors are complete on their own (AGSC-00-01).
 
 ## Drafted rules
 

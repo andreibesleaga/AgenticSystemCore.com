@@ -4,33 +4,8 @@
     "www-next",
     "www"
   ],
-  "skip": [
-    {
-      "path": "scripts/baseline/**",
-      "reason": "regression captures of the previous build, compared byte for byte by scripts/compare-baseline.js and never published; they still carry the retired pages' wording and are scheduled to move out of the repository with the baseline recapture"
-    }
-  ],
+  "skip": [],
   "allow": [
-    {
-      "check": "process",
-      "path": "www-next/specs/**",
-      "reason": "the frozen specification rendered verbatim; its trace tags change only at 1.0.0"
-    },
-    {
-      "check": "internal-note",
-      "path": "www-next/specs/**",
-      "reason": "the frozen specification rendered verbatim; its rationale notes change only at 1.0.0"
-    },
-    {
-      "check": "process",
-      "path": "www-next/ns/**",
-      "reason": "the frozen ontology rendered verbatim; its comments carry the rules' trace tags"
-    },
-    {
-      "check": "process",
-      "path": "www-next/assets/search-site.json",
-      "reason": "the site search index quotes the frozen specification's rules, trace tags included"
-    },
     {
       "check": "personal",
       "path": "www-next/assets/search-site.json",
@@ -63,6 +38,12 @@
       "check": "wording",
       "path": "scripts/legacy/*.js",
       "reason": "the frozen previous generator's forbidden-wording guard"
+    },
+    {
+      "check": "process",
+      "path": "www/_headers",
+      "text": "D67",
+      "reason": "the live build now served, replaced whole by www-next at launch and never edited by hand; www-next carries no such comment"
     }
   ]
 }

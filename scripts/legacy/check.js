@@ -109,7 +109,7 @@ for (const f of files) {
   if (s.includes('\r') || !s.endsWith('\n') || s.endsWith('\n\n')) fails.push(`${r}: LF only, exactly one trailing LF`);
   if (/\.(json|jsonld)$/.test(r) || r === '.well-known/knowledge-linkset') { try { JSON.parse(s); } catch (e) { fails.push(`${r}: invalid JSON: ${e.message}`); } }
   // The tagged requirements document names two forbidden framings in order to forbid them (NFR-12); that one quoted sentence is allowed.
-  const t = ['no Web4/crypto framing, book or &quot;companion&quot; strings', 'no Web4/crypto framing, book or \\"companion\\" strings', 'with no reading order imposed (R23)', 'no &quot;start here&quot; link and no imposed reading order', 'no \\"start here\\" link and no imposed reading order'].reduce((x, q) => x.split(q).join(''), s);
+  const t = ['no Web4/crypto framing, book or &quot;companion&quot; strings', 'no Web4/crypto framing, book or \\"companion\\" strings', 'with no reading order imposed', 'no &quot;start here&quot; link and no imposed reading order', 'no \\"start here\\" link and no imposed reading order'].reduce((x, q) => x.split(q).join(''), s);
   if (!r.startsWith('specs/') && r !== 'assets/search-site.json' && new RegExp(['wiley', 'companion', 'chapter \\d', 'reading order', 'discovery' + '-product', '05-' + 'WILEY'].join('|'), 'i').test(t)) fails.push(`${r}: forbidden string (AGSC-06-03 / private record)`);
   if (/\bWeb4\b|W3C (?:standard|Recommendation) for AgenticSystemCore/i.test(t)) fails.push(`${r}: forbidden claim`);
   if (/andrei\.besleaga\.nicolae@|abnmaster@|@gmail\.com/i.test(s)) fails.push(`${r}: the operator's e-mail address is published`);

@@ -43,7 +43,7 @@ A node MAY link related discovery documents and systems, such as an llms.txt fil
 
 ## Examples
 
-This node's own document, a Level-0 link set, shown pretty-printed:
+This node's own document, shown pretty-printed (the Level-2 form: every artefact link carries a digest, and the ledger head is declared):
 
 {{example-self}}
 

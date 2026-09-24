@@ -1,6 +1,6 @@
 ---
 title: "Standards and references"
-summary: "Every standard this work stands on or defines, with its version and the date it was checked; the three registrations it requests and their current status; the related work it was compared against; and the publications that describe it."
+summary: "Every standard this work stands on or defines, with its version and the date it was checked; the registrations it requests — two with IANA and one w3id.org namespace — and their current status; the related work it was compared against; and the publications that describe it."
 description: "The standards AgenticSystemCore builds on (RFC 8615, RFC 8288, RFC 9264, RFC 7284, RFC 9530, JCS, JSON-LD, SKOS, PROV-O, OWL 2 RL, OKF, MCP, WebMCP, A2A and more), the registrations requested, related work and publications."
 ---
 

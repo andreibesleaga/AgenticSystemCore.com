@@ -46,18 +46,15 @@
 <h2 id="the-key-words">The key words</h2>
 <p>MUST, MUST NOT, REQUIRED, SHALL, SHOULD, SHOULD NOT and MAY are used as defined in BCP 14 (RFC 2119 and RFC 8174), and only when written in capitals. MUST is an obligation whose violation is non-conformance; SHOULD is a recommendation that may be set aside for a stated reason; MAY is a permission.</p>
 <h2 id="the-small-bracketed-references">The small bracketed references</h2>
-<p>Every rule ends with a bracketed note such as <code>[PRD-002 ← D41, G04, research/16 §3.3]</code>. It is the rule's traceability record: why the rule exists and where it came from. It is shown small and grey on this site because it is not part of what the rule requires. Its parts are:</p>
+<p>Most rules end with a bracketed note such as <code>[PRD-002]</code> or <code>[PRD-022, RFC 9264]</code>. It is the rule's traceability record: the requirement the rule serves and, where there is one, the external document it follows. It is shown small and grey on this site because it is not part of what the rule requires. Its parts are:</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
 <thead><tr><th scope="col">Form</th><th scope="col">Meaning</th><th scope="col">Where to find it</th></tr></thead>
 <tbody>
 <tr><td><code>PRD-nnn</code>, <code>NFR-nn</code></td><td>A product requirement, or a non-functional requirement, in EARS form</td><td>Published on the <a href="/docs/requirements/">requirements page</a>; the identifiers link there</td></tr>
-<tr><td><code>Dnn</code>, <code>D41(4)</code></td><td>A numbered decision of the project's decision register, sometimes with a sub-item</td><td>The editors' internal working record; not published</td></tr>
-<tr><td><code>Rnn</code>, <code>Gnn</code>, <code>Vn-nn</code>, <code>AR2-nn</code>, <code>SO-nn</code>, <code>Mn</code>, <code>Un</code></td><td>Findings of review, gap, verification, adversarial and minimality passes over earlier drafts</td><td>The editors' internal working record; not published</td></tr>
-<tr><td><code>audit/X §n</code>, <code>research/nn §n</code></td><td>Sections of the project's audit and research memos</td><td>The editors' internal working record; not published</td></tr>
-<tr><td><code>Art. XI</code></td><td>An article of the project's development constitution</td><td>The editors' internal working record; not published</td></tr>
 <tr><td><code>OKF v0.2</code>, <code>RFC 9264</code>, <code>A2A §8.4</code></td><td>An external document the rule follows</td><td>The <a href="/docs/standards/">standards page</a> lists each with its version and the date it was checked</td></tr>
+<tr><td><code>design</code></td><td>The rule records a design choice of this specification rather than a requirement or an external document</td><td>The rule text itself</td></tr>
 </tbody></table></div>
-<p>A reader who wants to implement the specification needs none of the internal references: the rule text, the schemas, the ontology and the vectors are complete on their own (<a class="ref" href="/specs/00-overview/#AGSC-00-01">AGSC-00-01</a>). The references exist so that the editors can show, for every rule, what requirement it serves and which review put it there.</p>
+<p>Earlier release candidates also carried, in these notes, identifiers of the editors' internal working records — decisions, review findings and research memos. They were removed from the text of the current candidate; the earlier tagged candidates keep them unchanged, because a tag never moves. A reader who wants to implement the specification needs none of them: the rule text, the schemas, the ontology and the vectors are complete on their own (<a class="ref" href="/specs/00-overview/#AGSC-00-01">AGSC-00-01</a>).</p>
 <h2 id="drafted-rules">Drafted rules</h2>
 <p>When a next release candidate is being drafted in the engine repository, its identifiers are shown here with a dotted underline and no link until it is tagged and published; none are pending now.</p>
 <h2 id="retired-rules">Retired rules</h2>

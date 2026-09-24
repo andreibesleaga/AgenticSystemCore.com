@@ -5,9 +5,13 @@
 // site LOOKS. This script pins that: it captures a baseline from a built output, and on every
 // later build it compares the new output against the captured one in four lanes.
 //
-//   node scripts/compare-baseline.js --capture        write scripts/baseline/ from the build
-//   node scripts/compare-baseline.js                  compare the build against scripts/baseline/
+//   node scripts/compare-baseline.js --capture        write the baseline from the build
+//   node scripts/compare-baseline.js                  compare the build against the baseline
 //   node scripts/compare-baseline.js --shots A B      compare two screenshot directories
+//
+// The baseline is a capture of an earlier build, kept OUTSIDE this repository (it carries the
+// retired pages' wording, which is not published). Name its directory in AGSC_BASELINE_DIR;
+// the first two forms refuse to run without it (exit 2).
 //
 // Node >= 22, standard library only. Exit 0 when the site is the same, 1 when it is not.
 //
@@ -17,7 +21,7 @@
 //    route is listed, never a failure: adding a surface is the point of the work.
 //
 // 2. NORMALISED BYTES. Each HTML page is normalised (below) and compared byte for byte.
-//    A difference fails unless the route carries a reason in scripts/baseline/accepted.json.
+//    A difference fails unless the route carries a reason in <baseline>/accepted.json.
 //
 // 3. SHAPE. The page CHROME — everything outside <main>, after normalisation — must be
 //    byte-identical for every baseline route, with no exception: that is the header, the
@@ -32,7 +36,7 @@
 //
 // N1  Every release-candidate literal `1.0.0-rc.<digits>` becomes `1.0.0-rc.X`. The site
 //     moved from rc.5 to rc.6 and the version string appears on most pages.
-// N2  Every region declared in scripts/baseline/added-regions.json is deleted. Each entry is
+// N2  Every region declared in <baseline>/added-regions.json is deleted. Each entry is
 //     {route: <glob or "*">, pattern: <JavaScript regular expression, "g" applied>, why: <plain words>}.
 //     A declared pattern that matches nothing anywhere is itself a failure, so the list
 //     cannot rot into a set of excuses.
@@ -43,8 +47,12 @@ const fs = require('fs'), path = require('path'), crypto = require('crypto'), zl
 
 const ROOT = path.resolve(__dirname, '..');
 const OUT = path.resolve(ROOT, (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www');
-const BASE = path.join(__dirname, 'baseline');
-const NORMDIR = path.join(BASE, 'normalised');
+const BASE = process.env.AGSC_BASELINE_DIR ? path.resolve(process.env.AGSC_BASELINE_DIR) : null;
+if (BASE === null && process.argv[2] !== '--shots') {
+  console.error('compare-baseline: set AGSC_BASELINE_DIR to the directory that holds the baseline (it is kept outside this repository)');
+  process.exit(2);
+}
+const NORMDIR = BASE === null ? null : path.join(BASE, 'normalised');
 
 const problems = [];
 const notes = [];
@@ -186,7 +194,7 @@ function capture() {
   }
   fs.mkdirSync(BASE, { recursive: true });
   fs.writeFileSync(path.join(BASE, 'routes.json'), JSON.stringify(record, null, 2) + '\n');
-  process.stdout.write(`baseline: captured ${files.length} files, ${Object.keys(record.pages).length} pages -> scripts/baseline/\n`);
+  process.stdout.write(`baseline: captured ${files.length} files, ${Object.keys(record.pages).length} pages -> ${BASE}\n`);
 }
 
 // ------------------------------------------------------------------ compare

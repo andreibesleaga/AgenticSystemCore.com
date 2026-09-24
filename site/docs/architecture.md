@@ -4,7 +4,7 @@ summary: "The architecture of the reference implementation in the arc42 and C4 f
 description: "arc42 and C4 architecture of AgenticSystemCore: quality goals, constraints, context, containers, bounded contexts, ports, runtime views, deployment, architecture decision records, quality lanes, risks and the STRIDE threat model."
 ---
 
-This page restates the frozen architecture document of the project (its S02 artefact, arc42 with C4 views and ISO 42010 correspondence rules) for readers who are not going to read the engine's source. It adds nothing to it. The architecture satisfies the [requirements](/docs/requirements/) and never overrides a rule of the [specification](/specs/); where this page and a rule disagree, the rule wins.
+This page restates the frozen architecture document of the project (its first architecture baseline, arc42 with C4 views and ISO 42010 correspondence rules) for readers who are not going to read the engine's source. It adds nothing to it. The architecture satisfies the [requirements](/docs/requirements/) and never overrides a rule of the [specification](/specs/); where this page and a rule disagree, the rule wins.
 
 ## 1. Quality goals, ranked
 
@@ -33,7 +33,7 @@ Two floors are never traded: the licence stack (NFR-10) and the clean-room rule 
 | Owner as operator | A green site with zero maintenance and unattended crons |
 | Port implementer | A normative specification plus vectors that make the reference code irrelevant |
 | Standards implementer | One well-known file, registered relations, content negotiation |
-| Owner as rights holder and approver | Every git write is the owner's; the licence stack; the clean room; the cost ceiling |
+| Maintainer as rights holder and approver | Every git write is the maintainer's; the licence stack; the clean room; the cost ceiling |
 | Future port implementers in other languages | No hidden behaviour in the JavaScript; byte-level vectors; no build step |
 
 ## 3. Constraints
@@ -51,9 +51,9 @@ Two floors are never traded: the licence stack (NFR-10) and the clean-room rule 
 | C9 | No network, wall clock or file system in the pure core; network only in `refresh` and `mcp` | Ports, enforced by tests |
 | C10 | Determinism: canonical JSON, sorted keys, LF, NFC, UTC seconds, `SOURCE_DATE_EPOCH` | `verify` is a double build with a byte comparison, and it blocks merges |
 
-> **Amendment 2026-09-18 (D94, ADR-019).** The "zero runtime dependencies" constraint (C1, ADR-002) is superseded. The reference engine uses actively maintained, permissively licensed libraries at exact pinned versions for the standard formats and protocols it reads and writes, with a committed lockfile, `npm ci` installs and an `npm audit` gate; only what the specification pins byte-for-byte and no library produces is written by hand. The specification itself never required zero dependencies; a port from the vectors alone (NFR-02) and every determinism rule are unchanged.
+> **Amendment 2026-09-18 (ADR-019).** The "zero runtime dependencies" constraint (C1, ADR-002) is superseded. The reference engine uses actively maintained, permissively licensed libraries at exact pinned versions for the standard formats and protocols it reads and writes, with a committed lockfile, `npm ci` installs and an `npm audit` gate; only what the specification pins byte-for-byte and no library produces is written by hand. The specification itself never required zero dependencies; a port from the vectors alone (NFR-02) and every determinism rule are unchanged.
 >
-> **Amendment 2026-09-18 (D97).** The reference engine is CommonJS and its floor is Node 22.12; the browser bundle stays ESM. The module system is a property of this one implementation, not of the specification — a conforming engine may be written in any language and any module system, and is judged only by the conformance vectors.
+> **Amendment 2026-09-18.** The reference engine is CommonJS and its floor is Node 22.12; the browser bundle stays ESM. The module system is a property of this one implementation, not of the specification — a conforming engine may be written in any language and any module system, and is judged only by the conformance vectors.
 
 
 ## 4. Context
@@ -86,7 +86,7 @@ The context map: Knowledge feeds Distribution as a conformist supplier (Distribu
 
 | Container | What it is |
 |---|---|
-| `agsc` CLI | Node ≥ 22.12, CommonJS, a small set of pinned and audited libraries (D94, D97); sixteen verbs, exit codes 0, 1 and 2, `--json` everywhere; five context directories under `src/` plus ports and Node adapters |
+| `agsc` CLI | Node ≥ 22.12, CommonJS, a small set of pinned and audited libraries; sixteen verbs, exit codes 0, 1 and 2, `--json` everywhere; five context directories under `src/` plus ports and Node adapters |
 | `agsc mcp` | A local stdio JSON-RPC server exposing seven tools: search, read, links, compose, propose, ask, remember |
 | Browser bundle | `www/js/agsc-core.js`: the same composition modules with no Node imports, plus the WebMCP page tools |
 | GitHub Actions | `ci.yml`, `release.yml`, `refresh.yml`: the only backend |
@@ -132,7 +132,7 @@ One bounded context corresponds to one `src/` directory, one specification secti
 | Lane | Trigger | Permissions | Result |
 |---|---|---|---|
 | Engine CI | Push, pull request | Read only | Tests with a fixed clock and no network, coverage, self-lint, vectors, every independent validator |
-| Engine release | A version tag pushed by the owner | Identity token and attestation write | Trusted publishing of the packages to npm with provenance attestations |
+| Engine release | A version tag pushed by the maintainer | Identity token and attestation write | Trusted publishing of the packages to npm with provenance attestations |
 | Content CI and deploy | Push to the main branch, pull request | Read only; the deploy job holds the host token | The pipeline, then publication of `www/` to Cloudflare Pages |
 | Refresh and channel ingest | Weekly cron; per-channel schedule | Read plus issue creation; the ingest job has no repository write of its own | Staleness and link checks producing at most one issue and never a commit; channel ingest under the guards of AGSC-01-30 and AGSC-08-26 |
 
@@ -152,12 +152,12 @@ Every action is pinned by commit hash; `pull_request_target` is never used; ther
 | ADR | Decision |
 |---|---|
 | 001 | Agent safety by structural defence, not by a classifier and not by sandboxing: trust-marked results, fenced prose, deterministic lints, identifier-only tools, inert skills, human merge; with the honest limit that hashes prove tampering, not safety |
-| 002 | Zero runtime dependencies, forever: Node built-ins only; a trivially auditable supply chain and portability to other runtimes — superseded 2026-09-18 by ADR-019 (D94) |
+| 002 | Zero runtime dependencies, forever: Node built-ins only; a trivially auditable supply chain and portability to other runtimes — superseded 2026-09-18 by ADR-019 |
 | 003 | Static only: Cloudflare Pages from `www/`, no servers, databases, queues or Workers; CI is the only backend |
 | 004 | One vocabulary, fourteen links: six item types with a `kind` qualifier on Concept, nine core keys with composition meaning and five Mode-2 keys for navigation |
 | 005 | Namespace content negotiation through the w3id `.htaccess`: zero project-owned server code and permanent addresses independent of the domain |
 | 006 | A derived, hash-chained ledger recomputed from git history on every build, never appended, with its head published in the discovery document |
-| 007 | The Content Use Terms travel inside every export that carries prose |
+| 007 | The Content Use Terms — or the prose licence the node names in their place — travel inside every export that carries prose |
 | 008 | JavaScript with JSDoc types and a language-independent capability plane: the definition is the specification, the schemas, the ontology and the vectors |
 | 009 | Five contexts rather than four; deferred, to be reopened only if the Interchange and Distribution boundary leaks |
 | 010 | Part II scope under the simplicity rule: `run` and `trace` opt-in and off by default, `conform` a thin verb over the vector runner, federation as a validator flag, runtime emitters as template renderings of the seven Harness files |
@@ -181,7 +181,7 @@ Every action is pinned by commit hash; `pull_request_target` is never used; ther
 | NFR-07 agent safety | The lint lane, tool-shape tests and the skills-inertness test |
 | NFR-08 WCAG 2.2 AA | An accessibility lane over the golden build, with alt text asserted |
 | NFR-09 unattended operation | An idempotence test for the refresh workflow and a restore-from-zero drill before launch |
-| NFR-10 licence stack | A REUSE and SPDX lint and a terms-embedded assertion on every prose export |
+| NFR-10 licence stack | An SPDX header on every browser script and a terms-embedded assertion on every prose export (a REUSE layout is a 1.1 item) |
 | NFR-11 cost ceiling | No model call reachable from the launch lanes, asserted by grep, and a spend line on the NOW page |
 | NFR-12 clean room | The clean-room lint and an importer that refuses book references |
 | NFR-13 offline and cross-platform | A portability checklist on three operating systems |
@@ -227,7 +227,7 @@ workspace "AgenticSystemCore" "Distributed Ontological Agentic Memory engine —
   model {
     reader = person "Human reader / contributor" "P1, P2"
     agent = person "Agent (reader, proposer, integrator)" "P3, P4, P6, P8"
-    owner = person "Owner (approver, git-write authority)" "S12, P9"
+    owner = person "Maintainer (approver, git-write authority)" "S12, P9"
     implementer = person "Standards / port implementer" "P10, P11, S13"
 
     asc = softwareSystem "AgenticSystemCore" "Compiles a Markdown Bundle into a wiki, an RDF graph, agent memory, skills and Harnesses" {

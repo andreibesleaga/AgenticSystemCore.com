@@ -15,7 +15,7 @@
     <dcterms:description>Vocabulary for AgenticSystemCore Bundles: six item types plus Bundle, Source, Proposal, Review, Harness and (rc.3) Attachment, aligned to SKOS, PROV-O and DCTerms.</dcterms:description>
     <dcterms:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-09-17</dcterms:issued>
     <dcterms:license rdf:resource="https://creativecommons.org/publicdomain/zero/1.0/"/>
-    <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-09-23</dcterms:modified>
+    <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-09-24</dcterms:modified>
     <dcterms:publisher rdf:resource="https://orcid.org/0009-0001-3464-5283"/>
     <dcterms:title>AgenticSystemCore vocabulary</dcterms:title>
     <vann:preferredNamespacePrefix>asc</vann:preferredNamespacePrefix>
@@ -135,7 +135,7 @@
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#contradicts">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#SymmetricProperty"/>
-    <rdfs:comment>Asserts that two items cannot both be true. Selecting both in a composition is a warning, never a failure. No domain or range is declared: any item type may author this key, and declaring asc:Concept would entail a Concept typing for Procedures, Episodes and Gates (D48, V1-28).</rdfs:comment>
+    <rdfs:comment>Asserts that two items cannot both be true. Selecting both in a composition is a warning, never a failure. No domain or range is declared: any item type may author this key, and declaring asc:Concept would entail a Concept typing for Procedures, Episodes and Gates.</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>contradicts</rdfs:label>
   </rdf:Description>
@@ -365,7 +365,7 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#uses">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:comment>Soft dependency: the subject draws on the object. A composition warns when a used item is absent. No domain, range or super-property is declared: skos:related is a sub-property of skos:semanticRelation, whose domain and range are skos:Concept (S19/S20), so a super-property axiom would re-introduce the unintended Concept typing and the S37 contradiction for Clusters (AGSC-05-26a, V3-06).</rdfs:comment>
+    <rdfs:comment>Soft dependency: the subject draws on the object. A composition warns when a used item is absent. No domain, range or super-property is declared: skos:related is a sub-property of skos:semanticRelation, whose domain and range are skos:Concept (S19/S20), so a super-property axiom would re-introduce the unintended Concept typing and the S37 contradiction for Clusters (AGSC-05-26a).</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>uses</rdfs:label>
     <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#usedBy"/>

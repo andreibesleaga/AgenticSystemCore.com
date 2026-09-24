@@ -46,19 +46,97 @@
 <p>Two more files under <a href="/exports/">/exports/</a> are additive: a tabular index of the passages and a skim view of them. No rule pins their bytes and nothing depends on them; they exist because they are cheaper to read than the files they come from. If what you want is a Harness — the small file set a runtime loads to work on a chosen set of items — <a href="/compose/">the compose page</a> computes one in the browser and offers each file for download; nothing is uploaded, and no key or account is needed.</p>
 <h2 id="tools-for-browser-assistants">Tools for browser assistants</h2>
 <p>Every item page, every guide page and the <a href="/compose/">compose page</a> offer seven named tools — search, read, links, ask, compose, propose and remember — to an assistant running inside the visitor's own browser, so it can ask this node questions instead of scraping the page. The tools run in the page itself. They read only this site's own published files: the search index, each item's Markdown and JSON-LD view, and the discovery document. They contact no other host, they carry no key and need no account, and the two that prepare a change — propose and remember — hand the prepared text back to the caller and write nothing, here or anywhere else; a change to this node still becomes a pull request that a person reviews and merges. Nothing runs unless the browser supports the WebMCP feature, which today means Chrome 149 or later with <code>chrome://flags/#enable-webmcp-testing</code> switched on, or a browser that ships it. In every other browser the page registers nothing, behaves exactly as it did before and shows no error. WebMCP is a draft report of a W3C Community Group; it is not a W3C standard and is not on the W3C standards track.</p>
+<h2 id="quickstart">Quickstart</h2>
+<p>One short path per kind of visitor, each of at most ten lines; the commands are the reference engine's (<a class="ref" href="/specs/09-conformance/#AGSC-09-07">AGSC-09-07</a>) and the build checks every verb named here against it (<a class="ref" href="/specs/06-surfaces/#AGSC-06-24">AGSC-06-24</a>).</p>
+<h3 id="quickstart-p0">P0 &#8212; Drop-in user</h3>
+<ol>
+<li><code>agsc init</code></li>
+<li><code>agsc ci</code></li>
+<li><code>agsc build</code></li>
+</ol>
+<h3 id="quickstart-p1">P1 &#8212; Human reader</h3>
+<ol>
+<li><code>open /docs/ then /specs/</code></li>
+<li><code>search from /search/</code></li>
+<li><code>follow an item's links and sources</code></li>
+</ol>
+<h3 id="quickstart-p2">P2 &#8212; Human contributor</h3>
+<ol>
+<li><code>fork the repository and edit one item file</code></li>
+<li><code>agsc lint --fix</code></li>
+<li><code>agsc propose</code></li>
+<li><code>open the pull request the proposal describes</code></li>
+</ol>
+<h3 id="quickstart-p3">P3 &#8212; Agent reader</h3>
+<ol>
+<li><code>fetch /.well-known/knowledge-linkset</code></li>
+<li><code>fetch /llms.txt or /graph.jsonld</code></li>
+<li><code>agsc mcp   (a local tool server over stdio)</code></li>
+</ol>
+<h3 id="quickstart-p4">P4 &#8212; Agent proposer</h3>
+<ol>
+<li><code>agsc mcp</code></li>
+<li><code>call the propose tool</code></li>
+<li><code>a person reviews and merges the proposal</code></li>
+</ol>
+<h3 id="quickstart-p5">P5 &#8212; Architect</h3>
+<ol>
+<li><code>open /compose/</code></li>
+<li><code>tick the items you want</code></li>
+<li><code>download the Harness (or: agsc compose &lt;slug&gt;… --zip)</code></li>
+</ol>
+<h3 id="quickstart-p6">P6 &#8212; Integrator</h3>
+<ol>
+<li><code>agsc skills install</code></li>
+<li><code>agsc export --steer --target &lt;tool&gt;</code></li>
+<li><code>agsc export --to cogx</code></li>
+</ol>
+<h3 id="quickstart-p7">P7 &#8212; Project team</h3>
+<ol>
+<li><code>author kind: spec, decision and task items</code></li>
+<li><code>agsc lint</code></li>
+<li><code>agsc build   (boards and gates render with the site)</code></li>
+</ol>
+<h3 id="quickstart-p8">P8 &#8212; Agent using a node as memory</h3>
+<ol>
+<li><code>agsc mcp</code></li>
+<li><code>call remember, then ask</code></li>
+<li><code>agsc import --from &lt;format&gt; &lt;dir&gt;   to bring memory back</code></li>
+</ol>
+<h3 id="quickstart-p9">P9 &#8212; Maintainer</h3>
+<ol>
+<li><code>agsc ci</code></li>
+<li><code>agsc verify --ledger</code></li>
+<li><code>agsc refresh --dry-run</code></li>
+</ol>
+<h3 id="quickstart-p10">P10 &#8212; Port implementer</h3>
+<ol>
+<li><code>read spec/, schema/, ontology/ and tests/vectors/</code></li>
+<li><code>run the vector set against your engine</code></li>
+<li><code>agsc conform --level &lt;n&gt;   to write the claim</code></li>
+</ol>
+<h3 id="quickstart-p11">P11 &#8212; Standards implementer</h3>
+<ol>
+<li><code>fetch /.well-known/knowledge-linkset</code></li>
+<li><code>validate-wellknown &lt;file&gt; --level 2</code></li>
+<li><code>follow rel=&quot;describedby&quot; from any page</code></li>
+</ol>
 <h2 id="status">Status</h2>
-<p>The specification is at release candidate <code>1.0.0-rc.6</code>. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no body has endorsed it. Every machine-readable file on this site is now written by the reference engine itself, from this repository's own content: the graph in its three forms, the search index, the chunk export, the skill packs, the item source views, the NOW state and the discovery document. The pages you are reading are written by this repository's own generator, because the engine's page templates do not yet take a site's stylesheet and header. The <a href="/docs/status/">status page</a> lists what is live and what is not.</p>
+<p>The specification is at release candidate <code>1.0.0-rc.6</code>. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no standards body has reviewed or adopted it. Every machine-readable file on this site is written by the reference engine, from this repository's own content: the graph in its three forms, the search index, the chunk export, the skill packs, the item source views, the NOW state, the derived ledger and the discovery document. The pages you are reading are written by this repository's own generator, which keeps this site's own page layout. The <a href="/docs/status/">status page</a> lists what is live and what is not.</p>
 <h2 id="limits">Limits</h2>
 <p>The specification states its own limit (<a class="ref" href="/specs/08-governance/#AGSC-08-19">AGSC-08-19</a>):</p>
 <blockquote>
 <p>These lints prove neither safety nor the absence of novel injection; hashes and attestations prove only that an artefact is what was published. An implementation MUST NOT claim more.</p>
 </blockquote>
+<h2 id="who-stands-behind-this">Who stands behind this</h2>
+<p>AgenticSystemCore is maintained by one person, with no company, no funding and no organisation behind it. What you can rely on: the specification, the schemas, the vocabulary and the conformance vectors are published under licences that let you continue without anyone's permission, and conformance is defined by published bytes, not by anyone's opinion. What you cannot rely on: a release schedule, a support channel, or a quick answer. Depend on the format and the vectors, which survive this project, and treat the reference implementation as one implementation among the ones that could exist.</p>
+<p>How decisions are made, what is promised and what happens if the maintainer stops are set out in <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/GOVERNANCE.md">the governance file</a>. How the name may be used is in <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/TRADEMARK-POLICY.md">the trademark policy</a>, and the exact sentence for saying that an implementation conforms is in <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONFORMANCE-STATEMENTS.md">how to state conformance</a>. The <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/CODE_OF_CONDUCT.md">code of conduct</a> applies to everyone taking part.</p>
 <h2 id="contact">Contact</h2>
 <ul>
 <li>Web: <a href="https://andreibesleaga.com/contact/">andreibesleaga.com/contact</a></li>
 <li>ORCID: <a href="https://orcid.org/0009-0001-3464-5283">0009-0001-3464-5283</a></li>
 <li>GitHub: <a href="https://github.com/andreibesleaga">andreibesleaga</a></li>
-<li>Security reports: see <a href="/.well-known/security.txt">security.txt</a></li>
+<li>Security reports: privately, through the project repository's vulnerability reporting, or the contact page; both are in <a href="/.well-known/security.txt">security.txt</a></li>
 </ul>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/about.md">Propose an edit</a> — opens <code>site/about.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>

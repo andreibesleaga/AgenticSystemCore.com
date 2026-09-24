@@ -53,11 +53,19 @@
   Access-Control-Allow-Origin: *
   Access-Control-Expose-Headers: Link, ETag, Content-Type
 
+/ledger.jsonl
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
 /now.md
   Access-Control-Allow-Origin: *
   Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /skills/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/boards/*
   Access-Control-Allow-Origin: *
   Access-Control-Expose-Headers: Link, ETag, Content-Type
 
@@ -97,8 +105,16 @@
 /chunks.jsonl
   Content-Type: application/jsonl; charset=utf-8
 
+/ledger.jsonl
+  Content-Type: application/jsonl
+  Cache-Control: no-cache
+
+/boards/*
+  Content-Type: application/json; charset=utf-8
+
 /now.md
   Content-Type: text/markdown; charset=utf-8; variant=GFM
+  Cache-Control: no-cache
 
 /skills/index.json
   Content-Type: application/json; charset=utf-8
@@ -126,3 +142,6 @@
 
 /ns/*.nt
   Content-Type: application/n-triples; charset=utf-8
+
+/ns/schema/*.json
+  Content-Type: application/json; charset=utf-8

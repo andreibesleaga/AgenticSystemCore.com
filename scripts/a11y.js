@@ -3,7 +3,7 @@
 // in both colour schemes (WCAG 2.0/2.1/2.2 A+AA + best practices), CSP violations, third-party
 // requests, first-Tab skip link, horizontal scroll at 320 px, the 404 page and the search script.
 // Run after `node scripts/check.js`. Needs, outside the repository:
-//   npm i --no-save playwright-core@1.62.1 axe-core@4.13.0
+//   npm i --no-save playwright-core@1.62.1 axe-core@4.13.0   (1.62.1 or a later 1.x works)
 //   CHROME_EXE=<path to a Chromium or chrome-headless-shell binary> node scripts/a11y.js
 // Exit 0 when clean, 1 with the list of problems.
 'use strict';
