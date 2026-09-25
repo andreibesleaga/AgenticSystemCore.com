@@ -10,8 +10,8 @@
 const http = require('http'), fs = require('fs'), path = require('path');
 const { chromium } = require('playwright-core');
 if (!process.env.CHROME_EXE) { console.error('a11y: set CHROME_EXE to a Chromium binary'); process.exit(2); }
-// AGSC_A11Y_WWW runs the same lane over another built node (e.g. the patterns site's www/).
-const WWW = process.env.AGSC_A11Y_WWW ? path.resolve(process.env.AGSC_A11Y_WWW) : path.resolve(__dirname, '..', (JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'agsc.config.json'), 'utf8')).build || {}).out || 'www');
+// SITE_A11Y_WWW runs the same lane over another built node (e.g. the patterns site's www/).
+const WWW = process.env.SITE_A11Y_WWW ? path.resolve(process.env.SITE_A11Y_WWW) : path.resolve(__dirname, '..', (JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'agsc.config.json'), 'utf8')).build || {}).out || 'www');
 const AXE = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 const headers = fs.readFileSync(path.join(WWW, '_headers'), 'utf8');
 const CSP = /Content-Security-Policy: (.*)/.exec(headers)[1];
@@ -75,7 +75,7 @@ srv.listen(0, async () => {
   // search page behaviour (this site's own search page only)
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
-  if (!process.env.AGSC_A11Y_WWW) {
+  if (!process.env.SITE_A11Y_WWW) {
   await page.goto(base + '/search/?q=digest', { waitUntil: 'load' });
   await page.waitForTimeout(600);
   const n = await page.evaluate(() => document.querySelectorAll('#results li').length);

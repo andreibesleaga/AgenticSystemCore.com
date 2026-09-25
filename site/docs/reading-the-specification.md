@@ -8,7 +8,7 @@ The specification is exact so that two implementers in two languages produce the
 
 ## Sections and rules
 
-The specification has twelve sections, `AGSC-00` to `AGSC-11`, each a page under [/specs/](/specs/). Every rule has a stable identifier of the form `AGSC-<section>-<number>`, for example AGSC-03-01, which is the first rule of the links section. Identifiers are never reused or renumbered (AGSC-00-16). On this site every identifier is a link: click one to reach the rule, and copy the address to cite it.
+The specification has twelve sections, `AGSC-00` to `AGSC-11`, each a page under [/specs/](/specs/); a section too long for one page is published in numbered parts, each with the section's title and a part line, and a link to a rule always names the part that carries it. Every rule has a stable identifier of the form `AGSC-<section>-<number>`, for example AGSC-03-01, which is the first rule of the links section. Identifiers are never reused or renumbered (AGSC-00-16). On this site every identifier is a link: click one to reach the rule, and copy the address to cite it.
 
 ## The key words
 

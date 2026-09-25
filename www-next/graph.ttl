@@ -293,7 +293,7 @@
     a asc:Source ;
     asc:grade "primary" .
 
-<https://agenticsystemcore.com/concepts/now/#source-2> dcterms:source "https://agenticsystemcore.com/specs/06-surfaces/#AGSC-06-22" ;
+<https://agenticsystemcore.com/concepts/now/#source-2> dcterms:source "https://agenticsystemcore.com/specs/06-surfaces/page-2/#AGSC-06-22" ;
     dcterms:title "AGSC-06-22" ;
     a asc:Source ;
     asc:grade "primary" .

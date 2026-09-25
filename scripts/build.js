@@ -8,15 +8,15 @@
 //
 //   node scripts/build.js [--out <dir>]      (default: www)
 //   SOURCE_DATE_EPOCH=<seconds> node scripts/build.js
-//   AGSC_ENGINE=<path> AGSC_SPEC_TAG=<tag>   (defaults: ../agentic-system-core, 1.0.0-rc.6)
-//   AGSC_SPEC_SOURCE=tag|worktree            (default: tag when the tag exists, else worktree)
+//   SITE_ENGINE=<path> SITE_SPEC_TAG=<tag>   (defaults: ../agentic-system-core, 1.0.0-rc.6)
+//   SITE_SPEC_SOURCE=tag|worktree            (default: tag when the tag exists, else worktree)
 'use strict';
 const fs = require('fs'), path = require('path'), crypto = require('crypto'), cp = require('child_process');
 const { compile: compileDiagram } = require('./diagram.js');
 
 const ROOT = path.resolve(__dirname, '..');
-const ENGINE = path.resolve(ROOT, process.env.AGSC_ENGINE || '../agentic-system-core');
-const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.6';
+const ENGINE = path.resolve(ROOT, process.env.SITE_ENGINE || '../agentic-system-core');
+const SPEC_TAG = process.env.SITE_SPEC_TAG || '1.0.0-rc.6';
 // Output directory: `build.out` of agsc.config.json. It is `www-next` until launch so that the
 // repository can be pushed without Cloudflare Pages publishing the new site (Pages serves `www/`);
 // at launch the maintainer sets `build.out` to `www`.
@@ -61,8 +61,8 @@ const git = (...args) => cp.execFileSync('git', ['-C', ENGINE, ...args], { encod
 // not. The last line of the build says which of the two it used, so a build from an untagged
 // working tree can never be mistaken for a build of a frozen candidate.
 const tagExists = (() => { try { git('rev-parse', '-q', '--verify', `${SPEC_TAG}^{commit}`); return true; } catch { return false; } })();
-const SPEC_SOURCE = process.env.AGSC_SPEC_SOURCE || (tagExists ? 'tag' : 'worktree');
-if (SPEC_SOURCE !== 'tag' && SPEC_SOURCE !== 'worktree') die(`AGSC_SPEC_SOURCE must be "tag" or "worktree", not ${SPEC_SOURCE}`);
+const SPEC_SOURCE = process.env.SITE_SPEC_SOURCE || (tagExists ? 'tag' : 'worktree');
+if (SPEC_SOURCE !== 'tag' && SPEC_SOURCE !== 'worktree') die(`SITE_SPEC_SOURCE must be "tag" or "worktree", not ${SPEC_SOURCE}`);
 if (SPEC_SOURCE === 'tag' && !tagExists) die(`tag ${SPEC_TAG} does not exist in ${ENGINE}`);
 const engineFile = p => {
   if (SPEC_SOURCE === 'tag') { try { return git('show', `${SPEC_TAG}:${p}`); } catch { die(`cannot read ${p} at tag ${SPEC_TAG} in ${ENGINE}`); } }
@@ -233,20 +233,30 @@ function splitFrontmatter(text, file) {
 
 // ------------------------------------------------------------------ Markdown (the subset the specification uses)
 const SAFE_URL = /^(https?:\/\/|mailto:|\/|#|\.{0,2}\/)/;
-let RULE_INDEX = new Map(); // rule id or error code -> spec page slug
+let RULE_INDEX = new Map(); // rule id or error code -> the spec page that carries it: `<section>` or `<section>/page-n` (see "the layout of the specification pages")
+let RULE_INDEX_DECIDED = false; // false until every section is laid out; a rule link derived before that could name the wrong part
 let REQ_IDS = new Set();    // PRD-nnn / NFR-nn ids that the requirements page defines
 const RULES_WITHOUT_TRACE = []; // rules whose source carries no trailing trace bracket (reported at the end)
 // Rules and codes drafted for the next release candidate in the engine working tree: the guide may cite
-// them, rendered unlinked and marked, until the next candidate is tagged and AGSC_SPEC_TAG moves
+// them, rendered unlinked and marked, until the next candidate is tagged and SITE_SPEC_TAG moves
 // (then empty this set again). Emptied when rc.4 was tagged and published: every identifier drafted for
 // it is now in the published specification.
 const PENDING_RULES = new Set();
 const PENDING_REQS = new Set();
 function idTarget(code, o) {
   if (!/^AGSC-(?:\d{2}-\d{2,3}[a-z]?|E\d{3})$/.test(code) || !RULE_INDEX.has(code)) return null;
+  if (!RULE_INDEX_DECIDED) die(`a link to ${code} was derived before the specification pages were laid out`);
   const page = RULE_INDEX.get(code);
   return page === o.page ? `#${code}` : `/specs/${page}/#${code}`;
 }
+// A link to a rule or an error code from hand-written page text. The page it lands on is the
+// rule index's, never a section name typed by hand, so a section published in parts breaks no link.
+const ruleHref = id => {
+  if (!RULE_INDEX_DECIDED) die(`a link to ${id} was asked for before the specification pages were laid out`);
+  if (!RULE_INDEX.has(id)) die(`no rule or error code ${id} in the specification`);
+  return `/specs/${RULE_INDEX.get(id)}/#${id}`;
+};
+const REF = id => `<a class="ref" href="${ruleHref(id)}">${id}</a>`;
 function linkIds(text, o) {
   let out = '', last = 0;
   for (const m of text.matchAll(/\bAGSC-(?:\d{2}-\d{2,3}[a-z]?|E\d{3})\b|\b(?:PRD-\d{3}|NFR-\d{2})\b/g)) {
@@ -862,6 +872,7 @@ const ENGINE_ROUTES_KEPT = new Map([
   ['/assets/site.css', 'the engine default theme; this site publishes the same bytes from assets/site.css (checked below)'],
   ['/assets/theme.js', 'the engine theme switcher; this site publishes the engine\'s own bytes'],
   ['/ns/1.0.0-draft.1/context.jsonld', 'emitted here beside the other versioned vocabulary documents this namespace site serves'],
+  ['/search/agsc-search.js', 'the engine\'s /search/ page script; this site keeps its own /search/ page and /assets/search.js over assets/search-site.json (every page, section, rule and error code, which the scratch Bundle does not carry)'],
 ]);
 {
   const adopted = r => ADOPTED.includes(r) || ADOPTED_PREFIX.some(pre => r.startsWith(pre));
@@ -944,6 +955,9 @@ const specPages = SPEC_FILES.map(f => {
   const h1 = (/^# (.*)$/m.exec(src) || [])[1] || slug;
   return { file: f, slug, src, h1, url: `/specs/${slug}/` };
 });
+// Provisional: the SECTION each rule id and error code belongs to. The layout of the
+// specification pages (below, before the pages are written) replaces the value by the PART
+// that carries the id when a section is published in parts; nothing derives a link before that.
 RULE_INDEX = new Map();
 for (const p of specPages) {
   for (const m of p.src.matchAll(/^\s*- \*\*(AGSC-\d{2}-\d{2,3}[a-z]?)\*\*/gm)) if (!RULE_INDEX.has(m[1])) RULE_INDEX.set(m[1], p.slug);
@@ -1180,6 +1194,144 @@ agsc mcp      # give an assistant seven tools over the same folder</code></pre>
 ${editLink('site', 'content/index.md')}`,
 });
 
+// ------------------------------------------------------------------ the layout of the specification pages
+// AGSC-06-21 gives every HTML page a budget of 100 KB, and a section's page is the section's own
+// text: a rule or a note is never shortened to fit. A section whose page would exceed the budget
+// is therefore published in parts, `/specs/<section>/` and `/specs/<section>/page-2/` (page-3/ if
+// ever needed), each under the budget and each carrying the section's title, its summary, its
+// status block, its plain-language box, its diagram, the contents of the whole section and a
+// "Part n of m" line with links to the other parts. The cut falls between two `##` headings where
+// such a layout fits, else at any heading, else between two rules — never inside a rule, its
+// notes, its tables, its code or its trace line. The rule index then names, for every rule id and
+// error code, the part that carries it, so every link derived from an id lands on the right page.
+// A fragment never reaches the server, so no `_redirects` entry could do this; the index is the
+// only mechanism, and scripts/check.js fails on any rule link that lands on another page.
+const PAGE_BUDGET = Math.min(100 * 1000, Number(process.env.SITE_PAGE_BUDGET) || Infinity); // decimal, AGSC-06-21; a smaller value exercises the split, a larger one is refused (not AGSC_-prefixed: the engine reads those as configuration overrides)
+const PART_WORDS = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+// The source of a section cut into blocks: a heading with the text under it, or one rule with
+// everything that follows it up to the next rule or the next heading (its notes, its tables, its
+// code and its trace line). A cut between two blocks is never inside a rule.
+function specBlocks(src) {
+  const blocks = []; let cur = null, fenced = false, section = null;
+  const open = heading => { cur = { heading, section, lines: [] }; blocks.push(cur); };
+  open(null);
+  for (const l of src.replace(/^# .*\n+/, '').replace(/\n+$/, '').split('\n')) {
+    if (/^ {0,3}(`{3,}|~{3,})/.test(l)) fenced = !fenced;
+    else if (!fenced && /^#{2,6} +\S/.test(l)) { if (/^## /.test(l)) section = l; open(l); }
+    else if (!fenced && /^[-*+] +\*\*AGSC-\d{2}-\d{2,3}[a-z]?\*\*/.test(l)) open(null);
+    cur.lines.push(l);
+  }
+  return blocks.filter(b => b.lines.some(x => x.trim()));
+}
+const isSectionHeading = b => b.heading !== null && /^## /.test(b.heading);
+const headingNumber = h => { const m = /^#{2,6} +(\d+(?:\.\d+)*)\b/.exec(h); return m ? m[1] : h.replace(/^#+ +/, ''); };
+// The m-part layout of a kind (`##` cuts, heading cuts, rule cuts) whose largest part is
+// smallest, so that growth lands evenly; null when the kind admits fewer than m parts. Dynamic
+// programming over the block prefix sums: best[k][i] is the smallest largest part of the first
+// i blocks in k parts, the last part starting at an allowed cut; ties go to the earliest cut.
+function layoutParts(blocks, sizes, m, allowed) {
+  const n = blocks.length;
+  if (m === 1) return [[0, n]];
+  const prefix = [0]; for (const s of sizes) prefix.push(prefix[prefix.length - 1] + s);
+  let best = new Array(n + 1).fill(Infinity); best[0] = 0; // zero parts cover zero blocks
+  const starts = []; // starts[k - 1][i]: where the last of k parts covering i blocks begins
+  for (let k = 1; k <= m; k++) {
+    const cur = new Array(n + 1).fill(Infinity), at = new Array(n + 1).fill(-1);
+    for (let i = 1; i <= n; i++) {
+      for (let j = 0; j < i; j++) {
+        if (best[j] === Infinity || (j > 0 && !allowed(blocks[j]))) continue;
+        const v = Math.max(best[j], prefix[i] - prefix[j]);
+        if (v < cur[i]) { cur[i] = v; at[i] = j; }
+      }
+    }
+    starts.push(at); best = cur;
+  }
+  if (best[n] === Infinity) return null;
+  const parts = []; let i = n;
+  for (let k = m; k >= 1; k--) { const j = starts[k - 1][i]; parts.unshift([j, i]); i = j; }
+  return parts;
+}
+// One section's pages from its parts: the page options addPage takes, in part order. With one
+// part this is the page the site always published; with more, every part repeats the section's
+// front matter and carries the part line, the whole contents and the links to the other parts.
+function specSectionPages(p, parts) {
+  const m = parts.length;
+  const plainSrc = stripH1(PLAIN[p.slug]).replace(/\n+Rules: [^\n]*\n?$/, '\n');
+  const bodies = parts.map(part => {
+    const toc = [], used = new Set(['main', 'status-heading', 'contents', 'plain']), tables = { n: 0 };
+    const html = md(part.src, { ruleLinks: true, page: part.page, toc, used, tables });
+    return { toc, used, tables, html };
+  });
+  const contents = bodies.flatMap((b, k) => b.toc.filter(t => !/ \(continued\)$/.test(t.html)).map(t => ({ ...t, part: k })));
+  const partLink = x => `<a href="${x.url}">part ${x.n}</a>`;
+  return parts.map((part, k) => {
+    const { used, tables, html } = bodies[k];
+    const prev = parts[k - 1], next = parts[k + 1];
+    const partLine = m === 1 ? '' : `<nav class="toc" aria-label="Parts of this section"><p><strong>Part ${part.n} of ${m}</strong>, ${part.range}. This section is published in ${PART_WORDS[m] || m} parts so that each page stays within the budget of ${REF('AGSC-06-21')}; a rule's link names the part that carries it. ${parts.filter(x => x !== part).map(x => `<a href="${x.url}"${x === prev ? ' rel="prev"' : x === next ? ' rel="next"' : ''}>Part ${x.n}</a> carries ${x.range}`).join('; ')}.</p></nav>\n`;
+    const endLine = m === 1 ? '' : `<p class="parts">${next ? `End of part ${part.n} of ${m}; <a href="${next.url}" rel="next">part ${next.n}</a> continues with ${next.range}.` : `End of part ${part.n} of ${m}, the last part of this section; ${partLink(parts[0])} begins it${prev && prev !== parts[0] ? ` and ${partLink(prev)} precedes this one` : ''}.`}</p>\n`;
+    return { url: part.url, opts: {
+      title: m === 1 ? p.h1 : `${p.h1} (part ${part.n} of ${m})`, heading: esc(p.h1), summary: summaryOf(p.url),
+      description: `${p.h1} — section ${p.slug.slice(0, 2)} of the AgenticSystemCore specification ${SPEC_VERSION}${m === 1 ? '' : `, part ${part.n} of ${m} (${part.range})`}.`, section: '/specs/', wide: true,
+      jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: p.h1, url: `${BASE}specs/${part.page}/`, version: SPEC_VERSION, license: 'https://www.apache.org/licenses/LICENSE-2.0', author: { '@type': 'Person', name: config.site.author }, isPartOf: `${BASE}specs/`, ...(m === 1 ? {} : { pagination: `Part ${part.n} of ${m}` }) },
+      body: statusBlock()
+        + partLine
+        + `<aside class="plain" aria-labelledby="plain"><h2 id="plain">In plain language</h2>\n${md(plainSrc, { ruleLinks: true, page: part.page, used, tables })}<p class="id">This box explains; the rules below decide. New to the notation? See <a href="/docs/reading-the-specification/">how to read the specification</a>.</p>\n</aside>\n`
+        + figure(SPEC_DIAGRAM[p.slug])
+        + (contents.length ? `<nav class="toc" aria-labelledby="contents"><h2 id="contents">Contents</h2>\n<ol>\n${contents.map(t => `<li><a href="${t.part === k ? '' : parts[t.part].url}#${t.id}">${t.html}</a>${t.part === k ? '' : ` <span class="id">part ${parts[t.part].n}</span>`}</li>`).join('\n')}\n</ol></nav>\n` : '')
+        + html
+        + endLine
+        + editLink('engine', `spec/${p.file}`),
+    } };
+  });
+}
+const SPEC_PARTS = new Map(); // section slug -> its parts [{ n, page, url, src, range }]
+RULE_INDEX_DECIDED = true; // from here on the index is refined section by section, and every trial render below uses it
+{
+  const traced = RULES_WITHOUT_TRACE.length; // trial renders report the same rules again; only the final render's report counts
+  const kinds = [isSectionHeading, b => b.heading !== null, () => true];
+  const OWNER = new Map(RULE_INDEX); // the section each id belongs to, as the provisional index says
+  // Sections are laid out in order, and a trial render links a rule of a LATER section to the
+  // page the index still names for it — a few bytes shorter than the final link if that section
+  // is then split. So the layout is confirmed by a final render of every page; if one overflows
+  // the budget by that drift, every section is laid out again with a margin, until none does.
+  for (let margin = 0; ; margin += 1000) {
+    if (margin > 5000) die('the layout of the specification pages does not settle (AGSC-06-21)');
+    for (const p of specPages) {
+      const own = [...OWNER].filter(([, v]) => v === p.slug).map(([k]) => k); // the ids this section carries
+      for (const id of own) RULE_INDEX.set(id, p.slug);
+      // the size of each block rendered on its own, on the section's first page
+      const blocks = specBlocks(p.src), sizes = blocks.map(b => Buffer.byteLength(md(`${b.lines.join('\n')}\n`, { ruleLinks: true, page: p.slug, used: new Set(), tables: { n: 0 } })));
+      const partsOf = ranges => ranges.map(([a, b], k) => {
+        const n = k + 1, page = n === 1 ? p.slug : `${p.slug}/page-${n}`;
+        const first = blocks[a], continued = n > 1 && !isSectionHeading(first);
+        const src = `${continued ? `${first.section} (continued)\n\n` : ''}${blocks.slice(a, b).map(x => x.lines.join('\n')).join('\n')}\n`;
+        const numbers = blocks.slice(a, b).filter(isSectionHeading).map(x => headingNumber(x.heading));
+        if (continued) numbers.unshift(`${headingNumber(first.section)} (continued)`);
+        const range = numbers.length > 1 ? `${numbers[0]} to ${numbers[numbers.length - 1]}` : numbers[0] || 'the opening';
+        return { n, page, url: `/specs/${page}/`, src, range };
+      });
+      let parts = null;
+      for (let m = 1; m <= 9 && !parts; m++) {
+        for (const allowed of kinds) {
+          const ranges = layoutParts(blocks, sizes, m, allowed);
+          if (!ranges) continue;
+          const candidate = partsOf(ranges);
+          for (const id of own) RULE_INDEX.set(id, p.slug);
+          for (const part of candidate) {
+            for (const x of part.src.matchAll(/^\s*- \*\*(AGSC-\d{2}-\d{2,3}[a-z]?)\*\*/gm)) if (own.includes(x[1])) RULE_INDEX.set(x[1], part.page);
+            for (const x of part.src.matchAll(/^\| `(AGSC-E\d{3})` \|/gm)) if (own.includes(x[1])) RULE_INDEX.set(x[1], part.page);
+          }
+          if (specSectionPages(p, candidate).every(({ url, opts }) => Buffer.byteLength(page({ url, ...opts })) <= PAGE_BUDGET - margin)) { parts = candidate; break; }
+        }
+      }
+      if (!parts) die(`spec/${p.file}: no layout in up to nine parts keeps every page within the ${PAGE_BUDGET} byte budget (AGSC-06-21); the largest block that cannot be cut renders to ${Math.max(...sizes)} bytes`);
+      SPEC_PARTS.set(p.slug, parts);
+    }
+    if (specPages.every(p => specSectionPages(p, SPEC_PARTS.get(p.slug)).every(({ url, opts }) => Buffer.byteLength(page({ url, ...opts })) <= PAGE_BUDGET))) break;
+  }
+  RULES_WITHOUT_TRACE.length = traced;
+}
+
 // specification index and sections
 addPage('/specs/', {
   title: 'Specification', summary: summaryOf('/specs/'), description: `The AgenticSystemCore specification ${SPEC_VERSION}: twelve sections, the discovery profile and the conformance levels.`, section: '/specs/',
@@ -1187,35 +1339,21 @@ addPage('/specs/', {
   body: `${statusBlock()}<p>New to the notation? Read <a href="/docs/reading-the-specification/">how to read the specification</a> first: it explains the rule identifiers, the key words and the small bracketed references. Each section below opens with a summary, a plain-language box and a diagram before the normative text.</p>
 <h2 id="sections">Sections</h2>
 <ol class="index" start="0">
-${specPages.map(p => `<li><a href="${p.url}">${esc(p.h1.replace(/^AGSC-\d{2} — /, ''))}</a> <span class="id">AGSC-${p.slug.slice(0, 2)}</span><br><span class="snippet">${esc(summaryOf(p.url))}</span></li>`).join('\n')}
+${specPages.map(p => `<li><a href="${p.url}">${esc(p.h1.replace(/^AGSC-\d{2} — /, ''))}</a> <span class="id">AGSC-${p.slug.slice(0, 2)}</span><br><span class="snippet">${esc(summaryOf(p.url))}</span>${SPEC_PARTS.get(p.slug).length > 1 ? `<br><span class="snippet">Published in ${PART_WORDS[SPEC_PARTS.get(p.slug).length] || SPEC_PARTS.get(p.slug).length} parts: ${SPEC_PARTS.get(p.slug).map(x => `<a href="${x.url}">part ${x.n}</a> (${x.range})`).join(', ')}.</span>` : ''}</li>`).join('\n')}
 </ol>
 <h2 id="profile">Discovery profile</h2>
 <p><a href="/specs/agentic-knowledge/">The knowledge link set profile</a> documents the discovery document that every node serves at <code>${WELLKNOWN}</code>.</p>
 <h2 id="mcp-extension">MCP extension</h2>
 <p><a href="/specs/mcp/">The MCP knowledge extension</a> is the reference text of <code>${esc(MCP_EXTENSION)}</code>, the identifier by which a Model Context Protocol server says that the knowledge it serves is also published as a Bundle.</p>
 <h2 id="conformance">Conformance</h2>
-<p>A claim names exactly one Level, the <code>spec_version</code> and the vector set it passed (<a class="ref" href="/specs/00-overview/#AGSC-00-12">AGSC-00-12</a>, <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-01">AGSC-10-01</a>). This site claims <strong>Level 0</strong> against <code>${esc(SPEC_VERSION)}</code>.</p>
+<p>A claim names exactly one Level, the <code>spec_version</code> and the vector set it passed (${REF('AGSC-00-12')}, ${REF('AGSC-10-01')}). This site claims <strong>Level 0</strong> against <code>${esc(SPEC_VERSION)}</code>.</p>
 ${figure('levels')}<h2 id="licence">Licence</h2>
 <p>The specification text is published under the Apache License 2.0 with the reference implementation. The schemas, the ontology and the identifiers are released under CC0 1.0.</p>
 `,
 });
-for (const p of specPages) {
-  const toc = [], used = new Set(['main', 'status-heading', 'contents', 'plain']);
-  const tables = { n: 0 };
-  const bodyHtml = md(p.src, { ruleLinks: true, page: p.slug, toc, used, tables });
-  const h1end = bodyHtml.indexOf('</h1>\n') + 6;
-  const plainSrc = stripH1(PLAIN[p.slug]).replace(/\n+Rules: [^\n]*\n?$/, '\n');
-  addPage(p.url, {
-    title: p.h1, summary: summaryOf(p.url), description: `${p.h1} — section ${p.slug.slice(0, 2)} of the AgenticSystemCore specification ${SPEC_VERSION}.`, section: '/specs/', wide: true,
-    jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: p.h1, url: `${BASE}specs/${p.slug}/`, version: SPEC_VERSION, license: 'https://www.apache.org/licenses/LICENSE-2.0', author: { '@type': 'Person', name: config.site.author }, isPartOf: `${BASE}specs/` },
-    body: statusBlock()
-      + `<aside class="plain" aria-labelledby="plain"><h2 id="plain">In plain language</h2>\n${md(plainSrc, { ruleLinks: true, page: p.slug, used, tables })}<p class="id">This box explains; the rules below decide. New to the notation? See <a href="/docs/reading-the-specification/">how to read the specification</a>.</p>\n</aside>\n`
-      + figure(SPEC_DIAGRAM[p.slug])
-      + (toc.length ? `<nav class="toc" aria-labelledby="contents"><h2 id="contents">Contents</h2>\n<ol>\n${toc.map(t => `<li><a href="#${t.id}">${t.html}</a></li>`).join('\n')}\n</ol></nav>\n` : '')
-      + bodyHtml.slice(h1end)
-      + editLink('engine', `spec/${p.file}`),
-  });
-}
+// The section pages, one per part, rendered now that every section is laid out and every
+// rule link therefore names its final page.
+for (const p of specPages) for (const { url, opts } of specSectionPages(p, SPEC_PARTS.get(p.slug))) addPage(url, opts);
 
 // the profile page (the 303 target of the profile URI and of every …/rel#<name>)
 {
@@ -1232,6 +1370,7 @@ for (const p of specPages) {
     ['contribute', 'A contribution endpoint, with <code>agsc-contribute-mode</code>.', ['AGSC-11-14']],
     ['access', 'Where a reader obtains credentials for a restricted node.', ['AGSC-11-20']],
     ['signature', 'A detached signature over the canonical bytes of the discovery document. OPTIONAL: at 1.x no rule pins the signature format, no Level requires the link, and a reader ignores it.', ['AGSC-06-08', 'AGSC-06-10']],
+    ['boards', 'The live boards of the node, <code>/boards/index.json</code>, present when the Bundle holds at least one task item.', ['AGSC-06-10', 'AGSC-10-13']],
   ];
   const registered = [
     ['describedby', 'The target describes this node. On the anchor it points at <code>graph.jsonld</code>; in page headers it points at this document.', ['AGSC-06-08', 'AGSC-06-25']],
@@ -1345,15 +1484,15 @@ function nsPage(url, versioned) {
 <dt>Version IRI</dt><dd><code>${esc(one(ONTOLOGY_IRI, OWL + 'versionIRI'))}</code> (<code>owl:versionInfo</code> ${esc(VERSION_INFO)})</dd>
 <dt>Terms</dt><dd>${counts[0]} classes, ${counts[1]} object properties, ${counts[2]} datatype properties</dd>
 <dt>Licence</dt><dd><a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a></dd>
-<dt>Profile</dt><dd>OWL 2 RL (<a class="ref" href="/specs/05-graph/#AGSC-05-22">AGSC-05-22</a>)</dd>
+<dt>Profile</dt><dd>OWL 2 RL (${REF('AGSC-05-22')})</dd>
 </dl>
 ${versioned ? '' : figure('spec-05-graph')}<h2 id="representations">Representations</h2>
 <ul>
 <li><a href="${prefix}agsc.ttl">Turtle</a>, <code>text/turtle</code>: the normative source.</li>
-<li><a href="${prefix}context.jsonld">JSON-LD context</a>, <code>application/ld+json</code>, generated from the Turtle (<a class="ref" href="/specs/06-surfaces/#AGSC-06-32">AGSC-06-32</a>).</li>
+<li><a href="${prefix}context.jsonld">JSON-LD context</a>, <code>application/ld+json</code>, generated from the Turtle (${REF('AGSC-06-32')}).</li>
 <li><a href="${prefix}agsc.rdf">RDF/XML</a>, <code>application/rdf+xml</code>, and <a href="${prefix}agsc.nt">N-Triples</a>, <code>application/n-triples</code>, both generated from the Turtle. Most browsers download these two rather than showing them.</li>
 ${versioned ? '' : '<li>The JSON Schemas of the specification, <a href="/ns/schema/item.schema.json">item</a>, <a href="/ns/schema/bundle.schema.json">bundle</a> and <a href="/ns/schema/config.schema.json">configuration</a>, <code>application/json</code>, at the addresses their <code>$id</code> names.</li>\n'}</ul>
-<p>${STATUS.w3id ? 'The namespace IRI negotiates between these representations through w3id.org' : 'Once the w3id.org redirects are registered, the namespace IRI will negotiate between these representations'} (<a class="ref" href="/specs/06-surfaces/#AGSC-06-06">AGSC-06-06</a>). ${versioned ? `This is the copy of version <code>${esc(VERSION_INFO)}</code>.` : `The copy of this version is at <a href="/ns/${esc(VERSION_INFO)}/"><code>/ns/${esc(VERSION_INFO)}/</code></a>; the pre-release version path stays in use until the specification reaches 1.0.0 (<a class="ref" href="/specs/05-graph/#AGSC-05-25">AGSC-05-25</a>).`}</p>
+<p>${STATUS.w3id ? 'The namespace IRI negotiates between these representations through w3id.org' : 'Once the w3id.org redirects are registered, the namespace IRI will negotiate between these representations'} (${REF('AGSC-06-06')}). ${versioned ? `This is the copy of version <code>${esc(VERSION_INFO)}</code>.` : `The copy of this version is at <a href="/ns/${esc(VERSION_INFO)}/"><code>/ns/${esc(VERSION_INFO)}/</code></a>; the pre-release version path stays in use until the specification reaches 1.0.0 (${REF('AGSC-05-25')}).`}</p>
 ${tbl('classes', 'Classes', 'class')}${tbl('object-properties', 'Object properties', 'object')}${tbl('datatype-properties', 'Datatype properties', 'datatype')}`,
   });
   put(`${prefix.slice(1)}agsc.ttl`, TTL);
@@ -1442,8 +1581,8 @@ addPage('/compose/', {
   title: 'Compose', summary: summaryOf('/compose/'), description: 'Select items and compute a Harness in this page — no server, no key, no upload; the same seven tools a browser assistant sees.', section: null,
   scripts: ['/compose/agsc-core.js', '/compose/agsc-page-tools.js', '/compose/agsc-compose.js', '/compose/webmcp.js'],
   jsonld: { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Compose', url: `${BASE}compose/`, applicationCategory: 'DeveloperApplication', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' }, author: { '@type': 'Person', name: config.site.author } },
-  body: `<p>Tick the items you want. The closure algebra of <a class="ref" href="/specs/07-composition/#AGSC-07-01">AGSC-07-01</a> runs <em>in this page</em>: no request leaves this origin, no key is needed and nothing is uploaded. The seven Harness files are offered one download per file, or all together as one .zip.</p>
-<p>This page also offers the seven tools of <a class="ref" href="/specs/09-conformance/#AGSC-09-13">AGSC-09-13</a> to a browser assistant that supports them, as every item and guide page does. See <a href="/about/#tools-for-browser-assistants">Tools for browser assistants</a>.</p>
+  body: `<p>Tick the items you want. The closure algebra of ${REF('AGSC-07-01')} runs <em>in this page</em>: no request leaves this origin, no key is needed and nothing is uploaded. The seven Harness files are offered one download per file, or all together as one .zip.</p>
+<p>This page also offers the seven tools of ${REF('AGSC-09-13')} to a browser assistant that supports them, as every item and guide page does. See <a href="/about/#tools-for-browser-assistants">Tools for browser assistants</a>.</p>
 <h2 id="items-heading">Items</h2>
 <ul id="items" aria-labelledby="items-heading"><li>Loading the published graph…</li></ul>
 <h2 id="verdict-heading">Verdict</h2>
@@ -1463,7 +1602,7 @@ addPage('/compose/', {
 // the guide (site/docs/*.md, hand-authored, plus the tagged documents rendered through slots)
 const statusRows = [
   ['Specification <code>' + esc(SPEC_VERSION) + '</code>', SPEC_SOURCE === 'tag' ? 'Live' : 'Draft', SPEC_SOURCE === 'tag' ? `Tagged on ${esc(SPEC_DATE)}; twelve sections at <a href="/specs/">/specs/</a>; the vocabulary and the vectors are frozen at the tag.` : 'A draft release candidate, not yet tagged; twelve sections at <a href="/specs/">/specs/</a>. The vocabulary and the vectors freeze at the tag.'],
-  ['This site as a node of its own specification', 'Live', `Items, <a href="/graph.jsonld"><code>graph.jsonld</code></a> with <a href="/graph.nq"><code>graph.nq</code></a> and <a href="/graph.ttl"><code>graph.ttl</code></a>, <a href="/llms.txt"><code>llms.txt</code></a>, <a href="/chunks.jsonl"><code>chunks.jsonl</code></a>, the <a href="/skills/">skill packs</a>, the <a href="/now/">NOW page</a> and the <a href="${WELLKNOWN}">discovery document</a>. The discovery validator checks it at Level 2 before every publish, and every digest it declares is compared with the bytes served. No conformance claim is made before <code>1.0.0</code> (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-05">AGSC-10-05</a>).`],
+  ['This site as a node of its own specification', 'Live', `Items, <a href="/graph.jsonld"><code>graph.jsonld</code></a> with <a href="/graph.nq"><code>graph.nq</code></a> and <a href="/graph.ttl"><code>graph.ttl</code></a>, <a href="/llms.txt"><code>llms.txt</code></a>, <a href="/chunks.jsonl"><code>chunks.jsonl</code></a>, the <a href="/skills/">skill packs</a>, the <a href="/now/">NOW page</a> and the <a href="${WELLKNOWN}">discovery document</a>. The discovery validator checks it at Level 2 before every publish, and every digest it declares is compared with the bytes served. No conformance claim is made before <code>1.0.0</code> (${REF('AGSC-10-05')}).`],
   ['The machine files, written by the reference engine', 'Live', `Every file above is emitted by <code>agsc build</code> over this repository's own content, and this site republishes those bytes rather than deriving them a second time. The pages of this site are written by this repository's own generator, which keeps the hand-written guide; the engine writes the same design for every other node. See <a href="/exports/">the list of machine-readable files</a>.`],
   ['Ontology files', 'Live', `Turtle, JSON-LD context, RDF/XML and N-Triples at <a href="/ns/">/ns/</a>.`],
   ['Namespace through w3id.org', STATUS.w3id ? 'Live' : 'Not yet resolving', regText.w3id],
@@ -1472,9 +1611,9 @@ const statusRows = [
   ['Internet-Draft', STATUS.draft ? 'Posted' : 'Not yet posted', regText.draft + (STATUS.draft ? '' : ' It will describe the discovery layer only and request two registrations: the well-known suffix and the profile URI.')],
   ['Preprint', STATUS.preprint ? 'Published' : 'In preparation', regText.preprint],
   ['Reference engine <code>agsc</code>', 'In preparation', 'The engine is written, and it builds this site: every machine-readable file here is emitted by <code>agsc build</code> over this repository&#39;s own content. The package itself is not published yet.'],
-  ['Independent validators', 'In preparation', 'The nine checker contracts of <a class="ref" href="/specs/09-conformance/#AGSC-09-90">AGSC-09-90</a> &#8212; seven validators and two generators &#8212; exist in the reference distribution, which is not published yet, beside its artefact counter and its benchmark tool; the maintainer&#39;s own tools stay in the repository. One validator, for the discovery document, checks this site at Level 2 before every publish.'],
-  ['Contribution channel', 'Live', `Declared in the <a href="${WELLKNOWN}">discovery document</a> as a pull-request target (<a class="ref" href="/specs/11-boundary/#AGSC-11-14">AGSC-11-14</a>), and every page generated from a source file carries a <em>Propose an edit</em> link to that file. Nothing is written without a person merging it.`],
-  ...(PATTERNS_NODE ? [['Patterns catalogue as a second node', 'In preparation', `The catalogue of agentic system patterns is being prepared as a second node at <code>patterns.agenticsystemcore.com</code>. ${PEERS.length ? 'This node already names it as a peer in the discovery document; the mutual check of <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a> passes once both are published.' : 'It is not declared as a peer yet.'}`]] : []),
+  ['Independent validators', 'In preparation', `The nine checker contracts of ${REF('AGSC-09-90')} &#8212; seven validators and two generators &#8212; exist in the reference distribution, which is not published yet, beside its artefact counter and its benchmark tool; the maintainer&#39;s own tools stay in the repository. One validator, for the discovery document, checks this site at Level 2 before every publish.`],
+  ['Contribution channel', 'Live', `Declared in the <a href="${WELLKNOWN}">discovery document</a> as a pull-request target (${REF('AGSC-11-14')}), and every page generated from a source file carries a <em>Propose an edit</em> link to that file. Nothing is written without a person merging it.`],
+  ...(PATTERNS_NODE ? [['Patterns catalogue as a second node', 'In preparation', `The catalogue of agentic system patterns is being prepared as a second node at <code>patterns.agenticsystemcore.com</code>. ${PEERS.length ? `This node already names it as a peer in the discovery document; the mutual check of ${REF('AGSC-10-12')} passes once both are published.` : 'It is not declared as a peer yet.'}`]] : []),
   ['Papers', 'Planned', 'Journal and conference papers follow the preprint; none is submitted.'],
 ];
 const statusTable = `<div class="table-wrap" tabindex="0" role="region" aria-label="Status"><table>
@@ -1490,8 +1629,8 @@ const registrationsTable = `<div class="table-wrap" tabindex="0" role="region" a
 <tr><th scope="row">Profile URI <code>${PROFILE}</code></th><td>IANA Profile URIs registry (RFC 7284)</td><td>First Come First Served</td><td>${regText.profile}</td></tr>
 <tr><th scope="row">Internet-Draft on the discovery layer</th><td>IETF Datatracker, Independent Submission Stream</td><td>Reviewed by the Independent Submissions Editor</td><td>${regText.draft}</td></tr>
 <tr><th scope="row">Namespace <code>agentic-system-core</code></th><td>w3id.org permanent identifiers</td><td>Pull request reviewed by the w3id maintainers</td><td>${regText.w3id}</td></tr>
-<tr><th scope="row">Discovery link relation</th><td>IANA Link Relations registry</td><td>None needed: the registered relation <code>describedby</code> (registered by W3C POWDER; RFC 6892 registers its inverse <code>describes</code>) is used with the media type (<a class="ref" href="/specs/06-surfaces/#AGSC-06-25">AGSC-06-25</a>)</td><td>No request</td></tr>
-<tr><th scope="row">MCP extension identifier <code>${esc(MCP_EXTENSION)}</code></th><td>MCP extensions mechanism (SEP-2133)</td><td>Reverse-domain identifier declared by the server; no registry entry (<a class="ref" href="/specs/11-boundary/#AGSC-11-18">AGSC-11-18</a>)</td><td>Declared in the specification; the reference text is at <a href="/specs/mcp/">/specs/mcp/</a></td></tr>
+<tr><th scope="row">Discovery link relation</th><td>IANA Link Relations registry</td><td>None needed: the registered relation <code>describedby</code> (registered by W3C POWDER; RFC 6892 registers its inverse <code>describes</code>) is used with the media type (${REF('AGSC-06-25')})</td><td>No request</td></tr>
+<tr><th scope="row">MCP extension identifier <code>${esc(MCP_EXTENSION)}</code></th><td>MCP extensions mechanism (SEP-2133)</td><td>Reverse-domain identifier declared by the server; no registry entry (${REF('AGSC-11-18')})</td><td>Declared in the specification; the reference text is at <a href="/specs/mcp/">/specs/mcp/</a></td></tr>
 </tbody></table></div>
 `;
 const publicationsHtml = `<ul>
@@ -1567,7 +1706,7 @@ const quickstartHtml = () => {
       if (m && !ENGINE_VERBS.has(m[1])) die(`quickstart ${id}: "${m[1]}" is not a verb of the engine (AGSC-09-07)`);
     }
   }
-  return `<h2 id="quickstart">Quickstart</h2>\n<p>One short path per kind of visitor, each of at most ten lines; the commands are the reference engine\'s (<a class="ref" href="/specs/09-conformance/#AGSC-09-07">AGSC-09-07</a>) and the build checks every verb named here against it (<a class="ref" href="/specs/06-surfaces/#AGSC-06-24">AGSC-06-24</a>).</p>\n`
+  return `<h2 id="quickstart">Quickstart</h2>\n<p>One short path per kind of visitor, each of at most ten lines; the commands are the reference engine\'s (${REF('AGSC-09-07')}) and the build checks every verb named here against it (${REF('AGSC-06-24')}).</p>\n`
     + QUICKSTART.map(([id, title, steps]) => `<h3 id="quickstart-${id.toLowerCase()}">${esc(id)} &#8212; ${esc(title)}</h3>\n<ol>\n${steps.map(s => `<li><code>${esc(s)}</code></li>`).join('\n')}\n</ol>\n`).join('');
 };
 
@@ -1598,15 +1737,15 @@ addPage('/legal/', {
 <tr><td>The specification text</td><td><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>, as published with the reference implementation</td></tr>
 </tbody></table></div>
 <h2 id="terms">Content Use Terms 1.0</h2>
-<p>The identifier <code>${TERMS_ID}</code> names this exact text, not a file name: the file <code>LICENSE-CONTENT</code> at the root of the specification's distribution, ${Buffer.byteLength(TERMS_TEXT)} bytes, SHA-256 <code>${TERMS_SHA256}</code> (<a class="ref" href="/specs/06-surfaces/#AGSC-06-18">AGSC-06-18</a>). A distribution that ships different wording must use a different identifier; a reader may check the hash.</p>
+<p>The identifier <code>${TERMS_ID}</code> names this exact text, not a file name: the file <code>LICENSE-CONTENT</code> at the root of the specification's distribution, ${Buffer.byteLength(TERMS_TEXT)} bytes, SHA-256 <code>${TERMS_SHA256}</code> (${REF('AGSC-06-18')}). A distribution that ships different wording must use a different identifier; a reader may check the hash.</p>
 <pre tabindex="0" class="terms"><code>${esc(TERMS_TEXT.replace(/\n$/, ''))}</code></pre>
 <h2 id="signals">Machine-readable signals</h2>
-<p>The same policy is stated three ways (<a class="ref" href="/specs/06-surfaces/#AGSC-06-18">AGSC-06-18</a>): the AI-usage signals of <a href="/robots.txt"><code>/robots.txt</code></a>, the TDM reservation in <a href="/.well-known/tdmrep.json"><code>/.well-known/tdmrep.json</code></a>, and the <code>schema:license</code> and <code>schema:usageInfo</code> members of <a href="/graph.jsonld"><code>/graph.jsonld</code></a> together with the provenance header of <a href="/llms.txt"><code>/llms.txt</code></a>.</p>
+<p>The same policy is stated three ways (${REF('AGSC-06-18')}): the AI-usage signals of <a href="/robots.txt"><code>/robots.txt</code></a>, the TDM reservation in <a href="/.well-known/tdmrep.json"><code>/.well-known/tdmrep.json</code></a>, and the <code>schema:license</code> and <code>schema:usageInfo</code> members of <a href="/graph.jsonld"><code>/graph.jsonld</code></a> together with the provenance header of <a href="/llms.txt"><code>/llms.txt</code></a>.</p>
 <h2 id="ai-assistance">How this text was written</h2>
 <p>${esc(config.site.author)} writes and maintains this work with the help of AI assistants. A person decides what is written and why. An assistant drafts and checks text under the author&#39;s direction. The author reads, edits and approves every sentence before it is published, and answers for all of it.</p>
 <p>Every item on this node records how its text was made &#8212; written by a person, written with AI assistance, generated by a model, or imported from elsewhere &#8212; and names the person accountable for it. You can read that record on the item&#39;s own page and in the machine-readable views.</p>
 <p>No model runs on this site, in its build, or in any check that decides whether a change is accepted.</p>
-<p>In the words the machine-readable exports use, which are a constant of the specification and are never authored here (<a class="ref" href="/specs/06-surfaces/#AGSC-06-15">AGSC-06-15</a>): <q>${esc(engineProvenance.ASSISTANCE)}</q></p>
+<p>In the words the machine-readable exports use, which are a constant of the specification and are never authored here (${REF('AGSC-06-15')}): <q>${esc(engineProvenance.ASSISTANCE)}</q></p>
 <h2 id="disclaimer">What this work does not claim</h2>
 <p><strong>No warranty.</strong> This work is published as it is. Nothing here is promised to be complete, correct, current or fit for any purpose.</p>
 <p><strong>No liability.</strong> Use it at your own risk. To the fullest extent the law allows, the author is not liable for anything that follows from using it, including any indirect, incidental, special or consequential loss and any loss of data, profit or business. Nothing here excludes or limits a liability that the law does not allow to be excluded or limited.</p>
@@ -1943,6 +2082,10 @@ ${PUBLIC_ARTEFACT.map(p => `${p}\n  Access-Control-Allow-Origin: *\n  Access-Con
 /ns/schema/*.json
   Content-Type: application/json; charset=utf-8
 `);
+// No entry for a section published in parts: a fragment such as `/specs/06-surfaces/#AGSC-06-22`
+// never reaches the server, so nothing here could send it to `/specs/06-surfaces/page-2/`. Every
+// link to a rule is derived from the rule index instead, and scripts/check.js refuses one that lands
+// on the wrong page.
 put('_redirects', `# Generated by scripts/build.js — do not hand-edit (AGSC-06-04).
 # The 0.0.x discovery path (AGSC-06-17).
 /.well-known/agentic-knowledge ${WELLKNOWN} 301

@@ -27,7 +27,7 @@ node scripts/check.js      # the gate: reproducible build, llms vectors, discove
 ```
 
 Needs Node 22.13 or later and the engine repository at `../agentic-system-core` (or
-`AGSC_ENGINE=<path>`), with its `npm ci` done. `SOURCE_DATE_EPOCH` fixes the build
+`SITE_ENGINE=<path>`), with its `npm ci` done. `SOURCE_DATE_EPOCH` fixes the build
 instant; without it the instant comes from the last commit.
 
 Optional browser lanes, with `playwright-core` and `axe-core` installed **outside** this

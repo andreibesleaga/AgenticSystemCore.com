@@ -22,6 +22,7 @@ The specification is written for implementers and is exact by design. This guide
 | [Start here](/docs/start-here/) | One reading path per kind of reader |
 | [Introduction](/docs/introduction/) | What is this, what is new about it, who is it for |
 | [The six modes](/docs/modes/) | Auto-wiki with an optional agent lane, distributed agentic memory, live specifications, evolving skills, runnable knowledge, the live board — a self-driving shared board |
+| [Demos](/docs/demos/) | Every mode and every persona as a five-minute demo: the commands, the printed lines, what each proves — kept true by a test |
 | [How it works](/docs/how-it-works/) | The build, the proposal lifecycle, discovery, import and export, determinism, safety |
 | [Data model](/docs/data-model/) | The six item types, the fourteen links, clusters, sources, provenance |
 | [Architecture](/docs/architecture/) | arc42 and C4 views, bounded contexts, ports, deployment, decisions, threat model |

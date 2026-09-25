@@ -130,11 +130,11 @@
 <div class="table-wrap" tabindex="0" role="region" aria-label="Measured, reproducible"><table>
 <thead><tr><th scope="col">What</th><th scope="col">Result</th><th scope="col">Reproduce with</th></tr></thead>
 <tbody>
-<tr><th scope="row">Conformance</th><td>164 vectors pass, 0 fail, of 194 (30 withdrawn); 322 of 332 active rules have a machine check</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer conformance --scratch &lt;dir&gt;</code></td></tr>
+<tr><th scope="row">Conformance</th><td>167 vectors pass, 0 fail, of 199 (32 withdrawn); 322 of 332 active rules have a machine check</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer conformance --scratch &lt;dir&gt;</code></td></tr>
 <tr><th scope="row">Determinism</th><td>49 files compared across two builds, and across time zones and locales: 0 differ</td><td><code>node bench/measure.js --layer determinism</code></td></tr>
 <tr><th scope="row">Security floor</th><td>85/85 seeded faults handled, 13/13 clean controls left alone. This proves neither safety nor the absence of new kinds of injection (AGSC-08-19)</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer security --scratch &lt;dir&gt;</code></td></tr>
 <tr><th scope="row">Accessibility</th><td>0 automated violations on the 61 pages this site had when it was measured, in the light and dark schemes; automated checks find only part of what matters, so this is a floor, not a claim</td><td><code>NODE_PATH=&lt;scratch&gt;/node_modules CHROME_EXE=&lt;chrome&gt; node bench/measure.js --layer a11y --nodes &lt;name&gt;=&lt;www&gt;,…</code></td></tr>
-<tr><th scope="row">Build scale</th><td>5,000 items built in 37.1 s, 10,000 in 75.0 s (median of three runs, one machine); 0 pages over the 100 KB budget</td><td><code>node bench/measure.js --layer perf   # sizes 100 500 501 1000 5000 10000, 3 runs each, median</code></td></tr>
+<tr><th scope="row">Build scale</th><td>5,000 items built in 30.2 s, 10,000 in 58.5 s (median of three runs, one machine); 0 pages over the 100 KB budget</td><td><code>node bench/measure.js --layer perf --scratch &lt;dir&gt; --sizes 100,500,1000,5000,10000 --runs 3   # 2026-09-25, after the write-path change</code></td></tr>
 <tr><th scope="row">Tokens per chunk</th><td>median 94 tokens per chunk of this site's chunk export (cl100k_base)</td><td><code>NODE_PATH=&lt;scratch&gt;/node_modules node bench/measure.js --layer tokens --nodes &lt;name&gt;=&lt;www&gt;,… --exports &lt;name&gt;=&lt;dir&gt;,…</code></td></tr>
 </tbody></table></div>
 <h2 id="get-started">Get started</h2>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demos — AgenticSystemCore</title>
+<meta name="description" content="Runnable demos of AgenticSystemCore: the six modes and the thirteen personas, each with the exact commands, the printed lines and what it proves, kept true by a test.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/demos/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/demos/">
+<meta property="og:title" content="Demos">
+<meta property="og:description" content="Runnable demos of AgenticSystemCore: the six modes and the thirteen personas, each with the exact commands, the printed lines and what it proves, kept true by a test.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Demos","description":"Runnable demos of AgenticSystemCore: the six modes and the thirteen personas, each with the exact commands, the printed lines and what it proves, kept true by a test.","url":"https://agenticsystemcore.com/docs/demos/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Demos</h1>
+<p class="summary"><strong>Summary</strong>Every mode and every persona as a small demo you can run in under five minutes from an empty folder: the exact commands, the lines they print, and the one thing each proves. Every command is run by a test in the engine repository, so this page cannot drift from the engine.</p>
+<p>Reading about six modes is one thing; seeing each one do something is another. The engine repository carries one page of demos, <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/DEMOS.md">docs/DEMOS.md</a>, and a test, <code>tests/docs/demos.test.js</code>, that runs every command on that page in a scratch folder and compares what was printed with what the page says. This page is the short form: what each demo does, the commands, and the lines to look for. The full page has every step and every expected line.</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Node.js 22.13 or later, <code>git</code> and a POSIX shell. Everything runs offline; no account, no key.</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir agsc-demos &amp;&amp; cd agsc-demos
+npm install agentic-system-core          # or, from a clone: npm install /path/to/agentic-system-core
+export PATH=&quot;$PWD/node_modules/.bin:$PATH&quot;
+export ENGINE=&quot;$PWD/node_modules/agentic-system-core&quot;
+export SOURCE_DATE_EPOCH=1789380000      # 2026-09-14T10:00:00Z, the build instant of every line below</code></pre>
+<p><code>ENGINE</code> is where the demo files live (<code>examples/demos/</code>, one small folder per mode, derived from the engine's own minimal fixture) and where the checkers are. The fixed build instant is what makes the printed timestamps reproducible; nothing else depends on it.</p>
+<h2 id="mode-0-the-self-correcting-wiki">Mode 0 — the self-correcting wiki</h2>
+<p><strong>What it proves.</strong> Plain notes become a checked, linked, agent-readable site with no model; a broken link stops publication; a person's edit becomes a proposal a person merges; the review lane reaches no model.</p>
+<pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-0-wiki&quot; . &amp;&amp; cd mode-0-wiki/notes
+agsc init                                          # adopts the notes, writes the configuration
+mkdir -p .well-known &amp;&amp; cp ../security.txt .well-known/security.txt
+cp ../boiling-point.md content/concepts/boiling-point.md
+printf 'Salt it like [pasta water](%s).\n' salting.md &gt;&gt; content/concepts/brewing.md
+agsc lint                                          # error: AGSC-E310 … resolves to nothing … brewing.md:4
+agsc build                                         # error: AGSC-E901 … emits no route for it; nothing under www/
+grep -v salting content/concepts/brewing.md &gt; brewing.tmp &amp;&amp; mv brewing.tmp content/concepts/brewing.md
+agsc build                                         # build: pass — www/ holds the site, graph.jsonld, llms.txt, search.json, the discovery document
+grep -A2 '## Stale items' www/now.md               # - boiling-point
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'adopted notes'
+printf '\nCoarser for a French press.\n' &gt;&gt; content/concepts/grind-size.md
+agsc lint --fix &amp;&amp; agsc propose grind-size         # writes dist/proposal/1.patch and prints the git commands, runs none
+agsc review                                        # lane: review is lint-only — no model call is reachable from it
+agsc ci &amp;&amp; agsc verify --ledger                    # ci: pass … verify: pass</code></pre>
+<p>Personas: the drop-in user, the human reader, the human contributor, the maintainer.</p>
+<h2 id="an-agent-on-the-same-wiki">An agent on the same wiki</h2>
+<p><strong>What it proves.</strong> An assistant gets seven tools over a Bundle — <code>search</code>, <code>read</code>, <code>links</code>, <code>compose</code>, <code>ask</code>, <code>propose</code>, <code>remember</code> — with nothing leaving the machine; every answer is marked <code>untrusted</code> and carries its licence; <code>propose</code> and <code>remember</code> hand back text and write nothing; the same seven tools on a published page give the same answers.</p>
+<p>Two small scripts stand in for an assistant: <code>mcp-call.js</code> starts <code>agsc mcp</code> and sends the three JSON-RPC lines every Model Context Protocol client sends first; <code>page-tools.js</code> loads the three scripts an item page loads and calls a tool the way the page does.</p>
+<pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-1-memory/a&quot; wiki &amp;&amp; cd wiki &amp;&amp; agsc build
+node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; search '{&quot;query&quot;:&quot;handoff&quot;}'
+node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; ask '{&quot;question&quot;:&quot;how does a handoff work&quot;}' &gt; ask.json
+node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; ask '{&quot;question&quot;:&quot;quantum chromodynamics&quot;}'   # &quot;body&quot;: &quot;no answer in this memory&quot;
+node &quot;$ENGINE/examples/demos/agents/page-tools.js&quot; www ask '{&quot;question&quot;:&quot;how does a handoff work&quot;}' &gt; page-ask.json
+cmp ask.json page-ask.json &amp;&amp; echo &quot;the page tools and the tool server gave the same answer&quot;</code></pre>
+<p>The <code>search</code> answer, as printed:</p>
+<pre tabindex="0" data-lang="text"><code>{
+  &quot;body&quot;: {
+    &quot;hits&quot;: [
+      { &quot;iri&quot;: &quot;https://a.example/concepts/handoff/&quot;, &quot;score&quot;: 1, &quot;slug&quot;: &quot;handoff&quot;, &quot;title&quot;: &quot;Handoff&quot; },
+      { &quot;iri&quot;: &quot;https://a.example/concepts/supervisor/&quot;, &quot;score&quot;: 1, &quot;slug&quot;: &quot;supervisor&quot;, &quot;title&quot;: &quot;Supervisor&quot; }
+    ]
+  },
+  &quot;license&quot;: &quot;LicenseRef-AgenticSystemCore-Content-Use-1.0&quot;,
+  &quot;source&quot;: &quot;search&quot;,
+  &quot;trust&quot;: &quot;untrusted&quot;,
+  &quot;type&quot;: &quot;items&quot;
+}</code></pre>
+<p>In a browser whose assistant supports in-page tools, every item page and the <code>/compose/</code> page register the same seven tools through <code>document.modelContext</code>; nothing is installed and no server runs. Connecting a real assistant is four lines of configuration per assistant, in the engine's <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md">assistant guide</a>. Personas: the agent reader, the agent proposer, the agent using a node as memory.</p>
+<h2 id="mode-1-distributed-memory">Mode 1 — distributed memory</h2>
+<p><strong>What it proves.</strong> Two nodes that name each other pass the mutual check with no server between them; a one-sided claim fails; every link in a discovery document carries a digest; the memory exports and re-imports without loss; a node written without the engine passes the shipped checker.</p>
+<pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-1-memory&quot; . &amp;&amp; cd mode-1-memory &amp;&amp; cp &quot;$ENGINE/LICENSE-CONTENT&quot; b/
+for n in a b c; do (cd $n &amp;&amp; git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m &quot;node $n&quot; &amp;&amp; agsc build); done
+node &quot;$ENGINE/tools/validate-wellknown&quot; a/www/.well-known/knowledge-linkset --level 2 --peer b/www/.well-known/knowledge-linkset
+#   validate-wellknown pass (level 2): 22 input file(s) read, 0 error(s), 0 warning(s)
+node &quot;$ENGINE/tools/validate-wellknown&quot; a/www/.well-known/knowledge-linkset --level 2 --peer c/www/.well-known/knowledge-linkset
+#   error AGSC-E907 resolved, not mutual: no rel#peer names https://c.example/.well-known/knowledge-linkset
+(cd b &amp;&amp; agsc export --markdown &amp;&amp; agsc export --okf &amp;&amp; agsc export --jsonld &amp;&amp; agsc export --to llm-context)
+mkdir fresh &amp;&amp; cd fresh &amp;&amp; agsc init &amp;&amp; agsc import ../b/dist/export/okf --from okf   # import: 3 written, 0 replaced, 0 unchanged
+agsc import ../b/dist/export/okf --from okf                                         # import: 0 written, 0 replaced, 3 unchanged
+cd .. &amp;&amp; node &quot;$ENGINE/tools/validate-wellknown&quot; level-0/.well-known/knowledge-linkset --level 0   # pass (level 0)</code></pre>
+<p>Personas: the standards implementer, the port implementer, the agent using a node as memory.</p>
+<h2 id="mode-2-live-specifications">Mode 2 — live specifications</h2>
+<p><strong>What it proves.</strong> A project's decisions, specifications, tasks and gates are ordinary items; a gate compiles into forge files whose one required check is a check a CI job really reports; the steering files an assistant reads are the same bytes for every assistant; a person reading the pages sees a task's state, a gate's checks and a decision's typed links.</p>
+<pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-2-project&quot; . &amp;&amp; cd mode-2-project
+agsc ci                                            # ci: pass; dist/gate.json, dist/forge/ruleset.json, dist/forge/status-checks.json
+cat dist/forge/status-checks.json                  # [&quot;links&quot;,&quot;review&quot;,&quot;schema&quot;]
+agsc export --steer                                # export --steer: 2 targets (agents, claude), identical bytes at each path
+agsc build
+grep -o '&lt;dt&gt;Task state&lt;/dt&gt;&lt;dd&gt;&lt;code&gt;[A-Z_]*&lt;/code&gt;&lt;/dd&gt;' www/concepts/task-login-tests/index.html   # TASK_STATE_WORKING</code></pre>
+<p>Persona: the project team.</p>
+<h2 id="mode-3-the-evolving-skills-library">Mode 3 — the evolving skills library</h2>
+<p><strong>What it proves.</strong> Procedures become skill packs, one per cluster, with a lockfile of digests; a pack installs with one command, a second run changes nothing, an update shows its diff, and a pack that no longer matches its lockfile installs nothing; a pack of this format imports back into its procedures, and a foreign skill comes in as a procedure in the cluster you name.</p>
+<pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-3-skills&quot; . &amp;&amp; cd mode-3-skills
+agsc skills                                        # skills: 2 packs under dist/skills/
+agsc skills install .claude/skills                 # skills install: 2 written, 0 unchanged
+agsc skills install .claude/skills                 # skills install: 0 written, 2 unchanged
+printf '\nInjected.\n' &gt;&gt; dist/skills/login/SKILL.md
+agsc skills install .agents/skills                 # error: AGSC-E413 … nothing was installed
+cd .. &amp;&amp; cp -r &quot;$ENGINE/examples/demos/mode-1-memory/a&quot; other &amp;&amp; cd other
+agsc import &quot;$ENGINE/examples/demos/mode-3-skills/foreign&quot; --from skills --cluster agent-patterns   # import: 1 written</code></pre>
+<p>Persona: the integrator.</p>
+<h2 id="mode-4-runnable-knowledge">Mode 4 — runnable knowledge</h2>
+<p><strong>What it proves.</strong> A selection of items becomes a Harness — the seven file kinds and an archive — and the tool server gives the same verdict for the same selection; the runtime renderings the specification names are not shipped, and the engine says so; <code>run --dry-run</code> lists a procedure's steps and refuses a program outside the allow list; <code>run</code> refuses to execute without an isolating runner; a traced run becomes an Episode whose spend the NOW page counts.</p>
+<pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-4-compose&quot; . &amp;&amp; cd mode-4-compose
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'runnable knowledge'
+agsc compose handoff run-the-tests task-login-form --zip   # dist/harness/&lt;name&gt;/ with AGENTS.md, arc42.md, decisions/, diagram.mmd, harness.jsonld, skills/, workspace.dsl, and the archive
+agsc compose handoff --emit crewai                          # error: AGSC-E001 … named by AGSC-07-18 but is not implemented at this milestone
+agsc run greet --dry-run                                    # run: step 1: echo hello … nothing executed
+agsc run fetch --dry-run                                    # [REFUSED: not in run.allow[]]
+agsc run greet                                              # error: AGSC-E001 run executed nothing … does not declare network isolation
+agsc trace run1.json &amp;&amp; agsc build &amp;&amp; grep -A4 '## Monthly spend' www/now.md   # spent: 0.25 USD, cap: 1 USD</code></pre>
+<p>A person on the built node's <code>/compose/</code> page ticks the same items and downloads the archive; its bytes equal the one <code>compose --zip</code> wrote. That needs a browser, so the engine's browser test lane proves it. Persona: the architect.</p>
+<h2 id="mode-5-the-live-board">Mode 5 — the live board</h2>
+<p><strong>What it proves.</strong> A cluster of tasks is a board published as JSON; an agent lane claims a task by proposing its working state through the tool server, which returns a patch and writes nothing; once a person applies and commits that patch, the build derives who holds the task from the commit; from then on every other claim of that task is refused — for a stranger, on the page as on the tool server — and the lane's work-in-progress limit refuses its second claim; a dry run of the lane proposes the Episode of the run, which the NOW page counts.</p>
+<pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-5-board&quot; . &amp;&amp; cd mode-5-board
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'the board' &amp;&amp; agsc build
+node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; propose '{&quot;agent&quot;:&quot;worker&quot;,&quot;at&quot;:&quot;2026-09-14&quot;,&quot;slug&quot;:&quot;task-login-form&quot;,&quot;task_state&quot;:&quot;TASK_STATE_WORKING&quot;}' &gt; claim.json
+node -e 'process.stdout.write(require(&quot;./claim.json&quot;).body.patch);' &gt; claim.patch
+git apply claim.patch &amp;&amp; git add content &amp;&amp; git commit -q -m 'claim task-login-form' -m 'Channel-Auto: worker'
+agsc build &amp;&amp; grep -o 'claimed by &lt;span&gt;[^&lt;]*&lt;/span&gt;' www/boards/login/index.html    # claimed by &lt;span&gt;process:worker&lt;/span&gt;
+node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; propose '{&quot;agent&quot;:&quot;someone-else&quot;,&quot;at&quot;:&quot;2026-09-14&quot;,&quot;slug&quot;:&quot;task-login-form&quot;,&quot;task_state&quot;:&quot;TASK_STATE_WORKING&quot;}'
+#   &quot;code&quot;: &quot;AGSC-E511&quot; — the task is already TASK_STATE_WORKING under process:worker; the first merged claim wins
+agsc refresh --agent worker --dry-run                # writes dist/proposal/1.patch with the run's Episode; prints the commands, runs none</code></pre>
+<p>Personas: the self-driving team, the agent proposer.</p>
+<h2 id="what-needs-something-you-may-not-have">What needs something you may not have</h2>
+<ul>
+<li><strong>A browser with an assistant</strong> — the in-page tools and the <code>/compose/</code> download. The page-tools script runs the page's own code without a browser; the engine's browser test lane runs a real Chromium.</li>
+<li><strong>A forge</strong> — the pull request, the required check, automatic merging. <code>propose</code> prints the commands, <code>ci</code> writes the enforcement files, the shipped action runs <code>agsc ci</code>; opening and merging is the forge's.</li>
+<li><strong>A model key</strong> — an agent lane that writes pages. The engine ships no model adapter; <code>refresh --agent &lt;name&gt; --dry-run</code> runs the lane's gates and budget and proposes the Episode, without a model call.</li>
+<li><strong>An isolating runner</strong> — <code>agsc run</code> executing a step. None ships; <code>run --dry-run</code> resolves the steps and <code>run</code> refuses with the reason.</li>
+</ul>
+<h2 id="how-the-page-stays-true">How the page stays true</h2>
+<p>The engine's test reads the full demos page, runs every marked command block in order in a fresh scratch folder with the fixed build instant and an empty git identity, and asserts that every line the page says to expect was printed, exactly. When the engine changes what it prints, that test fails and the page is corrected — never the other way round. The <a href="/docs/scenarios/">scenarios</a> are the same behaviour written as Given/When/Then; the <a href="/docs/modes/">six modes</a> explain what each mode is for.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/demos.md">Propose an edit</a> — opens <code>site/docs/demos.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">patterns.agenticsystemcore.com</a></p>
+</footer>
+</body>
+</html>

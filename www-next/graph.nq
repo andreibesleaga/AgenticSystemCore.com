@@ -262,7 +262,7 @@
 <https://agenticsystemcore.com/concepts/now/#source-1> <http://purl.org/dc/terms/title> "AGSC-00-07"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/#source-1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Source> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/#source-1> <https://w3id.org/agentic-system-core/ns#grade> "primary"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
-<https://agenticsystemcore.com/concepts/now/#source-2> <http://purl.org/dc/terms/source> "https://agenticsystemcore.com/specs/06-surfaces/#AGSC-06-22"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/now/#source-2> <http://purl.org/dc/terms/source> "https://agenticsystemcore.com/specs/06-surfaces/page-2/#AGSC-06-22"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/#source-2> <http://purl.org/dc/terms/title> "AGSC-06-22"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/#source-2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Source> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/#source-2> <https://w3id.org/agentic-system-core/ns#grade> "primary"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .

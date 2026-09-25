@@ -4,18 +4,21 @@
 // www/; (2) the llms layout against vectors disc-0013/disc-0014 of the specification;
 // (3) the discovery document with the engine's tools/validate-wellknown at Level 0;
 // (4) every HTML page: structure, accessibility basics, unique ids, internal links and
-// fragments, no third-party loads, CSP-compatible markup, the 100 KB budget; (5) machine
-// files: JSON parses, NFC, one trailing LF, _headers and _redirects content, sitemap targets;
-// (6) WCAG contrast of the colour tokens in both schemes.
+// fragments, no third-party loads, CSP-compatible markup, the 100 KB budget; (4a) every active
+// rule of spec/ anchored exactly once under /specs/, and every link to a rule id — in a page, in
+// the graph, in a machine view — landing on the page that carries it, since a section over the
+// page budget is published in parts; (5) machine files: JSON parses, NFC, one trailing LF,
+// _headers and _redirects content, sitemap targets; (6) WCAG contrast of the colour tokens in
+// both schemes.
 'use strict';
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const ROOT = path.resolve(__dirname, '..');
-const ENGINE = path.resolve(ROOT, process.env.AGSC_ENGINE || '../agentic-system-core');
-const SPEC_TAG = process.env.AGSC_SPEC_TAG || '1.0.0-rc.6';
+const ENGINE = path.resolve(ROOT, process.env.SITE_ENGINE || '../agentic-system-core');
+const SPEC_TAG = process.env.SITE_SPEC_TAG || '1.0.0-rc.6';
 // The same parameter scripts/build.js reads: the vectors come from the release tag, and from the
 // engine's working tree while the candidate has not been tagged yet.
 const tagExists = cp.spawnSync('git', ['-C', ENGINE, 'rev-parse', '-q', '--verify', `${SPEC_TAG}^{commit}`], { stdio: 'ignore' }).status === 0;
-const SPEC_SOURCE = process.env.AGSC_SPEC_SOURCE || (tagExists ? 'tag' : 'worktree');
+const SPEC_SOURCE = process.env.SITE_SPEC_SOURCE || (tagExists ? 'tag' : 'worktree');
 const engineFile = p => SPEC_SOURCE === 'tag'
   ? cp.execFileSync('git', ['-C', ENGINE, 'show', `${SPEC_TAG}:${p}`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
   : fs.readFileSync(path.join(ENGINE, p), 'utf8');
@@ -125,6 +128,24 @@ else {
   }
 }
 
+// The generator's own knobs never carry the engine's `AGSC_` prefix: the engine reads every
+// `AGSC_*` name of the process environment as a configuration override (AGSC-01-37, AGSC-09-09)
+// and refuses one it does not know (`AGSC-E004`), and every script here hands its environment to
+// the engine's child processes. So a knob of this repository — in a script or in a workflow's
+// `env:` block — is named `SITE_*` (or `ENGINE_REF`), never `AGSC_*`.
+{
+  const scripts = fs.readdirSync(path.join(ROOT, 'scripts')).filter(f => f.endsWith('.js')).map(f => path.join(ROOT, 'scripts', f));
+  for (const f of scripts) {
+    const hit = /process\.env\.(AGSC_[A-Z0-9_]+)/.exec(fs.readFileSync(f, 'utf8'));
+    ok(hit === null, `${path.relative(ROOT, f)} reads ${hit && hit[1]}: a knob of this repository must not carry the engine's AGSC_ prefix (the engine refuses it as an unknown override, AGSC-E004)`);
+  }
+  const workflows = path.join(ROOT, '.github', 'workflows');
+  for (const f of fs.existsSync(workflows) ? fs.readdirSync(workflows).filter(f => /\.ya?ml$/.test(f)) : []) {
+    const hit = /^\s+(AGSC_[A-Z0-9_]+):\s/m.exec(fs.readFileSync(path.join(workflows, f), 'utf8'));
+    ok(hit === null, `.github/workflows/${f} sets ${hit && hit[1]} in an env block: the engine's child processes would refuse it (AGSC-E004)`);
+  }
+}
+
 const files = fs.existsSync(WWW) ? walk(WWW) : [];
 const exists = p => fs.existsSync(p) && fs.statSync(p).isFile();
 const targetFile = urlPath => {
@@ -133,6 +154,32 @@ const targetFile = urlPath => {
   if (p.endsWith('/')) return exists(path.join(f, 'index.html')) ? path.join(f, 'index.html') : null;
   return exists(f) ? f : null;
 };
+// (4a) the page each rule lives on. A section over the page budget is published in parts
+// (AGSC-06-21; scripts/build.js, "the layout of the specification pages"), so the page a rule
+// lives on is a fact of the build, not of the section's name. Every active rule of spec/ has
+// exactly one anchor under /specs/, and every link to a rule id must land on that page.
+const engineList = dir => (SPEC_SOURCE === 'tag'
+  ? cp.execFileSync('git', ['-C', ENGINE, 'ls-tree', '--name-only', `${SPEC_TAG}:${dir}`], { encoding: 'utf8' }).split('\n')
+  : fs.readdirSync(path.join(ENGINE, dir))).filter(Boolean).sort();
+const RULE_PAGE = new Map(); // rule id or error code -> the built page that anchors it
+const RULE_ID = /^AGSC-(?:\d{2}-\d{2,3}[a-z]?|E\d{3})$/;
+let retiredAnchors = 0;
+for (const f of files.filter(f => /^specs\/.*index\.html$/.test(rel(f)))) {
+  for (const m of fs.readFileSync(f, 'utf8').matchAll(/<(?:li|tr) id="(AGSC-(?:\d{2}-\d{2,3}[a-z]?|E\d{3}))"(?: class="rule-item( retired)?")?>/g)) {
+    if (RULE_PAGE.has(m[1])) fails.push(`${rel(f)}: ${m[1]} is anchored a second time (first on ${rel(RULE_PAGE.get(m[1]))})`);
+    else RULE_PAGE.set(m[1], f);
+    if (m[2]) retiredAnchors++;
+  }
+}
+const activeRules = new Set(), retiredRules = new Set();
+for (const f of engineList('spec').filter(f => /^\d{2}-[a-z0-9-]+\.md$/.test(f)))
+  for (const m of engineFile(`spec/${f}`).matchAll(/^\s*- \*\*(AGSC-\d{2}-\d{2,3}[a-z]?)\*\*(\s*\*\(retired at)?/gm)) (m[2] ? retiredRules : activeRules).add(m[1]);
+for (const id of activeRules) ok(RULE_PAGE.has(id), `active rule ${id} has no anchor under /specs/`);
+for (const [id, f] of RULE_PAGE) if (!id.startsWith('AGSC-E')) ok(activeRules.has(id) || retiredRules.has(id), `${rel(f)}: anchors ${id}, which spec/ does not define`);
+const activeAnchors = [...RULE_PAGE.keys()].filter(id => activeRules.has(id)).length;
+const specPageCount = new Set([...RULE_PAGE.values()]).size;
+/** The page a rule link must land on, as a route, for a message. */
+const routeOf = f => '/' + rel(path.dirname(f)) + '/';
 const idsOf = new Map();
 const idsIn = html => [...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
 for (const f of files.filter(f => f.endsWith('.html'))) idsOf.set(f, new Set(idsIn(fs.readFileSync(f, 'utf8'))));
@@ -169,6 +216,7 @@ for (const f of files.filter(f => f.endsWith('.html'))) {
     const tf = p === '' ? f : targetFile(p);
     if (!tf) { E(`broken internal link: ${href}`); continue; }
     if (frag !== undefined && frag !== '' && tf.endsWith('.html') && !idsOf.get(tf).has(frag)) E(`broken fragment: ${href}`);
+    else if (frag !== undefined && RULE_ID.test(frag) && RULE_PAGE.has(frag) && RULE_PAGE.get(frag) !== tf) E(`rule link lands on the wrong page: ${href} — ${frag} is on ${routeOf(RULE_PAGE.get(frag))} (AGSC-06-21 parts)`);
   }
 }
 
@@ -181,6 +229,13 @@ for (const f of files) {
   if (s.normalize('NFC') !== s) fails.push(`${r}: not NFC (AGSC-E604)`);
   if (s.includes('\r') || !s.endsWith('\n') || s.endsWith('\n\n')) fails.push(`${r}: LF only, exactly one trailing LF`);
   if (/\.(json|jsonld)$/.test(r) || r === '.well-known/knowledge-linkset') { try { JSON.parse(s); } catch (e) { fails.push(`${r}: invalid JSON: ${e.message}`); } }
+  // (4a) for the machine files too — an item's `sources[].resource` in the graph, a machine
+  // view, the search index — a rule link names the page that carries the rule.
+  if (!r.endsWith('.html')) for (const m of s.matchAll(/(?:https:\/\/agenticsystemcore\.com)?\/specs\/([a-z0-9/-]+\/)#(AGSC-(?:\d{2}-\d{2,3}[a-z]?|E\d{3}))\b/g)) {
+    const want = RULE_PAGE.get(m[2]);
+    if (!want) fails.push(`${r}: links ${m[2]}, which no specification page anchors`);
+    else if (want !== targetFile(`/specs/${m[1]}`)) fails.push(`${r}: rule link lands on the wrong page: ${m[0]} — ${m[2]} is on ${routeOf(want)} (AGSC-06-21 parts)`);
+  }
   // The tagged requirements document names two forbidden framings in order to forbid them (NFR-12); that one quoted sentence is allowed.
   const t = ['no Web4/crypto framing, book or &quot;companion&quot; strings', 'no Web4/crypto framing, book or \\"companion\\" strings', 'with no reading order imposed', 'no &quot;start here&quot; link and no imposed reading order', 'no \\"start here\\" link and no imposed reading order'].reduce((x, q) => x.split(q).join(''), s);
   if (!r.startsWith('specs/') && r !== 'assets/search-site.json' && new RegExp(['wiley', 'companion', 'chapter \\d', 'reading order', 'discovery' + '-product', '05-' + 'WILEY'].join('|'), 'i').test(t)) fails.push(`${r}: forbidden string (AGSC-06-03 / private record)`);
@@ -273,4 +328,4 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
 }
 
 if (fails.length) { process.stderr.write(fails.map(f => `FAIL ${f}`).join('\n') + `\ncheck: ${fails.length} failure(s)\n`); process.exit(1); }
-process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, headers, contrast, public hygiene\n`);
+process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} retired on ${specPageCount} specification pages with every rule link on its page, headers, contrast, public hygiene\n`);

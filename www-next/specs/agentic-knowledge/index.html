@@ -91,7 +91,7 @@
 <p>A client finds the document in one of three ways:</p>
 <ul>
 <li>It requests <code>/.well-known/knowledge-linkset</code> on the node's origin (<a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a>).</li>
-<li>It follows <code>&lt;link rel=&quot;describedby&quot; href=&quot;/.well-known/knowledge-linkset&quot; type=&quot;application/linkset+json&quot;&gt;</code> in the head of a page (<a class="ref" href="/specs/06-surfaces/#AGSC-06-25">AGSC-06-25</a>).</li>
+<li>It follows <code>&lt;link rel=&quot;describedby&quot; href=&quot;/.well-known/knowledge-linkset&quot; type=&quot;application/linkset+json&quot;&gt;</code> in the head of a page (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-25">AGSC-06-25</a>).</li>
 <li>It follows the equivalent <code>Link</code> response header on <code>/</code> (<a class="ref" href="/specs/11-boundary/#AGSC-11-05">AGSC-11-05</a>).</li>
 </ul>
 <p><code>describedby</code> is a registered relation (registered by the W3C POWDER Recommendation; RFC 6892 registers its inverse, <code>describes</code>). The media type and the profile say what kind of description the target is, so no new relation name is needed.</p>
@@ -110,7 +110,7 @@
 <div class="table-wrap" tabindex="0" role="region" aria-label="Relation"><table>
 <thead><tr><th scope="col">Relation</th><th scope="col">Meaning</th><th scope="col">Rules</th></tr></thead>
 <tbody>
-<tr><th scope="row"><code>describedby</code></th><td>The target describes this node. On the anchor it points at <code>graph.jsonld</code>; in page headers it points at this document.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-25">AGSC-06-25</a></td></tr>
+<tr><th scope="row"><code>describedby</code></th><td>The target describes this node. On the anchor it points at <code>graph.jsonld</code>; in page headers it points at this document.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>, <a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-25">AGSC-06-25</a></td></tr>
 <tr><th scope="row"><code>alternate</code></th><td>The same knowledge in another representation, such as <code>/llms.txt</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a></td></tr>
 <tr><th scope="row"><code>license</code></th><td>The licence page of the node.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a></td></tr>
 <tr><th scope="row"><code>service-doc</code></th><td>Human documentation, such as <code>/specs/</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a></td></tr>
@@ -123,8 +123,8 @@
 <tbody>
 <tr id="graph"><th scope="row"><code>…/rel#graph</code></th><td>The RDF views of the Bundle, <code>/graph.ttl</code> and <code>/graph.nq</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/05-graph/#AGSC-05-06">AGSC-05-06</a></td></tr>
 <tr id="ontology"><th scope="row"><code>…/rel#ontology</code></th><td>The vocabulary the graph uses, <code>/ns/</code> and its files.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-06">AGSC-06-06</a></td></tr>
-<tr id="context"><th scope="row"><code>…/rel#context</code></th><td>The JSON-LD context file, <code>/ns/context.jsonld</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-32">AGSC-06-32</a></td></tr>
-<tr id="now"><th scope="row"><code>…/rel#now</code></th><td>The generated state page, <code>/now/</code> and <code>/now.md</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-22">AGSC-06-22</a></td></tr>
+<tr id="context"><th scope="row"><code>…/rel#context</code></th><td>The JSON-LD context file, <code>/ns/context.jsonld</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-32">AGSC-06-32</a></td></tr>
+<tr id="now"><th scope="row"><code>…/rel#now</code></th><td>The generated state page, <code>/now/</code> and <code>/now.md</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-22">AGSC-06-22</a></td></tr>
 <tr id="skills"><th scope="row"><code>…/rel#skills</code></th><td>The skill packs exported from Procedures, <code>/skills/index.json</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-01">AGSC-06-01</a></td></tr>
 <tr id="ledger"><th scope="row"><code>…/rel#ledger</code></th><td>The derived ledger, <code>/ledger.jsonl</code>, carrying <code>digest</code> and <code>agsc-ledger-head</code>.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-11">AGSC-06-11</a></td></tr>
 <tr id="peer"><th scope="row"><code>…/rel#peer</code></th><td>Another node's discovery document, for the mutual-conformance check.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a></td></tr>
@@ -132,6 +132,7 @@
 <tr id="contribute"><th scope="row"><code>…/rel#contribute</code></th><td>A contribution endpoint, with <code>agsc-contribute-mode</code>.</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-14">AGSC-11-14</a></td></tr>
 <tr id="access"><th scope="row"><code>…/rel#access</code></th><td>Where a reader obtains credentials for a restricted node.</td><td><a class="ref" href="/specs/11-boundary/#AGSC-11-20">AGSC-11-20</a></td></tr>
 <tr id="signature"><th scope="row"><code>…/rel#signature</code></th><td>A detached signature over the canonical bytes of the discovery document. OPTIONAL: at 1.x no rule pins the signature format, no Level requires the link, and a reader ignores it.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a></td></tr>
+<tr id="boards"><th scope="row"><code>…/rel#boards</code></th><td>The live boards of the node, <code>/boards/index.json</code>, present when the Bundle holds at least one task item.</td><td><a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>, <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-13">AGSC-10-13</a></td></tr>
 </tbody></table></div>
 <h2 id="target-attributes">Target attributes</h2>
 <p>Extension target attributes use the prefix <code>agsc-</code>, except <code>digest</code>. Every attribute value is an array of strings (<a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>).</p>
@@ -172,14 +173,14 @@
         },
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:ghlY759VcK7ymgQtJbERSrJlZmAHUNfwnNGrTZWn/as=:&quot;
+            &quot;sha-256=:2qz/K3nLFCei9QGBMGcJnM5dGvLv3nc8NWqpqPIhLZ0=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/exports/llms-ctx.txt&quot;,
           &quot;type&quot;: &quot;text/plain&quot;
         },
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:S7OtmJ7tfClhp4mBmxsRfUBvTOhxuEempgj9dpJHtyw=:&quot;
+            &quot;sha-256=:nRRWk/5r2RYwVA2jt83FRwVu7/VZygVFL1JmOLg3P3E=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/llms.txt&quot;,
           &quot;type&quot;: &quot;text/plain&quot;
@@ -189,10 +190,10 @@
       &quot;describedby&quot;: [
         {
           &quot;agsc-bundle-hash&quot;: [
-            &quot;sha-256=:RCUXjyMyUWYhb7cQhQl9ohU+knEL6j2jflsxoX0mofs=:&quot;
+            &quot;sha-256=:jFKpXNQcuxJXrica8AtQ04nOctFSC2YNFEzevsteCAo=:&quot;
           ],
           &quot;agsc-bundle-version&quot;: [
-            &quot;0.0.0+20.g96b0850a84b3&quot;
+            &quot;0.0.0+21.g391bb21eb0ca&quot;
           ],
           &quot;agsc-counts&quot;: [
             &quot;clusters=3&quot;,
@@ -203,16 +204,25 @@
             &quot;procedures=1&quot;
           ],
           &quot;agsc-generated-at&quot;: [
-            &quot;2026-09-24T11:41:59Z&quot;
+            &quot;2026-09-24T15:17:57Z&quot;
           ],
           &quot;agsc-spec-version&quot;: [
             &quot;1.0.0-rc.6&quot;
           ],
           &quot;digest&quot;: [
-            &quot;sha-256=:uWyOvJwKE3WqvpP/NwmrHrGWcDpnigx2ZVhxTlhDgsg=:&quot;
+            &quot;sha-256=:a7fVhYnYGSqRVvGzSVAf+eI7wlIA/FHicBJ9nUlo+lg=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/graph.jsonld&quot;,
           &quot;type&quot;: &quot;application/ld+json&quot;
+        }
+      ],
+      &quot;https://w3id.org/agentic-system-core/rel#boards&quot;: [
+        {
+          &quot;digest&quot;: [
+            &quot;sha-256=:KKs+kPv+ggZWigbv26scT/VdhPS7Jbg/LGIiqatO5lQ=:&quot;
+          ],
+          &quot;href&quot;: &quot;https://agenticsystemcore.com/boards/index.json&quot;,
+          &quot;type&quot;: &quot;application/json&quot;
         }
       ],
       &quot;https://w3id.org/agentic-system-core/rel#context&quot;: [
@@ -235,14 +245,14 @@
       &quot;https://w3id.org/agentic-system-core/rel#graph&quot;: [
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:amZ8LFviqz2OieLRXuE5bEwSFIrWQMO6bzk6Ghlpgz8=:&quot;
+            &quot;sha-256=:NZthH//uHA8cjYeO7nNP6r5PMYDi8xT438oy5/6z12g=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/graph.nq&quot;,
           &quot;type&quot;: &quot;application/n-quads&quot;
         },
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:ueqX4m2mzG1fWBWCZo0ouWaxAS6XoE/cdADjXH+MHO4=:&quot;
+            &quot;sha-256=:HbdcVJMbm4piuVQEvv09YXCngb26aA1QHA/rdcohL0c=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/graph.ttl&quot;,
           &quot;type&quot;: &quot;text/turtle&quot;
@@ -251,10 +261,10 @@
       &quot;https://w3id.org/agentic-system-core/rel#ledger&quot;: [
         {
           &quot;agsc-ledger-head&quot;: [
-            &quot;f29542e9afeebfdd4838182a542a58b1fbd87d4a45a32d7c7417b00db3b31a45&quot;
+            &quot;8f59b3db589e365b3708027527a2a084e2d6d6ece1e174c3923536b11f02eed5&quot;
           ],
           &quot;digest&quot;: [
-            &quot;sha-256=:8OR595EFWCI6+wVnSIjwzHKvuEJnxh7rXjpWwGcakN8=:&quot;
+            &quot;sha-256=:BId+rqbsRN1MSutZ5EHqZBbYn2zeW8VqQLzSpPTZMrQ=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/ledger.jsonl&quot;,
           &quot;type&quot;: &quot;application/jsonl&quot;
@@ -263,7 +273,7 @@
       &quot;https://w3id.org/agentic-system-core/rel#now&quot;: [
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:xPtH9LihQ2pCAz9l2zDns+J7yMCaBtF/cKUDWYp7oqk=:&quot;
+            &quot;sha-256=:cGixCEqu2bIoJ3Ukh+OHbUq5yNo7U/2Ex3IDUfz9ciY=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/now.md&quot;,
           &quot;type&quot;: &quot;text/markdown&quot;
@@ -287,7 +297,7 @@
       &quot;https://w3id.org/agentic-system-core/rel#skills&quot;: [
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:q7xL+KEKXY62IGGZNnfNzjcr/HYm0XD2IlTcoGeUhts=:&quot;
+            &quot;sha-256=:zEy83urzo+bwd6SbNMYJFV+JK80DTw2jdAqVtV8704I=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/skills/index.json&quot;,
           &quot;type&quot;: &quot;application/json&quot;

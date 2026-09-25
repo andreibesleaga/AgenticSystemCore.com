@@ -10,7 +10,7 @@
 //   node scripts/compare-baseline.js --shots A B      compare two screenshot directories
 //
 // The baseline is a capture of an earlier build, kept OUTSIDE this repository (it carries the
-// retired pages' wording, which is not published). Name its directory in AGSC_BASELINE_DIR;
+// retired pages' wording, which is not published). Name its directory in SITE_BASELINE_DIR;
 // the first two forms refuse to run without it (exit 2).
 //
 // Node >= 22, standard library only. Exit 0 when the site is the same, 1 when it is not.
@@ -47,9 +47,9 @@ const fs = require('fs'), path = require('path'), crypto = require('crypto'), zl
 
 const ROOT = path.resolve(__dirname, '..');
 const OUT = path.resolve(ROOT, (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www');
-const BASE = process.env.AGSC_BASELINE_DIR ? path.resolve(process.env.AGSC_BASELINE_DIR) : null;
+const BASE = process.env.SITE_BASELINE_DIR ? path.resolve(process.env.SITE_BASELINE_DIR) : null;
 if (BASE === null && process.argv[2] !== '--shots') {
-  console.error('compare-baseline: set AGSC_BASELINE_DIR to the directory that holds the baseline (it is kept outside this repository)');
+  console.error('compare-baseline: set SITE_BASELINE_DIR to the directory that holds the baseline (it is kept outside this repository)');
   process.exit(2);
 }
 const NORMDIR = BASE === null ? null : path.join(BASE, 'normalised');

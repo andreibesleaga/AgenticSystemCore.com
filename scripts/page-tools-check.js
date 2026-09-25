@@ -24,7 +24,7 @@
 const fs = require('fs'), path = require('path'), vm = require('node:vm'), crypto = require('crypto'), cp = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const ENGINE = path.resolve(ROOT, process.env.AGSC_ENGINE || '../agentic-system-core');
+const ENGINE = path.resolve(ROOT, process.env.SITE_ENGINE || '../agentic-system-core');
 const CONFIG = JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8'));
 const OUT = path.resolve(ROOT, (() => {
   const i = process.argv.indexOf('--out');
