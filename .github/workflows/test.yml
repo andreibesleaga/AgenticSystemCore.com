@@ -69,6 +69,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: andreibesleaga/agentic-system-core
+          # The engine repository is private until launch day, so another
+          # repository's default token cannot read it: until it is public, the
+          # owner stores a fine-grained token with read access to the engine's
+          # contents as the repository secret ENGINE_TOKEN. Once the engine is
+          # public the default
+          # token suffices and the secret may be deleted.
+          token: ${{ secrets.ENGINE_TOKEN || github.token }}
           ref: ${{ inputs.engine_ref || env.ENGINE_REF }}
           path: agentic-system-core
           fetch-depth: 0
