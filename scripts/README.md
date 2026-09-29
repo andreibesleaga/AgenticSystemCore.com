@@ -16,7 +16,6 @@ need `playwright-core` and `axe-core` installed outside the repository.
 | `page-tools-check.js` | proves the seven page tools against the built site, with no browser |
 | `a11y.js` | optional: axe-core over every page in both colour schemes, CSP, third-party requests, keyboard checks |
 | `shots.js`, `compare-baseline.js` | optional: screenshots, and the "the site still looks the same" comparison against a baseline kept outside the repository (`AGSC_SITE_BASELINE`) |
-| [legacy/](legacy/README.md) | the previous generator, frozen as a fallback |
 
 ```bash
 node scripts/build.js && node scripts/check.js   # "check: pass" when everything holds

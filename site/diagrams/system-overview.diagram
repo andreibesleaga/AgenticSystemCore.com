@@ -9,8 +9,8 @@ box disc 324 172 148 36 "discovery document" acc
 box files 16 100 120 60 "Markdown items|+ one config file"
 box build 176 100 104 60 "deterministic|build"
 arrow files build
-arrow build pages
+arrow build pages via=300,46
 arrow build graph
 arrow build llms
-arrow build disc
+arrow build disc via=300,190
 note "one folder in, every surface out — the same bytes on every machine"

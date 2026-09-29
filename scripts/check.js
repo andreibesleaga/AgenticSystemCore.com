@@ -173,7 +173,7 @@ for (const f of files.filter(f => /^specs\/.*index\.html$/.test(rel(f)))) {
 }
 const activeRules = new Set(), retiredRules = new Set();
 for (const f of engineList('spec').filter(f => /^\d{2}-[a-z0-9-]+\.md$/.test(f)))
-  for (const m of engineFile(`spec/${f}`).matchAll(/^\s*- \*\*(AGSC-\d{2}-\d{2,3}[a-z]?)\*\*(\s*\*\(retired at)?/gm)) (m[2] ? retiredRules : activeRules).add(m[1]);
+  for (const m of engineFile(`spec/${f}`).matchAll(/^\s*- \*\*(AGSC-\d{2}-\d{2,3}[a-z]?)\*\*(\s*\*\((?:retired at |reserved:))?/gm)) (m[2] ? retiredRules : activeRules).add(m[1]);
 for (const id of activeRules) ok(RULE_PAGE.has(id), `active rule ${id} has no anchor under /specs/`);
 for (const [id, f] of RULE_PAGE) if (!id.startsWith('AGSC-E')) ok(activeRules.has(id) || retiredRules.has(id), `${rel(f)}: anchors ${id}, which spec/ does not define`);
 const activeAnchors = [...RULE_PAGE.keys()].filter(id => activeRules.has(id)).length;
@@ -242,7 +242,7 @@ for (const f of files) {
   if (/\bWeb4\b|W3C (?:standard|Recommendation) for AgenticSystemCore/i.test(t)) fails.push(`${r}: forbidden claim`);
   if (/andrei\.besleaga\.nicolae@|abnmaster@|@gmail\.com/i.test(s)) fails.push(`${r}: the operator's e-mail address is published`);
 }
-// AGSC-06-21 as amended at rc.5: ≤1 MB per index document (decimal), sharded above 500 items.
+// AGSC-06-21: ≤1 MB per index document (decimal), sharded above 500 items.
 const searchJson = path.join(WWW, 'search.json');
 ok(exists(searchJson) && fs.statSync(searchJson).size <= 1000 * 1000, 'search.json missing or over the 1 MB index-document budget (AGSC-06-21)');
 const headers = exists(path.join(WWW, '_headers')) ? fs.readFileSync(path.join(WWW, '_headers'), 'utf8') : '';
@@ -328,4 +328,4 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
 }
 
 if (fails.length) { process.stderr.write(fails.map(f => `FAIL ${f}`).join('\n') + `\ncheck: ${fails.length} failure(s)\n`); process.exit(1); }
-process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} retired on ${specPageCount} specification pages with every rule link on its page, headers, contrast, public hygiene\n`);
+process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} reserved on ${specPageCount} specification pages with every rule link on its page, headers, contrast, public hygiene\n`);

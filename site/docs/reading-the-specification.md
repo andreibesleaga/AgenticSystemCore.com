@@ -1,7 +1,7 @@
 ---
 title: "Reading the specification"
-summary: "A key to the specification's notation: what the rule identifiers mean, how the key words MUST and SHOULD are used, what the small bracketed references at the end of each rule are, why some rules are marked retired, and how error codes, vectors and Levels fit together."
-description: "How to read the AgenticSystemCore specification: rule identifiers, BCP 14 key words, the bracketed trace references, retired rules, error codes, test vectors and conformance Levels."
+summary: "A key to the specification's notation: what the rule identifiers mean, how the key words MUST and SHOULD are used, what the small bracketed references at the end of each rule are, why some rules are marked reserved, and how error codes, vectors and Levels fit together."
+description: "How to read the AgenticSystemCore specification: rule identifiers, BCP 14 key words, the bracketed trace references, reserved rules, error codes, test vectors and conformance Levels."
 ---
 
 The specification is exact so that two implementers in two languages produce the same bytes. That exactness makes it dense. This page explains its conventions, so that the rule text can be read for what it says.
@@ -24,19 +24,18 @@ Most rules end with a bracketed note such as `[PRD-002]` or `[PRD-022, RFC 9264]
 | `OKF v0.2`, `RFC 9264`, `A2A §8.4` | An external document the rule follows | The [standards page](/docs/standards/) lists each with its version and the date it was checked |
 | `design` | The rule records a design choice of this specification rather than a requirement or an external document | The rule text itself |
 
-Earlier release candidates also carried, in these notes, identifiers of the editors' internal working records — decisions, review findings and research memos. They were removed from the text of the current candidate; the earlier tagged candidates keep them unchanged, because a tag never moves. A reader who wants to implement the specification needs none of them: the rule text, the schemas, the ontology and the vectors are complete on their own (AGSC-00-01).
 
 ## Drafted rules
 
 When a next release candidate is being drafted in the engine repository, its identifiers are shown here with a dotted underline and no link until it is tagged and published; none are pending now.
 
-## Retired rules
+## Reserved rules
 
-A rule marked *(retired at rc.3 or rc.4 …)* was found to say nothing that another rule did not already say, and was merged into that rule. Its identifier is kept and never reused, so that older citations still resolve, and the note says where its content now lives. Retired rules impose nothing.
+A rule marked *(reserved: …)* holds no requirement: while the specification was drafted, it was found to say nothing that another rule did not already say, and its content was merged into that rule, which the note names. Its identifier is kept and never reused (AGSC-00-16), so that a citation of it still resolves. Reserved rules impose nothing.
 
 ## Amendments
 
-A rule marked *(added at rc.3 …)*, *(amended at rc.3 …)*, *(added at rc.4 …)* or *(amended at rc.4 …)* changed at the third or the fourth release candidate, and the note names the decision behind it. Released sections are immutable: a change ships as a new version (AGSC-00-16).
+A rule may close with a short italic note in parentheses, such as *(amended …)* or *(corrected …)*: the rule changed while the specification was drafted, and the note gives the date and says what changed and why. The note is not part of what the rule requires. Released sections are immutable: a change ships as a new version (AGSC-00-16).
 
 ## Error codes
 

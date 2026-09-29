@@ -20,12 +20,6 @@
     },
     {
       "check": "wording",
-      "path": "www-next/docs/requirements/index.html",
-      "text": "NFR-12",
-      "reason": "NFR-12 names the forbidden framings in order to forbid them"
-    },
-    {
-      "check": "wording",
       "path": "scripts/build.js",
       "reason": "the build's forbidden-wording guard: the words it refuses to emit"
     },
@@ -33,11 +27,6 @@
       "check": "wording",
       "path": "scripts/check.js",
       "reason": "the gate's forbidden-wording list: the words it refuses on the site"
-    },
-    {
-      "check": "wording",
-      "path": "scripts/legacy/*.js",
-      "reason": "the frozen previous generator's forbidden-wording guard"
     },
     {
       "check": "process",

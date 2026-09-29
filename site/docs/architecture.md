@@ -78,7 +78,7 @@ The boundary rule between the last two: Interchange is foreign formats in both d
 
 {{diagram:bounded-contexts}}
 
-The context map: Knowledge feeds Distribution as a conformist supplier (Distribution renders what Knowledge validated and adds nothing); Knowledge feeds Composition as customer and supplier (Composition consumes the resolved graph; Knowledge does not know compositions exist); Governance feeds Distribution a published language of trailers and ledger entries. The Boundary context, added at rc.3, is an anti-corruption layer around every external surface, so that an external draft moving (the MCP handshake changed between its 2025 and 2026 revisions; the WebMCP report date moved) changes a declared version string and a plugin, never the core. Its interface is the four-rule plugin contract: declare, pin, inherit, prove (AGSC-11-16 to AGSC-11-19).
+The context map: Knowledge feeds Distribution as a conformist supplier (Distribution renders what Knowledge validated and adds nothing); Knowledge feeds Composition as customer and supplier (Composition consumes the resolved graph; Knowledge does not know compositions exist); Governance feeds Distribution a published language of trailers and ledger entries. The Boundary context is an anti-corruption layer around every external surface, so that an external draft moving (the MCP handshake changed between its 2025 and 2026 revisions; the WebMCP report date moved) changes a declared version string and a plugin, never the core. Its interface is the four-rule plugin contract: declare, pin, inherit, prove (AGSC-11-16 to AGSC-11-19).
 
 ## 6. Containers
 
@@ -220,7 +220,7 @@ The assets are the content repository, the engine repository and its packages, t
 | A skill pack carrying executables | The content-only rule on both export and install, a hash lockfile, a diff before every update |
 | Repudiation or a silent rewrite of history | Provenance on every item, the pull request as the record, force pushes blocked, the hash-chained ledger, mirrors and attested snapshots |
 
-Six further threats added at rc.3 (request forgery through peer fetch, exfiltration from a wrongly public restricted node, spam through contribution channels, surface spoofing, successor impersonation after a tombstone, and SVG attachments as carriers) are on the [compliance and security page](/docs/compliance/#security-considerations) with the rules that close them. Two residual risks are accepted and named: novel injection phrasing that no lint recognises, and the owner as the single approver.
+Six further threats (request forgery through peer fetch, exfiltration from a wrongly public restricted node, spam through contribution channels, surface spoofing, successor impersonation after a tombstone, and SVG attachments as carriers) are on the [compliance and security page](/docs/compliance/#security-considerations) with the rules that close them. Two residual risks are accepted and named: novel injection phrasing that no lint recognises, and the owner as the single approver.
 
 ## 14. The model in Structurizr DSL
 

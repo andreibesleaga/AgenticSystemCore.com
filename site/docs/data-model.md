@@ -14,7 +14,7 @@ An item is one Markdown file with a YAML header between `---` lines (AGSC-02-01)
 
 | Type | What it records | Notes |
 |---|---|---|
-| Concept | A unit of knowledge | Qualified by `kind`: `pattern`, `taxonomy`, `explainer`, `principle`, `decision`, `spec`, `task`, `term` (AGSC-02-12) or, since rc.3, `architecture` (AGSC-02-97) |
+| Concept | A unit of knowledge | Qualified by `kind`: `pattern`, `taxonomy`, `explainer`, `principle`, `decision`, `spec`, `task`, `term` (AGSC-02-12) or `architecture` (AGSC-02-97) |
 | Episode | Something that happened: a session, a run, an incident | Start, actor, outcome |
 | Procedure | Steps a reader can run | Exports one-to-one to a skill file |
 | Lesson | Knowledge distilled from one or more Episodes | Carries a severity; the set of Lessons is the node's error record |
@@ -56,9 +56,9 @@ Every item carries `prov` with an origin (`human`, `ai-assisted`, `ai-generated`
 
 ## Status
 
-`draft`, `stable`, `deprecated` and, since rc.3, `retired`. A retired item keeps its page and its address and leaves every export (AGSC-11-22). Slugs are never reused; a renamed or superseded slug produces a redirect (AGSC-06-04).
+`draft`, `stable`, `deprecated` and `retired`. A retired item keeps its page and its address and leaves every export (AGSC-11-22). Slugs are never reused; a renamed or superseded slug produces a redirect (AGSC-06-04).
 
-## Added at rc.3
+## Ports, architectures, attachments and task states
 
 Items may declare ports, `produces` and `consumes` type names, that the combiner wires (AGSC-02-96); a Concept of kind `architecture` stores a selection the combiner re-runs (AGSC-02-97); items may carry attachments under a safety allow-list, and a pattern's images must be SVG (AGSC-02-98); a task may carry one of the nine Agent2Agent task states verbatim (AGSC-02-99).
 

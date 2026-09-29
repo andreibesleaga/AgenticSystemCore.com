@@ -376,6 +376,22 @@ function pageClaimants(map) {
   }
   return out;
 }
+function pageDeclaresBoards(map) {
+  const raw = (map || {})['/.well-known/knowledge-linkset'];
+  if (typeof raw !== 'string') return false;
+  try {
+    const doc = JSON.parse(raw);
+    const context = (doc && doc.linkset && doc.linkset[0]) || null;
+    if (context === null || typeof context !== 'object') return false;
+    // The relation is `https://` + this suffix; matched by its suffix so that the
+    // emitted script names no absolute origin (AGSC-06-05).
+    const suffix = '//w3id.org/agentic-system-core/rel#boards';
+    return Object.keys(context).some((name) => name.slice(-suffix.length) === suffix
+      && Array.isArray(context[name]) && context[name].length > 0);
+  } catch (e) {
+    return false;
+  }
+}
 function pageBaseOf(map) {
   const raw = map['/.well-known/knowledge-linkset'];
   if (typeof raw === 'string') {
@@ -702,7 +718,7 @@ function pageToolset(corpus, core) {
       const kinds = pageKindToType();
       const kind = kinds[args.kind] === undefined ? 'concept' : args.kind;
       const type = kinds[kind];
-      // AGSC-09-14b as amended at rc.6: a Gate's Level is a governance decision a
+      // AGSC-09-14b: a Gate's Level is a governance decision a
       // tool call may not invent, and an episode's schema branch requires `actor`.
       if (args.kind === 'gate') {
         return pageErrorEnvelope('remember', 'AGSC-E203', 'remember does not accept kind "gate": a Gate\'s Level is a governance decision (AGSC-09-14b)');
@@ -1022,6 +1038,7 @@ function pageBoardMove(block, body, frontmatter, type, slug, args, claimedBy) {
     pageIndexOf: pageIndexOf,
     pageCorpus: pageCorpus,
     pageClaimants: pageClaimants,
+    pageDeclaresBoards: pageDeclaresBoards,
     pageBaseOf: pageBaseOf,
     pageEdges: pageEdges,
     pageCompare: pageCompare,
@@ -1075,7 +1092,9 @@ function pageBoardMove(block, body, frontmatter, type, slug, args, claimedBy) {
       }));
     }).then(function () {
       // AGSC-10-13: the board exports carry the derived `claimed_by` a claim is
-      // checked against (AGSC-10-17). A node with no task has no /boards/ route.
+      // checked against (AGSC-10-17). A node with no task has no /boards/ route and
+      // no rel#boards link, so the page asks for the index only when it is declared.
+      if (!pageDeclaresBoards(sources)) return null;
       return get('/boards/index.json').then(function (text) {
         var boards = [];
         try { boards = (JSON.parse(text) || {}).boards || []; } catch (e) { boards = []; }

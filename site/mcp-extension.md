@@ -12,7 +12,7 @@ MCP carries optional extensions in the capabilities a party reports. The protoco
 
 Under that revision there is no moment at which the two sides agree on extensions once and for all. The same page says "There is no negotiation handshake. Every request carries its protocol version, and the server accepts or rejects each request independently", and "Servers **MUST** implement `server/discover`". So a server declaring this extension carries the identifier in the capabilities of its `server/discover` result and in the capabilities it reports per request; an `initialize` handshake belongs to the earlier revisions the same page calls legacy.
 
-The settings object has exactly one member, `linkset`: the absolute `https` URL of the server's `/.well-known/knowledge-linkset`. A server must emit that member and must emit no other. That document is served as `application/linkset+json` with the profile `https://w3id.org/agentic-system-core/profile/agentic-knowledge` (AGSC-06-07, AGSC-11-04), and the [profile page](/specs/agentic-knowledge/) documents its shape. Since `1.0.0-rc.5` the specification pins the object and the way it is carried, and two conformance vectors hold the bytes (AGSC-11-18).
+The settings object has exactly one member, `linkset`: the absolute `https` URL of the server's `/.well-known/knowledge-linkset`. A server must emit that member and must emit no other. That document is served as `application/linkset+json` with the profile `https://w3id.org/agentic-system-core/profile/agentic-knowledge` (AGSC-06-07, AGSC-11-04), and the [profile page](/specs/agentic-knowledge/) documents its shape. The specification pins the object and the way it is carried, and two conformance vectors hold the bytes (AGSC-11-18).
 
 ```json
 {
@@ -29,7 +29,7 @@ The settings object has exactly one member, `linkset`: the absolute `https` URL 
 
 ## The tools
 
-A server declaring the extension exposes exactly seven tools, as ordinary core MCP tools. Their names, arguments and results are fixed by the specification (AGSC-09-13), and their results are byte-identical to the same node's browser-side tools for the same input and the same Bundle (AGSC-09-16).
+A server declaring the extension exposes exactly seven tools, as ordinary core MCP tools. Their names, arguments and results are fixed by the specification (AGSC-09-13), and their results are equal as values to the same node's browser-side tools for the same input and the same Bundle: the same members, in the same order, with the same contents (AGSC-09-16).
 
 | Tool | What it returns |
 | --- | --- |
@@ -63,4 +63,4 @@ A surface never restates this floor. It inherits it (AGSC-11-18).
 
 ## Reference implementation
 
-There is none yet for the extension itself. This node serves the discovery document and the static artefacts it names; the tool server that would advertise the extension is not published. The [status page](/docs/status/) says what is live and what is not.
+The reference engine's local tool server, `agsc mcp`, advertises the extension in its capabilities, with the `linkset` of the node it serves (AGSC-11-18); it runs on the reader's own machine over standard input and output. This node itself runs no tool server: it serves the discovery document and the static artefacts it names. The [status page](/docs/status/) says what is live and what is not.

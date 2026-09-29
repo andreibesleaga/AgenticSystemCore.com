@@ -55,7 +55,7 @@ node scripts/page-tools-check.js                                        # the se
   can be pushed at any time without publishing. At launch it becomes `www`: rebuild, run
   the gate, commit, push.
 - **The patterns node.** `"x-patterns-node": false` in `agsc.config.json` drops the peer
-  link and the two sentences that promise the second node; `true` (or absent) keeps them.
+  link and the sentences that name the second node; `true` (or absent) keeps them.
 
 ## Contributing
 
@@ -70,6 +70,9 @@ assistants. A person decides what is written, an assistant drafts and checks it,
 person reads, edits and approves everything that is published and answers for it. Every
 published item records how its text was made and names the person accountable for it.
 Written with AI assistance, reviewed and published by a person.
+The assistance covered text, code, figures and diagrams alike. No model runs on the site,
+in its build or in its checks. What an assistant or agent writes from this work is its
+own output, not a statement by the author.
 
 ## What this does not claim
 

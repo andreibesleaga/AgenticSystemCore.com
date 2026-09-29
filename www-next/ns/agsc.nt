@@ -14,7 +14,7 @@
 <https://w3id.org/agentic-system-core/ns#Cluster> <http://www.w3.org/2000/01/rdf-schema#label> "Cluster"^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#Cluster> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2004/02/skos/core#Collection> .
 <https://w3id.org/agentic-system-core/ns#Concept> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
-<https://w3id.org/agentic-system-core/ns#Concept> <http://www.w3.org/2000/01/rdf-schema#comment> "A unit of knowledge in a Bundle: a pattern, taxonomy, explainer, principle, decision, spec, task, term or (rc.3) architecture, distinguished by asc:kind."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#Concept> <http://www.w3.org/2000/01/rdf-schema#comment> "A unit of knowledge in a Bundle: a pattern, taxonomy, explainer, principle, decision, spec, task, term or architecture, distinguished by asc:kind."^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#Concept> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
 <https://w3id.org/agentic-system-core/ns#Concept> <http://www.w3.org/2000/01/rdf-schema#label> "Concept"^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#Concept> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2004/02/skos/core#Concept> .
@@ -141,7 +141,7 @@
 <https://w3id.org/agentic-system-core/ns#isVerifiedBy> <http://www.w3.org/2000/01/rdf-schema#label> "is verified by"^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#isVerifiedBy> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#verifies> .
 <https://w3id.org/agentic-system-core/ns#kind> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-<https://w3id.org/agentic-system-core/ns#kind> <http://www.w3.org/2000/01/rdf-schema#comment> "Qualifier on a Concept: pattern, taxonomy, explainer, principle, decision, spec, task, term or (rc.3) architecture."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#kind> <http://www.w3.org/2000/01/rdf-schema#comment> "Qualifier on a Concept: pattern, taxonomy, explainer, principle, decision, spec, task, term or architecture."^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#kind> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/agentic-system-core/ns#Concept> .
 <https://w3id.org/agentic-system-core/ns#kind> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
 <https://w3id.org/agentic-system-core/ns#kind> <http://www.w3.org/2000/01/rdf-schema#label> "kind"^^<http://www.w3.org/2001/XMLSchema#string> .
@@ -226,7 +226,7 @@
 <https://w3id.org/agentic-system-core/ns#staleAfter> <http://www.w3.org/2000/01/rdf-schema#label> "stale after"^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#staleAfter> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#dateTime> .
 <https://w3id.org/agentic-system-core/ns#status> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-<https://w3id.org/agentic-system-core/ns#status> <http://www.w3.org/2000/01/rdf-schema#comment> "Publication state of an item: draft, stable, deprecated or (rc.3) retired (AGSC-11-22)."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns#status> <http://www.w3.org/2000/01/rdf-schema#comment> "Publication state of an item: draft, stable, deprecated or retired (AGSC-11-22)."^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#status> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/agentic-system-core/ns> .
 <https://w3id.org/agentic-system-core/ns#status> <http://www.w3.org/2000/01/rdf-schema#label> "status"^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#status> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
@@ -270,7 +270,7 @@
 <https://w3id.org/agentic-system-core/ns#verifies> <http://www.w3.org/2000/01/rdf-schema#label> "verifies"^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns#verifies> <http://www.w3.org/2002/07/owl#inverseOf> <https://w3id.org/agentic-system-core/ns#isVerifiedBy> .
 <https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/creator> <https://orcid.org/0009-0001-3464-5283> .
-<https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/description> "Vocabulary for AgenticSystemCore Bundles: six item types plus Bundle, Source, Proposal, Review, Harness and (rc.3) Attachment, aligned to SKOS, PROV-O and DCTerms."^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/description> "Vocabulary for AgenticSystemCore Bundles: six item types plus Bundle, Source, Proposal, Review, Harness and Attachment, aligned to SKOS, PROV-O and DCTerms."^^<http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/issued> "2026-09-17"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/license> <https://creativecommons.org/publicdomain/zero/1.0/> .
 <https://w3id.org/agentic-system-core/ns> <http://purl.org/dc/terms/modified> "2026-09-24"^^<http://www.w3.org/2001/XMLSchema#date> .

@@ -12,7 +12,7 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns">
     <dcterms:creator rdf:resource="https://orcid.org/0009-0001-3464-5283"/>
-    <dcterms:description>Vocabulary for AgenticSystemCore Bundles: six item types plus Bundle, Source, Proposal, Review, Harness and (rc.3) Attachment, aligned to SKOS, PROV-O and DCTerms.</dcterms:description>
+    <dcterms:description>Vocabulary for AgenticSystemCore Bundles: six item types plus Bundle, Source, Proposal, Review, Harness and Attachment, aligned to SKOS, PROV-O and DCTerms.</dcterms:description>
     <dcterms:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-09-17</dcterms:issued>
     <dcterms:license rdf:resource="https://creativecommons.org/publicdomain/zero/1.0/"/>
     <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-09-24</dcterms:modified>
@@ -49,7 +49,7 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Concept">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:comment>A unit of knowledge in a Bundle: a pattern, taxonomy, explainer, principle, decision, spec, task, term or (rc.3) architecture, distinguished by asc:kind.</rdfs:comment>
+    <rdfs:comment>A unit of knowledge in a Bundle: a pattern, taxonomy, explainer, principle, decision, spec, task, term or architecture, distinguished by asc:kind.</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>Concept</rdfs:label>
     <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
@@ -226,7 +226,7 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#kind">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdfs:comment>Qualifier on a Concept: pattern, taxonomy, explainer, principle, decision, spec, task, term or (rc.3) architecture.</rdfs:comment>
+    <rdfs:comment>Qualifier on a Concept: pattern, taxonomy, explainer, principle, decision, spec, task, term or architecture.</rdfs:comment>
     <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Concept"/>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>kind</rdfs:label>
@@ -343,7 +343,7 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#status">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdfs:comment>Publication state of an item: draft, stable, deprecated or (rc.3) retired (AGSC-11-22).</rdfs:comment>
+    <rdfs:comment>Publication state of an item: draft, stable, deprecated or retired (AGSC-11-22).</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>status</rdfs:label>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Reading the specification — AgenticSystemCore</title>
-<meta name="description" content="How to read the AgenticSystemCore specification: rule identifiers, BCP 14 key words, the bracketed trace references, retired rules, error codes, test vectors and conformance Levels.">
+<meta name="description" content="How to read the AgenticSystemCore specification: rule identifiers, BCP 14 key words, the bracketed trace references, reserved rules, error codes, test vectors and conformance Levels.">
 <link rel="canonical" href="https://agenticsystemcore.com/docs/reading-the-specification/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
 <link rel="stylesheet" href="/assets/site.css">
@@ -13,8 +13,8 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/docs/reading-the-specification/">
 <meta property="og:title" content="Reading the specification">
-<meta property="og:description" content="How to read the AgenticSystemCore specification: rule identifiers, BCP 14 key words, the bracketed trace references, retired rules, error codes, test vectors and conformance Levels.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Reading the specification","description":"How to read the AgenticSystemCore specification: rule identifiers, BCP 14 key words, the bracketed trace references, retired rules, error codes, test vectors and conformance Levels.","url":"https://agenticsystemcore.com/docs/reading-the-specification/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<meta property="og:description" content="How to read the AgenticSystemCore specification: rule identifiers, BCP 14 key words, the bracketed trace references, reserved rules, error codes, test vectors and conformance Levels.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Reading the specification","description":"How to read the AgenticSystemCore specification: rule identifiers, BCP 14 key words, the bracketed trace references, reserved rules, error codes, test vectors and conformance Levels.","url":"https://agenticsystemcore.com/docs/reading-the-specification/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
 <script src="/compose/webmcp.js" defer></script>
@@ -39,7 +39,7 @@
 </header>
 <main id="main">
 <h1>Reading the specification</h1>
-<p class="summary"><strong>Summary</strong>A key to the specification's notation: what the rule identifiers mean, how the key words MUST and SHOULD are used, what the small bracketed references at the end of each rule are, why some rules are marked retired, and how error codes, vectors and Levels fit together.</p>
+<p class="summary"><strong>Summary</strong>A key to the specification's notation: what the rule identifiers mean, how the key words MUST and SHOULD are used, what the small bracketed references at the end of each rule are, why some rules are marked reserved, and how error codes, vectors and Levels fit together.</p>
 <p>The specification is exact so that two implementers in two languages produce the same bytes. That exactness makes it dense. This page explains its conventions, so that the rule text can be read for what it says.</p>
 <h2 id="sections-and-rules">Sections and rules</h2>
 <p>The specification has twelve sections, <code>AGSC-00</code> to <code>AGSC-11</code>, each a page under <a href="/specs/">/specs/</a>; a section too long for one page is published in numbered parts, each with the section's title and a part line, and a link to a rule always names the part that carries it. Every rule has a stable identifier of the form <code>AGSC-&lt;section&gt;-&lt;number&gt;</code>, for example <a class="ref" href="/specs/03-links/#AGSC-03-01">AGSC-03-01</a>, which is the first rule of the links section. Identifiers are never reused or renumbered (<a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a>). On this site every identifier is a link: click one to reach the rule, and copy the address to cite it.</p>
@@ -54,13 +54,12 @@
 <tr><td><code>OKF v0.2</code>, <code>RFC 9264</code>, <code>A2A §8.4</code></td><td>An external document the rule follows</td><td>The <a href="/docs/standards/">standards page</a> lists each with its version and the date it was checked</td></tr>
 <tr><td><code>design</code></td><td>The rule records a design choice of this specification rather than a requirement or an external document</td><td>The rule text itself</td></tr>
 </tbody></table></div>
-<p>Earlier release candidates also carried, in these notes, identifiers of the editors' internal working records — decisions, review findings and research memos. They were removed from the text of the current candidate; the earlier tagged candidates keep them unchanged, because a tag never moves. A reader who wants to implement the specification needs none of them: the rule text, the schemas, the ontology and the vectors are complete on their own (<a class="ref" href="/specs/00-overview/#AGSC-00-01">AGSC-00-01</a>).</p>
 <h2 id="drafted-rules">Drafted rules</h2>
 <p>When a next release candidate is being drafted in the engine repository, its identifiers are shown here with a dotted underline and no link until it is tagged and published; none are pending now.</p>
-<h2 id="retired-rules">Retired rules</h2>
-<p>A rule marked <em>(retired at rc.3 or rc.4 …)</em> was found to say nothing that another rule did not already say, and was merged into that rule. Its identifier is kept and never reused, so that older citations still resolve, and the note says where its content now lives. Retired rules impose nothing.</p>
+<h2 id="reserved-rules">Reserved rules</h2>
+<p>A rule marked <em>(reserved: …)</em> holds no requirement: while the specification was drafted, it was found to say nothing that another rule did not already say, and its content was merged into that rule, which the note names. Its identifier is kept and never reused (<a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a>), so that a citation of it still resolves. Reserved rules impose nothing.</p>
 <h2 id="amendments">Amendments</h2>
-<p>A rule marked <em>(added at rc.3 …)</em>, <em>(amended at rc.3 …)</em>, <em>(added at rc.4 …)</em> or <em>(amended at rc.4 …)</em> changed at the third or the fourth release candidate, and the note names the decision behind it. Released sections are immutable: a change ships as a new version (<a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a>).</p>
+<p>A rule may close with a short italic note in parentheses, such as <em>(amended …)</em> or <em>(corrected …)</em>: the rule changed while the specification was drafted, and the note gives the date and says what changed and why. The note is not part of what the rule requires. Released sections are immutable: a change ships as a new version (<a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a>).</p>
 <h2 id="error-codes">Error codes</h2>
 <p>Every failure a conforming tool reports has a code of the form <code>AGSC-E&lt;nnn&gt;</code>, and each code has exactly one row in the <a href="/specs/09-conformance/#section-9-4">registry</a> naming the rule that raises it. The hundreds digit is the area: 0 command line, 1 parsing, 2 schema, 3 links, 4 lint, 5 provenance and adoption, 6 determinism, 7 ledger, 8 composition, 9 input, output and federation.</p>
 <h2 id="vectors">Vectors</h2>
@@ -94,7 +93,7 @@
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/reading-the-specification.md">Propose an edit</a> — opens <code>site/docs/reading-the-specification.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">patterns.agenticsystemcore.com</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
 </footer>
 </body>
 </html>

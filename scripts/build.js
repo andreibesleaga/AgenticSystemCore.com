@@ -89,8 +89,8 @@ const stripH1 = s => s.replace(/^# .*\n+/, '').replace(/^\*\*Who this is for:\*\
 // bytes the patterns node serves and the two sites cannot drift. The Markdown machine view and the
 // surface declaration go through the engine's functions for the same reason. Unlike spec/, docs/
 // and ontology/ — which are read from the frozen TAG — these modules are read from the engine's
-// working tree, because `src/distribution/page-tools.js` does not exist at 1.0.0-rc.5 (it was
-// written after the tag) and because a page tool must never lag the implementation it mirrors.
+// working tree, because a page tool must never lag the implementation it mirrors: the tag
+// freezes the normative text, not the code that renders a page's tools.
 // `node scripts/page-tools-check.js` records the SHA-256 of every emitted script.
 const enginePath = p => path.join(ENGINE, p);
 const engineModule = p => { try { return require(enginePath(p)); } catch (e) { return die(`cannot load the engine module ${p} from ${ENGINE}: ${e.message}`); } };
@@ -239,8 +239,8 @@ let REQ_IDS = new Set();    // PRD-nnn / NFR-nn ids that the requirements page d
 const RULES_WITHOUT_TRACE = []; // rules whose source carries no trailing trace bracket (reported at the end)
 // Rules and codes drafted for the next release candidate in the engine working tree: the guide may cite
 // them, rendered unlinked and marked, until the next candidate is tagged and SITE_SPEC_TAG moves
-// (then empty this set again). Emptied when rc.4 was tagged and published: every identifier drafted for
-// it is now in the published specification.
+// (then empty this set again). Empty now: every identifier the guide cites is in the published
+// specification.
 const PENDING_RULES = new Set();
 const PENDING_REQS = new Set();
 function idTarget(code, o) {
@@ -345,8 +345,8 @@ function headingId(text, used) {
 }
 // The trailing traceability record of a rule: "[PRD-002, OKF v0.2]". It is
 // rendered as a separate small line (class trace) so that the rule sentence reads on its own.
-// Since rc.5 a rule may close with an italic amendment note after its bracket — "[…] *(trace
-// corrected at rc.5, …)*" — so the note is allowed to follow and is kept where the author put it.
+// A rule may close with an italic amendment note after its bracket — "[…] *(amended
+// 2026-09-24: …)*" — so the note is allowed to follow and is kept where the author put it.
 const TRACE_RE = /\s\[([^\[\]]{3,})\]((?:\s*\*\(.*\)\*)?)\s*$/;
 // Mark the trace record of a rule: the trailing bracket group on the last prose line of the item
 // (never a table row, never a line inside a fenced block). Returns true when one was found.
@@ -440,7 +440,7 @@ function md(src, o = {}) {
       html += '<ul>\n' + items.map(c => {
         const first = c[0], lead = /^\*\*(AGSC-\d{2}-\d{2,3}[a-z]?)\*\*/.exec(first);
         const isRule = !!(lead && o.ruleLinks);
-        const retired = isRule && /^\*\*AGSC-[^*]+\*\*\s*\*\(retired at/.test(first);
+        const retired = isRule && /^\*\*AGSC-[^*]+\*\*\s*\*\((?:retired at |reserved:)/.test(first);
         if (isRule && !retired && !markTrace(c)) RULES_WITHOUT_TRACE.push(lead[1]);
         const simple = c.length === 1 || c.slice(1).every(x => x !== '' && !isList(x) && !isFence(x) && !x.includes('|'));
         let inner = simple ? mdInline(c.join('\n'), o) : md(c.join('\n'), { ...o, used, toc: null, inItem: true });
@@ -514,13 +514,13 @@ const FORGE = {
 };
 if (!FORGE.site) die('agsc.config.json: contribute[] needs one entry with mode "pr" (AGSC-11-14)');
 
-// rc.5 configuration guards, against schema/config.schema.json at the tag.
+// Configuration guards, against schema/config.schema.json at the tag.
 // `build.feed` and `build.rdfxml` are RESERVED names of 1.1 and are rejected (AGSC-06-01, AGSC-01-18).
-for (const k of Object.keys(config.build || {})) if (k !== 'out') die(`agsc.config.json: build.${k} is a reserved name, AGSC-E004 (withdrawn at rc.5)`);
+for (const k of Object.keys(config.build || {})) if (k !== 'out') die(`agsc.config.json: build.${k} is a reserved name, AGSC-E004`);
 // THE PATTERNS-NODE SWITCH. One setting turns the second node on or off for this
 // site: `"x-patterns-node": false` in agsc.config.json. It lives in the vendor-extension
 // namespace the FROZEN config schema reserves (`^x-[a-z0-9]+(-[a-z0-9]+)+$`, verified in
-// schema/config.schema.json at tag 1.0.0-rc.5), which is the only place a setting no rule
+// schema/config.schema.json at the tag), which is the only place a setting no rule
 // defines may go in a file whose schema is `additionalProperties: false`. Absent means ON,
 // so a configuration written before this switch existed keeps behaving as it did.
 // OFF drops three things and nothing else: the `peers` line from the emitted discovery
@@ -540,9 +540,9 @@ const PEERS = PATTERNS_NODE ? DECLARED_PEERS : [];
 // when the switch is off. Each substitution MUST match, or the build stops: prose moves,
 // and a switch that silently stops hiding something is worse than no switch.
 const PATTERNS_PROSE = [
-  { from: 'The reference engine, the patterns catalogue as a second node, the Internet-Draft and the registrations follow.',
+  { from: 'Beside it stand the open-source reference engine and a second node that runs it as a live demonstration; the Internet-Draft and the registrations follow.',
     hits: 0,
-    to: 'The reference engine, the Internet-Draft and the registrations follow.' },
+    to: 'Beside it stands the open-source reference engine; the Internet-Draft and the registrations follow.' },
 ];
 // Counted on every build, in BOTH states, and checked once the guide has been read: a
 // sentence this list no longer finds means the prose moved and the switch has quietly
@@ -568,10 +568,10 @@ for (const c of CONTRIBUTE) {
   if (!okTarget) die(`agsc.config.json: contribute[].target ${c.target} does not match mode ${c.mode} (AGSC-E209, AGSC-11-14)`);
   for (const k of Object.keys(c)) if (!['mode', 'target', 'channel'].includes(k)) die(`agsc.config.json: contribute[].${k} is not a member of this site's configuration`);
 }
-// AGSC-02-24 as amended at rc.5: an authored single-line string carries no C0 control, U+007F,
+// AGSC-02-24: an authored single-line string carries no C0 control, U+007F,
 // U+0085, U+2028 or U+2029, because a writer puts it on a line of a line-oriented text surface.
 const BAD_LINE_CP = c => c <= 0x1f || c === 0x7f || c === 0x85 || c === 0x2028 || c === 0x2029;
-const singleLine = (where, v) => { if (typeof v === 'string') for (const ch of v) if (BAD_LINE_CP(ch.codePointAt(0))) die(`${where}: U+${ch.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')} is a control character or line separator in a single-line string (AGSC-E204, AGSC-02-24 at rc.5)`); return v; };
+const singleLine = (where, v) => { if (typeof v === 'string') for (const ch of v) if (BAD_LINE_CP(ch.codePointAt(0))) die(`${where}: U+${ch.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')} is a control character or line separator in a single-line string (AGSC-E204, AGSC-02-24)`); return v; };
 for (const [k, v] of Object.entries(config.site)) singleLine(`agsc.config.json: site.${k}`, v);
 for (const [k, v] of Object.entries(config.bundle)) singleLine(`agsc.config.json: bundle.${k}`, v);
 
@@ -593,11 +593,11 @@ if (declared !== SPEC_VERSION) die(`tag ${SPEC_TAG} declares spec_version ${decl
     const src = fs.readFileSync(f, 'utf8');
     for (const m of src.matchAll(/\b1\.0\.0-rc\.\d+\b/g)) {
       if (m[0] === SPEC_VERSION) continue;
-      // The historical-note carve-out gave the engine's own checker, in the same words:
-      // "Since `1.0.0-rc.5` the specification pins …" is a statement ABOUT an earlier candidate,
-      // not a claim that this build publishes it. Only the phrase `Since <version>` carves out,
-      // and only the literal that phrase introduces.
-      if (/\bSince\s+`?$/.test(src.slice(Math.max(0, m.index - 10), m.index).replace(/`$/, '`'))) continue;
+      // No carve-out: the candidate this build publishes is the first public one, so a page
+      // presents no earlier draft, not even as history. Any other candidate literal is stale,
+      // whatever words introduce it; the sentence is rewritten, never excused.
+      // (A version the specification itself quotes reaches the site through the tagged text,
+      // which this walk does not read.)
       die(`${path.relative(ROOT, f)}: names ${m[0]} while this build publishes ${SPEC_VERSION} (AGSC-00-17)`);
     }
   }
@@ -737,7 +737,7 @@ const EXTERNAL = [
   ['skos:inScheme', '@id'], ['skos:member', '@id'], ['skos:broader', '@id'], ['skos:narrower', '@id'], ['skos:related', '@id'],
   ['dcterms:requires', '@id'], ['dcterms:isRequiredBy', '@id'], ['dcterms:replaces', '@id'], ['dcterms:isReplacedBy', '@id'],
   ['dcterms:source', null], ['dcterms:title', null], ['dcterms:creator', null], ['dcterms:date', null], ['dcterms:format', null],
-  // rc.5 amendments (2026-09-21): AGSC-05-26 gained `dcterms:created` and
+  // Amendments of 2026-09-21: AGSC-05-26 gained `dcterms:created` and
   // `dcterms:modified` as `xsd:dateTime`, and AGSC-05-31(c) makes
   // `schema:usageInfo` a literal, not an IRI. These three rows lagged, so
   // this context and the engine's could not be the byte-identical copy AGSC-05-09
@@ -775,7 +775,7 @@ const GRAPH = (() => {
   const single = a => a.length === 1 ? a[0] : a;
   const nodes = [{
     '@id': BASE, '@type': 'Bundle', specVersion: SPEC_VERSION,
-    // AGSC-05-26 / AGSC-06-18 as amended at rc.5: `schema:usageInfo` carries the
+    // AGSC-05-26 / AGSC-06-18: `schema:usageInfo` carries the
     // Content Use Terms IDENTIFIER as an `xsd:string` literal, not a link to the
     // page that prints the terms — "a LicenseRef- or SPDX identifier is text, not
     // an IRI" (2026-09-21).
@@ -882,14 +882,14 @@ const ENGINE_ROUTES_KEPT = new Map([
 }
 
 // ------------------------------------------------------------------ the derived ledger (AGSC-08-20a, AGSC-06-08, AGSC-10-04)
-// This node claims Level 2, and Level 2 includes the derived ledger. When the engine's build emits
+// This node publishes the Level-2 form of its discovery document, with the derived ledger. When the engine's build emits
 // `/ledger.jsonl` (with its `…/rel#ledger` link) this site publishes those bytes; until it does,
 // the ledger is derived here by the ENGINE's own function over the same git-log file the content
 // version reads, the content tree of `content/` at HEAD and the same build instant, and the link
 // is added to the discovery document below. Either way the bytes are the engine's derivation.
 const LEDGER = (() => {
   if (ENGINE_BUILD.files.has('/ledger.jsonl')) return { fromEngine: true };
-  if (!GIT_LOG) die('no git history to derive /ledger.jsonl from; this node claims Level 2 (AGSC-08-20a, AGSC-10-04)');
+  if (!GIT_LOG) die('no git history to derive /ledger.jsonl from; this node publishes the Level-2 form, which links it (AGSC-08-20a, AGSC-10-04)');
   const tree = cp.execFileSync('git', ['-C', ROOT, 'rev-parse', 'HEAD:content'], { encoding: 'utf8' }).trim();
   if (!/^[0-9a-f]{40,64}$/.test(tree)) die(`the content tree hash is not a git object id: ${tree}`);
   const derived = engineLedger.derive(GIT_LOG, tree, ENGINE_BUILD.version, { epoch: EPOCH });
@@ -1014,7 +1014,7 @@ ${engineTheme.SWITCHER}
 <p class="summary"><strong>Summary</strong>${esc(summary)}</p>
 ${body}</main>
 <footer class="site">
-<p class="copyright">&#169; ${esc(FOOTER_YEAR)} ${esc(config.site.author)}. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="${WELLKNOWN}">Discovery</a> · <a href="/llms.txt">llms.txt</a>${PATTERNS_NODE ? ' · <a href="https://patterns.agenticsystemcore.com/">patterns.agenticsystemcore.com</a>' : ''}</p>
+<p class="copyright">&#169; ${esc(FOOTER_YEAR)} ${esc(config.site.author)}. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="${WELLKNOWN}">Discovery</a> · <a href="/llms.txt">llms.txt</a>${PATTERNS_NODE ? ' · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a>' : ''}</p>
 </footer>
 </body>
 </html>
@@ -1029,7 +1029,7 @@ const itemMeta = it => {
   parts.push(`<dt>Provenance</dt><dd>${esc(ORIGIN_TEXT[it.fm.prov.origin])} (origin <code>${esc(it.fm.prov.origin)}</code>, operator <code>${esc(it.fm.prov.operator)}</code>)</dd>`);
   return `<dl class="meta">\n${parts.join('\n')}\n</dl>\n`;
 };
-const sourcesList = it => (it.fm.sources || []).length ? `<h2 id="sources">Sources</h2>\n<ol class="sources">\n${it.fm.sources.map((s, k) => `<li id="source-${k + 1}"><a${REF_LABEL.test(String(s.title || '')) ? ' class="ref"' : ''} href="${esc(s.resource.startsWith(BASE) ? '/' + s.resource.slice(BASE.length) : s.resource)}">${esc(s.title || s.resource)}</a>${s.grade ? ` <span class="grade">(${esc(s.grade)})</span>` : ''}</li>`).join('\n')}\n</ol>\n` : '';
+const sourcesList = it => (it.fm.sources || []).length ? `<h2 id="sources">Sources</h2>\n<ol class="sources">\n${it.fm.sources.map((s, k) => `<li id="source-${k + 1}"><a${REF_LABEL.test(String(s.title || '')) ? ' class="ref"' : ''} href="${esc(s.resource.startsWith(BASE) ? '/' + s.resource.slice(BASE.length) : s.resource)}">${esc(s.title || s.resource)}</a></li>`).join('\n')}\n</ol>\n` : '';
 const statusBlock = () => `<section class="status" aria-labelledby="status-heading">
 <h2 id="status-heading">Status of this document</h2>
 <p>Specification <code>${esc(SPEC_VERSION)}</code>, ${SPEC_SOURCE === 'tag' ? `a release candidate tagged on ${esc(SPEC_DATE)}` : 'a draft release candidate, not yet tagged'}. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no standards body has reviewed or adopted it. Released sections are immutable; a correction ships as a new version.</p>
@@ -1096,7 +1096,7 @@ const NAMES = {
   boards: { 'agsc-board': 'this format\'s own board file', asana: 'Asana', github: 'GitHub issues and projects', gitlab: 'GitLab', jira: 'Jira', linear: 'Linear', markdown: 'plain Markdown', notion: 'Notion', 'obsidian-kanban': 'Obsidian Kanban', todotxt: 'Todo.txt', trello: 'Trello' },
   skills: { agentskills: 'Agent Skills folders', 'claude-plugin': 'Claude Code plugins', marketplace: 'plugin marketplaces', cursor: 'Cursor rules', windsurf: 'Windsurf rules' },
   hosts: { 'cloudflare-pages': 'Cloudflare Pages', 'static-host': 'nginx or Apache', 'github-pages': 'GitHub Pages behind a proxy', local: 'your own machine', 'git-clone': 'a clone of the repository', ipfs: 'IPFS through a gateway', 'ledger-anchor': 'a ledger-anchored record' },
-  adapters: { board: 'project boards', cogx: 'COGX memory archives', gabbe: 'GABBE kits', 'llm-context': 'a compact context file for a model', skills: 'skills repositories' },
+  adapters: { board: 'project boards', cogx: 'COGX memory archives', gabbe: 'GABBE kits', 'llm-context': 'a compact context file for a model', mermaid: 'Mermaid link diagrams', skills: 'skills repositories' },
 };
 for (const [k, list] of Object.entries(REGISTRY)) {
   for (const n of list) if (!NAMES[k][n]) die(`front page: the engine's ${k} registry has "${n}", which the page does not name`);
@@ -1121,7 +1121,7 @@ addPage('/', {
   jsonld: { '@context': 'https://schema.org', '@type': 'WebSite', name: config.site.title, url: BASE, description: index.fm.description, author: { '@type': 'Person', name: config.site.author, sameAs: ['https://orcid.org/0009-0001-3464-5283'] } },
   body: `<p class="tagline">${esc(config.site.tagline)}</p>
 ${md(index.body)}<h2 id="different">What is different about it</h2>
-<p class="lead">Other systems have some of these. To our knowledge none has them together: a knowledge base a machine can find through registered web mechanisms, a digest on everything it points at, a typed graph with a published vocabulary, bytes pinned by conformance vectors, a person on every merge — directly, or by a standing rule that person recorded — and a runnable harness out of the same files, with no server.</p>
+<p class="lead">Other systems have some of these. To the author's knowledge none has them together: a knowledge base a machine can find through registered web mechanisms, a digest on everything it points at, a typed graph with a published vocabulary, bytes pinned by conformance vectors, a person on every merge — directly, or by a standing rule that person recorded — and a runnable harness out of the same files, with no server.</p>
 <p>These are claims about the specification's text and its test vectors, not performance claims. The dated comparison with other systems is in the <a href="/docs/standards/#related-work">related work</a>, and the full sentence in the <a href="/docs/introduction/">introduction</a>.</p>
 <h2 id="what-you-can-do">Six ways to use it</h2>
 <ul class="modes">
@@ -1142,7 +1142,7 @@ ${MODE_CARDS.map(([t, d, h]) => `<li><strong><a href="${h}">${esc(t)}</a></stron
 <ul class="modes">
 <li><strong><a href="/docs/modes/#mode-0-the-automatic-self-correcting-wiki">A wiki that corrects itself</a></strong>Markdown in; a checked, linked, searchable site out, with every change reviewed.</li>
 <li><strong><a href="/docs/modes/#mode-2-live-specifications-and-the-memory-of-a-software-project">A project's living specifications</a></strong>Decisions, specifications, tasks and gates as one governed memory.</li>
-<li><strong><a href="/concepts/">A pattern catalogue</a></strong>Concepts with sources and provenance, readable without JavaScript, composable into a starting architecture.</li>
+<li><strong><a href="/concepts/">A library of patterns</a></strong>Concepts with sources and provenance, readable without JavaScript, composable into a starting architecture.</li>
 <li><strong><a href="/docs/modes/#mode-5-the-live-board-self-driving-product-and-project-management">A team board</a></strong>A board exported from a project tool becomes a live board and goes back again: ${REGISTRY.boards.length} board formats, listed below.</li>
 </ul>
 <h2 id="works-with">Works with the tools you already use</h2>
@@ -1157,7 +1157,7 @@ ${MODE_CARDS.map(([t, d, h]) => `<li><strong><a href="${h}">${esc(t)}</a></stron
 <li><strong>Where a node can live:</strong> ${shown('hosts')} — any place that serves the files over HTTPS; <code>agsc-host list</code> says what each place can and cannot do.</li>
 </ul>
 <h2 id="brain">A distributed brain, with no server</h2>
-<p>Each node is a folder of files published as a static site. Nodes find and read each other through registered web mechanisms, every file they point at carries its digest, and they share one vocabulary. A node names its peers; a reader walks from one to the next. No node calls another, and no server sits in between.</p>
+<p>Each node is a folder of files published as a static site. Nodes find and read each other through registered web mechanisms, every file they point at carries its digest, and they share one vocabulary. A node names its peers; a reader walks from one to the next. No node calls another, and no server sits in between.${PATTERNS_NODE ? ' This node&#39;s peer is a second node, <a href="https://patterns.agenticsystemcore.com/">patterns.agenticsystemcore.com</a>: a demonstration node run by the same reference engine, whose sample content is a small set of well-known agent-system patterns described from public sources.' : ''}</p>
 ${figure('system-overview')}<h2 id="benefits">What each reader gets</h2>
 <div class="table-wrap" tabindex="0" role="region" aria-label="What each reader gets"><table>
 <thead><tr><th scope="col">You are</th><th scope="col">You get</th><th scope="col">Where</th></tr></thead>
@@ -1165,7 +1165,7 @@ ${figure('system-overview')}<h2 id="benefits">What each reader gets</h2>
 <tr><th scope="row">A person with notes</th><td>a wiki that checks and links itself, and a project's living memory</td><td><code>agsc init</code>, then <code>agsc ci</code></td></tr>
 <tr><th scope="row">A team</th><td>a live board and shared skills</td><td><a href="/docs/modes/">the six modes</a>, <a href="/skills/">skill packs</a></td></tr>
 <tr><th scope="row">An agent or an assistant</th><td>memory it can find, verify and cite; tools on every page</td><td><a href="${WELLKNOWN}">the discovery document</a>, <a href="/llms.txt">llms.txt</a>, <a href="/chunks.jsonl">the chunk export</a></td></tr>
-<tr><th scope="row">An implementer</th><td>a standard with vectors and standalone checkers, in any language</td><td><a href="/specs/">the specification</a>, <a href="/docs/reading-the-specification/">how to read it</a></td></tr>
+<tr><th scope="row">An implementer</th><td>a specification with vectors and standalone checkers, in any language</td><td><a href="/specs/">the specification</a>, <a href="/docs/reading-the-specification/">how to read it</a></td></tr>
 <tr><th scope="row">A publisher</th><td>static files, no server to run and nothing to pay for beyond hosting</td><td><a href="/procedures/publish-a-level-0-node/">publish a Level-0 node</a></td></tr>
 </tbody></table></div>
 <h2 id="measured">Measured, reproducible</h2>
@@ -1346,7 +1346,7 @@ ${specPages.map(p => `<li><a href="${p.url}">${esc(p.h1.replace(/^AGSC-\d{2} —
 <h2 id="mcp-extension">MCP extension</h2>
 <p><a href="/specs/mcp/">The MCP knowledge extension</a> is the reference text of <code>${esc(MCP_EXTENSION)}</code>, the identifier by which a Model Context Protocol server says that the knowledge it serves is also published as a Bundle.</p>
 <h2 id="conformance">Conformance</h2>
-<p>A claim names exactly one Level, the <code>spec_version</code> and the vector set it passed (${REF('AGSC-00-12')}, ${REF('AGSC-10-01')}). This site claims <strong>Level 0</strong> against <code>${esc(SPEC_VERSION)}</code>.</p>
+<p>A claim names exactly one Level, the <code>spec_version</code> and the vector set it passed (${REF('AGSC-00-12')}, ${REF('AGSC-10-01')}). This site claims <strong>Level 0</strong> against <code>${esc(SPEC_VERSION)}</code>, with the vector set published in that version; the engine that builds it passes every vector of that set.</p>
 ${figure('levels')}<h2 id="licence">Licence</h2>
 <p>The specification text is published under the Apache License 2.0 with the reference implementation. The schemas, the ontology and the identifiers are released under CC0 1.0.</p>
 `,
@@ -1378,7 +1378,7 @@ for (const p of specPages) for (const { url, opts } of specSectionPages(p, SPEC_
     ['license', 'The licence page of the node.', ['AGSC-06-10']],
     ['service-doc', 'Human documentation, such as <code>/specs/</code>.', ['AGSC-06-10']],
     ['author', 'The author of the node.', ['AGSC-06-10']],
-    ['related, service-desc, service-meta, collection, item, cite-as', 'Related-system links, OPTIONAL, each carrying <code>type</code>. Admitted by both rules since rc.5; <code>cite-as</code> since rc.6.', ['AGSC-06-10', 'AGSC-06-35']],
+    ['related, service-desc, service-meta, collection, item, cite-as', 'Related-system links, OPTIONAL, each carrying <code>type</code>. Admitted by both rules.', ['AGSC-06-10', 'AGSC-06-35']],
   ];
   const attrs = [
     ['digest', 'One string <code>sha-256=:&lt;base64&gt;:</code> over the bytes of the target (RFC 9530, RFC 9651). Level 2 and above.', ['AGSC-06-08']],
@@ -1401,7 +1401,7 @@ for (const p of specPages) for (const { url, opts } of specSectionPages(p, SPEC_
 ${rows.map(r => `<tr${idOf ? ` id="${idOf(r)}"` : ''}><th scope="row">${nameCell(r)}</th><td>${r[1]}</td><td>${r[2].map(R).join(', ')}</td></tr>`).join('\n')}
 </tbody></table></div>
 `;
-  const level2 = { linkset: [{ alternate: [{ digest: ['sha-256=:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=:'], href: 'https://example.org/llms.txt', type: 'text/plain' }], anchor: 'https://example.org/', describedby: [{ 'agsc-bundle-hash': ['sha-256=:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=:'], 'agsc-counts': ['clusters=0', 'concepts=0', 'episodes=0', 'gates=0', 'lessons=0', 'procedures=0'], 'agsc-generated-at': ['2026-01-01T00:00:00Z'], 'agsc-spec-version': [SPEC_VERSION], digest: ['sha-256=:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=:'], href: 'https://example.org/graph.jsonld', type: 'application/ld+json' }], [`${REL}ledger`]: [{ 'agsc-ledger-head': ['bee9ba6593162f59dae28f42ba25fa04ea3fd65ae4f80685fb1c4ede151189ac'], digest: ['sha-256=:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=:'], href: 'https://example.org/ledger.jsonl', type: 'application/jsonl' }], license: [{ href: 'https://example.org/legal/' }], 'service-doc': [{ href: 'https://example.org/specs/' }] }] };
+  const level2 = { linkset: [{ alternate: [{ digest: ['sha-256=:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=:'], href: 'https://example.org/llms.txt', type: 'text/plain' }], anchor: 'https://example.org/', describedby: [{ 'agsc-bundle-hash': ['sha-256=:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=:'], 'agsc-bundle-version': ['v1.0.0'], 'agsc-counts': ['clusters=0', 'concepts=0', 'episodes=0', 'gates=0', 'lessons=0', 'procedures=0'], 'agsc-generated-at': ['2026-01-01T00:00:00Z'], 'agsc-spec-version': [SPEC_VERSION], digest: ['sha-256=:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=:'], href: 'https://example.org/graph.jsonld', type: 'application/ld+json' }], [`${REL}ledger`]: [{ 'agsc-ledger-head': ['bee9ba6593162f59dae28f42ba25fa04ea3fd65ae4f80685fb1c4ede151189ac'], digest: ['sha-256=:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=:'], href: 'https://example.org/ledger.jsonl', type: 'application/jsonl' }], license: [{ href: 'https://example.org/legal/' }], 'service-doc': [{ href: 'https://example.org/specs/' }] }] };
   const slots = {
     status: `<section class="status" aria-labelledby="status-heading">
 <h2 id="status-heading">Status</h2>
@@ -1414,13 +1414,13 @@ ${rows.map(r => `<tr${idOf ? ` id="${idOf(r)}"` : ''}><th scope="row">${nameCell
 </dl>
 </section>
 ${figure('agentic-knowledge')}`,
-    // AGSC-06-01 (amended at rc.5): each row's anchor is named exactly as the fragment of the
+    // AGSC-06-01: each row's anchor is named exactly as the fragment of the
     // relation URI — `#graph`, not `#rel-graph` — so a client that does follow `…/rel#graph`
     // keeps that fragment and lands on this row.
     relations: `<p>Registered relations (IANA Link Relations registry):</p>\n` + table(['Relation', 'Meaning', 'Rules'], registered, null, r => `<code>${esc(r[0])}</code>`)
       + `<p>Extension relations. Each URI <code>${REL}&lt;name&gt;</code> resolves to its row below.</p>\n`
       + table(['Extension relation', 'Target', 'Rules'], relations, r => r[0], r => `<code>…/rel#${r[0]}</code>`),
-    attributes: `<p>Extension target attributes use the prefix <code>agsc-</code>, except <code>digest</code>. Every attribute value is an array of strings (${R('AGSC-06-10')}).</p>\n`
+    attributes: `<p>Extension target attributes use the prefix <code>agsc-</code>, except <code>digest</code>. Every extension target attribute value (<code>digest</code> and every <code>agsc-*</code> attribute) is an array of strings; <code>type</code>, <code>title</code> and <code>media</code> are strings and <code>hreflang</code> is an array of strings (RFC 9264 §4.2.4.1) (${R('AGSC-06-10')}).</p>\n`
       + table(['Attribute', 'Meaning', 'Rules'], attrs, r => `attr-${r[0]}`, r => `<code>${esc(r[0])}</code>`),
     'example-self': `<p>The live document is at <a href="${WELLKNOWN}"><code>${WELLKNOWN}</code></a>; a browser shows it as text. The same bytes, pretty-printed:</p>\n<pre tabindex="0" data-lang="json"><code>${esc(pretty(WELLKNOWN_DOC))}</code></pre>\n`,
     'example-level2': `<pre tabindex="0" data-lang="json"><code>${esc(pretty(level2))}</code></pre>\n`,
@@ -1602,18 +1602,18 @@ addPage('/compose/', {
 // the guide (site/docs/*.md, hand-authored, plus the tagged documents rendered through slots)
 const statusRows = [
   ['Specification <code>' + esc(SPEC_VERSION) + '</code>', SPEC_SOURCE === 'tag' ? 'Live' : 'Draft', SPEC_SOURCE === 'tag' ? `Tagged on ${esc(SPEC_DATE)}; twelve sections at <a href="/specs/">/specs/</a>; the vocabulary and the vectors are frozen at the tag.` : 'A draft release candidate, not yet tagged; twelve sections at <a href="/specs/">/specs/</a>. The vocabulary and the vectors freeze at the tag.'],
-  ['This site as a node of its own specification', 'Live', `Items, <a href="/graph.jsonld"><code>graph.jsonld</code></a> with <a href="/graph.nq"><code>graph.nq</code></a> and <a href="/graph.ttl"><code>graph.ttl</code></a>, <a href="/llms.txt"><code>llms.txt</code></a>, <a href="/chunks.jsonl"><code>chunks.jsonl</code></a>, the <a href="/skills/">skill packs</a>, the <a href="/now/">NOW page</a> and the <a href="${WELLKNOWN}">discovery document</a>. The discovery validator checks it at Level 2 before every publish, and every digest it declares is compared with the bytes served. No conformance claim is made before <code>1.0.0</code> (${REF('AGSC-10-05')}).`],
+  ['This site as a node of its own specification', 'Live', `Items, <a href="/graph.jsonld"><code>graph.jsonld</code></a> with <a href="/graph.nq"><code>graph.nq</code></a> and <a href="/graph.ttl"><code>graph.ttl</code></a>, <a href="/llms.txt"><code>llms.txt</code></a>, <a href="/chunks.jsonl"><code>chunks.jsonl</code></a>, the <a href="/skills/">skill packs</a>, the <a href="/now/">NOW page</a> and the <a href="${WELLKNOWN}">discovery document</a>. The discovery validator checks it at Level 2 before every publish, and every digest it declares is compared with the bytes served. It claims Level 0 against the specification version above (${REF('AGSC-00-12')}); the reference engine&#39;s own Level-3 claim waits for its <code>1.0.0</code> release (${REF('AGSC-10-05')}).`],
   ['The machine files, written by the reference engine', 'Live', `Every file above is emitted by <code>agsc build</code> over this repository's own content, and this site republishes those bytes rather than deriving them a second time. The pages of this site are written by this repository's own generator, which keeps the hand-written guide; the engine writes the same design for every other node. See <a href="/exports/">the list of machine-readable files</a>.`],
   ['Ontology files', 'Live', `Turtle, JSON-LD context, RDF/XML and N-Triples at <a href="/ns/">/ns/</a>.`],
   ['Namespace through w3id.org', STATUS.w3id ? 'Live' : 'Not yet resolving', regText.w3id],
   ['Well-known URI <code>knowledge-linkset</code>', { 'not-requested': 'Not requested', requested: 'Requested', registered: 'Registered' }[STATUS.wellknown], regText.wellknown],
   ['Profile URI', { 'not-filed': 'Not filed', filed: 'Filed', registered: 'Registered' }[STATUS.profile], regText.profile],
-  ['Internet-Draft', STATUS.draft ? 'Posted' : 'Not yet posted', regText.draft + (STATUS.draft ? '' : ' It will describe the discovery layer only and request two registrations: the well-known suffix and the profile URI.')],
+  ['Internet-Draft', STATUS.draft ? 'Posted' : 'Not yet posted', regText.draft + (STATUS.draft ? '' : ' It will describe the discovery layer only, request the registration of the well-known suffix <code>knowledge-linkset</code>, and record the fields of the profile URI, whose registration in the Profile URIs registry is to be requested separately.')],
   ['Preprint', STATUS.preprint ? 'Published' : 'In preparation', regText.preprint],
   ['Reference engine <code>agsc</code>', 'In preparation', 'The engine is written, and it builds this site: every machine-readable file here is emitted by <code>agsc build</code> over this repository&#39;s own content. The package itself is not published yet.'],
   ['Independent validators', 'In preparation', `The nine checker contracts of ${REF('AGSC-09-90')} &#8212; seven validators and two generators &#8212; exist in the reference distribution, which is not published yet, beside its artefact counter and its benchmark tool; the maintainer&#39;s own tools stay in the repository. One validator, for the discovery document, checks this site at Level 2 before every publish.`],
   ['Contribution channel', 'Live', `Declared in the <a href="${WELLKNOWN}">discovery document</a> as a pull-request target (${REF('AGSC-11-14')}), and every page generated from a source file carries a <em>Propose an edit</em> link to that file. Nothing is written without a person merging it.`],
-  ...(PATTERNS_NODE ? [['Patterns catalogue as a second node', 'In preparation', `The catalogue of agentic system patterns is being prepared as a second node at <code>patterns.agenticsystemcore.com</code>. ${PEERS.length ? `This node already names it as a peer in the discovery document; the mutual check of ${REF('AGSC-10-12')} passes once both are published.` : 'It is not declared as a peer yet.'}`]] : []),
+  ...(PATTERNS_NODE ? [['Second node (live demonstration)', 'In preparation', `A second node, at <code>patterns.agenticsystemcore.com</code>, is being prepared: a live demonstration of the reference engine, running on a small sample of well-known agent-system patterns described from public sources. ${PEERS.length ? `This node already names it as a peer in the discovery document; the mutual check of ${REF('AGSC-10-12')} passes once both are published.` : 'It is not declared as a peer yet.'}`]] : []),
   ['Papers', 'Planned', 'Journal and conference papers follow the preprint; none is submitted.'],
 ];
 const statusTable = `<div class="table-wrap" tabindex="0" role="region" aria-label="Status"><table>
@@ -1716,7 +1716,7 @@ addPage('/about/', {
   jsonld: { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'About AgenticSystemCore', url: `${BASE}about/`, author: { '@type': 'Person', name: config.site.author, sameAs: ['https://orcid.org/0009-0001-3464-5283', 'https://github.com/andreibesleaga', CONTACT_URL] } },
   body: md(read('site/about.md'), { ruleLinks: true }).replace('<h2 id="status">', quickstartHtml() + '<h2 id="status">') + editLink('site', 'site/about.md'),
 });
-// AGSC-06-18 as amended at rc.5 pins the text the identifier names: the file `LICENSE-CONTENT`
+// AGSC-06-18 pins the text the identifier names: the file `LICENSE-CONTENT`
 // at the root of the specification's distribution, with this SHA-256 over its bytes. The Bundle
 // root carries its own copy; both are checked to be that text, or `/legal/` would publish terms
 // the identifier does not name.
@@ -1726,7 +1726,7 @@ if (!TERMS_TEXT.includes(`SPDX-License-Identifier: ${TERMS_ID}`)) die('LICENSE-C
 if (sha256hex(Buffer.from(TERMS_TEXT, 'utf8')) !== TERMS_SHA256) die(`LICENSE-CONTENT at tag ${SPEC_TAG} is not the text AGSC-06-18 pins (${TERMS_SHA256})`);
 if (sha256hex(fs.readFileSync(path.join(ROOT, 'LICENSE-CONTENT'))) !== TERMS_SHA256) die('the Bundle root LICENSE-CONTENT is not the text AGSC-06-18 pins');
 addPage('/legal/', {
-  title: 'Legal and privacy', summary: summaryOf('/legal/'), description: 'The Content Use Terms, the licences of each kind of artefact, the machine-readable signals and the privacy notice of this node.', section: null,
+  title: 'Legal and privacy', summary: summaryOf('/legal/'), description: 'The Content Use Terms, the licences of each kind of artefact, copyright, citing, first publication, the machine-readable signals and the privacy notice of this node.', section: null,
   jsonld: { '@context': 'https://schema.org', '@type': 'WebPage', name: 'Legal and privacy', url: `${BASE}legal/` },
   body: `<h2 id="licences">Licences</h2>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Licences"><table>
@@ -1735,21 +1735,35 @@ addPage('/legal/', {
 <tr><td>The prose of the items, and the pages and text files that carry it, including <code>/llms.txt</code>, <code>/llms-full.txt</code> and <code>/graph.jsonld</code></td><td><a href="#terms">Content Use Terms 1.0</a> (<code>${TERMS_ID}</code>)</td></tr>
 <tr><td>The schemas, the ontology, the JSON-LD context, the identifiers and the discovery document</td><td><a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a></td></tr>
 <tr><td>The specification text</td><td><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>, as published with the reference implementation</td></tr>
+<tr><td>The reference engine, its command line and checkers, and the conformance vectors</td><td><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a></td></tr>
 </tbody></table></div>
+<h2 id="copyright">Copyright and authorship</h2>
+<p>&#169; ${esc(FOOTER_YEAR)} ${esc(config.site.author)}. The author wrote the specification, the reference engine, the vocabulary, the schemas, the guide and the items of this node, except where an item&#39;s provenance names another author, and holds the copyright in all of it except the parts dedicated to the public domain under CC0 1.0. The licences above grant the permissions they state and nothing more; every other right is kept by the author, including the right to publish the same material elsewhere, in any form. The right to be named as the author, and to object to a change that harms the work&#39;s integrity, stays with the author wherever the law gives it.</p>
 <h2 id="terms">Content Use Terms 1.0</h2>
 <p>The identifier <code>${TERMS_ID}</code> names this exact text, not a file name: the file <code>LICENSE-CONTENT</code> at the root of the specification's distribution, ${Buffer.byteLength(TERMS_TEXT)} bytes, SHA-256 <code>${TERMS_SHA256}</code> (${REF('AGSC-06-18')}). A distribution that ships different wording must use a different identifier; a reader may check the hash.</p>
 <pre tabindex="0" class="terms"><code>${esc(TERMS_TEXT.replace(/\n$/, ''))}</code></pre>
+<h2 id="citing">Citing and quoting</h2>
+<p>Cite this work as <a href="/docs/standards/#how-to-cite">the standards page</a> shows: the specification by its version, and the paper by its DOI once it is published. Clause 3 of the Content Use Terms lets anyone quote the prose, with attribution to this node&#39;s address and the item&#39;s address, in any work that adds their own contribution; the licences of the specification, the engine and the vocabulary allow more. Nothing on this page limits a quotation, or any other use, that the law of your country allows without permission.</p>
+<h2 id="prior-art">First publication and prior art</h2>
+<p>Specification <code>${esc(SPEC_VERSION)}</code>, tagged on ${esc(SPEC_DATE)}, is the version in which this work was first made public, together with its reference engine, its vocabulary, its schemas and its conformance vectors. ${STATUS.preprint ? `The permanent record is the Zenodo deposit <a href="https://doi.org/${esc(STATUS.preprint.doi)}">${esc(STATUS.preprint.doi)}</a> of ${esc(STATUS.preprint.date)}: the paper, and a sealed archive of the tagged sources whose SHA-256 digests are listed in the deposit&#39;s <code>SHA256SUMS</code> file, with an OpenTimestamps proof of that list.` : 'The permanent record &#8212; a deposit with a persistent identifier holding the paper and a sealed archive of the tagged sources, with their SHA-256 digests and an OpenTimestamps proof of them &#8212; is named here once it is published.'}</p>
+<p>Everything these artefacts describe &#8212; the format, the rules, the discovery mechanism, the vocabulary and the designs of the engine &#8212; is published so that it is on the public record from that date, and it is free to implement under the licences on this page. Publication does not stop anyone from applying for a patent; it places what is published here in the state of the art against which the novelty of a later application is judged.</p>
 <h2 id="signals">Machine-readable signals</h2>
-<p>The same policy is stated three ways (${REF('AGSC-06-18')}): the AI-usage signals of <a href="/robots.txt"><code>/robots.txt</code></a>, the TDM reservation in <a href="/.well-known/tdmrep.json"><code>/.well-known/tdmrep.json</code></a>, and the <code>schema:license</code> and <code>schema:usageInfo</code> members of <a href="/graph.jsonld"><code>/graph.jsonld</code></a> together with the provenance header of <a href="/llms.txt"><code>/llms.txt</code></a>.</p>
+<p>The same policy is stated three ways (${REF('AGSC-06-18')}): the AI-usage signals of <a href="/robots.txt"><code>/robots.txt</code></a>, the TDM reservation in <a href="/.well-known/tdmrep.json"><code>/.well-known/tdmrep.json</code></a>, and the <code>schema:license</code> and <code>schema:usageInfo</code> members of <a href="/graph.jsonld"><code>/graph.jsonld</code></a> together with the provenance header of <a href="/llms.txt"><code>/llms.txt</code></a>. The reservation of text and data mining does not limit what the law of your country allows researchers to do without permission.</p>
 <h2 id="ai-assistance">How this text was written</h2>
 <p>${esc(config.site.author)} writes and maintains this work with the help of AI assistants. A person decides what is written and why. An assistant drafts and checks text under the author&#39;s direction. The author reads, edits and approves every sentence before it is published, and answers for all of it.</p>
 <p>Every item on this node records how its text was made &#8212; written by a person, written with AI assistance, generated by a model, or imported from elsewhere &#8212; and names the person accountable for it. You can read that record on the item&#39;s own page and in the machine-readable views.</p>
 <p>No model runs on this site, in its build, or in any check that decides whether a change is accepted.</p>
+<p><strong>What the assistance covered.</strong> Text, code, figures and diagrams alike. ${esc(config.site.author)} reviewed all of it and answers for it.</p>
+<p><strong>Models are optional, and belong to whoever runs them.</strong> The reference engine contains no model adapter and calls no model. The model steps the specification describes &#8212; an agent lane, a review lane, automatic correction, a narrated answer &#8212; are optional: each stays off unless the person running an engine adds an adapter of their own and turns it on, each runs under that person&#39;s spend cap (${REF('AGSC-01-38')}), and each is that person&#39;s responsibility.</p>
+<p><strong>What your assistant says is not this site speaking.</strong> The page tools, the tool server and the exports hand this node&#39;s published text to software that someone else runs. What an assistant or agent writes from it is that software&#39;s output and the responsibility of the person who runs it: it is not a statement by the author, and it can be wrong even where the text it read is right. The Content Use Terms still apply to any of this node&#39;s text it reproduces, and text an agent sends back as a proposal becomes part of this node only after a person reviews and merges it.</p>
 <p>In the words the machine-readable exports use, which are a constant of the specification and are never authored here (${REF('AGSC-06-15')}): <q>${esc(engineProvenance.ASSISTANCE)}</q></p>
 <h2 id="disclaimer">What this work does not claim</h2>
 <p><strong>No warranty.</strong> This work is published as it is. Nothing here is promised to be complete, correct, current or fit for any purpose.</p>
 <p><strong>No liability.</strong> Use it at your own risk. To the fullest extent the law allows, the author is not liable for anything that follows from using it, including any indirect, incidental, special or consequential loss and any loss of data, profit or business. Nothing here excludes or limits a liability that the law does not allow to be excluded or limited.</p>
 <p><strong>Not advice.</strong> Nothing here is legal, professional, financial, medical or safety advice. Where a page describes a rule, a regulation or a standard, it is a description and nothing more, and it may be wrong or out of date.</p>
+<p><strong>Verify before relying.</strong> The specification, the guide and the items describe formats, designs and practices. Check them against your own requirements and against the sources they cite, and test what you build, before you rely on them. Nothing here is security advice either: following the specification&#39;s security rules does not by itself make a system secure.</p>
+<p><strong>The software.</strong> The reference engine and this site&#39;s code are provided under the Apache License 2.0, which carries its own disclaimer of warranty (section 7) and limitation of liability (section 8).</p>
+<p><strong>Links to other sites.</strong> Links to other sites are there for reference. What they lead to belongs to its owners; the author does not control it and is not responsible for it, and a link does not mean the author approves of it.</p>
 <p><strong>Nobody else is behind this.</strong> This is the independent work of one person. No standards body, no foundation, no company and no institution named anywhere on this site has reviewed, approved, sponsored or is otherwise connected with it. This is not a document of the IETF, of the W3C or of any other body, and none of them has adopted it.</p>
 <p><strong>Other people&#39;s names belong to them.</strong> Product, project and organisation names used here &#8212; among them those of the IETF, IANA, the W3C, the Linux Foundation, Cloudflare, GitHub, npm, Google, OpenAI, Anthropic, Meta and Zenodo &#8212; are used only to say what is being talked about. They are the marks of their respective owners, and using a name is not a claim of any connection with its owner.</p>
 <p><strong>The name of this project.</strong> AgenticSystemCore&#8482; is a trademark of Andrei N. Besleaga. Other names belong to their owners.</p>
@@ -1993,7 +2007,7 @@ put('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http:
 
 // _headers: Cloudflare Pages merges every matching block, so each header is set once.
 // The machine routes a visiting agent — or this site's own page tools on another origin — may
-// read cross-origin. `/pages/*` joins the list at rc.5: it is what the `read` and `propose` page
+// read cross-origin. `/pages/*` is on the list because it is what the `read` and `propose` page
 // tools return (AGSC-06-02, AGSC-09-16).
 const PUBLIC_ARTEFACT = ['/.well-known/knowledge-linkset', '/graph.jsonld', '/graph.nq', '/graph.ttl', '/llms.txt', '/llms-full.txt', '/search.json', '/pages/*.md', '/pages/*.jsonld', '/ns/*', '/chunks.jsonl', '/ledger.jsonl', '/now.md', '/skills/*', '/boards/*', '/exports/*'];
 put('_headers', `# Generated by scripts/build.js — do not hand-edit (AGSC-06-04).
@@ -2045,7 +2059,7 @@ ${PUBLIC_ARTEFACT.map(p => `${p}\n  Access-Control-Allow-Origin: *\n  Access-Con
   Content-Type: application/jsonl
   Cache-Control: no-cache
 
-/boards/*
+/boards/*.json
   Content-Type: application/json; charset=utf-8
 
 /now.md
@@ -2107,8 +2121,8 @@ for (const [p, c] of files) {
   if (s !== null) {
     if (s.normalize('NFC') !== s) die(`${p}: output not NFC (AGSC-E604)`);
     if (!s.endsWith('\n') || s.endsWith('\n\n')) die(`${p}: output must end with exactly one LF`);
-    if (p.endsWith('.html') && Buffer.byteLength(s) > 100 * 1000) die(`${p}: ${Buffer.byteLength(s)} bytes exceeds the 100 KB page budget (AGSC-06-21; KB is decimal at rc.5)`);
-    // AGSC-06-21 as amended at rc.5: ≤1 MB per index document, and `/search.json` carries the docs
+    if (p.endsWith('.html') && Buffer.byteLength(s) > 100 * 1000) die(`${p}: ${Buffer.byteLength(s)} bytes exceeds the 100 KB page budget (AGSC-06-21; KB is decimal)`);
+    // AGSC-06-21: ≤1 MB per index document, and `/search.json` carries the docs
     // of at most 500 items before it becomes a manifest over `/search-<nn>.json` shards.
     if (p === 'search.json') {
       if (Buffer.byteLength(s) > 1000 * 1000) die(`search.json: ${Buffer.byteLength(s)} bytes exceeds the 1 MB index-document budget (AGSC-06-21)`);

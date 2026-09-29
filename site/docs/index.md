@@ -29,7 +29,7 @@ The specification is written for implementers and is exact by design. This guide
 | [Requirements](/docs/requirements/) | The product requirements in EARS form, with the identifiers the specification cites |
 | [Scenarios](/docs/scenarios/) | The behaviour-driven scenarios, one feature file per persona |
 | [Glossary](/docs/glossary/) | Every term of the specification and of the ontology, generated from the sources |
-| [Reading the specification](/docs/reading-the-specification/) | Rule identifiers, key words, the bracketed references, retired rules, error codes, Levels |
+| [Reading the specification](/docs/reading-the-specification/) | Rule identifiers, key words, the bracketed references, reserved rules, error codes, Levels |
 | [Standards and references](/docs/standards/) | Every standard this work stands on or defines, the registrations and their status, related work, publications |
 | [Compliance and security](/docs/compliance/) | The regulatory crosswalk, the security considerations, what this site does with your data |
 | [Status](/docs/status/) | What is live today and what is not yet |

@@ -15,7 +15,7 @@ sources:
   - resource: https://agenticsystemcore.com/specs/00-overview/#AGSC-00-07
     title: AGSC-00-07
     grade: primary
-  - resource: https://agenticsystemcore.com/specs/06-surfaces/page-2/#AGSC-06-22
+  - resource: https://agenticsystemcore.com/specs/06-surfaces/#AGSC-06-22
     title: AGSC-06-22
     grade: primary
 ---

@@ -7,7 +7,7 @@
   var CORE = globalThis.AGSC_CORE;
   var SPEC_VERSION = "1.0.0-rc.6";
   var LICENSE_PROSE = "LicenseRef-AgenticSystemCore-Content-Use-1.0";
-  var state ={ base: '', bodies: {}, instant: '', items: [], selection: [], verdict: null, version: '' };
+  var state = { base: '', bodies: {}, instant: '', items: [], rows: [], selection: [], verdict: null, version: '' };
   globalThis.AGSC_COMPOSE = state;
 
   function el(id) { return typeof document === 'undefined' ? null : document.getElementById(id); }
@@ -16,9 +16,10 @@
   // AGSC-09-16: one tool contract, two transports. All SEVEN tools are implemented
   // by `agsc-page-tools.js`, which this page loads before this controller and which
   // installs `globalThis.AGSC_TOOLS`. This controller therefore installs NOTHING on
-  // that name: until rc.5 it installed a stub that answered `compose` and refused the
-  // other six, and that stub — not the shared implementation — is what the site
-  // actually shipped.
+  // that name, so the page and the stdio server answer from the same implementation.
+
+  /** The prompt shown while no item is selected: an empty selection is not a verdict. */
+  var EMPTY = 'Select one or more items to compose.';
 
   /** The selection a `/compose/?from=<slug>` link names (AGSC-07-24). */
   function selectionFromQuery() {
@@ -39,11 +40,46 @@
     });
   }
 
+  /**
+   * One sentence per Composition warning (AGSC-07-07's `AGSC-E803`, AGSC-07-23's
+   * `AGSC-E804`). A warning never invalidates a composition; the reader is told
+   * what it means, not only its code.
+   */
+  function warningText(warning) {
+    var source = warning.source === undefined ? '' : String(warning.source);
+    var target = warning.target === undefined ? '' : String(warning.target);
+    if (warning.code === 'AGSC-E804') {
+      return source + ' consumes the port ' + target + ', and no selected item produces it;'
+        + ' the composition is still valid (AGSC-07-23)';
+    }
+    if (warning.code === 'AGSC-E803') {
+      return source + ' names ' + target + ' under ' + warning.key + ', which does not close a'
+        + ' selection (only requires does), so it was not added (AGSC-07-05, AGSC-07-07)';
+    }
+    return 'a warning on ' + warning.key + ': ' + source + ' to ' + target;
+  }
+  state.warningText = warningText;
+
+  /** Fill one list and its heading from entries, hiding both when there are none. */
+  function fillList(id, entries, line) {
+    var list = el(id);
+    if (!list) return;
+    list.textContent = '';
+    list.hidden = entries.length === 0;
+    if (el(id + '-heading')) el(id + '-heading').hidden = list.hidden;
+    for (var i = 0; i < entries.length; i += 1) {
+      var li = document.createElement('li');
+      li.textContent = line(entries[i]);
+      list.appendChild(li);
+    }
+  }
+
   function render() {
     var result = CORE.compose(state.items, state.selection);
     state.verdict = result;
+    var empty = state.selection.length === 0;
     var verdict = el('verdict');
-    if (verdict) verdict.textContent = CORE.canonicalJson(CORE.verdictOf(result));
+    if (verdict) verdict.textContent = empty ? '' : CORE.canonicalJson(CORE.verdictOf(result));
     var why = el('explanations');
     if (why) {
       why.textContent = '';
@@ -58,21 +94,16 @@
         why.appendChild(li);
       }
     }
-    var problems = el('conflicts');
-    if (problems) {
-      problems.textContent = '';
-      problems.hidden = result.conflicts.length === 0;
-      if (el('conflicts-heading')) el('conflicts-heading').hidden = problems.hidden;
-      for (var c = 0; c < result.conflicts.length; c += 1) {
-        var conflict = result.conflicts[c];
-        var row = document.createElement('li');
-        row.textContent = conflict.code + ' on ' + conflict.key + ': ' + conflict.pair.join(' / ');
-        problems.appendChild(row);
-      }
-    }
-    text(el('validity'), result.valid ? 'valid' : 'invalid — no Harness is emitted (AGSC-07-17)');
+    fillList('conflicts', result.conflicts, function (conflict) {
+      return conflict.code + ' on ' + conflict.key + ': ' + conflict.pair.join(' / ');
+    });
+    fillList('warnings', empty ? [] : (result.warnings || []), function (warning) {
+      return warning.code + ': ' + warningText(warning);
+    });
+    if (empty) text(el('validity'), EMPTY);
+    else text(el('validity'), result.valid ? 'valid' : 'invalid — no Harness is emitted (AGSC-07-17)');
     var button = el('download');
-    if (button) button.disabled = !result.valid;
+    if (button) button.disabled = empty || !result.valid;
   }
 
   /**
@@ -184,10 +215,41 @@
     });
   }
 
+  /**
+   * The filter box: a plain, case-insensitive text match on each item's title,
+   * description and slug. It hides the rows that do not match and never changes the
+   * selection, so a ticked item stays in the composition while it is filtered out.
+   */
+  function applyFilter() {
+    var box = el('filter');
+    var query = box ? String(box.value || '').trim().toLowerCase() : '';
+    var shown = 0;
+    for (var i = 0; i < state.rows.length; i += 1) {
+      var row = state.rows[i];
+      var match = query === '' || row.text.indexOf(query) !== -1;
+      row.li.hidden = !match;
+      if (match) shown += 1;
+    }
+    text(el('filter-status'), query === '' ? ''
+      : shown + ' of ' + state.rows.length + ' items match "' + query + '".');
+    return shown;
+  }
+  state.applyFilter = applyFilter;
+
+  function showFilter() {
+    var form = el('filter-form');
+    var box = el('filter');
+    if (!form || !box) return;
+    form.addEventListener('submit', function (event) { event.preventDefault(); });
+    box.addEventListener('input', applyFilter);
+    form.hidden = false;
+  }
+
   function paint() {
     var list = el('items');
     if (!list) return;
     list.textContent = '';
+    state.rows = [];
     for (var i = 0; i < state.items.length; i += 1) {
       var item = state.items[i];
       if (item.type === 'cluster') continue;
@@ -209,7 +271,11 @@
       li.appendChild(box);
       li.appendChild(label);
       list.appendChild(li);
+      state.rows.push({ li: li, text: [item.title, item.description, item.slug]
+        .filter(function (part) { return typeof part === 'string'; }).join(' ').toLowerCase() });
     }
+    showFilter();
+    applyFilter();
   }
 
   /**

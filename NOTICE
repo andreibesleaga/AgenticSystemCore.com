@@ -1,2 +1,15 @@
 AgenticSystemCore
 Copyright 2026 Andrei N. Besleaga
+
+Which licence covers which part:
+- the code of this repository (the site generator and its checks): Apache
+  License 2.0 (LICENSE);
+- the specification text the site publishes: Apache License 2.0, as published
+  with the reference implementation;
+- the schemas, the ontology, the JSON-LD context, the identifiers and the
+  discovery document: CC0 1.0 Universal;
+- the prose of the items and the pages and text files that carry it: the
+  AgenticSystemCore Content Use Terms 1.0 (LICENSE-CONTENT).
+Every right these licences do not grant is reserved by the author.
+
+AgenticSystemCore™ is a trademark of Andrei N. Besleaga. Other names belong to their owners.

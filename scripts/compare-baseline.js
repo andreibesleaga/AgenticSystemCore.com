@@ -35,7 +35,7 @@
 // ---------------------------------------------------------------- the normalisation, exactly
 //
 // N1  Every release-candidate literal `1.0.0-rc.<digits>` becomes `1.0.0-rc.X`. The site
-//     moved from rc.5 to rc.6 and the version string appears on most pages.
+//     version string appears on most pages, and a baseline may predate the current one.
 // N2  Every region declared in <baseline>/added-regions.json is deleted. Each entry is
 //     {route: <glob or "*">, pattern: <JavaScript regular expression, "g" applied>, why: <plain words>}.
 //     A declared pattern that matches nothing anywhere is itself a failure, so the list
