@@ -1120,9 +1120,21 @@ addPage('/', {
   title: config.site.title, summary: summaryOf('/'), description: index.fm.description, section: null,
   jsonld: { '@context': 'https://schema.org', '@type': 'WebSite', name: config.site.title, url: BASE, description: index.fm.description, author: { '@type': 'Person', name: config.site.author, sameAs: ['https://orcid.org/0009-0001-3464-5283'] } },
   body: `<p class="tagline">${esc(config.site.tagline)}</p>
+<p class="lead">AgenticSystemCore turns one folder of Markdown into a website, a knowledge graph and a local tool server for AI assistants at once — every link typed, every published artefact carrying a digest a reader can check, every change merged by a person or by a rule that person recorded — so people, search engines and AI agents read the same checked knowledge, with no server, database or language model needed to build, check or publish it.</p>
 ${md(index.body)}<h2 id="different">What is different about it</h2>
-<p class="lead">Other systems have some of these. To the author's knowledge none has them together: a knowledge base a machine can find through registered web mechanisms, a digest on everything it points at, a typed graph with a published vocabulary, bytes pinned by conformance vectors, a person on every merge — directly, or by a standing rule that person recorded — and a runnable harness out of the same files, with no server.</p>
+<p class="lead">Other systems have some of these. To the author's knowledge none has them together: a knowledge base a machine can find through registered web mechanisms, a digest on everything it points at, a typed graph with a published vocabulary, bytes pinned by conformance vectors, a person on every merge — directly, or by a standing rule that person recorded — and a starting harness out of the same files, with no server.</p>
 <p>These are claims about the specification's text and its test vectors, not performance claims. The dated comparison with other systems is in the <a href="/docs/standards/#related-work">related work</a>, and the full sentence in the <a href="/docs/introduction/">introduction</a>.</p>
+<h2 id="compares">How it compares</h2>
+<p>What it shares with others' work, and how it differs:</p>
+<ul>
+<li><strong>LLM wikis</strong> (<a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f">Andrej Karpathy's idea</a>, the <a href="https://github.com/decodingai-magazine/llm-wiki-workshop">Decoding AI workshop</a>): the same aim — Markdown pages, sources kept apart, knowledge prepared in advance. There a model writes pages and a link's kind lives in prose; here links are typed, deterministic checks find orphans and stale links, and a model proposes but never merges.</li>
+<li><strong><a href="https://technicspub.com/ontology-pipeline/">The Ontology Pipeline</a></strong> (Jessica Talisman): six stages from controlled vocabulary to knowledge graph. The graph stage works today, the others in part; the next version is planned to follow them. No compatibility is claimed.</li>
+<li><strong>Google's <a href="https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md">Open Knowledge Format</a></strong>: also Markdown with a header, but link kinds stay in prose; no discovery layer or digests.</li>
+<li><strong><a href="https://llmstxt.org/">llms.txt</a></strong>: a node publishes one, with a fixed grammar, beside a discovery document giving each artefact's digest.</li>
+<li><strong>Agent discovery</strong> (<a href="https://datatracker.ietf.org/doc/draft-jimenez-dawn-discovery-landscape/">IETF survey</a>) finds who can act; this finds what is known. <a href="https://www.rfc-editor.org/info/rfc9727">RFC 9727 (api-catalog)</a> is the design precedent.</li>
+<li><strong><a href="https://wikiba.se/">Wikibase and Wikidata</a></strong>: a typed graph in a served wiki with live writes; here, static files under version control.</li>
+</ul>
+<p>${STATUS.preprint ? `Details in <a href="https://doi.org/${esc(STATUS.preprint.doi)}">the paper</a>` : 'Details in the <a href="/docs/standards/#related-work">related work</a>'}; source on <a href="https://github.com/andreibesleaga/agentic-system-core">GitHub</a>.</p>
 <h2 id="what-you-can-do">Six ways to use it</h2>
 <ul class="modes">
 ${MODE_CARDS.map(([t, d, h]) => `<li><strong><a href="${h}">${esc(t)}</a></strong>${esc(d)}</li>`).join('\n')}

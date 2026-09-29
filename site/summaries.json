@@ -3,7 +3,7 @@
   "/404.html": "There is no page at this address.",
   "/about/": "Who writes AgenticSystemCore, how people and agents read this node, the status of the specification and how to get in touch.",
   "/clusters/": "The groupings this node uses to organise its items.",
-  "/compose/": "Select items from this node and compute a runnable Harness in the browser; the same page offers the seven tools to a browser assistant.",
+  "/compose/": "Select items from this node and compute a Harness in the browser; the same page offers the seven tools to a browser assistant.",
   "/concepts/": "The twelve terms of the specification, each on its own page with the rules that define it.",
   "/episodes/": "The episodes index of this node, empty for now: the route exists because the specification names it for every node.",
   "/exports/": "Every machine-readable file this node publishes, what each is for, and which are pinned by a rule.",
