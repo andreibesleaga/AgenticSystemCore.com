@@ -1,6 +1,6 @@
 {
   "build": {
-    "out": "www-next"
+    "out": "www"
   },
   "bundle": {
     "id": "agenticsystemcore",

@@ -29,10 +29,15 @@
       "reason": "the gate's forbidden-wording list: the words it refuses on the site"
     },
     {
+      "check": "personal",
+      "path": "www/assets/search-site.json",
+      "reason": "search excerpts are cut at a fixed length, so the canonical name Andrei N. Besleaga can end mid-word at any letter; the file holds no other personal data"
+    },
+    {
       "check": "process",
-      "path": "www/_headers",
-      "text": "D67",
-      "reason": "the live build now served, replaced whole by www-next at launch and never edited by hand; www-next carries no such comment"
+      "path": "www/docs/requirements/index.html",
+      "text": "auto-disable runbook",
+      "reason": "NFR-09 is a product requirement that a node ships a restore runbook (rendered from the engine's PRD)"
     }
   ]
 }

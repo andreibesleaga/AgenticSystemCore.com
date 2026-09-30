@@ -31,7 +31,7 @@ const STATUS = {
   profile: 'not-filed',         // not-filed | filed | registered
   draft: null,                  // e.g. 'draft-besleaga-agentic-knowledge-wellknown-00' once posted
   w3id: false,                  // true once the w3id.org namespace redirects are live
-  preprint: null,               // e.g. { doi: '10.5281/zenodo.NNNNNNN', title: '…', date: 'YYYY-MM-DD' } once published
+  preprint: { doi: '10.5281/zenodo.23052710', title: 'AgenticSystemCore: Distributed Knowledge Bundles and Runnable Systems, for People and Agents', date: '2026-09-30' },               // e.g. { doi: '10.5281/zenodo.NNNNNNN', title: '…', date: 'YYYY-MM-DD' } once published
 };
 
 // ------------------------------------------------------------------ basics
@@ -1622,8 +1622,8 @@ const statusRows = [
   ['Profile URI', { 'not-filed': 'Not filed', filed: 'Filed', registered: 'Registered' }[STATUS.profile], regText.profile],
   ['Internet-Draft', STATUS.draft ? 'Posted' : 'Not yet posted', regText.draft + (STATUS.draft ? '' : ' It will describe the discovery layer only, request the registration of the well-known suffix <code>knowledge-linkset</code>, and record the fields of the profile URI, whose registration in the Profile URIs registry is to be requested separately.')],
   ['Preprint', STATUS.preprint ? 'Published' : 'In preparation', regText.preprint],
-  ['Reference engine <code>agsc</code>', 'In preparation', 'The engine is written, and it builds this site: every machine-readable file here is emitted by <code>agsc build</code> over this repository&#39;s own content. The package itself is not published yet.'],
-  ['Independent validators', 'In preparation', `The nine checker contracts of ${REF('AGSC-09-90')} &#8212; seven validators and two generators &#8212; exist in the reference distribution, which is not published yet, beside its artefact counter and its benchmark tool; the maintainer&#39;s own tools stay in the repository. One validator, for the discovery document, checks this site at Level 2 before every publish.`],
+  ['Reference engine <code>agsc</code>', 'Published', 'The engine is written, and it builds this site: every machine-readable file here is emitted by <code>agsc build</code> over this repository&#39;s own content. Published as <code>agentic-system-core</code> (short alias <code>agsc-cli</code>) on npm and as <code>agentic-system-core</code> on PyPI, at <code>1.0.0-rc.6</code>.'],
+  ['Independent validators', 'Published', `The nine checker contracts of ${REF('AGSC-09-90')} &#8212; seven validators and two generators &#8212; ship in the published npm package beside its artefact counter and its benchmark tool; the maintainer&#39;s own tools stay in the repository. One validator, for the discovery document, checks this site at Level 2 before every publish.`],
   ['Contribution channel', 'Live', `Declared in the <a href="${WELLKNOWN}">discovery document</a> as a pull-request target (${REF('AGSC-11-14')}), and every page generated from a source file carries a <em>Propose an edit</em> link to that file. Nothing is written without a person merging it.`],
   ...(PATTERNS_NODE ? [['Second node (live demonstration)', 'In preparation', `A second node, at <code>patterns.agenticsystemcore.com</code>, is being prepared: a live demonstration of the reference engine, running on a small sample of well-known agent-system patterns described from public sources. ${PEERS.length ? `This node already names it as a peer in the discovery document; the mutual check of ${REF('AGSC-10-12')} passes once both are published.` : 'It is not declared as a peer yet.'}`]] : []),
   ['Papers', 'Planned', 'Journal and conference papers follow the preprint; none is submitted.'],
