@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Machine-readable files — AgenticSystemCore</title>
+<meta name="description" content="Every machine-readable file this node publishes, what each is for, and which are additive.">
+<link rel="canonical" href="https://agenticsystemcore.com/exports/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/exports/">
+<meta property="og:title" content="Machine-readable files">
+<meta property="og:description" content="Every machine-readable file this node publishes, what each is for, and which are additive.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Machine-readable files","url":"https://agenticsystemcore.com/exports/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main" class="wide">
+<h1>Machine-readable files</h1>
+<p class="summary"><strong>Summary</strong>Every machine-readable file this node publishes, what each is for, and which are pinned by a rule.</p>
+<p>Everything a program needs from this node is a static file it can fetch without a key, an account or a request to anyone. Start at the discovery document; everything else is reachable from it. The two files under <code>/exports/</code> are <strong>additive</strong>: no rule pins their bytes, nothing depends on them, and they exist because they are cheaper to read than the files they are derived from.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Machine-readable files"><table>
+<thead><tr><th scope="col">File</th><th scope="col">Media type</th><th scope="col">What it is</th></tr></thead>
+<tbody>
+<tr><td><a href="/.well-known/knowledge-linkset"><code>/.well-known/knowledge-linkset</code></a></td><td><code>application/linkset+json</code></td><td>The one file to fetch first: it says what this node is, where its graph, ontology, skills and NOW page are, which nodes it peers with, and how to propose a change.</td></tr>
+<tr><td><a href="/llms.txt"><code>/llms.txt</code></a></td><td><code>text/plain</code></td><td>The node in one page, for a model with a small context: a title, a provenance header and one line per item.</td></tr>
+<tr><td><a href="/llms-full.txt"><code>/llms-full.txt</code></a></td><td><code>text/plain</code></td><td>The same, with every item's whole body.</td></tr>
+<tr><td><a href="/search.json"><code>/search.json</code></a></td><td><code>application/json</code></td><td>The search index a page or an agent searches offline, the same bytes the engine emits.</td></tr>
+<tr><td><a href="/graph.jsonld"><code>/graph.jsonld</code></a></td><td><code>application/ld+json</code></td><td>Every item as RDF, in JSON-LD.</td></tr>
+<tr><td><a href="/graph.nq"><code>/graph.nq</code></a></td><td><code>application/n-quads</code></td><td>The same graph as N-Quads &#8212; the form its fingerprint is taken over.</td></tr>
+<tr><td><a href="/graph.ttl"><code>/graph.ttl</code></a></td><td><code>text/turtle</code></td><td>The same graph as Turtle, for a reader.</td></tr>
+<tr><td><a href="/chunks.jsonl"><code>/chunks.jsonl</code></a></td><td><code>application/jsonl</code></td><td>One line per passage, each with its digest, its item, its licence and its IRI: what a retrieval system indexes when it wants to cite what it found.</td></tr>
+<tr><td><a href="/pages/bundle.md"><code>/pages/&lt;slug&gt;.md</code></a></td><td><code>text/markdown</code></td><td>The source file of one item, exactly as it is stored.</td></tr>
+<tr><td><a href="/pages/bundle.jsonld"><code>/pages/&lt;slug&gt;.jsonld</code></a></td><td><code>application/ld+json</code></td><td>One item as RDF, on its own.</td></tr>
+<tr><td><a href="/skills/index.json"><code>/skills/index.json</code></a></td><td><code>application/json</code></td><td>The skill packs and their digests.</td></tr>
+<tr><td><a href="/now.md"><code>/now.md</code></a></td><td><code>text/markdown</code></td><td>The state of this node at the last build.</td></tr>
+<tr><td><a href="/ledger.jsonl"><code>/ledger.jsonl</code></a></td><td><code>application/jsonl</code></td><td>The derived ledger: one hash-chained line per commit of this site's history and one for the build, re-verifiable offline. Its head is on the ledger link of the discovery document.</td></tr>
+<tr><td><a href="/ns/context.jsonld"><code>/ns/context.jsonld</code></a></td><td><code>application/ld+json</code></td><td>The JSON-LD context the graph files use.</td></tr>
+<tr><td><a href="/exports/chunks-index.toon"><code>/exports/chunks-index.toon</code></a></td><td><code>text/plain</code></td><td>The metadata of every passage in TOON tabular form &#8212; the same rows as <code>/chunks.jsonl</code> without the bodies, in about a quarter fewer tokens. Additive and non-normative.</td></tr>
+<tr><td><a href="/exports/llms-ctx.txt"><code>/exports/llms-ctx.txt</code></a></td><td><code>text/plain</code></td><td>A skim view: one labelled section per passage. It drops the digests, the licence and the IRIs on purpose, so anything that needs to cite goes back to <code>/chunks.jsonl</code>. Additive and non-normative.</td></tr>
+<tr><td><a href="/robots.txt"><code>/robots.txt</code></a></td><td><code>text/plain</code></td><td>Who may crawl, and the text-and-data-mining reservation, in the crawler dialect.</td></tr>
+<tr><td><a href="/.well-known/tdmrep.json"><code>/.well-known/tdmrep.json</code></a></td><td><code>application/json</code></td><td>The same reservation, in the TDM dialect.</td></tr>
+<tr><td><a href="/sitemap.xml"><code>/sitemap.xml</code></a></td><td><code>application/xml</code></td><td>Every page of this site.</td></tr>
+</tbody></table></div>
+<h2 id="in-the-page">Tools inside the page</h2>
+<p>Every item page and every guide page of this site also offers seven tools to an assistant running in the visitor's browser: search, read, links, ask, compose, propose and remember. They read only the files above, contact no other host, carry no key and write nothing. <a href="/about/#tools-for-browser-assistants">How they work</a>, and <a href="/compose/">the page that uses them</a>.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>

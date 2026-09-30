@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agenticsystemcore.com/ns/schema/bundle.schema.json",
+  "title": "AgenticSystemCore bundle root",
+  "description": "Frontmatter of content/index.md, the Bundle root document (AGSC-01-04). It MUST NOT carry a type key: the root is not an item and does not enter the graph as one. additionalProperties is true: unknown keys are preserved and reported as AGSC-E207 warnings (AGSC-02-05). CC0-1.0.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["spec_version", "okf_version", "title", "description", "base"],
+  "not": { "required": ["type"] },
+  "properties": {
+    "spec_version": {
+      "description": "SemVer; a reader MUST accept any Bundle whose MAJOR equals its own (AGSC-00-14, AGSC-00-15, AGSC-00-17).",
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "bundle_version": {
+      "description": "The content version of the Bundle state this document was written for (AGSC-04-25). Derived at build and never authored; it appears in the Bundle root document only of an `export --markdown`/`--okf` output (AGSC-01-26).",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,63}$"
+    },
+    "okf_version": {
+      "description": "Open Knowledge Format version this Bundle is a superset of; allowed at the bundle root only.",
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "title": {
+      "description": "AGSC-02-24: an authored SINGLE-LINE string — no C0 control, no U+007F, U+0085, U+2028 or U+2029 — because AGSC-06-13a block (1) puts it on the `# ` line of /llms.txt and /llms-full.txt. A violation is AGSC-E204.",
+      "type": "string",
+      "pattern": "^[^\\x00-\\x1F\\x7F\\x85\\u2028\\u2029]*$",
+      "minLength": 3,
+      "maxLength": 120
+    },
+    "description": {
+      "description": "NOT single-line-bounded, deliberately: AGSC-06-13a block (3) emits this value with 'newlines in the source replaced by a single space', so a multi-line Bundle description is conforming and the writer collapses it.",
+      "type": "string",
+      "minLength": 40,
+      "maxLength": 200
+    },
+    "base": {
+      "description": "Absolute https origin, trailing slash optional; the IRI base of every item (AGSC-01-19, AGSC-05-01). MUST equal site.base in agsc.config.json, including the http://localhost[:port]/ development placeholder written by adoption. No query, no fragment, and no path segment that is . or .. (AGSC-01-19).",
+      "type": "string",
+      "pattern": "^(?:https://[^\\x00-\\x20/?#]+(?:/[^\\x00-\\x20/?#]+)*/?|http://localhost(?::[0-9]{1,5})?/?)$"
+    },
+    "lang": { "type": "string", "pattern": "^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$" },
+    "license": {
+      "description": "SPDX or LicenseRef identifier covering the prose of this Bundle (AGSC-06-15). Single-line: it is the `license:` line of the AGSC-06-13a provenance header (AGSC-02-24).",
+      "type": "string",
+      "pattern": "^[^\\x00-\\x1F\\x7F\\x85\\u2028\\u2029]*$"
+    },
+    "prov": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["origin", "operator"],
+      "properties": {
+        "origin": { "enum": ["human", "ai-assisted", "ai-generated", "imported"] },
+        "agent": { "type": "string" },
+        "model": { "type": "string" },
+        "operator": {
+          "description": "AGSC-02-07: human:<id> only.",
+          "type": "string",
+          "pattern": "^human:[a-z0-9][a-z0-9._-]*$"
+        },
+        "agreement": { "type": "string" }
+      }
+    }
+  }
+}

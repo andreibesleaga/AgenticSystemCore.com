@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide — AgenticSystemCore</title>
+<meta name="description" content="Plain-language guide to AgenticSystemCore: introduction, the six modes, how it works, the data model, the architecture, the requirements, the standards and the compliance record.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/">
+<meta property="og:title" content="Guide">
+<meta property="og:description" content="Plain-language guide to AgenticSystemCore: introduction, the six modes, how it works, the data model, the architecture, the requirements, the standards and the compliance record.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Guide","description":"Plain-language guide to AgenticSystemCore: introduction, the six modes, how it works, the data model, the architecture, the requirements, the standards and the compliance record.","url":"https://agenticsystemcore.com/docs/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Guide</h1>
+<p class="summary"><strong>Summary</strong>The plain-language layer of this site: what AgenticSystemCore is, the six ways it is used, how it works, and how to read the specification without being a standards expert.</p>
+<p>The specification is written for implementers and is exact by design. This guide is written for everyone else. Every page here explains; none of them decides. Where a guide page and a rule disagree, the rule wins, and each page names the rules it explains with small references like (<a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a>) that link to the rule text.</p>
+<h2 id="reading-paths">Reading paths</h2>
+<ul>
+<li><strong>Not sure where to begin?</strong> The <a href="/docs/start-here/">start page</a> has one path for each kind of reader: the curious, the developer, the implementer and the agent.</li>
+<li><strong>New here?</strong> Read the <a href="/docs/introduction/">introduction</a>, then the <a href="/docs/modes/">six modes</a>, then <a href="/docs/how-it-works/">how it works</a>.</li>
+<li><strong>Architect or engineer?</strong> Start with the <a href="/docs/data-model/">data model</a> and the <a href="/docs/architecture/">architecture</a>, then the <a href="/docs/requirements/">requirements</a> and the <a href="/docs/scenarios/">scenarios</a>.</li>
+<li><strong>Implementing the standard?</strong> Read <a href="/docs/reading-the-specification/">how to read the specification</a>, then the <a href="/specs/">specification</a> itself, the <a href="/specs/agentic-knowledge/">discovery profile</a> and the <a href="/ns/">ontology</a>.</li>
+<li><strong>Checking legal, security or policy questions?</strong> Go to <a href="/docs/standards/">standards and references</a> and <a href="/docs/compliance/">compliance and security</a>.</li>
+<li><strong>Looking for something specific?</strong> Use the <a href="/search/">search</a>, which covers every page and every rule of this site.</li>
+</ul>
+<h2 id="the-pages">The pages</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
+<thead><tr><th scope="col">Page</th><th scope="col">What it answers</th></tr></thead>
+<tbody>
+<tr><td><a href="/docs/start-here/">Start here</a></td><td>One reading path per kind of reader</td></tr>
+<tr><td><a href="/docs/introduction/">Introduction</a></td><td>What is this, what is new about it, who is it for</td></tr>
+<tr><td><a href="/docs/modes/">The six modes</a></td><td>Auto-wiki with an optional agent lane, distributed agentic memory, live specifications, evolving skills, runnable knowledge, the live board — a self-driving shared board</td></tr>
+<tr><td><a href="/docs/demos/">Demos</a></td><td>Every mode and every persona as a five-minute demo: the commands, the printed lines, what each proves — kept true by a test</td></tr>
+<tr><td><a href="/docs/how-it-works/">How it works</a></td><td>The build, the proposal lifecycle, discovery, import and export, determinism, safety</td></tr>
+<tr><td><a href="/docs/data-model/">Data model</a></td><td>The six item types, the fourteen links, clusters, sources, provenance</td></tr>
+<tr><td><a href="/docs/architecture/">Architecture</a></td><td>arc42 and C4 views, bounded contexts, ports, deployment, decisions, threat model</td></tr>
+<tr><td><a href="/docs/requirements/">Requirements</a></td><td>The product requirements in EARS form, with the identifiers the specification cites</td></tr>
+<tr><td><a href="/docs/scenarios/">Scenarios</a></td><td>The behaviour-driven scenarios, one feature file per persona</td></tr>
+<tr><td><a href="/docs/glossary/">Glossary</a></td><td>Every term of the specification and of the ontology, generated from the sources</td></tr>
+<tr><td><a href="/docs/reading-the-specification/">Reading the specification</a></td><td>Rule identifiers, key words, the bracketed references, reserved rules, error codes, Levels</td></tr>
+<tr><td><a href="/docs/standards/">Standards and references</a></td><td>Every standard this work stands on or defines, the registrations and their status, related work, publications</td></tr>
+<tr><td><a href="/docs/compliance/">Compliance and security</a></td><td>The regulatory crosswalk, the security considerations, what this site does with your data</td></tr>
+<tr><td><a href="/docs/status/">Status</a></td><td>What is live today and what is not yet</td></tr>
+</tbody></table></div>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/index.md">Propose an edit</a> — opens <code>site/docs/index.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>

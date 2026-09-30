@@ -1,0 +1,744 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agenticsystemcore.com/ns/schema/item.schema.json",
+  "title": "AgenticSystemCore item",
+  "description": "Frontmatter contract for one content item (spec/02-item.md). Keyword subset: exactly the one AGSC-02-24 fixes (normative there); config.schema.json may use more, because the engine validates it and no Bundle reader reads it. additionalProperties is true everywhere on purpose: unknown keys MUST be preserved and reported by lint as AGSC-E207 warnings, never as errors (AGSC-02-05, OKF tolerance). Count bounds that this subset cannot express (tags 2-5) are lint-level warnings, not schema errors. description is OPTIONAL in every branch so that an adopted file validates (AGSC-02-92); a concept or cluster without one is the lint warning AGSC-E408 (AGSC-02-21). When present on a concept or cluster the 40-200 bound is enforced by those branches; elsewhere any length is accepted and lint warns. Every length bound counts Unicode code points, as JSON Schema 2020-12 defines minLength/maxLength (AGSC-02-24); the UTF-16 rule of AGSC-04-05 governs JSON member-name ordering only. CC0-1.0.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "type",
+    "title",
+    "prov"
+  ],
+  "properties": {
+    "type": {
+      "description": "Authoritative item type; MUST match the containing folder (AGSC-01-03).",
+      "enum": [
+        "concept",
+        "episode",
+        "procedure",
+        "lesson",
+        "cluster",
+        "gate"
+      ]
+    },
+    "title": {
+      "description": "3-120 characters, any Unicode in NFC (§2.2 common-key table).",
+      "$ref": "#/$defs/single_line",
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 120
+    },
+    "description": {
+      "description": "Optional everywhere in the schema; lint-required on concept and cluster as AGSC-E408 (AGSC-02-21). Where present on those two types the 40-200 code-point bound is enforced by their branches (AGSC-02-24).",
+      "$ref": "#/$defs/single_line",
+      "type": "string"
+    },
+    "status": {
+      "description": "Default stable.",
+      "enum": [
+        "draft",
+        "stable",
+        "deprecated",
+        "retired"
+      ]
+    },
+    "release": {
+      "description": "Release switchboard key (AGSC-01-20).",
+      "$ref": "#/$defs/slug"
+    },
+    "tags": {
+      "description": "2-5 values from config tags.allowed; membership is checked by lint (AGSC-01-21).",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      }
+    },
+    "aliases": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/single_line",
+        "type": "string"
+      }
+    },
+    "clusters": {
+      "description": "Cluster slugs; the first is primary. Membership is authored here, never on the cluster file (AGSC-02-19).",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/slug"
+      }
+    },
+    "lang": {
+      "description": "Lowercase BCP 47, admitting singleton (extension and private-use) subtags such as x-internal or u-co-phonebk; default en.",
+      "type": "string",
+      "pattern": "^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$"
+    },
+    "date": {
+      "$ref": "#/$defs/date"
+    },
+    "modified": {
+      "$ref": "#/$defs/date"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "prov": {
+      "$ref": "#/$defs/prov"
+    },
+    "generated": {
+      "$ref": "#/$defs/generated"
+    },
+    "verified": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/verified_entry"
+      }
+    },
+    "stale_after": {
+      "$ref": "#/$defs/instant"
+    },
+    "id": {
+      "description": "If present MUST equal the slug (AGSC-01-11).",
+      "$ref": "#/$defs/slug"
+    },
+    "iri": {
+      "description": "If present MUST equal the computed IRI (AGSC-05-05).",
+      "type": "string",
+      "pattern": "^https://[^\\x00-\\x20]+/$"
+    },
+    "spec_version": {
+      "$ref": "#/$defs/semver"
+    },
+    "related": {
+      "$ref": "#/$defs/link_array"
+    },
+    "broader": {
+      "$ref": "#/$defs/link_array"
+    },
+    "narrower": {
+      "$ref": "#/$defs/link_array"
+    },
+    "uses": {
+      "$ref": "#/$defs/link_array"
+    },
+    "requires": {
+      "$ref": "#/$defs/link_array"
+    },
+    "excludes": {
+      "$ref": "#/$defs/link_array"
+    },
+    "derived-from": {
+      "$ref": "#/$defs/link_array"
+    },
+    "contradicts": {
+      "$ref": "#/$defs/link_array"
+    },
+    "supersedes": {
+      "$ref": "#/$defs/link_array"
+    },
+    "implements": {
+      "description": "Mode-2 key 10 (AGSC-03-01); inverse implemented-by.",
+      "$ref": "#/$defs/link_array"
+    },
+    "verifies": {
+      "description": "Mode-2 key 11; inverse verified-by.",
+      "$ref": "#/$defs/link_array"
+    },
+    "covers": {
+      "description": "Mode-2 key 12; inverse covered-by.",
+      "$ref": "#/$defs/link_array"
+    },
+    "blocked-by": {
+      "description": "Mode-2 key 13; inverse blocks.",
+      "$ref": "#/$defs/link_array"
+    },
+    "decided-by": {
+      "description": "Mode-2 key 14; inverse decides.",
+      "$ref": "#/$defs/link_array"
+    },
+    "attachments": {
+      "type": "array",
+      "description": "AGSC-02-98 / AGSC-01-34.",
+      "items": {
+        "type": "object",
+        "required": [
+          "file",
+          "media_type",
+          "alt"
+        ],
+        "properties": {
+          "file": {
+            "type": "string",
+            "pattern": "^[^/\\\\\\x00][^\\x00\\\\]*$"
+          },
+          "media_type": {
+            "type": "string",
+            "pattern": "^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$"
+          },
+          "alt": {
+            "$ref": "#/$defs/single_line",
+            "type": "string",
+            "minLength": 1
+          },
+          "license": {
+            "$ref": "#/$defs/single_line",
+            "type": "string"
+          }
+        },
+        "patternProperties": {
+          "^x-[a-z0-9]+(-[a-z0-9]+)+$": {}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "title": "concept",
+      "required": [
+        "type",
+        "kind"
+      ],
+      "properties": {
+        "type": {
+          "const": "concept"
+        },
+        "description": {
+          "description": "40-200 Unicode code points (§2.2 common-key table, AGSC-02-24).",
+          "$ref": "#/$defs/single_line",
+          "type": "string",
+          "minLength": 40,
+          "maxLength": 200
+        },
+        "kind": {
+          "enum": [
+            "pattern",
+            "taxonomy",
+            "explainer",
+            "principle",
+            "decision",
+            "spec",
+            "task",
+            "term",
+            "architecture"
+          ]
+        },
+        "evidence": {
+          "enum": [
+            "explicit",
+            "structural",
+            "single-source"
+          ]
+        },
+        "maturity": {
+          "enum": [
+            "established",
+            "emerging",
+            "research"
+          ]
+        },
+        "mapping": {
+          "enum": [
+            "explicit",
+            "author"
+          ]
+        },
+        "signature": {
+          "type": "boolean"
+        },
+        "signature_elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/single_line",
+            "type": "string"
+          }
+        },
+        "owasp_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^LLM[0-9]{2}:[0-9]{4}$"
+          }
+        },
+        "domains": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/single_line",
+            "type": "string"
+          }
+        },
+        "modality": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/single_line",
+            "type": "string"
+          }
+        },
+        "deployment": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/single_line",
+            "type": "string"
+          }
+        },
+        "implementations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "label",
+              "url"
+            ],
+            "properties": {
+              "label": {
+                "$ref": "#/$defs/single_line",
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "pattern": "^https?://"
+              }
+            }
+          }
+        },
+        "diagram": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "file",
+            "alt"
+          ],
+          "properties": {
+            "file": {
+              "description": "MUST be <slug>.svg, compiled from content/diagrams/<slug>.diagram (AGSC-02-13). It is a file name, not a route: the compiled SVG is inlined in the item's page (AGSC-01-07, AGSC-02-13).",
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*\\.svg$"
+            },
+            "alt": {
+              "$ref": "#/$defs/single_line",
+              "type": "string",
+              "minLength": 1
+            },
+            "caption": {
+              "$ref": "#/$defs/single_line",
+              "type": "string"
+            }
+          }
+        },
+        "produces": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,63}$",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "description": "AGSC-02-96 port type names; not Link keys. The 1-64 code-point bound is enforced by minLength/maxLength, never by the pattern quantifier (AGSC-02-24)."
+        },
+        "consumes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,63}$",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "description": "AGSC-02-96 port type names; not Link keys. The 1-64 code-point bound is enforced by minLength/maxLength, never by the pattern quantifier (AGSC-02-24)."
+        },
+        "task_state": {
+          "enum": [
+            "TASK_STATE_UNSPECIFIED",
+            "TASK_STATE_SUBMITTED",
+            "TASK_STATE_WORKING",
+            "TASK_STATE_INPUT_REQUIRED",
+            "TASK_STATE_AUTH_REQUIRED",
+            "TASK_STATE_COMPLETED",
+            "TASK_STATE_FAILED",
+            "TASK_STATE_CANCELED",
+            "TASK_STATE_REJECTED"
+          ],
+          "default": "TASK_STATE_UNSPECIFIED",
+          "description": "AGSC-02-99; kind: task only; closed for the node's own frontmatter; the AGSC-11-02 reading (UNSPECIFIED) applies to a foreign board a reader did not author."
+        },
+        "verdict_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "AGSC-02-97; kind: architecture only."
+        }
+      }
+    },
+    {
+      "title": "episode",
+      "required": [
+        "type",
+        "started",
+        "actor",
+        "outcome"
+      ],
+      "properties": {
+        "type": {
+          "const": "episode"
+        },
+        "started": {
+          "$ref": "#/$defs/instant"
+        },
+        "ended": {
+          "$ref": "#/$defs/instant"
+        },
+        "actor": {
+          "$ref": "#/$defs/actor"
+        },
+        "outcome": {
+          "enum": [
+            "success",
+            "partial",
+            "failure"
+          ]
+        },
+        "refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^https?://"
+          }
+        },
+        "usage": {
+          "$ref": "#/$defs/usage"
+        }
+      }
+    },
+    {
+      "title": "procedure",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "const": "procedure"
+        },
+        "when": {
+          "description": "One-line trigger; becomes the exported SKILL.md description, at most 1024 characters (AGSC-02-15).",
+          "$ref": "#/$defs/single_line",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/single_line",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "title": "lesson",
+      "required": [
+        "type",
+        "severity"
+      ],
+      "properties": {
+        "type": {
+          "const": "lesson"
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warn",
+            "block"
+          ]
+        }
+      }
+    },
+    {
+      "title": "cluster",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "const": "cluster"
+        },
+        "description": {
+          "description": "40-200 Unicode code points (§2.2 common-key table, AGSC-02-24).",
+          "$ref": "#/$defs/single_line",
+          "type": "string",
+          "minLength": 40,
+          "maxLength": 200
+        },
+        "broader": {
+          "description": "At most one parent cluster: the tree is mono-parent (AGSC-03-08); more than one value is AGSC-E308 (AGSC-03-08).",
+          "type": "array",
+          "maxItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/link_target"
+          }
+        },
+        "order": {
+          "type": "integer"
+        },
+        "family": {
+          "$ref": "#/$defs/single_line",
+          "type": "string"
+        }
+      }
+    },
+    {
+      "title": "gate",
+      "required": [
+        "type",
+        "level"
+      ],
+      "properties": {
+        "type": {
+          "const": "gate"
+        },
+        "level": {
+          "enum": [
+            "L1",
+            "L2"
+          ]
+        },
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "schema",
+              "links",
+              "provenance",
+              "determinism",
+              "review"
+            ]
+          }
+        },
+        "enforce": {
+          "description": "AGSC-08-12: each value is compiled deterministically and idempotently by a writer.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "status-check",
+              "hook",
+              "codeowner",
+              "ruleset"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "slug": {
+      "description": "AGSC-01-10: 1-64 characters, lowercase ASCII, single hyphens, no leading or trailing hyphen, no --.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "link_target": {
+      "description": "A slug, optionally followed by #anchor (AGSC-03-02).",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*(?:#[a-z0-9]+(?:-[a-z0-9]+)*)?$",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "link_array": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/link_target"
+      }
+    },
+    "date": {
+      "description": "AGSC-02-06.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "instant": {
+      "description": "AGSC-02-06: datetime with explicit UTC offset, seconds precision, never a bare date.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "single_line": {
+      "description": "AGSC-02-24: an AUTHORED SINGLE-LINE string. It MUST NOT carry a C0 control (U+0000-U+001F), U+007F, U+0085, U+2028 or U+2029, because a writer puts it on a LINE of a line-oriented text surface (/llms.txt, /llms-full.txt, /now.md, the Harness files, llms-ctx.txt, robots.txt, _headers, _redirects, /.well-known/security.txt) where a line break creates a new line, a forged heading or a forged header. A violation is AGSC-E204 (spec/09 section 9.4 precedence: every pattern violation takes that code). The class is a negated character class with no lookahead, no back-reference and no quantifier-based bound, so it is the ECMA-262 dialect JSON Schema 2020-12 names and transliterates mechanically to the \\x{...} escapes of RE2, Go and Rust. A writer additionally NEUTRALISES these code points when it interpolates such a string (knowledge/unicode.js#singleLine), so a Bundle that never passed validation still cannot inject structure.",
+      "type": "string",
+      "pattern": "^[^\\x00-\\x1F\\x7F\\x85\\u2028\\u2029]*$"
+    },
+    "actor": {
+      "description": "AGSC-02-09: human:<id>, process:<id> or <producer>/<version>.",
+      "type": "string",
+      "pattern": "^(?:human:[a-z0-9][a-z0-9._-]*|process:[a-z0-9][a-z0-9._-]*|[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._+-]*)$"
+    },
+    "human_actor": {
+      "description": "AGSC-02-07: prov.operator is a person, human:<id> only, so the DCO-Plus Assisted-by trailer of AGSC-08-06 can always match it.",
+      "type": "string",
+      "pattern": "^human:[a-z0-9][a-z0-9._-]*$"
+    },
+    "source": {
+      "description": "One inline Source; resource is required (AGSC-02-10).",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "resource"
+      ],
+      "properties": {
+        "id": {
+          "description": "Stable source identifier used to de-duplicate ingested messages (AGSC-01-33).",
+          "$ref": "#/$defs/single_line",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "resource": {
+          "description": "A web URL, or the channel form urn:agsc:channel:<name>:<source_id> for a message with no URL (AGSC-01-33).",
+          "type": "string",
+          "pattern": "^(?:https?://[^\\x00-\\x20]+|urn:agsc:channel:[a-z0-9-]+:[^\\x00-\\x20]+)$"
+        },
+        "title": {
+          "$ref": "#/$defs/single_line",
+          "type": "string"
+        },
+        "author": {
+          "$ref": "#/$defs/single_line",
+          "type": "string"
+        },
+        "year": {
+          "type": "string",
+          "pattern": "^[0-9]{4}$"
+        },
+        "verified": {
+          "$ref": "#/$defs/date"
+        },
+        "grade": {
+          "enum": [
+            "primary",
+            "secondary",
+            "tertiary"
+          ]
+        }
+      }
+    },
+    "prov": {
+      "description": "AGSC-08-01. commit and reviewer are derived at build and MUST NOT appear here (AGSC-08-02). source_version and source_hash are written by import alone (AGSC-01-22).",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "origin",
+        "operator"
+      ],
+      "properties": {
+        "origin": {
+          "enum": [
+            "human",
+            "ai-assisted",
+            "ai-generated",
+            "imported"
+          ]
+        },
+        "agent": {
+          "$ref": "#/$defs/single_line",
+          "type": "string"
+        },
+        "model": {
+          "$ref": "#/$defs/single_line",
+          "type": "string"
+        },
+        "operator": {
+          "$ref": "#/$defs/human_actor"
+        },
+        "agreement": {
+          "$ref": "#/$defs/single_line",
+          "type": "string"
+        },
+        "source_version": {
+          "description": "Written by `import` alone (AGSC-01-22, AGSC-04-25): the content version of the Bundle this item was taken from. Never authored, and never derived for an item that was not imported.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,63}$"
+        },
+        "source_hash": {
+          "description": "Written by `import` alone (AGSC-01-22, AGSC-04-15): the bundle hash of the Bundle this item was taken from, lowercase hexadecimal SHA-256.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "generated": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "by"
+      ],
+      "properties": {
+        "by": {
+          "$ref": "#/$defs/actor"
+        },
+        "at": {
+          "$ref": "#/$defs/instant"
+        }
+      }
+    },
+    "verified_entry": {
+      "description": "The evidence of a Review (AGSC-08-03): a human adds it, so by is human_actor.",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "by",
+        "at"
+      ],
+      "properties": {
+        "by": {
+          "$ref": "#/$defs/human_actor"
+        },
+        "at": {
+          "$ref": "#/$defs/instant"
+        }
+      }
+    },
+    "usage": {
+      "description": "Optional token accounting rolled up on the NOW page (AGSC-08-25).",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "model": {
+          "$ref": "#/$defs/single_line",
+          "type": "string"
+        },
+        "tokens_in": {
+          "type": "integer"
+        },
+        "tokens_out": {
+          "type": "integer"
+        },
+        "cost_usd": {
+          "type": "number"
+        },
+        "estimate": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

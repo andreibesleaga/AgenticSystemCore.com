@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AGSC-04 — Canonicalization and determinism — AgenticSystemCore</title>
+<meta name="description" content="AGSC-04 — Canonicalization and determinism — section 04 of the AgenticSystemCore specification 1.0.0-rc.6.">
+<link rel="canonical" href="https://agenticsystemcore.com/specs/04-canonicalization/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/specs/04-canonicalization/">
+<meta property="og:title" content="AGSC-04 — Canonicalization and determinism">
+<meta property="og:description" content="AGSC-04 — Canonicalization and determinism — section 04 of the AgenticSystemCore specification 1.0.0-rc.6.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AGSC-04 — Canonicalization and determinism","url":"https://agenticsystemcore.com/specs/04-canonicalization/","version":"1.0.0-rc.6","license":"https://www.apache.org/licenses/LICENSE-2.0","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/specs/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/" aria-current="page">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main" class="wide">
+<h1>AGSC-04 — Canonicalization and determinism</h1>
+<p class="summary"><strong>Summary</strong>Why two builds anywhere give the same bytes: canonical JSON, NFC text, one time format, fixed sort orders and SHA-256.</p>
+<section class="status" aria-labelledby="status-heading">
+<h2 id="status-heading">Status of this document</h2>
+<p>Specification <code>1.0.0-rc.6</code>, a release candidate tagged on 2026-09-29. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no standards body has reviewed or adopted it. Released sections are immutable; a correction ships as a new version.</p>
+</section>
+<aside class="plain" aria-labelledby="plain"><h2 id="plain">In plain language</h2>
+<p><strong>The promise.</strong> Build the same Bundle twice, on two machines, with two conforming tools: every machine artefact is byte-identical. HTML pages are identical within one tool.</p>
+<p><strong>How.</strong> JSON is written in the canonical form of RFC 8785 (members sorted by UTF-16 code unit, no whitespace, <code>-0</code> written as <code>0</code>). Text is NFC-normalised <strong>before</strong> anything is sorted or hashed. Time is one instant format in UTC, taken from <code>SOURCE_DATE_EPOCH</code> or the last commit. Every list has a stated sort order. Hashes are SHA-256, lowercase hex.</p>
+<p><strong>Unicode.</strong> The vectors were generated with Unicode 16.0.0; a tool states the version it uses. A run of more than 256 combining marks after one character is refused, so hostile input cannot exhaust memory.</p>
+<p><strong>Why it matters.</strong> Because outputs are deterministic, a digest in the discovery document is a real integrity check, two nodes can compare notes, and a reader can rebuild a site from its source and check that nothing changed.</p>
+<p class="id">This box explains; the rules below decide. New to the notation? See <a href="/docs/reading-the-specification/">how to read the specification</a>.</p>
+</aside>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 280" role="img" aria-label="Canonicalization: the same four inputs (content tree, configuration, build instant, git log) built on machine A and on machine B give identical bytes (highlighted), through NFC normalisation, fixed sort orders, canonical JSON and SHA-256" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-spec-04-canonicalization" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="30" width="150" height="90" rx="6"/>
+<rect x="210" y="30" width="110" height="50" rx="6"/>
+<rect x="210" y="90" width="110" height="50" rx="6"/>
+<rect x="360" y="30" width="84" height="110" rx="6" class="acc" stroke-width="2.2"/>
+<path d="M170.0 65.9 L206.0 61.8" marker-end="url(#ar-spec-04-canonicalization)"/>
+<path d="M169.9 93.1 L206.1 101.5" marker-end="url(#ar-spec-04-canonicalization)"/>
+<path d="M323.9 67.9 L356.1 74.9" marker-end="url(#ar-spec-04-canonicalization)"/>
+<path d="M323.9 102.1 L356.1 95.1" marker-end="url(#ar-spec-04-canonicalization)"/>
+<rect x="16" y="150" width="428" height="60" rx="6"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="91" y="55.0" font-size="12">four inputs</text>
+<text x="91" y="71.0" font-size="12">content tree</text>
+<text x="91" y="87.0" font-size="12">config file</text>
+<text x="91" y="103.0" font-size="12">build instant + git log</text>
+<text x="265" y="59.0" font-size="12">machine A</text>
+<text x="265" y="119.0" font-size="12">machine B</text>
+<text x="402" y="81.0" font-size="12">identical</text>
+<text x="402" y="97.0" font-size="12">bytes</text>
+<text x="230" y="176.0" font-size="12">NFC first → fixed sort orders → JCS JSON</text>
+<text x="230" y="192.0" font-size="12">→ SHA-256, lowercase hex</text>
+<text x="230" y="268" font-size="11">the promise: build it anywhere, get the same bytes — so a digest is a real check</text>
+</g>
+</svg>
+<figcaption>The highlighted result is the promise: build anywhere, get the same bytes, so a digest in the discovery document is a real integrity check.</figcaption>
+</figure>
+<nav class="toc" aria-labelledby="contents"><h2 id="contents">Contents</h2>
+<ol>
+<li><a href="#section-4-1">4.1 The determinism obligation</a></li>
+<li><a href="#section-4-2">4.2 JSON (JCS, RFC 8785)</a></li>
+<li><a href="#section-4-3">4.3 Text</a></li>
+<li><a href="#section-4-4">4.4 Time</a></li>
+<li><a href="#section-4-5">4.5 Ordering</a></li>
+<li><a href="#section-4-6">4.6 Hashes and the canonical RDF form</a></li>
+<li><a href="#section-4-7">4.7 Normalization on write</a></li>
+<li><a href="#section-4-8">4.8 Normalization order, Unicode version and the cross-implementation obligation</a></li>
+<li><a href="#section-4-9">4.9 The content version</a></li>
+</ol></nav>
+<h2 id="section-4-1">4.1 The determinism obligation</h2>
+<ul>
+<li id="AGSC-04-01" class="rule-item"><a class="rule" href="#AGSC-04-01"><strong>AGSC-04-01</strong></a> Two builds of the same Bundle content with the same <code>SOURCE_DATE_EPOCH</code> MUST produce byte-identical output on every operating system and every runtime. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-004">PRD-004</a>]</span></li>
+<li id="AGSC-04-02" class="rule-item"><a class="rule" href="#AGSC-04-02"><strong>AGSC-04-02</strong></a> Verification is a double build into two directories followed by a recursive byte comparison; any difference is error <a class="ref" href="/specs/09-conformance/#AGSC-E602"><code>AGSC-E602</code></a>. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-004">PRD-004</a>]</span></li>
+<li id="AGSC-04-03" class="rule-item"><a class="rule" href="#AGSC-04-03"><strong>AGSC-04-03</strong></a> A build MUST NOT read a wall clock, resolve the network, read environment locale, or depend on filesystem enumeration order. <span class="trace">[design]</span></li>
+</ul>
+<h2 id="section-4-2">4.2 JSON (JCS, RFC 8785)</h2>
+<ul>
+<li id="AGSC-04-04" class="rule-item"><a class="rule" href="#AGSC-04-04"><strong>AGSC-04-04</strong></a> Every emitted JSON artefact — <code>graph.jsonld</code>, per-item <code>.jsonld</code>, <code>search.json</code>, the well-known file, <code>dist/gate.json</code>, <code>ledger.jsonl</code> entries — MUST be JCS-canonical and MUST be followed by exactly one LF. Vector files are <strong>not</strong> emitted artefacts: they are governed by <a class="ref" href="/specs/09-conformance/#AGSC-09-06">AGSC-09-06</a>, which requires JCS member <em>order</em> but permits pretty-printing. This rule binds at <strong>Level 2 and above</strong> (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-04">AGSC-10-04</a>). A Level-0 publisher's JSON artefacts MUST be valid I-JSON (RFC 7493) and SHOULD be JCS-canonical, and <code>tools/validate-wellknown --level 0</code> MUST NOT require canonical bytes — UTF-16 member ordering and ECMA-262 number formatting are not something a CMS export produces by accident, and Level 0 exists precisely so that it need not. <span class="trace">[<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-02">AGSC-10-02</a>]</span></li>
+<li id="AGSC-04-05" class="rule-item"><a class="rule" href="#AGSC-04-05"><strong>AGSC-04-05</strong></a> JCS here means: UTF-8 output; no whitespace between tokens; members sorted by <strong>UTF-16 code units</strong> of the member name; numbers per ECMA-262 §7.1.12.1 (<code>Number#toString</code>); input restricted to I-JSON. Locale and Unicode code-point sorting MUST NOT be used: they differ from UTF-16 order for astral-plane keys. A number MUST NOT serialise as <code>-0</code>: ECMA-262 §7.1.12.1 renders negative zero as <code>0</code>, so a producer emits <code>0</code>. <em>(Rationale: RFC 8785 erratum 7920 — Verified, reported 2024-05-02 — addresses the <strong>parser</strong> instead, &quot;a JSON parser following this specification SHOULD generate an error condition … when it encounters -0&quot;, noting that the serialisation is lossy. This specification chooses the producer-side rule, because I-JSON input is a precondition of <a class="ref" href="#AGSC-04-05">AGSC-04-05</a> and a Bundle never authors <code>-0</code>.)</em> <strong>The UTF-16 rule governs JSON member names and nothing else</strong> — every other ordering in this specification is code-point (<a class="ref" href="#AGSC-04-12">AGSC-04-12</a>/13), and the two differ only for astral-plane text, which reaches member names through <code>search.json</code> tokens (<a class="ref" href="/specs/06-surfaces/#AGSC-06-23">AGSC-06-23</a>) and nowhere else. A port MUST therefore sort member names by UTF-16 code units (comparing surrogate-aware, not by rune) even where its language's default string order is by code point; vector <code>jcs-0003</code> proves it. <span class="trace">[RFC 8785]</span></li>
+<li id="AGSC-04-06" class="rule-item"><a class="rule" href="#AGSC-04-06"><strong>AGSC-04-06</strong></a> A JSON artefact that is not JCS-canonical is error <a class="ref" href="/specs/09-conformance/#AGSC-E601"><code>AGSC-E601</code></a>. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-004">PRD-004</a>]</span></li>
+</ul>
+<h2 id="section-4-3">4.3 Text</h2>
+<ul>
+<li id="AGSC-04-07" class="rule-item"><a class="rule" href="#AGSC-04-07"><strong>AGSC-04-07</strong></a> All emitted text MUST be UTF-8 without BOM, LF-terminated, NFC-normalized, with exactly one trailing LF. Non-NFC output is <a class="ref" href="/specs/09-conformance/#AGSC-E604"><code>AGSC-E604</code></a>. <span class="trace">[design]</span></li>
+<li id="AGSC-04-08" class="rule-item"><a class="rule" href="#AGSC-04-08"><strong>AGSC-04-08</strong></a> Slugs, keys and IRIs stay ASCII; titles, descriptions and aliases MAY be any Unicode in NFC. <span class="trace">[design]</span></li>
+</ul>
+<h2 id="section-4-4">4.4 Time</h2>
+<ul>
+<li id="AGSC-04-09" class="rule-item"><a class="rule" href="#AGSC-04-09"><strong>AGSC-04-09</strong></a> The build instant MUST come from <code>SOURCE_DATE_EPOCH</code> (integer seconds since the Unix epoch), defaulting to the last commit time. Where no git history exists — the drop-in flow of <a class="ref" href="/docs/requirements/#PRD-053">PRD-053</a> runs before <code>git init</code> — the default MUST be <code>0</code> (<code>1970-01-01T00:00:00Z</code>) with warning <a class="ref" href="/specs/09-conformance/#AGSC-E606"><code>AGSC-E606</code></a>, so the instant is always defined. A malformed value MUST exit 2 (<a class="ref" href="/specs/09-conformance/#AGSC-E603"><code>AGSC-E603</code></a>, the configuration class of <a class="ref" href="/specs/09-conformance/#AGSC-09-08">AGSC-09-08</a>); the variable MUST NOT be unset for child processes. <span class="trace">[design]</span></li>
+<li id="AGSC-04-10" class="rule-item"><a class="rule" href="#AGSC-04-10"><strong>AGSC-04-10</strong></a> Every embedded timestamp MUST be rendered from that instant as <code>YYYY-MM-DDTHH:MM:SSZ</code> — UTC, seconds precision, never milliseconds, never a local offset. <span class="trace">[design]</span></li>
+<li id="AGSC-04-11" class="rule-item"><a class="rule" href="#AGSC-04-11"><strong>AGSC-04-11</strong></a> Staleness, &quot;last build&quot; and NOW counts MUST all derive from the same instant. Only the <code>refresh</code> verb MAY read a real clock, and a clock it reads MUST NOT reach any emitted artefact: ledger <code>ts</code> values derive from the committer times of the git-log file (<a class="ref" href="/specs/08-governance/#AGSC-08-20a">AGSC-08-20a</a>) and from <code>SOURCE_DATE_EPOCH</code> for the single trailing <code>build</code> entry, never from a wall clock, so a <code>refresh</code> observation can only open an issue. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-015">PRD-015</a>, <a class="ref" href="/docs/requirements/#PRD-017">PRD-017</a>]</span></li>
+</ul>
+<h2 id="section-4-5">4.5 Ordering</h2>
+<ul>
+<li id="AGSC-04-12" class="rule-item"><a class="rule" href="#AGSC-04-12"><strong>AGSC-04-12</strong></a> All ordering — except the JSON member-name ordering of <a class="ref" href="#AGSC-04-05">AGSC-04-05</a>, which is UTF-16 code units by deliberate exception — MUST be code-point comparison of the sort key. Locale collation, case-insensitive collation and <code>Intl</code> comparators MUST NOT be used. <span class="trace">[design]</span></li>
+<li id="AGSC-04-13" class="rule-item"><a class="rule" href="#AGSC-04-13"><strong>AGSC-04-13</strong></a> Explicit sort keys: items by slug; links by <code>(key, target)</code>; tags by code point; cluster members by <code>(order, slug)</code> with absent <code>order</code> sorting last; search tokens as JSON member names per <a class="ref" href="#AGSC-04-05">AGSC-04-05</a> (UTF-16 code units), never by code point; sitemap entries by URL; N-Quads lines by their serialized bytes; RDF subjects, then predicates, then objects by IRI or lexical form; JSON object members by <a class="ref" href="#AGSC-04-05">AGSC-04-05</a>. <span class="trace">[design]</span></li>
+<li id="AGSC-04-14" class="rule-item"><a class="rule" href="#AGSC-04-14"><strong>AGSC-04-14</strong></a> Arrays authored by a human (<code>tags</code>, <code>clusters</code>, <code>aliases</code>, Link arrays) MUST retain author order in the source file and MUST be sorted only in derived artefacts, so that <code>lint --fix</code> never reorders meaning-bearing first entries such as the primary cluster. <span class="trace">[design]</span></li>
+</ul>
+<h2 id="section-4-6">4.6 Hashes and the canonical RDF form</h2>
+<ul>
+<li id="AGSC-04-15" class="rule-item"><a class="rule" href="#AGSC-04-15"><strong>AGSC-04-15</strong></a> <code>graph.nq</code> — canonical N-Quads, code-point ordered, each quad terminated by a single LF — is the hashed form of the graph. Every line of it is a quad whose fourth term, the graph name, is the Bundle IRI (<a class="ref" href="/specs/05-graph/#AGSC-05-03">AGSC-05-03</a>): the file is one named graph, and no statement is written in the default graph. <code>bundle.hash</code> MUST be the lowercase hex SHA-256 of its bytes. <em>(Rationale: one named graph lets a consumer load several nodes' dumps into one store without losing which node stated what.)</em> <span class="trace">[design]</span></li>
+<li id="AGSC-04-16" class="rule-item"><a class="rule" href="#AGSC-04-16"><strong>AGSC-04-16</strong></a> Because exports are blank-node-free (§05), RDFC-1.0 canonicalization degenerates to this sort. An implementation MUST scope any conformance claim to &quot;canonical N-Quads equal to RDFC-1.0 output for blank-node-free datasets&quot; and MUST NOT claim full RDFC-1.0. <span class="trace">[design]</span></li>
+<li id="AGSC-04-17" class="rule-item"><a class="rule" href="#AGSC-04-17"><strong>AGSC-04-17</strong></a> Content hashes elsewhere (per-item Markdown, ontology files, skill packs) MUST be lowercase hex SHA-256 over the canonical bytes. A CIDv1 (<code>raw</code>, sha2-256, base32 <code>b…</code>) MAY additionally be emitted for <code>graph.nq</code>; when emitted it MUST be computed over the same canonical bytes. <span class="trace">[design]</span></li>
+<li id="AGSC-04-18" class="rule-item"><a class="rule" href="#AGSC-04-18"><strong>AGSC-04-18</strong></a> <code>search.json</code>, <code>sitemap.xml</code> and the well-known file MUST be reproducible from <code>content/</code>, <code>agsc.config.json</code> (every URL derives from <code>site.base</code>, every switch from <code>build{}</code>) and <code>SOURCE_DATE_EPOCH</code>, plus — for the well-known file's <code>agsc-ledger-head</code> and <code>agsc-bundle-version</code> attributes and the <code>digest</code> of its <code>…/rel#ledger</code> link, and nothing else — the git-log file of <a class="ref" href="/specs/08-governance/#AGSC-08-02">AGSC-08-02</a>/08-20a. No other input exists — four inputs in all. <span class="trace">[design]</span></li>
+</ul>
+<h2 id="section-4-7">4.7 Normalization on write</h2>
+<ul>
+<li id="AGSC-04-19" class="rule-item"><a class="rule" href="#AGSC-04-19"><strong>AGSC-04-19</strong></a> <code>lint --fix</code> MUST be idempotent: applying it twice MUST produce the same bytes as applying it once. Its normalizations are limited to line endings, NFC, trailing newline, frontmatter key order (<strong>schema order</strong> = the top-level <code>properties</code> order of <code>schema/item.schema.json</code>, then the matching <code>oneOf</code> branch's <code>properties</code> order, then unknown keys in code-point order — including inside a nested mapping, where the order is that <code>$def</code>'s <code>properties</code> order — the order <a class="ref" href="/specs/02-item/#AGSC-02-90">AGSC-02-90</a> emits, so <code>lint --fix</code> never rewrites an adopted file), and wikilink rewriting. The emitted YAML profile is fixed: block style only, two-space indentation, sequence items indented two spaces under their key, plain scalars unless the value would re-parse as another type or begins with an indicator character (then double-quoted with <code>\</code> and <code>&quot;</code> escapes only), one space after every <code>:</code>, no document markers, no trailing spaces. What it changed — and, where it only reports, what it would change — MUST be reported as a finding: a line-ending, BOM, NFC or trailing-newline normalisation under <a class="ref" href="/specs/09-conformance/#AGSC-E108"><code>AGSC-E108</code></a> (the encoding rule that obliges it, <a class="ref" href="/specs/01-bundle/#AGSC-01-14">AGSC-01-14</a>), every other normalisation of this rule under <a class="ref" href="/specs/09-conformance/#AGSC-E506"><code>AGSC-E506</code></a>. Both are warnings, so no exit code depends on the choice; fixing the code keeps two conforming engines from reporting the same file under different codes. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-003">PRD-003</a>, <a class="ref" href="/specs/03-links/#AGSC-03-12">AGSC-03-12</a>]</span></li>
+<li id="AGSC-04-20" class="rule-item"><a class="rule" href="#AGSC-04-20"><strong>AGSC-04-20</strong></a> <code>lint --fix</code> MUST NOT change prose, reorder authored arrays, or add, remove or infer any key. <span class="trace">[design]</span></li>
+</ul>
+<h2 id="section-4-8">4.8 Normalization order, Unicode version and the cross-implementation obligation</h2>
+<ul>
+<li id="AGSC-04-21" class="rule-item"><a class="rule" href="#AGSC-04-21"><strong>AGSC-04-21</strong></a> <strong>Order.</strong> Normalization and canonicalization do not commute, so the order is fixed: text is NFC-normalized <strong>first</strong> (<a class="ref" href="#AGSC-04-07">AGSC-04-07</a>), then canonicalized (<a class="ref" href="#AGSC-04-05">AGSC-04-05</a>). Every JSON member name MUST be NFC-normalized <strong>before</strong> it is sorted; a producer that sorts first and normalizes afterwards emits different bytes for the same input and is non-conforming. The same order governs every derived artefact: normalize, then sort, then serialize. <span class="trace">[design]</span></li>
+<li id="AGSC-04-22" class="rule-item"><a class="rule" href="#AGSC-04-22"><strong>AGSC-04-22</strong></a> <strong>Unicode version.</strong> The vectors of <code>tests/vectors/**</code> were generated against <strong>Unicode 16.0.0</strong>; NFC, the General_Category classes of the tokenizer (<a class="ref" href="/specs/06-surfaces/#AGSC-06-23">AGSC-06-23</a>) and the case mapping of <a class="ref" href="/specs/03-links/#AGSC-03-13">AGSC-03-13</a> are those of that version. The vector set is version-stable: every character in it has identical NFC, General_Category and case-mapping properties from Unicode 15.0 through 18.0.0 (verified 2026-09-17 by recomputation and the Unicode stability policy), so a runtime on any of those versions passes the set and the pin names the generation version, not a runtime requirement. A conforming implementation MUST state the Unicode version of its runtime in its conformance claim (<a class="ref" href="/specs/09-conformance/#AGSC-09-01">AGSC-09-01</a>). A divergence that arises only from a different Unicode version, on input outside the vector set, is a documented divergence and not a conformance failure; a divergence <strong>on the vector set</strong> is a failure. <span class="trace">[design]</span></li>
+<li id="AGSC-04-23" class="rule-item"><a class="rule" href="#AGSC-04-23"><strong>AGSC-04-23</strong></a> <strong>Combining-sequence bound.</strong> NFC is computed per starter-delimited segment, so a segment must be buffered before any of it is emitted. A conforming implementation MUST NOT buffer without bound: a starter followed by more than <strong>256</strong> combining marks is <a class="ref" href="/specs/09-conformance/#AGSC-E607"><code>AGSC-E607</code></a> (a lint error naming the file and offset), never a silent truncation and never unbounded memory. <span class="trace">[design]</span></li>
+<li id="AGSC-04-24" class="rule-item"><a class="rule" href="#AGSC-04-24"><strong>AGSC-04-24</strong></a> <strong>Cross-implementation obligation.</strong> Byte-identity across <em>implementations</em> is claimed for the machine artefacts — <code>graph.jsonld</code>, <code>graph.ttl</code>, <code>graph.nq</code>, per-item <code>.jsonld</code>, <code>search.json</code> and its shards, <code>chunks.jsonl</code> and its shards, <code>ledger.jsonl</code>, <code>/.well-known/knowledge-linkset</code>, <code>/llms.txt</code>, <code>/llms-full.txt</code> and the board exports — and is discharged by the expected-byte vectors that name them. The seven Harness <strong>file kinds</strong> of <a class="ref" href="/specs/07-composition/#AGSC-07-12">AGSC-07-12</a> carry the same obligation, discharged when the <code>harness/</code> vector area is populated; until then no conformance claim may assert cross-implementation byte-identity for a Harness. Generated <strong>HTML</strong> is byte-identical within one implementation (<a class="ref" href="#AGSC-04-01">AGSC-04-01</a>) and is NOT part of the cross-implementation vector set: no rule pins a Markdown renderer's output. A conformance claim MUST NOT assert cross-implementation byte-identity for HTML. <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-060">PRD-060</a>]</span></li>
+</ul>
+<h2 id="section-4-9">4.9 The content version</h2>
+<ul>
+<li id="AGSC-04-25" class="rule-item"><p><a class="rule" href="#AGSC-04-25"><strong>AGSC-04-25</strong></a> <strong>The content version.</strong> A Bundle has one <strong>content version</strong>, <code>bundle_version</code>: a short, human-readable name for the state a build published or a consumer saved, so that a reader, a citation and an imported item can all say <em>which</em> version of this node's content they mean. It is <strong>derived at build</strong>, never authored, never stored and never incremented by the engine — a static build keeps no state between runs, so a counter of its own could not be reproduced. Its inputs are the two the derived ledger already uses, and it therefore adds no input to a build: the git-log file of <a class="ref" href="/specs/08-governance/#AGSC-08-20b">AGSC-08-20b</a> and the build instant of <a class="ref" href="#AGSC-04-09">AGSC-04-09</a>.</p>
+<p><strong>Derivation</strong> — the first branch that applies, where <em>the built commit</em> is the last element of the git-log file:
+1. the <code>tag</code> of the built commit, when it carries one;
+2. otherwise <code>&lt;tag&gt;+&lt;n&gt;.g&lt;hash&gt;</code>, where <code>&lt;tag&gt;</code> is the <code>tag</code> of the newest earlier element that carries one, <code>&lt;n&gt;</code> is the number of elements after that element up to and including the built commit, and <code>&lt;hash&gt;</code> is the first <strong>twelve</strong> lowercase-hexadecimal characters of the built commit's <code>sha</code> — a fixed width, because git's own abbreviation length depends on the clone and would make the string unreproducible;
+3. otherwise, when no element carries a <code>tag</code>, <code>0.0.0+&lt;n&gt;.g&lt;hash&gt;</code> with <code>&lt;n&gt;</code> the number of elements in the git-log file;
+4. otherwise, with no git history at all — the drop-in flow <a class="ref" href="#AGSC-04-09">AGSC-04-09</a> names — <code>0.0.0+&lt;instant&gt;</code>, where <code>&lt;instant&gt;</code> is the build instant written <code>YYYYMMDDThhmmssZ</code>, <a class="ref" href="#AGSC-04-10">AGSC-04-10</a>'s form with its separators removed so that the whole value stays inside the grammar below.</p>
+<p>The <strong>grammar</strong> is <code>^[A-Za-z0-9][A-Za-z0-9._+-]{0,63}$</code> — one line, ASCII, and safe unescaped inside a JSON string, an HTML comment and a link-set attribute value. A <code>tag</code> that does not match it is not a content version: the built commit is treated as untagged <strong>for this rule alone</strong>, the derivation falls to the next branch, the ledger still takes <code>kind: release</code> from that tag (<a class="ref" href="/specs/08-governance/#AGSC-08-20a">AGSC-08-20a</a>), and the verbs that derive the version — those that EMIT — report the value-was-defaulted warning <a class="ref" href="/specs/09-conformance/#AGSC-E506"><code>AGSC-E506</code></a> naming the tag they could not use; <code>lint</code>, which reads no build fact, reports nothing here (<a class="ref" href="#AGSC-04-09">AGSC-04-09</a>, <a class="ref" href="#AGSC-04-11">AGSC-04-11</a>). <em>(Rationale: <code>lint</code> reads no clock and no git history by design — the same choice that keeps <a class="ref" href="#AGSC-04-09">AGSC-04-09</a>'s <a class="ref" href="/specs/09-conformance/#AGSC-E606"><code>AGSC-E606</code></a> out of it — so a <code>lint</code> that reported this warning would have to start a process and read the checkout, and its output would then depend on the clone rather than on the Bundle.)</em></p>
+<p>The version is <strong>stamped</strong> in exactly these places, and adding one is a MINOR:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 1"><table>
+<thead><tr><th scope="col">where</th><th scope="col">how</th></tr></thead>
+<tbody>
+<tr><td><code>/.well-known/knowledge-linkset</code></td><td>the target attribute <code>agsc-bundle-version</code>, one value, on the anchor's <code>describedby</code> link beside <code>agsc-bundle-hash</code> (<a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-08a">AGSC-06-08a</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-20">AGSC-11-20</a>)</td></tr>
+<tr><td><code>/now/</code> and <code>/now.md</code></td><td>the single line <code>content version &lt;bundle_version&gt;, built at &lt;instant&gt;, fingerprint &lt;bundle-hash&gt;, specification &lt;spec_version&gt;</code> (<a class="ref" href="/specs/06-surfaces/#AGSC-06-22">AGSC-06-22</a>)</td></tr>
+<tr><td>every agent-facing digest</td><td>the <code>bundle_version:</code> line of the provenance header (<a class="ref" href="/specs/06-surfaces/#AGSC-06-13a">AGSC-06-13a</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-15">AGSC-06-15</a>), which carries it into <code>/llms.txt</code>, <code>/llms-full.txt</code>, the language-model context export, every <code>export --steer</code> target and every <code>AGENTS.md</code> and <code>SKILL.md</code> a Harness emits (<a class="ref" href="/specs/01-bundle/#AGSC-01-29">AGSC-01-29</a>)</td></tr>
+<tr><td><code>/chunks.jsonl</code></td><td>the <code>bundle_version</code> member of the shard manifest, where sharding produced one (<a class="ref" href="/specs/06-surfaces/#AGSC-06-31">AGSC-06-31</a>); a chunk line is unchanged, its member set being closed by <a class="ref" href="/specs/06-surfaces/#AGSC-06-29">AGSC-06-29</a></td></tr>
+<tr><td><code>/skills/index.json</code></td><td>the <code>bundle_version</code> member of the index object (<a class="ref" href="/specs/07-composition/#AGSC-07-19">AGSC-07-19</a>)</td></tr>
+<tr><td>a Harness</td><td>the <code>bundle_version</code> member of <code>harness.jsonld</code> (<a class="ref" href="/specs/07-composition/#AGSC-07-12">AGSC-07-12</a>); the seven file kinds stay seven and no file is added for it</td></tr>
+<tr><td><code>export --markdown</code>, <code>export --okf</code></td><td>the <code>bundle_version</code> key of the written <code>content/index.md</code>, beside <code>spec_version</code> (<a class="ref" href="/specs/01-bundle/#AGSC-01-26">AGSC-01-26</a>); the item files are byte-preserving and are not touched (<a class="ref" href="/specs/01-bundle/#AGSC-01-29">AGSC-01-29</a>)</td></tr>
+<tr><td><code>export --jsonld</code>, <code>export --jsonl</code></td><td>nowhere — both are byte-identical to the graph of the same build and MUST NOT invent a member the graph does not carry (<a class="ref" href="/specs/01-bundle/#AGSC-01-27">AGSC-01-27</a>)</td></tr>
+<tr><td><code>/changelog/</code></td><td>a versions list, one row per element of the git-log file that carries a <code>tag</code>, oldest first: the tag, that element's <code>committed_at</code> date and its <code>sha</code>. The list is derived from the git-log file rather than from <code>ledger.jsonl</code>, because a 1.0 ledger entry carries <code>kind: release</code> and the commit reference but not the tag's name (<a class="ref" href="/specs/08-governance/#AGSC-08-21">AGSC-08-21</a>)</td></tr>
+<tr><td>the archive of a multi-file result</td><td>the file NAME <code>&lt;directory&gt;-&lt;bundle_version&gt;.zip</code> of <a class="ref" href="/specs/09-conformance/#AGSC-09-09">AGSC-09-09</a>'s <code>--zip</code>, whose bytes are <a class="ref" href="/specs/07-composition/#AGSC-07-13a">AGSC-07-13a</a>'s; the archive's CONTENT is unchanged and no entry is added for it, and a value outside the grammar above becomes <code>unversioned</code> rather than a wrong name</td></tr>
+</tbody></table></div>
+<p>An <code>import</code> records where each written item came from: <code>prov.source_version</code> = the source's content version and <code>prov.source_hash</code> = the source's bundle hash, each omitted when the source publishes neither (<a class="ref" href="/specs/01-bundle/#AGSC-01-22">AGSC-01-22</a>, <a class="ref" href="/specs/08-governance/#AGSC-08-01">AGSC-08-01</a>).</p>
+<p>The content version is <strong>not</strong> an input to any digest. <code>bundle.hash</code> is the hash of <code>graph.nq</code> (<a class="ref" href="#AGSC-04-15">AGSC-04-15</a>) and nothing here adds to it, so re-tagging unchanged content changes the published version and not the fingerprint, and changing content changes the fingerprint whether or not anyone re-tags — which is what makes the two worth publishing together. Vectors <code>build-0014</code>, <code>disc-0013</code>, <code>disc-0015</code>, <code>imp-0002</code>, <code>compose-0016</code> (the archive name). <span class="trace">[<a class="ref" href="/docs/requirements/#PRD-008">PRD-008</a>, <a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a>, <a class="ref" href="#AGSC-04-09">AGSC-04-09</a>, <a class="ref" href="/specs/08-governance/#AGSC-08-20b">AGSC-08-20b</a>]</span></p>
+</li>
+</ul>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/agentic-system-core/edit/main/spec/04-canonicalization.md">Propose an edit</a> — opens <code>spec/04-canonicalization.md</code> in the specification repository; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>

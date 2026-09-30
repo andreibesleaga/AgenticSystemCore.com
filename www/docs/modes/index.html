@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The six modes — AgenticSystemCore</title>
+<meta name="description" content="The six modes of AgenticSystemCore: auto-wiki (with an optional agent lane), distributed agentic memory, live specifications, evolutive skills, runnable knowledge and the live board, each with its mechanism and its requirements.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/modes/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/modes/">
+<meta property="og:title" content="The six modes">
+<meta property="og:description" content="The six modes of AgenticSystemCore: auto-wiki (with an optional agent lane), distributed agentic memory, live specifications, evolutive skills, runnable knowledge and the live board, each with its mechanism and its requirements.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"The six modes","description":"The six modes of AgenticSystemCore: auto-wiki (with an optional agent lane), distributed agentic memory, live specifications, evolutive skills, runnable knowledge and the live board, each with its mechanism and its requirements.","url":"https://agenticsystemcore.com/docs/modes/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>The six modes</h1>
+<p class="summary"><strong>Summary</strong>One folder of Markdown, one format, six ways of using it: an automatic wiki, a distributed memory for agents, live specifications for a software project, an evolving library of skills, knowledge that can be assembled into a running architecture, and a shared live board on which agents and people run a whole project until it is done.</p>
+<p>No mode adds a file type or a key. Each is a way of reading the same files, and one Bundle can be used in all six at once. The requirement identifiers (PRD-nnn) link to the <a href="/docs/requirements/">requirements page</a>.</p>
+<h2 id="mode-0-the-automatic-self-correcting-wiki">Mode 0 — the automatic, self-correcting wiki</h2>
+<p><strong>What you do.</strong> Write Markdown. Run one command, or push to your repository. Get a website with a graph, a search index, an agent-facing text file and a discovery document. No language model is needed for any of it (<a class="ref" href="/docs/requirements/#PRD-012">PRD-012</a>).</p>
+<p><strong>What &quot;self-correcting&quot; means here.</strong> Nothing in this mode guesses. <code>agsc ci</code> runs deterministic checks and refuses to publish what fails them: the header against the schema, every link to an existing target, no cycles where cycles are forbidden, no orphans left unreported (<a class="ref" href="/specs/03-links/#AGSC-03-07">AGSC-03-07</a> to <a class="ref" href="/specs/03-links/#AGSC-03-10">AGSC-03-10</a>). Every item can carry an instant after which it is stale, and the build flags it against its own build instant (<a class="ref" href="/specs/02-item/#AGSC-02-06">AGSC-02-06</a>, <a class="ref" href="/specs/04-canonicalization/#AGSC-04-11">AGSC-04-11</a>). The NOW page of every build lists the stale items (<a class="ref" href="/specs/06-surfaces/#AGSC-06-22">AGSC-06-22</a>); a scheduled refresh that re-checks external links and opens at most one issue is a requirement (<a class="ref" href="/docs/requirements/#PRD-044">PRD-044</a>) that version 1.0 does not ship. What went wrong becomes a Lesson item, and the set of Lessons is the error log (<a class="ref" href="/docs/requirements/#PRD-016">PRD-016</a>). Corrections, whether a person or an agent writes them, arrive as proposals that a person ratifies (<a class="ref" href="/specs/08-governance/#AGSC-08-03">AGSC-08-03</a>).</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 260" role="img" aria-label="Mode 0, auto-wiki: people or agents write Markdown, lint gates check it (highlighted), a static site with search and a NOW page is built, and lessons and stale flags flow back to the writers" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-mode-0-autowiki" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="90" width="110" height="50" rx="6"/>
+<rect x="160" y="85" width="120" height="60" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="304" y="90" width="140" height="50" rx="6"/>
+<rect x="160" y="180" width="120" height="44" rx="6"/>
+<path d="M130.0 115.0 L156.0 115.0" marker-end="url(#ar-mode-0-autowiki)"/>
+<path d="M284.0 115.0 L300.0 115.0" marker-end="url(#ar-mode-0-autowiki)"/>
+<path d="M326.3 142.0 L262.4 178.0" marker-end="url(#ar-mode-0-autowiki)" stroke-dasharray="4 3"/>
+<path d="M178.9 178.0 L117.3 142.0" marker-end="url(#ar-mode-0-autowiki)" stroke-dasharray="4 3"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="71" y="111.0" font-size="12">write Markdown</text>
+<text x="71" y="127.0" font-size="12">(people, agents)</text>
+<text x="220" y="103.0" font-size="12">lint gates</text>
+<text x="220" y="119.0" font-size="12">schema, links,</text>
+<text x="220" y="135.0" font-size="12">staleness</text>
+<text x="374" y="111.0" font-size="12">static site</text>
+<text x="374" y="127.0" font-size="12">search, NOW, graph</text>
+<text x="220" y="198.0" font-size="12">lessons +</text>
+<text x="220" y="214.0" font-size="12">stale flags</text>
+<text x="230" y="248" font-size="11">no model needed: checks are deterministic lints; fixes return as proposals</text>
+</g>
+</svg>
+<figcaption>The highlighted gates are deterministic checks, so the wiki corrects itself without any model; what comes back is a proposal a person ratifies.</figcaption>
+</figure>
+<p><strong>Optional: let a model drive it.</strong> A node may declare an <strong>agent lane</strong>: a model-driven or programmatic agent with a name, a model, a monthly budget, the tasks it may perform (create, edit, update, review, summarize, translate, refresh, plan, claim, work) and the item types it may touch (<a class="ref" href="/specs/01-bundle/#AGSC-01-36">AGSC-01-36</a>). Each lane creates at most <code>max_new_items</code> items per proposal (default twenty) and, on a live board, holds at most <code>max_claims</code> tasks at once (default one); the whole node also carries one cap on model spend of every kind, ten dollars a month unless changed, and the enabled agents' budgets may not add up to more (<a class="ref" href="/specs/01-bundle/#AGSC-01-38">AGSC-01-38</a>). It runs as the refresh verb or as a client of the tool server, reads the published surfaces, and can only ever open proposals, each carrying its provenance and an episode with its cost (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a>); <code>refresh --agent &lt;name&gt; --dry-run</code> shows the shape of the proposal it would open without opening it; the reference engine ships no model adapter at 1.0, so a live run needs one. With <code>publish: auto</code> on its channel the wiki becomes <strong>self-driving</strong>: pages are created, edited, reviewed and updated by the model alone, under the standing ratification the owner configured once, the lints at error severity, the budget, and the rule that procedures, gates and configuration always stay with a person (<a class="ref" href="/specs/08-governance/#AGSC-08-29">AGSC-08-29</a>). Non-determinism is confined to what is proposed; the build stays deterministic and model-free (<a class="ref" href="/specs/08-governance/#AGSC-08-30">AGSC-08-30</a>). The lane is off by default.</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 280" role="img" aria-label="The agent lane: a declared agent with a model, tasks, types, a channel and a budget runs as refresh, reads the published surfaces, and opens a proposal (highlighted) that carries provenance and an episode with its cost; the proposal passes the lints and the auto-merge guards, or is rejected before any lint runs when it steps outside its declared types" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-agent-lane" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="30" width="150" height="80" rx="6"/>
+<rect x="206" y="30" width="120" height="80" rx="6"/>
+<rect x="366" y="30" width="138" height="80" rx="6" class="acc" stroke-width="2.2"/>
+<path d="M170.0 70.0 L202.0 70.0" marker-end="url(#ar-agent-lane)"/>
+<path d="M330.0 70.0 L362.0 70.0" marker-end="url(#ar-agent-lane)"/>
+<rect x="206" y="150" width="120" height="60" rx="6"/>
+<rect x="366" y="150" width="138" height="60" rx="6"/>
+<rect x="16" y="150" width="150" height="60" rx="6"/>
+<path d="M370.2 112.2 L315.4 147.8" marker-end="url(#ar-agent-lane)"/>
+<path d="M330.0 180.0 L362.0 180.0" marker-end="url(#ar-agent-lane)"/>
+<path d="M202.0 180.0 L170.0 180.0" marker-end="url(#ar-agent-lane)"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="91" y="58.0" font-size="12">agents[] entry</text>
+<text x="91" y="74.0" font-size="12">model · tasks · types</text>
+<text x="91" y="90.0" font-size="12">channel · budget</text>
+<text x="266" y="58.0" font-size="12">refresh --agent</text>
+<text x="266" y="74.0" font-size="12">reads surfaces,</text>
+<text x="266" y="90.0" font-size="12">calls the model</text>
+<text x="435" y="58.0" font-size="12">proposal</text>
+<text x="435" y="74.0" font-size="12">prov: ai-generated</text>
+<text x="435" y="90.0" font-size="12">+ episode with usage</text>
+<text x="266" y="176.0" font-size="12">declared types</text>
+<text x="266" y="192.0" font-size="12">and tasks? budget?</text>
+<text x="435" y="176.0" font-size="12">lints at error,</text>
+<text x="435" y="192.0" font-size="12">auto-merge guards</text>
+<text x="91" y="176.0" font-size="12">rejected: E509</text>
+<text x="91" y="192.0" font-size="12">skipped: E510</text>
+<text x="260" y="268" font-size="11">never a write — every output is a proposal; the build stays model-free</text>
+</g>
+</svg>
+<figcaption>The highlighted proposal is the only thing an agent lane can produce; a write to the branch is impossible by construction, and the budget stops the lane for the month.</figcaption>
+</figure>
+<p>Requirements: <a class="ref" href="/docs/requirements/#PRD-011">PRD-011</a> to <a class="ref" href="/docs/requirements/#PRD-021">PRD-021</a>. Rules: <a class="ref" href="/specs/06-surfaces/">AGSC-06</a> for what is emitted, <a class="ref" href="/specs/08-governance/">AGSC-08</a> for the checks.</p>
+<h2 id="mode-1-distributed-agentic-memory">Mode 1 — distributed agentic memory</h2>
+<p><strong>What you do.</strong> Point an agent at a node. It reads the discovery document, the graph, the chunk export or llms.txt, or it calls the local tool server, which exposes exactly seven tools: search, read, links, compose, propose, ask and remember (<a class="ref" href="/specs/09-conformance/#AGSC-09-13">AGSC-09-13</a>). It cites items by their addresses. When it wants to change something, it proposes; a person merges.</p>
+<p><strong>Distributed.</strong> A node can declare other nodes as peers, and the two can be checked for mutual conformance with one command (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a>). An agent walks peers itself, over HTTPS only, refusing private and special-purpose addresses, with a hop limit, a fan-out cap and a request budget (<a class="ref" href="/specs/11-boundary/#AGSC-11-07">AGSC-11-07</a> to <a class="ref" href="/specs/11-boundary/#AGSC-11-10">AGSC-11-10</a>). Everything that comes from a peer is marked untrusted and carries its origin (<a class="ref" href="/specs/11-boundary/#AGSC-11-11">AGSC-11-11</a>). Citing another node is done through sources, never through a link (<a class="ref" href="/specs/11-boundary/#AGSC-11-12">AGSC-11-12</a>).</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 260" role="img" aria-label="Mode 1, distributed agentic memory: an agent reads a node's items, graph and tools, writes through a proposal (highlighted) that a human ratifies before it reaches the store, and walks peer nodes itself" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-mode-1-memory" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="20" width="200" height="210" rx="8" stroke-dasharray="6 4"/>
+<rect x="30" y="40" width="172" height="44" rx="6"/>
+<rect x="30" y="100" width="172" height="44" rx="6"/>
+<rect x="30" y="160" width="172" height="44" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="300" y="96" width="130" height="48" rx="6"/>
+<rect x="300" y="176" width="130" height="44" rx="6"/>
+<rect x="300" y="20" width="130" height="44" rx="6"/>
+<path d="M296.0 120.6 L206.0 121.3" marker-end="url(#ar-mode-1-memory)"/>
+<path d="M296.1 137.2 L205.9 159.6" marker-end="url(#ar-mode-1-memory)"/>
+<path d="M206.0 187.8 L296.0 193.6" marker-end="url(#ar-mode-1-memory)"/>
+<path d="M300.0 198.0 L250 198 L250 62 L202.0 62.0" marker-end="url(#ar-mode-1-memory)" stroke-dasharray="4 3"/>
+<path d="M365.0 92.0 L365.0 68.0" marker-end="url(#ar-mode-1-memory)" stroke-dasharray="4 3"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="116" y="14" font-size="11">a node (this site, or yours)</text>
+<text x="116" y="66.0" font-size="11">items + graph + llms.txt</text>
+<text x="116" y="126.0" font-size="11">read: tools, graph, chunks</text>
+<text x="116" y="186.0" font-size="12">write: proposal</text>
+<text x="365" y="124.0" font-size="12">agent</text>
+<text x="365" y="202.0" font-size="12">human ratifies</text>
+<text x="365" y="46.0" font-size="12">peer node</text>
+<text x="230" y="248" font-size="11">open reads; every write is a proposal a human merges; nodes never call nodes</text>
+</g>
+</svg>
+<figcaption>Reads are open; the highlighted write path always passes through a human before anything is stored.</figcaption>
+</figure>
+<p>Requirements: <a class="ref" href="/docs/requirements/#PRD-022">PRD-022</a> to <a class="ref" href="/docs/requirements/#PRD-027">PRD-027</a>, <a class="ref" href="/docs/requirements/#PRD-057">PRD-057</a>. Rules: <a class="ref" href="/specs/05-graph/">AGSC-05</a>, <a class="ref" href="/specs/06-surfaces/">AGSC-06</a>, <a class="ref" href="/specs/11-boundary/">AGSC-11</a>.</p>
+<h2 id="mode-2-live-specifications-and-the-memory-of-a-software-project">Mode 2 — live specifications and the memory of a software project</h2>
+<p><strong>What you do.</strong> Keep a project's own decisions, specifications, tasks, gates and session records as items of the same format. Concepts of kind <code>principle</code>, <code>decision</code>, <code>spec</code>, <code>task</code> and <code>term</code>, plus Gate and Episode items, need no new type (<a class="ref" href="/docs/requirements/#PRD-028">PRD-028</a>). Five engineering links join them: <code>implements</code>, <code>verifies</code>, <code>covers</code>, <code>blocked-by</code> and <code>decided-by</code> (<a class="ref" href="/specs/03-links/#AGSC-03-01">AGSC-03-01</a>). A Gate's checks compile into required status checks in CI (<a class="ref" href="/specs/08-governance/#AGSC-08-09">AGSC-08-09</a>). Tasks carry an Agent2Agent task state, clusters of tasks are boards, and <code>/boards/</code> is a static export a client can merge across nodes (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-13">AGSC-10-13</a>).</p>
+<p><strong>Steer files.</strong> The Bundle exports instruction files for coding agents, such as <code>AGENTS.md</code>, from its NOW page and its Concepts, Procedures, Gates and Lessons, as context only; enforcement stays in CI (<a class="ref" href="/docs/requirements/#PRD-029">PRD-029</a>). This specification is itself developed this way.</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 280" role="img" aria-label="Mode 2, live specifications: a project's own decisions, specs (highlighted), tasks, gates, episodes and boards live in one Bundle, joined by the five engineering links, and the Bundle exports steer files for coding agents" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-mode-2-specs" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="20" width="428" height="170" rx="8" stroke-dasharray="6 4"/>
+<rect x="30" y="36" width="96" height="40" rx="6"/>
+<rect x="182" y="36" width="96" height="40" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="334" y="36" width="96" height="40" rx="6"/>
+<rect x="30" y="110" width="96" height="40" rx="6"/>
+<rect x="182" y="110" width="96" height="40" rx="6"/>
+<rect x="334" y="110" width="96" height="40" rx="6"/>
+<path d="M178.0 56.0 L130.0 56.0" marker-end="url(#ar-mode-2-specs)"/>
+<path d="M330.0 56.0 L282.0 56.0" marker-end="url(#ar-mode-2-specs)"/>
+<path d="M122.7 108.2 L185.3 77.8" marker-end="url(#ar-mode-2-specs)"/>
+<path d="M178.0 130.0 L130.0 130.0" marker-end="url(#ar-mode-2-specs)" stroke-dasharray="4 3"/>
+<path d="M382.0 80.0 L382.0 106.0" marker-end="url(#ar-mode-2-specs)"/>
+<rect x="120" y="206" width="220" height="36" rx="6"/>
+<path d="M230.0 194.0 L230.0 202.0" marker-end="url(#ar-mode-2-specs)"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="230" y="14" font-size="11">the project's own Bundle</text>
+<text x="78" y="60.0" font-size="12">decisions</text>
+<text x="230" y="60.0" font-size="12">specs</text>
+<text x="382" y="60.0" font-size="12">tasks</text>
+<text x="78" y="134.0" font-size="12">gates</text>
+<text x="230" y="134.0" font-size="12">episodes</text>
+<text x="382" y="134.0" font-size="12">boards</text>
+<text x="154" y="50" font-size="10">decided-by</text>
+<text x="306" y="50" font-size="10">implements</text>
+<text x="154" y="124" font-size="10">runs</text>
+<text x="376" y="96" font-size="10" text-anchor="end">as a board</text>
+<text x="230" y="228.0" font-size="11">steer files for coding agents</text>
+<text x="230" y="268" font-size="11">the same format, holding a project's own decisions, specs, tasks and gates</text>
+</g>
+</svg>
+<figcaption>The highlighted specs are ordinary items: decided by decision items, implemented by tasks, verified by gates, all inside one Bundle.</figcaption>
+</figure>
+<p>Requirements: <a class="ref" href="/docs/requirements/#PRD-028">PRD-028</a> to <a class="ref" href="/docs/requirements/#PRD-031">PRD-031</a>. Rules: <a href="/specs/02-item/#section-2-10">AGSC-02 §2.10</a>, <a href="/specs/10-implementation-profiles/#section-10-5">AGSC-10 §10.5</a>.</p>
+<h2 id="mode-3-the-evolving-skills-library">Mode 3 — the evolving skills library</h2>
+<p><strong>What you do.</strong> Procedures export to skill packs in the <code>SKILL.md</code> format, one pack per Cluster, installable into an agent's skill tree with one command (<a class="ref" href="/docs/requirements/#PRD-032">PRD-032</a>, <a class="ref" href="/docs/requirements/#PRD-033">PRD-033</a>). Packs are content only: no scripts, no executables, no symlinks, no tool allow-lists, and a lockfile of hashes verifies every file (<a class="ref" href="/docs/requirements/#PRD-035">PRD-035</a>). An agent that improves a skill can import its <code>SKILL.md</code> back as a Procedure (<a class="ref" href="/docs/requirements/#PRD-034">PRD-034</a>); splitting a whole emitted pack back into its procedures is not in version 1.0.</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 260" role="img" aria-label="Mode 3, evolutive skills: Procedures export to SKILL.md packs (highlighted), packs install into an agent's tool tree, and an improved skill comes back as a Procedure through import" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-mode-3-skills" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="100" width="120" height="50" rx="6"/>
+<rect x="170" y="100" width="120" height="50" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="324" y="100" width="120" height="50" rx="6"/>
+<path d="M140.0 125.0 L166.0 125.0" marker-end="url(#ar-mode-3-skills)"/>
+<path d="M294.0 125.0 L320.0 125.0" marker-end="url(#ar-mode-3-skills)"/>
+<path d="M384.0 150.0 L384 190 L76 190 L76.0 150.0" marker-end="url(#ar-mode-3-skills)" stroke-dasharray="4 3"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="76" y="121.0" font-size="12">Procedures</text>
+<text x="76" y="137.0" font-size="12">(steps + checks)</text>
+<text x="230" y="129.0" font-size="12">SKILL.md packs</text>
+<text x="384" y="121.0" font-size="12">agent tool tree</text>
+<text x="384" y="137.0" font-size="12">(.claude/skills…)</text>
+<text x="230" y="204" font-size="11">an improved skill comes back as a Procedure</text>
+<text x="230" y="248" font-size="11">packs are content only: no scripts, no executables, a lockfile of hashes</text>
+</g>
+</svg>
+<figcaption>The highlighted packs are content only; the dashed return is how a skill improved in the field becomes a Procedure again.</figcaption>
+</figure>
+<p>Requirements: <a class="ref" href="/docs/requirements/#PRD-032">PRD-032</a> to <a class="ref" href="/docs/requirements/#PRD-035">PRD-035</a>. Rules: <a href="/specs/07-composition/#section-7-4">AGSC-07 §7.4</a>.</p>
+<h2 id="mode-4-runnable-knowledge">Mode 4 — runnable knowledge</h2>
+<p><strong>What you do.</strong> Select Concepts, in the browser or on the command line. The combiner runs five steps in a fixed order: it pulls in everything the selection requires, hides what is superseded, refuses any surviving pair that excludes each other, warns about contradictions and missing dependencies, then wires ports (<a class="ref" href="/specs/07-composition/#AGSC-07-04">AGSC-07-04</a> to <a class="ref" href="/specs/07-composition/#AGSC-07-08">AGSC-07-08</a>, <a class="ref" href="/specs/07-composition/#AGSC-07-23">AGSC-07-23</a>). A valid selection yields a Harness of exactly seven files (<a class="ref" href="/specs/07-composition/#AGSC-07-12">AGSC-07-12</a>), byte-identical whether produced in the browser or by the CLI (<a class="ref" href="/specs/07-composition/#AGSC-07-13">AGSC-07-13</a>). Renderings of those seven files for other runtimes — GABBE, kaiban-distributed, CrewAI, LangGraph, ADK, n8n — are named by the specification (<a class="ref" href="/specs/07-composition/#AGSC-07-18">AGSC-07-18</a>) and planned for version 1.1; at 1.0 an emitter is a plugin you write. A saved architecture item re-runs its selection (<a class="ref" href="/specs/07-composition/#AGSC-07-24">AGSC-07-24</a>).</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 260" role="img" aria-label="Mode 4, runnable knowledge: a selection of Concepts goes through the combiner's five fixed steps to a Harness of seven files (highlighted), which runtimes render" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-mode-4-runnable" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="16" y="100" width="100" height="50" rx="6"/>
+<rect x="148" y="90" width="120" height="70" rx="6"/>
+<rect x="300" y="90" width="140" height="70" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="300" y="190" width="140" height="40" rx="6"/>
+<path d="M120.0 125.0 L144.0 125.0" marker-end="url(#ar-mode-4-runnable)"/>
+<path d="M272.0 125.0 L296.0 125.0" marker-end="url(#ar-mode-4-runnable)"/>
+<path d="M370.0 164.0 L370.0 186.0" marker-end="url(#ar-mode-4-runnable)"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="66" y="121.0" font-size="12">select</text>
+<text x="66" y="137.0" font-size="12">Concepts</text>
+<text x="208" y="113.0" font-size="12">combiner</text>
+<text x="208" y="129.0" font-size="12">5 fixed steps</text>
+<text x="208" y="145.0" font-size="12">no model, no key</text>
+<text x="370" y="113.0" font-size="12">Harness</text>
+<text x="370" y="129.0" font-size="12">7 files: C4, arc42,</text>
+<text x="370" y="145.0" font-size="12">ADRs, gates, skills</text>
+<text x="370" y="214.0" font-size="12">runtime renderings</text>
+<text x="230" y="248" font-size="11">verdict first — an invalid selection yields no Harness at all</text>
+</g>
+</svg>
+<figcaption>The highlighted Harness exists only for a valid selection; runtimes such as GABBE or kaiban-distributed are renderings of its seven files.</figcaption>
+</figure>
+<p>Requirements: <a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a> to <a class="ref" href="/docs/requirements/#PRD-038">PRD-038</a>. Rules: <a class="ref" href="/specs/07-composition/">AGSC-07</a>.</p>
+<h2 id="mode-5-the-live-board-self-driving-product-and-project-management">Mode 5 — the live board: self-driving product and project management</h2>
+<p><strong>What you do.</strong> Put a whole project on one Bundle: its decisions, specifications, tasks on boards, gates, procedures as skills, lessons and session records. Declare where proposals go and at least one surface agents can use. Optionally enable agent lanes whose tasks include planning, claiming and working, each holding at most its configured <code>max_claims</code> tasks at once (default one) and proposing at most <code>max_new_items</code> items at a time. Then let people, local agents and remote agents work on it together (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-16">AGSC-10-16</a>).</p>
+<p><strong>How it works.</strong> It is a live board first — always current, read by everyone, changed only by proposals — and a pull system: claiming a task is proposing its working state, which is what pulls the work — an agent lane holds at most one task at a time unless configured otherwise, and work flows through the board's states until it is done; concurrent claims resolve by merge order. In its architecture it is the blackboard pattern (Hayes-Roth 1985, Nii 1986) realised on the format: the Bundle is the shared data structure every participant — a person, a local agent, a remote agent — reads through the published surfaces and writes to only through proposals. The board export says who holds each task and whether the board is done, and an agent lane keeps working until every board it may touch is done, a task needs a person, or its budget is reached (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-17">AGSC-10-17</a>). All of Modes 1 to 4 are in use at once: the memory, the live specs, the skills and the runnable architectures.</p>
+<p><strong>System 1 and System 2.</strong> A live board has two lanes. The fast lane is everything that runs without a fresh human decision: agent lanes, automatic merges, refresh, the ledger, the exports, the peer check. The slow lane is everything that needs one: gates, reviews, decisions, releases, and every change to a procedure, a gate, a cluster or the configuration. The fast lane can never reach the slow lane, and every fast-lane action is auditable afterwards through the ledger and the episode of each run (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-18">AGSC-10-18</a>). Remote participants propose through contribute targets, channels or a declared responder; nodes never call nodes, so a live board shared by many agents needs no server of its own.</p>
+<figure class="diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" role="img" aria-label="Mode 5, the live board: people, local agents and remote agents pull work from the shared Bundle (highlighted: decisions, specs, tasks on boards, gates, skills, lessons) through its published surfaces and write to it only as proposals; the fast lane of agent lanes and automatic merges never reaches the slow lane of gates, reviews and decisions, where a person decides" font-family="system-ui, sans-serif" font-size="14">
+<defs><marker id="ar-mode-5-live-board" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="176" y="24" width="170" height="122" rx="6" class="acc" stroke-width="2.2"/>
+<rect x="16" y="40" width="120" height="44" rx="6"/>
+<rect x="16" y="100" width="120" height="44" rx="6"/>
+<rect x="16" y="160" width="120" height="44" rx="6"/>
+<path d="M140.0 70.0 L172.0 73.9" marker-end="url(#ar-mode-5-live-board)"/>
+<path d="M139.9 109.2 L172.1 102.8" marker-end="url(#ar-mode-5-live-board)"/>
+<path d="M121.5 158.1 L172.5 131.4" marker-end="url(#ar-mode-5-live-board)"/>
+<rect x="380" y="24" width="124" height="70" rx="6"/>
+<rect x="380" y="110" width="124" height="44" rx="6"/>
+<path d="M350.0 72.2 L376.0 68.5" marker-end="url(#ar-mode-5-live-board)"/>
+<path d="M442.0 98.0 L442.0 106.0" marker-end="url(#ar-mode-5-live-board)"/>
+<rect x="176" y="176" width="328" height="96" rx="8" stroke-dasharray="6 4"/>
+<rect x="190" y="196" width="140" height="60" rx="6"/>
+<rect x="348" y="196" width="140" height="60" rx="6"/>
+<path d="M260.5 150.0 L260.2 192.0" marker-end="url(#ar-mode-5-live-board)" stroke-dasharray="4 3"/>
+</g>
+<g fill="currentColor" text-anchor="middle">
+<text x="261" y="65.0" font-size="12">the Bundle as live board</text>
+<text x="261" y="81.0" font-size="12">decisions · specs · tasks</text>
+<text x="261" y="97.0" font-size="12">boards · gates · skills</text>
+<text x="261" y="113.0" font-size="12">lessons · episodes</text>
+<text x="76" y="66.0" font-size="12">people</text>
+<text x="76" y="126.0" font-size="12">local agents</text>
+<text x="76" y="186.0" font-size="12">remote agents</text>
+<text x="442" y="47.0" font-size="12">fast lane</text>
+<text x="442" y="63.0" font-size="12">agent lanes, auto</text>
+<text x="442" y="79.0" font-size="12">merges, refresh</text>
+<text x="442" y="128.0" font-size="12">boards: claimed_by,</text>
+<text x="442" y="144.0" font-size="12">done</text>
+<text x="340" y="170" font-size="11">slow lane — a person decides</text>
+<text x="260" y="222.0" font-size="12">gates · reviews</text>
+<text x="260" y="238.0" font-size="12">decisions · releases</text>
+<text x="418" y="222.0" font-size="12">procedures · gates</text>
+<text x="418" y="238.0" font-size="12">configuration</text>
+<text x="260" y="288" font-size="11">the fast lane runs until the board is done; the slow lane is unreachable from it</text>
+</g>
+</svg>
+<figcaption>The highlighted Bundle is the shared pull board itself; every participant reads it and proposes to it, and the dashed border is the line the fast lane can never cross.</figcaption>
+</figure>
+<p>Requirements: <a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a>, <a class="ref" href="/docs/requirements/#PRD-064">PRD-064</a>. Rules: <a href="/specs/08-governance/#section-8-6">AGSC-08 §8.6</a> and <a href="/specs/10-implementation-profiles/#section-10-6">AGSC-10 §10.6</a>.</p>
+<h2 id="what-every-mode-shares">What every mode shares</h2>
+<p>Provenance on every item, a human decision on every merge, a ledger derived from git history, the same discovery document, and the same honest limit: the checks prove that an artefact is what was published, never that it is safe or true (<a class="ref" href="/specs/08-governance/#AGSC-08-19">AGSC-08-19</a>).</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/modes.md">Propose an edit</a> — opens <code>site/docs/modes.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>
