@@ -29,7 +29,7 @@ const OUT = path.resolve(ROOT, (() => { const i = process.argv.indexOf('--out');
 const STATUS = {
   wellknown: 'not-requested',   // not-requested | requested | registered
   profile: 'not-filed',         // not-filed | filed | registered
-  draft: null,                  // e.g. 'draft-besleaga-agentic-knowledge-wellknown-00' once posted
+  draft: 'draft-besleaga-agentic-knowledge-wellknown-00',                  // e.g. 'draft-besleaga-agentic-knowledge-wellknown-00' once posted
   w3id: false,                  // true once the w3id.org namespace redirects are live
   preprint: { doi: '10.5281/zenodo.23052710', title: 'AgenticSystemCore: Distributed Knowledge Bundles and Runnable Systems, for People and Agents', date: '2026-09-30' },               // e.g. { doi: '10.5281/zenodo.NNNNNNN', title: '…', date: 'YYYY-MM-DD' } once published
 };
@@ -1045,7 +1045,7 @@ const regText = {
   wellknown: { 'not-requested': 'Not yet requested. The suffix <code>knowledge-linkset</code> will be requested for the Well-Known URIs registry (RFC 8615) through an Internet-Draft; it is not registered.', requested: 'Requested for the Well-Known URIs registry (RFC 8615); not yet registered.', registered: 'Registered in the Well-Known URIs registry (RFC 8615).' }[STATUS.wellknown],
   profile: { 'not-filed': 'Not yet filed in the Profile URIs registry (RFC 7284).', filed: 'Filed in the Profile URIs registry (RFC 7284); not yet registered.', registered: 'Registered in the Profile URIs registry (RFC 7284).' }[STATUS.profile],
   draft: STATUS.draft ? `<a href="https://datatracker.ietf.org/doc/${esc(STATUS.draft.replace(/-\d{2}$/, ''))}/"><code>${esc(STATUS.draft)}</code></a>` : 'Not yet posted.',
-  w3id: STATUS.w3id ? 'The namespace <code>https://w3id.org/agentic-system-core/</code> resolves.' : 'The namespace <code>https://w3id.org/agentic-system-core/</code> does not resolve yet; the pull request to w3id.org has not been opened.',
+  w3id: STATUS.w3id ? 'The namespace <code>https://w3id.org/agentic-system-core/</code> resolves.' : 'The namespace <code>https://w3id.org/agentic-system-core/</code> does not resolve yet; the pull request to w3id.org is open and not yet merged.',
   preprint: STATUS.preprint ? `Published: <a href="https://doi.org/${esc(STATUS.preprint.doi)}">${esc(STATUS.preprint.title)}</a> (${esc(STATUS.preprint.date)}), DOI <code>${esc(STATUS.preprint.doi)}</code>.` : 'In preparation; not yet published.',
 };
 
