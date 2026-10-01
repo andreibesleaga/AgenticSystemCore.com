@@ -1,0 +1,27 @@
+{
+  "updated": "2026-10-01T00:00:00Z",
+  "capabilities": "basic",
+  "provider": "Andrei N. Besleaga (https://andreibesleaga.com/contact/)",
+  "measurement-method": "third-party-modeled",
+  "methodology-uri": "https://andreibesleaga.com/sustainability-methodology.html",
+  "reporting-period": "2026-09",
+  "target": "agenticsystemcore.com",
+  "target-type": "origin",
+  "energy-consumption": 0.21,
+  "energy-unit": "kWh",
+  "carbon-footprint": 103.7,
+  "carbon-unit": "gCO2e",
+  "carbon-accounting": "location-based",
+  "carbon-intensity-gCO2e-per-kWh": 494,
+  "scope-1": 0,
+  "scope-2": 0,
+  "scope-3": 103.7,
+  "estimated-annual-emissions-kgCO2e": 1.245,
+  "disclosure-uri": "https://andreibesleaga.com/disclosures.html",
+  "extensions": {
+    "https://andreibesleaga.com/sustainability/extensions/transferred-bytes": {
+      "data-transferred-gb": 0.7
+    }
+  },
+  "signed": "eyJhbGciOiJFZERTQSIsImN0eSI6InN1c3RhaW5hYmlsaXR5LWRhdGEranNvbiIsImp3ayI6eyJrdHkiOiJPS1AiLCJjcnYiOiJFZDI1NTE5IiwieCI6Im5EQlZQanpsWmZiRVJQb3F0bUdjYmNOZ1Ffbmw5bl82cUNOenlWVjhoVlUiLCJraWQiOiJES0g4a0NiQTBEMXBqWnYxMnhxOGVHdWRxRUhQMmkwdHE0aF9STVlKeFdvIiwiYWxnIjoiRWREU0EiLCJ1c2UiOiJzaWcifX0.eyJ1cGRhdGVkIjoiMjAyNi0xMC0wMVQwMDowMDowMFoiLCJjYXBhYmlsaXRpZXMiOiJiYXNpYyIsInByb3ZpZGVyIjoiQW5kcmVpIE4uIEJlc2xlYWdhIChodHRwczovL2FuZHJlaWJlc2xlYWdhLmNvbS9jb250YWN0LykiLCJtZWFzdXJlbWVudC1tZXRob2QiOiJ0aGlyZC1wYXJ0eS1tb2RlbGVkIiwibWV0aG9kb2xvZ3ktdXJpIjoiaHR0cHM6Ly9hbmRyZWliZXNsZWFnYS5jb20vc3VzdGFpbmFiaWxpdHktbWV0aG9kb2xvZ3kuaHRtbCIsInJlcG9ydGluZy1wZXJpb2QiOiIyMDI2LTA5IiwidGFyZ2V0IjoiYWdlbnRpY3N5c3RlbWNvcmUuY29tIiwidGFyZ2V0LXR5cGUiOiJvcmlnaW4iLCJlbmVyZ3ktY29uc3VtcHRpb24iOjAuMjEsImVuZXJneS11bml0Ijoia1doIiwiY2FyYm9uLWZvb3RwcmludCI6MTAzLjcsImNhcmJvbi11bml0IjoiZ0NPMmUiLCJjYXJib24tYWNjb3VudGluZyI6ImxvY2F0aW9uLWJhc2VkIiwiY2FyYm9uLWludGVuc2l0eS1nQ08yZS1wZXIta1doIjo0OTQsInNjb3BlLTEiOjAsInNjb3BlLTIiOjAsInNjb3BlLTMiOjEwMy43LCJlc3RpbWF0ZWQtYW5udWFsLWVtaXNzaW9ucy1rZ0NPMmUiOjEuMjQ1LCJkaXNjbG9zdXJlLXVyaSI6Imh0dHBzOi8vYW5kcmVpYmVzbGVhZ2EuY29tL2Rpc2Nsb3N1cmVzLmh0bWwiLCJleHRlbnNpb25zIjp7Imh0dHBzOi8vYW5kcmVpYmVzbGVhZ2EuY29tL3N1c3RhaW5hYmlsaXR5L2V4dGVuc2lvbnMvdHJhbnNmZXJyZWQtYnl0ZXMiOnsiZGF0YS10cmFuc2ZlcnJlZC1nYiI6MC43fX19.OZiDqw0x-pW2kr5cnnjVJ5DbsPABXDGm9-FcX3Dk8w-X18LBrRV6Vzms9vHIkdt4SXDuizQU3Dh80OqipbyFAw"
+}
