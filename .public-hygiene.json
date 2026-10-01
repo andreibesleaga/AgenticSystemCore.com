@@ -38,6 +38,12 @@
       "path": "www/docs/requirements/index.html",
       "text": "auto-disable runbook",
       "reason": "NFR-09 is a product requirement that a node ships a restore runbook (rendered from the engine's PRD)"
+    },
+    {
+      "check": "secret",
+      "path": "www/.well-known/sustainability-data",
+      "text": "\"signed\":",
+      "reason": "the signed member is a public JSON Web Signature over this document (EdDSA, its public key embedded; draft-besleaga-sustainability-wellknown), placed by the operator's monthly report tool; it is a signature anyone can verify, not a credential"
     }
   ]
 }

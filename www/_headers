@@ -145,3 +145,10 @@
 
 /ns/schema/*.json
   Content-Type: application/json; charset=utf-8
+
+# /.well-known/sustainability-data (draft-besleaga-sustainability-wellknown): the signed monthly report.
+# Added by ~/work/sustainability-monthly after each build; the site build does not emit it.
+/.well-known/sustainability-data
+  Content-Type: application/sustainability-data+json
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
