@@ -30,7 +30,7 @@ const STATUS = {
   wellknown: 'not-requested',   // not-requested | requested | registered
   profile: 'not-filed',         // not-filed | filed | registered
   draft: 'draft-besleaga-agentic-knowledge-wellknown-00',                  // e.g. 'draft-besleaga-agentic-knowledge-wellknown-00' once posted
-  w3id: false,                  // true once the w3id.org namespace redirects are live
+  w3id: true,                   // true once the w3id.org namespace redirects are live
   preprint: { doi: '10.5281/zenodo.23052710', title: 'AgenticSystemCore: Distributed Knowledge Bundles and Runnable Systems, for People and Agents', date: '2026-09-30' },               // e.g. { doi: '10.5281/zenodo.NNNNNNN', title: '…', date: 'YYYY-MM-DD' } once published
 };
 
