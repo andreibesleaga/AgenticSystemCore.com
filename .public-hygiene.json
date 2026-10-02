@@ -1,23 +1,10 @@
 {
   "_": "Allow-list of tools/public-hygiene (in the engine repository) for this site. Every entry says why the hit is public by intent.",
   "built": [
-    "www-next",
     "www"
   ],
   "skip": [],
   "allow": [
-    {
-      "check": "personal",
-      "path": "www-next/assets/search-site.json",
-      "text": "Andrei N. B\"",
-      "reason": "a search excerpt cut after 'Andrei N. B' of the canonical name"
-    },
-    {
-      "check": "process",
-      "path": "www-next/docs/requirements/index.html",
-      "text": "auto-disable runbook",
-      "reason": "NFR-09 is a product requirement that a node ships a restore runbook (rendered from the engine's PRD)"
-    },
     {
       "check": "wording",
       "path": "scripts/build.js",
@@ -42,6 +29,12 @@
     {
       "check": "secret",
       "path": "www/.well-known/sustainability-data",
+      "text": "\"signed\":",
+      "reason": "the signed member is a public JSON Web Signature over this document (EdDSA, its public key embedded; draft-besleaga-sustainability-wellknown), placed by the operator's monthly report tool; it is a signature anyone can verify, not a credential"
+    },
+    {
+      "check": "secret",
+      "path": "static/.well-known/sustainability-data",
       "text": "\"signed\":",
       "reason": "the signed member is a public JSON Web Signature over this document (EdDSA, its public key embedded; draft-besleaga-sustainability-wellknown), placed by the operator's monthly report tool; it is a signature anyone can verify, not a credential"
     }

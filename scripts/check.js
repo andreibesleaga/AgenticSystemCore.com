@@ -22,7 +22,7 @@ const SPEC_SOURCE = process.env.SITE_SPEC_SOURCE || (tagExists ? 'tag' : 'worktr
 const engineFile = p => SPEC_SOURCE === 'tag'
   ? cp.execFileSync('git', ['-C', ENGINE, 'show', `${SPEC_TAG}:${p}`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
   : fs.readFileSync(path.join(ENGINE, p), 'utf8');
-const WWW = path.join(ROOT, (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www'); // www-next until launch (README)
+const WWW = path.join(ROOT, (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www'); // build.out in agsc.config.json (README)
 const fails = [];
 const NO_TRACE_IN_SOURCE = new Set(['AGSC-05-26']); // the one rule whose source ends in a table with no bracket
 // AGSC-06-05/06-17: the only <script> elements any page may carry — all same-origin, all classic,
@@ -262,7 +262,8 @@ for (const need of [
   '/graph.ttl\n  Content-Type: text/turtle; charset=utf-8',
   '/now.md\n  Content-Type: text/markdown; charset=utf-8; variant=GFM\n  Cache-Control: no-cache',
   '/skills/*.md\n  Content-Type: text/markdown; charset=utf-8; variant=GFM',
-  '/exports/*\n  Content-Type: text/plain; charset=utf-8',
+  '/exports/chunks-index.toon\n  Content-Type: text/plain; charset=utf-8',
+  '/exports/llms-ctx.txt\n  Content-Type: text/plain; charset=utf-8',
   'Content-Type: application/linkset+json; profile="https://w3id.org/agentic-system-core/profile/agentic-knowledge"',
   'Link: <https://w3id.org/agentic-system-core/profile/agentic-knowledge>; rel="profile"',
   "Content-Security-Policy: default-src 'none'; script-src 'self'",
@@ -270,6 +271,21 @@ for (const need of [
   'Link: </.well-known/knowledge-linkset>; rel="describedby"; type="application/linkset+json"',
 ]) ok(headers.includes(need), `_headers lacks: ${need} (AGSC-06-17, AGSC-11-03, AGSC-11-05)`);
 ok(!/Access-Control-Allow-Credentials/i.test(headers), '_headers must not allow credentials (AGSC-11-03)');
+// One block per address: Cloudflare Pages keeps only the later of two blocks for the same
+// address, so a repeated address silently drops headers (it once dropped AGSC-11-03's).
+const headerBlocks = new Map();
+for (const block of headers.split(/\n\n+/)) {
+  const lines = block.split('\n').filter(l => l && !l.startsWith('#'));
+  if (!lines.length) continue;
+  if (headerBlocks.has(lines[0])) fails.push(`_headers: the address ${lines[0]} has two blocks; the host keeps only the later one`);
+  headerBlocks.set(lines[0], lines.slice(1).map(l => l.trim()));
+}
+for (const route of ['/.well-known/knowledge-linkset', '/graph.jsonld', '/graph.nq', '/graph.ttl', '/llms.txt', '/llms-full.txt', '/search.json', '/chunks.jsonl', '/ledger.jsonl', '/now.md', '/exports/chunks-index.toon', '/exports/llms-ctx.txt']) {
+  const lines = headerBlocks.get(route) || [];
+  ok(lines.includes('Access-Control-Expose-Headers: Link, ETag, Content-Type') && lines.includes('Access-Control-Allow-Origin: *'), `_headers: ${route} lacks the cross-origin headers in its own block (AGSC-11-03)`);
+}
+// A pattern that also matches a page would give that page a machine content type (it once served /exports/ as text).
+for (const route of headerBlocks.keys()) if (/\/\*$/.test(route) && route !== '/*' && (headerBlocks.get(route) || []).some(l => /^Content-Type:/.test(l))) fails.push(`_headers: ${route} sets a Content-Type on a pattern that also matches the folder's index page`);
 const redirects = exists(path.join(WWW, '_redirects')) ? fs.readFileSync(path.join(WWW, '_redirects'), 'utf8') : '';
 ok(/^\/\.well-known\/agentic-knowledge \/\.well-known\/knowledge-linkset 301$/m.test(redirects), '_redirects lacks the 0.0.x alias (AGSC-06-17)');
 const sitemap = exists(path.join(WWW, 'sitemap.xml')) ? fs.readFileSync(path.join(WWW, 'sitemap.xml'), 'utf8') : '';

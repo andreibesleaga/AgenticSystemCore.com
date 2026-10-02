@@ -17,9 +17,8 @@ const { compile: compileDiagram } = require('./diagram.js');
 const ROOT = path.resolve(__dirname, '..');
 const ENGINE = path.resolve(ROOT, process.env.SITE_ENGINE || '../agentic-system-core');
 const SPEC_TAG = process.env.SITE_SPEC_TAG || '1.0.0-rc.6';
-// Output directory: `build.out` of agsc.config.json. It is `www-next` until launch so that the
-// repository can be pushed without Cloudflare Pages publishing the new site (Pages serves `www/`);
-// at launch the maintainer sets `build.out` to `www`.
+// Output directory: `build.out` of agsc.config.json, `www` — the folder Cloudflare Pages serves,
+// so a push to `main` publishes what this script wrote.
 const CONFIG_OUT = (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www';
 const OUT = path.resolve(ROOT, (() => { const i = process.argv.indexOf('--out'); return i > 0 ? process.argv[i + 1] : CONFIG_OUT; })());
 
@@ -707,7 +706,7 @@ const ntTerm = o => {
 const NT = [...new Set(onto.triples.map(t => `<${t.s}> <${t.p}> ${ntTerm(t.o)} .`))].sort((a, b) => Buffer.compare(Buffer.from(a), Buffer.from(b))).join('\n') + '\n';
 
 // exactly the prefix set, the order, the declaration case and the indentation of the
-// engine's own `tools/gen-ns`, so that `gen-ns --check www-next/ns` reports nothing at all. The
+// engine's own `tools/gen-ns`, so that `gen-ns --check www/ns` reports nothing at all. The
 // `schema` prefix is declared and used by no triple of this vocabulary, as it is there: a
 // declared prefix nothing uses is legal RDF/XML, and agreeing byte for byte with the checker is
 // worth more than dropping it. scripts/check.js runs that checker on every run.
@@ -1626,7 +1625,7 @@ const statusRows = [
   ['Independent validators', 'Published', `The nine checker contracts of ${REF('AGSC-09-90')} &#8212; seven validators and two generators &#8212; ship in the published npm package beside its artefact counter and its benchmark tool; the maintainer&#39;s own tools stay in the repository. One validator, for the discovery document, checks this site at Level 2 before every publish.`],
   ['Contribution channel', 'Live', `Declared in the <a href="${WELLKNOWN}">discovery document</a> as a pull-request target (${REF('AGSC-11-14')}), and every page generated from a source file carries a <em>Propose an edit</em> link to that file. Nothing is written without a person merging it.`],
   ...(PATTERNS_NODE ? [['Second node (live demonstration)', 'Live', `A second node, at <code>patterns.agenticsystemcore.com</code>, is online: a live demonstration of the reference engine, running on a small sample of well-known agent-system patterns described from public sources. Its published items are in the repository <a href="https://github.com/andreibesleaga/agsc-demo-node">agsc-demo-node</a>. ${PEERS.length ? `Each names the other as a peer in its discovery document, and the mutual check of ${REF('AGSC-10-12')} passes.` : 'It is not declared as a peer yet.'}`]] : []),
-  ['Papers', 'Planned', 'Journal and conference papers follow the preprint; none is submitted.'],
+  ['Papers', 'Submitted', 'A journal letter was submitted on 2026-10-01 and is under review; nothing is accepted.'],
 ];
 const statusTable = `<div class="table-wrap" tabindex="0" role="region" aria-label="Status"><table>
 <thead><tr><th scope="col">What</th><th scope="col">State</th><th scope="col">Detail</th></tr></thead>
@@ -1639,7 +1638,7 @@ const registrationsTable = `<div class="table-wrap" tabindex="0" role="region" a
 <tbody>
 <tr><th scope="row">Well-known URI suffix <code>knowledge-linkset</code></th><td>IANA Well-Known URIs registry (RFC 8615)</td><td>Specification Required; requested through the Internet-Draft</td><td>${regText.wellknown}</td></tr>
 <tr><th scope="row">Profile URI <code>${PROFILE}</code></th><td>IANA Profile URIs registry (RFC 7284)</td><td>First Come First Served</td><td>${regText.profile}</td></tr>
-<tr><th scope="row">Internet-Draft on the discovery layer</th><td>IETF Datatracker, Independent Submission Stream</td><td>Reviewed by the Independent Submissions Editor</td><td>${regText.draft}</td></tr>
+<tr><th scope="row">Internet-Draft on the discovery layer</th><td>IETF Datatracker, individual Internet-Draft</td><td>An individual draft: on no stream and adopted by no working group; it may be revised or left to expire</td><td>${regText.draft}</td></tr>
 <tr><th scope="row">Namespace <code>agentic-system-core</code></th><td>w3id.org permanent identifiers</td><td>Pull request reviewed by the w3id maintainers</td><td>${regText.w3id}</td></tr>
 <tr><th scope="row">Discovery link relation</th><td>IANA Link Relations registry</td><td>None needed: the registered relation <code>describedby</code> (registered by W3C POWDER; RFC 6892 registers its inverse <code>describes</code>) is used with the media type (${REF('AGSC-06-25')})</td><td>No request</td></tr>
 <tr><th scope="row">MCP extension identifier <code>${esc(MCP_EXTENSION)}</code></th><td>MCP extensions mechanism (SEP-2133)</td><td>Reverse-domain identifier declared by the server; no registry entry (${REF('AGSC-11-18')})</td><td>Declared in the specification; the reference text is at <a href="/specs/mcp/">/specs/mcp/</a></td></tr>
@@ -1648,7 +1647,7 @@ const registrationsTable = `<div class="table-wrap" tabindex="0" role="region" a
 const publicationsHtml = `<ul>
 <li><strong>Preprint.</strong> ${regText.preprint}${STATUS.preprint ? '' : ' It will establish the specification, its vectors and its discovery layer as of the tagged release, with a persistent identifier.'}</li>
 <li><strong>Internet-Draft.</strong> ${regText.draft}</li>
-<li><strong>Papers.</strong> Journal and conference papers are planned after the preprint; none has been submitted.</li>
+<li><strong>Papers.</strong> A journal letter was submitted on 2026-10-01 and is under review; nothing is accepted.</li>
 </ul>
 <h3 id="how-to-cite">How to cite</h3>
 <p>${STATUS.preprint ? `Cite the preprint by its DOI, <code>${esc(STATUS.preprint.doi)}</code>, and the specification by version.` : 'Until the preprint is published, cite the specification by version and tag:'}</p>
@@ -2017,97 +2016,56 @@ if (!(/ai-train=no/.test(ROBOTS) && TDM.every(r => r['tdm-reservation'] === 1) &
 routes.sort(byCode);
 put('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes.map(r => `<url><loc>${esc(ORIGIN + r)}</loc><lastmod>${GENERATED_AT.slice(0, 10)}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 
-// _headers: Cloudflare Pages merges every matching block, so each header is set once.
-// The machine routes a visiting agent — or this site's own page tools on another origin — may
-// read cross-origin. `/pages/*` is on the list because it is what the `read` and `propose` page
-// tools return (AGSC-06-02, AGSC-09-16).
-const PUBLIC_ARTEFACT = ['/.well-known/knowledge-linkset', '/graph.jsonld', '/graph.nq', '/graph.ttl', '/llms.txt', '/llms-full.txt', '/search.json', '/pages/*.md', '/pages/*.jsonld', '/ns/*', '/chunks.jsonl', '/ledger.jsonl', '/now.md', '/skills/*', '/boards/*', '/exports/*'];
-put('_headers', `# Generated by scripts/build.js — do not hand-edit (AGSC-06-04).
-/*
-  X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
-  Referrer-Policy: strict-origin-when-cross-origin
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
-  Permissions-Policy: interest-cohort=()
-
-/
-  Link: <${WELLKNOWN}>; rel="describedby"; type="application/linkset+json"
-
-${PUBLIC_ARTEFACT.map(p => `${p}\n  Access-Control-Allow-Origin: *\n  Access-Control-Expose-Headers: Link, ETag, Content-Type`).join('\n\n')}
-
-/.well-known/knowledge-linkset
-  Content-Type: application/linkset+json; profile="${PROFILE}"
-  Link: <${PROFILE}>; rel="profile"
-  Cache-Control: no-cache
-
-/.well-known/tdmrep.json
-  Content-Type: application/json; charset=utf-8
-
-/.well-known/security.txt
-  Content-Type: text/plain; charset=utf-8
-
-/graph.jsonld
-  Content-Type: application/ld+json; charset=utf-8
-
-/search.json
-  Content-Type: application/json; charset=utf-8
-
-/pages/*.md
-  Content-Type: text/markdown; charset=utf-8; variant=GFM
-
-/pages/*.jsonld
-  Content-Type: application/ld+json; charset=utf-8
-
-/graph.nq
-  Content-Type: application/n-quads; charset=utf-8
-
-/graph.ttl
-  Content-Type: text/turtle; charset=utf-8
-
-/chunks.jsonl
-  Content-Type: application/jsonl; charset=utf-8
-
-/ledger.jsonl
-  Content-Type: application/jsonl
-  Cache-Control: no-cache
-
-/boards/*.json
-  Content-Type: application/json; charset=utf-8
-
-/now.md
-  Content-Type: text/markdown; charset=utf-8; variant=GFM
-  Cache-Control: no-cache
-
-/skills/index.json
-  Content-Type: application/json; charset=utf-8
-
-/skills/*.md
-  Content-Type: text/markdown; charset=utf-8; variant=GFM
-
-/exports/*
-  Content-Type: text/plain; charset=utf-8
-
-/llms.txt
-  Content-Type: text/plain; charset=utf-8
-
-/llms-full.txt
-  Content-Type: text/plain; charset=utf-8
-
-/ns/*.ttl
-  Content-Type: text/turtle; charset=utf-8
-
-/ns/*.jsonld
-  Content-Type: application/ld+json; charset=utf-8
-
-/ns/*.rdf
-  Content-Type: application/rdf+xml; charset=utf-8
-
-/ns/*.nt
-  Content-Type: application/n-triples; charset=utf-8
-
-/ns/schema/*.json
-  Content-Type: application/json; charset=utf-8
-`);
+// _headers: ONE block per address. Cloudflare Pages merges blocks whose patterns differ, but when
+// the same address is written twice it keeps only the later block, which once dropped the
+// cross-origin headers of every machine file (AGSC-11-03); scripts/check.js refuses a repeated
+// address. The machine routes a visiting agent — or this site's own page tools on another
+// origin — may read cross-origin. `/pages/*` is on the list because it is what the `read` and
+// `propose` page tools return (AGSC-06-02, AGSC-09-16). The files under `/exports/` are named
+// one by one: a pattern `/exports/*` would also match the index page `/exports/`.
+const EXPORT_FILES = LLM_CONTEXT.map(f => `/exports/${f}`);
+const PUBLIC_ARTEFACT = ['/.well-known/knowledge-linkset', '/graph.jsonld', '/graph.nq', '/graph.ttl', '/llms.txt', '/llms-full.txt', '/search.json', '/pages/*.md', '/pages/*.jsonld', '/ns/*', '/chunks.jsonl', '/ledger.jsonl', '/now.md', '/skills/*', '/boards/*', ...EXPORT_FILES];
+const HEADER_BLOCKS = new Map(); // address -> header lines, in the order they are written
+const addHeaders = (route, ...lines) => { if (!HEADER_BLOCKS.has(route)) HEADER_BLOCKS.set(route, []); HEADER_BLOCKS.get(route).push(...lines); };
+addHeaders('/*', 'X-Content-Type-Options: nosniff', 'X-Frame-Options: DENY', 'Referrer-Policy: strict-origin-when-cross-origin',
+  "Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+  'Permissions-Policy: interest-cohort=()');
+addHeaders('/', `Link: <${WELLKNOWN}>; rel="describedby"; type="application/linkset+json"`);
+addHeaders('/.well-known/knowledge-linkset', `Content-Type: application/linkset+json; profile="${PROFILE}"`, `Link: <${PROFILE}>; rel="profile"`, 'Cache-Control: no-cache');
+for (const [route, type, ...rest] of [
+  ['/.well-known/tdmrep.json', 'application/json; charset=utf-8'],
+  ['/.well-known/security.txt', 'text/plain; charset=utf-8'],
+  ['/graph.jsonld', 'application/ld+json; charset=utf-8'],
+  ['/search.json', 'application/json; charset=utf-8'],
+  ['/pages/*.md', 'text/markdown; charset=utf-8; variant=GFM'],
+  ['/pages/*.jsonld', 'application/ld+json; charset=utf-8'],
+  ['/graph.nq', 'application/n-quads; charset=utf-8'],
+  ['/graph.ttl', 'text/turtle; charset=utf-8'],
+  ['/chunks.jsonl', 'application/jsonl; charset=utf-8'],
+  ['/ledger.jsonl', 'application/jsonl', 'Cache-Control: no-cache'],
+  ['/boards/*.json', 'application/json; charset=utf-8'],
+  ['/now.md', 'text/markdown; charset=utf-8; variant=GFM', 'Cache-Control: no-cache'],
+  ['/skills/index.json', 'application/json; charset=utf-8'],
+  ['/skills/*.md', 'text/markdown; charset=utf-8; variant=GFM'],
+  ...EXPORT_FILES.map(f => [f, 'text/plain; charset=utf-8']),
+  ['/llms.txt', 'text/plain; charset=utf-8'],
+  ['/llms-full.txt', 'text/plain; charset=utf-8'],
+  ['/ns/*.ttl', 'text/turtle; charset=utf-8'],
+  ['/ns/*.jsonld', 'application/ld+json; charset=utf-8'],
+  ['/ns/*.rdf', 'application/rdf+xml; charset=utf-8'],
+  ['/ns/*.nt', 'application/n-triples; charset=utf-8'],
+  ['/ns/schema/*.json', 'application/json; charset=utf-8'],
+]) addHeaders(route, `Content-Type: ${type}`, ...rest);
+for (const route of PUBLIC_ARTEFACT) addHeaders(route, 'Access-Control-Allow-Origin: *', 'Access-Control-Expose-Headers: Link, ETag, Content-Type');
+// The signed monthly sustainability report (draft-besleaga-sustainability-wellknown), written into
+// static/ by the operator's report tool and republished byte for byte (static/README.md): a
+// rebuild keeps it, and its header block is part of this file instead of being appended later.
+const SUSTAINABILITY = path.join(ROOT, 'static', '.well-known', 'sustainability-data');
+if (fs.existsSync(SUSTAINABILITY)) {
+  put('.well-known/sustainability-data', fs.readFileSync(SUSTAINABILITY));
+  addHeaders('/.well-known/sustainability-data', 'Content-Type: application/sustainability-data+json', 'Access-Control-Allow-Origin: *', 'Cache-Control: public, max-age=3600');
+}
+put('_headers', `# Generated by scripts/build.js — do not hand-edit (AGSC-06-04).\n${[...HEADER_BLOCKS].map(([route, lines]) => `${route}\n${lines.map(l => `  ${l}`).join('\n')}`).join('\n\n')}\n`);
 // No entry for a section published in parts: a fragment such as `/specs/06-surfaces/#AGSC-06-22`
 // never reaches the server, so nothing here could send it to `/specs/06-surfaces/page-2/`. Every
 // link to a rule is derived from the rule index instead, and scripts/check.js refuses one that lands
@@ -2115,6 +2073,8 @@ ${PUBLIC_ARTEFACT.map(p => `${p}\n  Access-Control-Allow-Origin: *\n  Access-Con
 put('_redirects', `# Generated by scripts/build.js — do not hand-edit (AGSC-06-04).
 # The 0.0.x discovery path (AGSC-06-17).
 /.well-known/agentic-knowledge ${WELLKNOWN} 301
+# Browsers and tools that ask for the classic icon address get the site's icon.
+/favicon.ico /favicon.svg 301
 `);
 
 // assets

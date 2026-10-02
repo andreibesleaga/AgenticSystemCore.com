@@ -9,7 +9,7 @@
 //
 // Why a scratch directory and not the repository root. AGSC-01-19 makes `build.out` a path
 // relative to the Bundle root and the engine's FileSystem port refuses to write outside it, so an
-// engine build started at the repository root would write over `www-next`, which is this
+// engine build started at the repository root would write over `www`, which is this
 // generator's output. The scratch Bundle is a copy of the same inputs with `build.out` pointed at
 // a directory of its own.
 //

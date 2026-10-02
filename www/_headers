@@ -10,73 +10,11 @@
   Link: </.well-known/knowledge-linkset>; rel="describedby"; type="application/linkset+json"
 
 /.well-known/knowledge-linkset
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/graph.jsonld
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/graph.nq
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/graph.ttl
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/llms.txt
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/llms-full.txt
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/search.json
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/pages/*.md
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/pages/*.jsonld
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/ns/*
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/chunks.jsonl
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/ledger.jsonl
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/now.md
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/skills/*
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/boards/*
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/exports/*
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
-
-/.well-known/knowledge-linkset
   Content-Type: application/linkset+json; profile="https://w3id.org/agentic-system-core/profile/agentic-knowledge"
   Link: <https://w3id.org/agentic-system-core/profile/agentic-knowledge>; rel="profile"
   Cache-Control: no-cache
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /.well-known/tdmrep.json
   Content-Type: application/json; charset=utf-8
@@ -86,28 +24,44 @@
 
 /graph.jsonld
   Content-Type: application/ld+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /search.json
   Content-Type: application/json; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /pages/*.md
   Content-Type: text/markdown; charset=utf-8; variant=GFM
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /pages/*.jsonld
   Content-Type: application/ld+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /graph.nq
   Content-Type: application/n-quads; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /graph.ttl
   Content-Type: text/turtle; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /chunks.jsonl
   Content-Type: application/jsonl; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /ledger.jsonl
   Content-Type: application/jsonl
   Cache-Control: no-cache
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /boards/*.json
   Content-Type: application/json; charset=utf-8
@@ -115,6 +69,8 @@
 /now.md
   Content-Type: text/markdown; charset=utf-8; variant=GFM
   Cache-Control: no-cache
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /skills/index.json
   Content-Type: application/json; charset=utf-8
@@ -122,14 +78,25 @@
 /skills/*.md
   Content-Type: text/markdown; charset=utf-8; variant=GFM
 
-/exports/*
+/exports/chunks-index.toon
   Content-Type: text/plain; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/exports/llms-ctx.txt
+  Content-Type: text/plain; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /llms.txt
   Content-Type: text/plain; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /llms-full.txt
   Content-Type: text/plain; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /ns/*.ttl
   Content-Type: text/turtle; charset=utf-8
@@ -146,8 +113,18 @@
 /ns/schema/*.json
   Content-Type: application/json; charset=utf-8
 
-# /.well-known/sustainability-data (draft-besleaga-sustainability-wellknown): the signed monthly report.
-# Added by ~/work/sustainability-monthly after each build; the site build does not emit it.
+/ns/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/skills/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/boards/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
 /.well-known/sustainability-data
   Content-Type: application/sustainability-data+json
   Access-Control-Allow-Origin: *

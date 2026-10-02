@@ -25,7 +25,7 @@ flowchart LR
   end
   B["scripts/build.js<br/>(the HTML pages)"]
   X["scripts/engine.js<br/>(runs the engine on the Bundle)"]
-  OUT["build.out<br/>www-next/ until launch"]
+  OUT["build.out<br/>www/"]
   CHK["scripts/check.js<br/>two builds, byte compare,<br/>discovery at Levels 0 and 2,<br/>links, headers, page tools, hygiene"]
   C --> B
   S --> B

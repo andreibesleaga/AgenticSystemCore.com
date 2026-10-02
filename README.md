@@ -21,7 +21,7 @@ until the specification's tag exists, and says which in its first output line.
 [docs/BUILD.md](docs/BUILD.md) has the picture.
 
 ```bash
-node scripts/build.js      # writes build.out (www-next/ until launch)
+node scripts/build.js      # writes build.out (www/)
 node scripts/check.js      # the gate: reproducible build, llms vectors, discovery at Level 2,
                            # links, headers, contrast, page tools, public hygiene
 ```
@@ -47,13 +47,13 @@ node scripts/page-tools-check.js                                        # the se
 | [scripts/](scripts/README.md) | the generator, the gate and the optional lanes |
 | `assets/` | the stylesheet (the engine's default theme, byte for byte), the search script, the icon |
 | [docs/](docs/BUILD.md) | how the site is built, with a diagram |
-| `www-next/` | the built site, committed; `www/` is what is live until launch |
+| `www/` | the built site, committed; Cloudflare Pages serves it as is |
 
 ## Two switches
 
-- **Output directory.** `build.out` in `agsc.config.json` is `www-next`, so the repository
-  can be pushed at any time without publishing. At launch it becomes `www`: rebuild, run
-  the gate, commit, push.
+- **Output directory.** `build.out` in `agsc.config.json` is `www`, the folder Cloudflare
+  Pages publishes: a push to `main` publishes the site. Rebuild and run the gate before
+  every commit.
 - **The patterns node.** `"x-patterns-node": false` in `agsc.config.json` drops the peer
   link and the sentences that name the second node; `true` (or absent) keeps them.
 
