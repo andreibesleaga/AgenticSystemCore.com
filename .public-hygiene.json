@@ -16,11 +16,6 @@
       "reason": "the gate's forbidden-wording list: the words it refuses on the site"
     },
     {
-      "check": "personal",
-      "path": "www/assets/search-site.json",
-      "reason": "search excerpts are cut at a fixed length, so the canonical name Andrei N. Besleaga can end mid-word at any letter; the file holds no other personal data"
-    },
-    {
       "check": "process",
       "path": "www/docs/requirements/index.html",
       "text": "auto-disable runbook",

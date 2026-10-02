@@ -1929,12 +1929,15 @@ put('404.html', page({ url: '/404.html', title: 'Page not found', summary: summa
 
 // site search index: every page, every H2 section, every rule and every error code
 const textOf = html => unesc(html.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<svg[\s\S]*?<\/svg>/g, ' ').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
+// An excerpt ends at the last whole word within its length, so no word — the author's name
+// included — is ever cut in the middle.
+const excerpt = (text, max) => (text.length <= max ? text : text.slice(0, text.lastIndexOf(' ', max) > 0 ? text.lastIndexOf(' ', max) : max));
 const SITE_INDEX = [];
 for (const [url, p] of pageTexts) {
   const main = p.html.slice(p.html.indexOf('<main'), p.html.indexOf('</main>'));
-  SITE_INDEX.push({ kind: 'page', text: textOf(main).slice(0, 1200), title: p.title, url });
-  for (const m of main.matchAll(/<h2 id="([^"]+)">([\s\S]*?)<\/h2>\n([\s\S]*?)(?=<h2 |$)/g)) if (!/^(contents|status-heading|plain|sources|members|index-)/.test(m[1])) SITE_INDEX.push({ kind: 'section', text: textOf(m[3]).slice(0, 400), title: `${p.title} › ${textOf(m[2])}`, url: `${url}#${m[1]}` });
-  for (const m of main.matchAll(/<li id="(AGSC-\d{2}-\d{2,3}[a-z]?)" class="rule-item[^"]*">([\s\S]*?)<\/li>/g)) SITE_INDEX.push({ kind: 'rule', text: textOf(m[2].replace(/<span class="trace">[\s\S]*?<\/span>/, '')).replace(/^AGSC-\S+\s*/, '').slice(0, 400), title: m[1], url: `${url}#${m[1]}` });
+  SITE_INDEX.push({ kind: 'page', text: excerpt(textOf(main), 1200), title: p.title, url });
+  for (const m of main.matchAll(/<h2 id="([^"]+)">([\s\S]*?)<\/h2>\n([\s\S]*?)(?=<h2 |$)/g)) if (!/^(contents|status-heading|plain|sources|members|index-)/.test(m[1])) SITE_INDEX.push({ kind: 'section', text: excerpt(textOf(m[3]), 400), title: `${p.title} › ${textOf(m[2])}`, url: `${url}#${m[1]}` });
+  for (const m of main.matchAll(/<li id="(AGSC-\d{2}-\d{2,3}[a-z]?)" class="rule-item[^"]*">([\s\S]*?)<\/li>/g)) SITE_INDEX.push({ kind: 'rule', text: excerpt(textOf(m[2].replace(/<span class="trace">[\s\S]*?<\/span>/, '')).replace(/^AGSC-\S+\s*/, ''), 400), title: m[1], url: `${url}#${m[1]}` });
   for (const m of main.matchAll(/<tr id="(AGSC-E\d{3})"><td>[\s\S]*?<\/td><td>([\s\S]*?)<\/td>/g)) SITE_INDEX.push({ kind: 'error code', text: textOf(m[2]), title: m[1], url: `${url}#${m[1]}` });
 }
 SITE_INDEX.sort((a, b) => byCode(a.url, b.url) || byCode(a.title, b.title));
