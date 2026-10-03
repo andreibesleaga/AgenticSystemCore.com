@@ -10,6 +10,7 @@ The specification is written for implementers and is exact by design. This guide
 
 - **Not sure where to begin?** The [start page](/docs/start-here/) has one path for each kind of reader: the curious, the developer, the implementer and the agent.
 - **New here?** Read the [introduction](/docs/introduction/), then the [six modes](/docs/modes/), then [how it works](/docs/how-it-works/).
+- **Want to use it now?** [How to use it](/docs/how-to-use/) has the first commands for every mode and every kind of user, the scenarios each covers and the hooks for agents and tools; the [demos](/docs/demos/) run each command from an empty folder.
 - **Architect or engineer?** Start with the [data model](/docs/data-model/) and the [architecture](/docs/architecture/), then the [requirements](/docs/requirements/) and the [scenarios](/docs/scenarios/).
 - **Implementing the standard?** Read [how to read the specification](/docs/reading-the-specification/), then the [specification](/specs/) itself, the [discovery profile](/specs/agentic-knowledge/) and the [ontology](/ns/).
 - **Checking legal, security or policy questions?** Go to [standards and references](/docs/standards/) and [compliance and security](/docs/compliance/).
@@ -22,6 +23,7 @@ The specification is written for implementers and is exact by design. This guide
 | [Start here](/docs/start-here/) | One reading path per kind of reader |
 | [Introduction](/docs/introduction/) | What is this, what is new about it, who is it for |
 | [The six modes](/docs/modes/) | Auto-wiki with an optional agent lane, distributed agentic memory, live specifications, evolving skills, runnable knowledge, the live board — a self-driving shared board |
+| [How to use it](/docs/how-to-use/) | The first commands for each mode and each kind of user — one person, one agent, many participants — the scenarios, the configuration switches, the hooks for agents and tools, and what the current version does not ship |
 | [Demos](/docs/demos/) | Every mode and every persona as a five-minute demo: the commands, the printed lines, what each proves — kept true by a test |
 | [How it works](/docs/how-it-works/) | The build, the proposal lifecycle, discovery, import and export, determinism, safety |
 | [Data model](/docs/data-model/) | The six item types, the fourteen links, clusters, sources, provenance |

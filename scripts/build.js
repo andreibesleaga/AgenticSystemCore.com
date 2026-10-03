@@ -1663,7 +1663,7 @@ const relatedWork = ['## 1. One sentence', '## 3. The agent-discovery mechanisms
   return `### ${line.replace(/^## /, '')}\n\n${sectionOf(DOC.related, h)}`;
 }).join('\n');
 const DOCS = fs.readdirSync(path.join(ROOT, 'site/docs')).filter(f => f.endsWith('.md') && f !== 'README.md').sort(); // a folder README describes the source folder, not a page
-const WIDE_DOCS = new Set(['architecture', 'requirements', 'scenarios', 'standards', 'compliance', 'glossary']);
+const WIDE_DOCS = new Set(['architecture', 'requirements', 'scenarios', 'standards', 'compliance', 'glossary', 'how-to-use']);
 for (const f of DOCS) {
   const slug = f === 'index.md' ? '' : f.slice(0, -3), url = `/docs/${slug}${slug ? '/' : ''}`;
   const { fm, body: authored } = splitFrontmatter(read(`site/docs/${f}`), `site/docs/${f}`);

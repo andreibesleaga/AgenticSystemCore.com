@@ -43,11 +43,11 @@
 <p>AgenticSystemCore has several doors. Find yourself below and follow that path; each step is one page, in the order given. Every page explains; the <a href="/specs/">specification</a> decides.</p>
 <h2 id="if-you-are-curious">If you are curious</h2>
 <p>1. The <a href="/docs/introduction/">introduction</a>: what this is, what is new about it, who it is for.
-2. The <a href="/docs/modes/">six modes</a>: six ways of using one folder of files.
+2. The <a href="/docs/modes/">six modes</a>: six ways of using one folder of files, and <a href="/docs/how-to-use/">how to use it</a>: the first commands for each.
 3. <a href="/docs/how-it-works/">How it works</a>: the build, proposals, discovery, import and export, safety.
 4. The <a href="/concepts/">vocabulary</a>: the terms, each one a page of this site.</p>
 <h2 id="if-you-are-a-developer">If you are a developer</h2>
-<p>1. <a href="/docs/how-it-works/">How it works</a>, then the <a href="/docs/architecture/">architecture</a>: the contexts, the ports and the deployment.
+<p>1. <a href="/docs/how-to-use/">How to use it</a>, then <a href="/docs/how-it-works/">how it works</a>, then the <a href="/docs/architecture/">architecture</a>: the contexts, the ports and the deployment.
 2. The source repository's <code>docs/START-HERE.md</code>, <code>docs/CODE-ORIENTATION.md</code> and <code>docs/TESTING.md</code>: a guided walk through the code and the tests. The repository is linked from every page's &quot;Propose an edit&quot; link.
 3. The <a href="/docs/requirements/">requirements</a> and the <a href="/docs/scenarios/">scenarios</a>: what the engine must do, and the behaviour it is tested against.</p>
 <h2 id="if-you-implement-the-standard-in-another-language">If you implement the standard in another language</h2>
@@ -59,7 +59,8 @@
 <p>1. The discovery document, <a href="/.well-known/knowledge-linkset"><code>/.well-known/knowledge-linkset</code></a>: every machine file of this node with its digest.
 2. <a href="/llms.txt"><code>/llms.txt</code></a> and <a href="/llms-full.txt"><code>/llms-full.txt</code></a>: the site in text, with a provenance header.
 3. <a href="/chunks.jsonl"><code>/chunks.jsonl</code></a>, the graph dumps and the <a href="/ns/">ontology</a>: for retrieval and for joining with other nodes.
-4. On any page of this site, the seven page tools, when your browser offers them; everything from here is marked untrusted, and <code>propose</code> returns text for a person to review.</p>
+4. <a href="/docs/how-to-use/">How to use it</a>, the section for agents: what to fetch, in which order, and how to propose a change.
+5. On any page of this site, the seven page tools, when your browser offers them; everything from here is marked untrusted, and <code>propose</code> returns text for a person to review.</p>
 <h2 id="where-a-node-can-live">Where a node can live</h2>
 <p>A node is a set of files, so it can live wherever files can be served over HTTPS: a web host, a laptop, a small device, a clone of its repository, IPFS behind a gateway, or a web interface in front of a ledger that records each build. What the rules ask of the place is fixed — the discovery document and the routes, with the response headers the build wrote (<a class="ref" href="/specs/06-surfaces/#AGSC-06-17">AGSC-06-17</a>) — and a <em>hosting profile</em>, one of the plugin kinds (<a class="ref" href="/specs/00-overview/#AGSC-00-24">AGSC-00-24</a>), tells each kind of place how. No rule of version 1.x pins a transport other than HTTP. The <a href="/docs/architecture/">architecture</a> describes the deployment; the source repository's <code>docs/CONNECTORS.md</code> lists every profile and what it cannot do.</p>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/start-here.md">Propose an edit</a> — opens <code>site/docs/start-here.md</code>; a submitted change becomes a pull request a person reviews.</p>
