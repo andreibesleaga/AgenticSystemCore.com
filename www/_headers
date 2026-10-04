@@ -129,3 +129,18 @@
   Content-Type: application/sustainability-data+json
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=3600
+
+/agent-skill/agentic-system-core/SKILL.md
+  Content-Type: text/markdown; charset=utf-8; variant=GFM
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/agent-skill/agentic-system-core/references/configuration.md
+  Content-Type: text/markdown; charset=utf-8; variant=GFM
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/agent-skill/agentic-system-core/references/connectors.md
+  Content-Type: text/markdown; charset=utf-8; variant=GFM
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type

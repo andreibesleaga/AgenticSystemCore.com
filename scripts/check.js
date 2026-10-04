@@ -264,6 +264,7 @@ for (const need of [
   '/skills/*.md\n  Content-Type: text/markdown; charset=utf-8; variant=GFM',
   '/exports/chunks-index.toon\n  Content-Type: text/plain; charset=utf-8',
   '/exports/llms-ctx.txt\n  Content-Type: text/plain; charset=utf-8',
+  '/agent-skill/agentic-system-core/SKILL.md\n  Content-Type: text/markdown; charset=utf-8; variant=GFM',
   'Content-Type: application/linkset+json; profile="https://w3id.org/agentic-system-core/profile/agentic-knowledge"',
   'Link: <https://w3id.org/agentic-system-core/profile/agentic-knowledge>; rel="profile"',
   "Content-Security-Policy: default-src 'none'; script-src 'self'",
@@ -298,7 +299,9 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
   // the surfaces the engine now builds for this node.
   'chunks.jsonl', 'graph.nq', 'graph.ttl', 'now.md', 'now/index.html', 'skills/index.json', 'skills/index.html',
   'tags/index.html', 'tags/vocabulary/index.html', 'exports/index.html',
-  'exports/chunks-index.toon', 'exports/llms-ctx.txt'])
+  'exports/chunks-index.toon', 'exports/llms-ctx.txt',
+  // the agent skill and its guide page
+  'agent-skill/agentic-system-core/SKILL.md', 'docs/agent-skill/index.html'])
   ok(exists(path.join(WWW, need)), `missing route: /${need}`);
 // (7) the page tools: their inputs, their declaration, and the tools themselves RUN.
 {

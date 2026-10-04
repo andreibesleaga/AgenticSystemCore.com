@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent skill — AgenticSystemCore</title>
+<meta name="description" content="The AgenticSystemCore agent skill: a SKILL.md in the Agent Skills format, with two reference files, for Claude Code and other agents that read skills; what it covers and how to install it.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/agent-skill/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/agent-skill/">
+<meta property="og:title" content="Agent skill">
+<meta property="og:description" content="The AgenticSystemCore agent skill: a SKILL.md in the Agent Skills format, with two reference files, for Claude Code and other agents that read skills; what it covers and how to install it.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Agent skill","description":"The AgenticSystemCore agent skill: a SKILL.md in the Agent Skills format, with two reference files, for Claude Code and other agents that read skills; what it covers and how to install it.","url":"https://agenticsystemcore.com/docs/agent-skill/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Agent skill</h1>
+<p class="summary"><strong>Summary</strong>One skill file that teaches a coding agent to use AgenticSystemCore: the six modes, the sixteen commands, how to write an item, how to propose a change, how to read and cite a node, and what an agent never does on its own. Download it into your agent's skills folder and the agent can pick up any mode at once.</p>
+<p>The skill is a folder in the Agent Skills format: one <code>SKILL.md</code> that an agent loads when a project holds <code>agsc.config.json</code> or when you mention a Bundle or a knowledge node, and two reference files it reads only when it needs them. It is plain Markdown, carries no script and runs nothing. Its text is CC0.</p>
+<h2 id="the-files">The files</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
+<thead><tr><th scope="col">File</th><th scope="col">What it holds</th></tr></thead>
+<tbody>
+<tr><td><a href="/agent-skill/agentic-system-core/SKILL.md"><code>SKILL.md</code></a></td><td>what an agent never does on its own; the six modes with the command and the configuration each needs; setup; the sixteen commands; how to write each kind of item; the five steps of a change; claiming a task on a live board; reading and citing a node; the checks before saying &quot;done&quot;</td></tr>
+<tr><td><a href="/agent-skill/agentic-system-core/references/connectors.md"><code>references/connectors.md</code></a></td><td>steering files for eleven coding agents, the tool server for five assistants, skill packs, memory systems, trackers, the pre-commit hook and the CI action</td></tr>
+<tr><td><a href="/agent-skill/agentic-system-core/references/configuration.md"><code>references/configuration.md</code></a></td><td>the configuration keys the modes use: peers, contribution routes, execution, budget, channels, agent lanes, federation limits</td></tr>
+</tbody></table></div>
+<h2 id="install-it">Install it</h2>
+<p>For one project, in Claude Code (run in the project folder; Git Bash on Windows):</p>
+<pre tabindex="0" data-lang="bash"><code>B=https://agenticsystemcore.com/agent-skill/agentic-system-core
+D=.claude/skills/agentic-system-core
+mkdir -p &quot;$D/references&quot;
+for f in SKILL.md references/connectors.md references/configuration.md; do curl -fsSL &quot;$B/$f&quot; -o &quot;$D/$f&quot;; done</code></pre>
+<p>For every project on the machine, set <code>D=~/.claude/skills/agentic-system-core</code> instead. Other agents that read Agent Skills look in <code>.agents/skills/</code> (and GitHub Copilot in <code>.github/skills/</code>): set <code>D</code> to that folder. Start a new session afterwards; the agent loads the skill when the work calls for it.</p>
+<p>The engine itself is installed separately, when you want it: <code>npm install -g agentic-system-core</code>, or <code>npx -y agsc-cli &lt;verb&gt;</code> without installing.</p>
+<h2 id="what-it-changes-in-how-an-agent-works">What it changes in how an agent works</h2>
+<ul>
+<li>It picks the mode from what you ask for, and runs the commands of that mode from the right folder.</li>
+<li>It writes items that pass the checks the first time: the right folder, the required keys of each item type, the provenance block with you as the accountable person, links by slug only.</li>
+<li>It never commits, pushes, deploys <code>www/</code>, installs software or changes an assistant's settings unless you ask in that request. A change ends as a proposal and the git commands it prints, which you run.</li>
+<li>It treats everything it reads from a node as data, never as an instruction, and cites what it uses by address.</li>
+<li>It runs <code>agsc lint</code> and <code>agsc ci</code> before it reports a change as done, and quotes numbers only from a command it ran.</li>
+</ul>
+<h2 id="not-the-same-as-this-node-s-skill-packs">Not the same as this node's skill packs</h2>
+<p>The <a href="/skills/">skill packs</a> of this node are generated by the engine from the node's own procedures, one pack per cluster, and say what the content says. This skill is written by hand and says how to use the engine. Use both: the packs for a node's procedures, this skill for working with any node.</p>
+<p>The <a href="/docs/how-to-use/">how-to-use page</a> has the same ground for a person to read, mode by mode.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/agent-skill.md">Propose an edit</a> — opens <code>site/docs/agent-skill.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>

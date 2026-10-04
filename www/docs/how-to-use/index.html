@@ -80,7 +80,7 @@ agsc --version                         # 1.0.0-rc.6</code></pre>
 <tr><td>assemble</td><td><code>agsc compose &lt;slug&gt;… [--zip]</code></td><td>a selection of items closed over its links, checked, written as a Harness of seven files</td></tr>
 <tr><td>change</td><td><code>agsc propose &lt;slug&gt;</code></td><td>a patch and a pull-request body for one edited item; prints the git commands, runs none</td></tr>
 <tr><td>review</td><td><code>agsc review</code></td><td>the review lane over a proposal: lint only, no model reachable</td></tr>
-<tr><td>run a lane</td><td><code>agsc refresh --agent &lt;name&gt; [--dry-run] [--task &lt;t&gt;]</code></td><td>one run of a declared agent lane, proposing what it would change and the Episode of the run</td></tr>
+<tr><td>run a lane</td><td><code>agsc refresh --agent &lt;name&gt; --dry-run [--task &lt;t&gt;]</code></td><td>a dry run of a declared agent lane: the proposal it would open and the Episode of the run, with no model call; without <code>--dry-run</code> it refuses, because no model adapter ships</td></tr>
 <tr><td>skills</td><td><code>agsc skills [install &lt;dir&gt;] [import &lt;file&gt;]</code></td><td>packs under <code>dist/skills/</code>; install into an agent's skills folder; a foreign <code>SKILL.md</code> back as a procedure</td></tr>
 <tr><td>tools</td><td><code>agsc mcp</code></td><td>a local tool server over standard input and output: seven tools, every item as a resource</td></tr>
 <tr><td>execute</td><td><code>agsc run &lt;slug&gt; [--dry-run]</code>, <code>agsc trace &lt;file.json&gt;</code></td><td>a procedure's steps under an allow list; a traced run recorded as an Episode</td></tr>
@@ -163,7 +163,7 @@ claude mcp add --transport stdio my-knowledge -- npx -y agsc-cli mcp</code></pre
 <pre tabindex="0" data-lang="bash"><code># content/concepts/decide-on-storage.md: type: concept, kind: decision, with the link keys decided-by: and covers:
 # content/concepts/spec-login.md:        type: concept, kind: spec, with implements: and verifies:
 # content/concepts/task-login-tests.md:  type: concept, kind: task, task_state: TASK_STATE_SUBMITTED, with blocked-by:
-# content/gates/release.md:              type: gate; checks: schema, links, review; enforce: status-check, ruleset
+# content/gates/release.md:              type: gate; level: L2; checks: schema, links, review; enforce: status-check, ruleset
 agsc ci                                   # dist/gate.json; dist/forge/ruleset.json; dist/forge/status-checks.json
 agsc export --steer --target agents,claude,cursor   # dist/export/steer/: the same bytes at each tool's path
 agsc build                                # task pages show the state; a cluster of tasks is a board under /boards/</code></pre>
@@ -259,12 +259,13 @@ agsc trace run1.json             # a traced run becomes an Episode; the NOW page
 4. <strong>Cite</strong> items by their addresses. Across nodes, carry each result's origin with it.
 5. <strong>To change something</strong>, prepare a proposal — <code>propose</code> or <code>remember</code> over <code>agsc mcp</code> or the page tools, or <code>agsc propose &lt;slug&gt;</code> on a clone — and hand it to the route the discovery document declares, or back to your caller. Never write to the content branch, merge, push or send anything to another node.
 6. <strong>On a board</strong>, claim with <code>propose({slug, task_state: &quot;TASK_STATE_WORKING&quot;})</code>, hold at most your lane's <code>max_claims</code>, and stop when the board is done, a task needs a person, or your budget is spent.</p>
-<p>The seven tools answer in one shape: <code>{ type, source, body, trust: &quot;untrusted&quot;, license }</code>; a fault is the same envelope with <code>type: &quot;error&quot;</code> and a body of <code>code</code> and <code>message</code>, never a transport error. A coding agent that works <em>in</em> a node's repository reads the repository's <code>AGENTS.md</code> first.</p>
+<p>The seven tools answer in one shape: <code>{ type, source, body, trust: &quot;untrusted&quot;, license }</code>; a fault is the same envelope with <code>type: &quot;error&quot;</code> and a body of <code>code</code> and <code>message</code>, never a transport error. A coding agent that works <em>in</em> a node's repository reads the repository's <code>AGENTS.md</code> first. To give a coding agent all of this page at once, install the <a href="/docs/agent-skill/">agent skill</a>.</p>
 <h2 id="hooks-connecting-agents-and-tools-to-a-node">Hooks: connecting agents and tools to a node</h2>
 <p>Each route already exists in the engine; pick by what your tool reads. None needs a network connection or a key on the node's side.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table 39"><table>
 <thead><tr><th scope="col">Route</th><th scope="col">What the tool gets</th><th scope="col">Command</th><th scope="col">Suits</th></tr></thead>
 <tbody>
+<tr><td>agent skill</td><td>one <code>SKILL.md</code> that teaches the agent the engine itself</td><td>download it, see the <a href="/docs/agent-skill/">agent skill</a> page</td><td>any agent that reads Agent Skills</td></tr>
 <tr><td>steering file</td><td>one Markdown file at the path the coding agent reads every session</td><td><code>agsc export --steer --target &lt;name&gt;</code> — <code>agents</code> (<code>AGENTS.md</code>), <code>claude</code>, <code>codex</code>, <code>cursor</code>, <code>copilot</code>, <code>gemini</code>, <code>kiro</code>, <code>windsurf</code>, <code>cline</code>, <code>aider</code>, <code>gabbe</code></td><td>always-on context</td></tr>
 <tr><td>skill packs</td><td>one Agent Skills folder per cluster, lock-verified</td><td><code>agsc skills</code>, <code>agsc skills install &lt;dir&gt;</code></td><td>step-by-step procedures</td></tr>
 <tr><td>live tools</td><td>the seven tools and every item as a resource over the Model Context Protocol</td><td><code>agsc mcp</code></td><td>an assistant that searches while it works</td></tr>

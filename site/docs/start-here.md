@@ -31,8 +31,9 @@ AgenticSystemCore has several doors. Find yourself below and follow that path; e
 1. The discovery document, [`/.well-known/knowledge-linkset`](/.well-known/knowledge-linkset): every machine file of this node with its digest.
 2. [`/llms.txt`](/llms.txt) and [`/llms-full.txt`](/llms-full.txt): the site in text, with a provenance header.
 3. [`/chunks.jsonl`](/chunks.jsonl), the graph dumps and the [ontology](/ns/): for retrieval and for joining with other nodes.
-4. [How to use it](/docs/how-to-use/), the section for agents: what to fetch, in which order, and how to propose a change.
-5. On any page of this site, the seven page tools, when your browser offers them; everything from here is marked untrusted, and `propose` returns text for a person to review.
+4. The [agent skill](/docs/agent-skill/): one file to load into a coding agent so it can use the engine in every mode.
+5. [How to use it](/docs/how-to-use/), the section for agents: what to fetch, in which order, and how to propose a change.
+6. On any page of this site, the seven page tools, when your browser offers them; everything from here is marked untrusted, and `propose` returns text for a person to review.
 
 ## Where a node can live
 

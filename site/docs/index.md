@@ -24,6 +24,7 @@ The specification is written for implementers and is exact by design. This guide
 | [Introduction](/docs/introduction/) | What is this, what is new about it, who is it for |
 | [The six modes](/docs/modes/) | Auto-wiki with an optional agent lane, distributed agentic memory, live specifications, evolving skills, runnable knowledge, the live board — a self-driving shared board |
 | [How to use it](/docs/how-to-use/) | The first commands for each mode and each kind of user — one person, one agent, many participants — the scenarios, the configuration switches, the hooks for agents and tools, and what the current version does not ship |
+| [Agent skill](/docs/agent-skill/) | One skill file that teaches a coding agent to use the engine in every mode, and how to install it |
 | [Demos](/docs/demos/) | Every mode and every persona as a five-minute demo: the commands, the printed lines, what each proves — kept true by a test |
 | [How it works](/docs/how-it-works/) | The build, the proposal lifecycle, discovery, import and export, determinism, safety |
 | [Data model](/docs/data-model/) | The six item types, the fourteen links, clusters, sources, provenance |

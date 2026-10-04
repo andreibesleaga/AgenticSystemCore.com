@@ -15,6 +15,7 @@ diagram sources and the one-sentence summary each generated page opens with.
 | `profile.md` | `/specs/agentic-knowledge/`, the page the discovery profile URI resolves to |
 | `mcp-extension.md` | `/specs/mcp/`, the reference text of the MCP extension identifier |
 | `summaries.json` | the one-sentence summary of every generated page, keyed by URL |
+| [agent-skill/](agent-skill/agentic-system-core/SKILL.md) | the agent skill, published byte for byte under `/agent-skill/`; `/docs/agent-skill/` explains it |
 
 `{{name}}` placeholders in these files are filled by the generator from the engine's
 documents (for example the status table); an unknown placeholder stops the build. After

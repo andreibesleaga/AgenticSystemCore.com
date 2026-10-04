@@ -50,7 +50,7 @@ Three facts carry the whole page:
 | assemble | `agsc compose <slug>… [--zip]` | a selection of items closed over its links, checked, written as a Harness of seven files |
 | change | `agsc propose <slug>` | a patch and a pull-request body for one edited item; prints the git commands, runs none |
 | review | `agsc review` | the review lane over a proposal: lint only, no model reachable |
-| run a lane | `agsc refresh --agent <name> [--dry-run] [--task <t>]` | one run of a declared agent lane, proposing what it would change and the Episode of the run |
+| run a lane | `agsc refresh --agent <name> --dry-run [--task <t>]` | a dry run of a declared agent lane: the proposal it would open and the Episode of the run, with no model call; without `--dry-run` it refuses, because no model adapter ships |
 | skills | `agsc skills [install <dir>] [import <file>]` | packs under `dist/skills/`; install into an agent's skills folder; a foreign `SKILL.md` back as a procedure |
 | tools | `agsc mcp` | a local tool server over standard input and output: seven tools, every item as a resource |
 | execute | `agsc run <slug> [--dry-run]`, `agsc trace <file.json>` | a procedure's steps under an allow list; a traced run recorded as an Episode |
@@ -156,7 +156,7 @@ Personas: the agent reader, the agent proposer, the agent using a node as memory
 # content/concepts/decide-on-storage.md: type: concept, kind: decision, with the link keys decided-by: and covers:
 # content/concepts/spec-login.md:        type: concept, kind: spec, with implements: and verifies:
 # content/concepts/task-login-tests.md:  type: concept, kind: task, task_state: TASK_STATE_SUBMITTED, with blocked-by:
-# content/gates/release.md:              type: gate; checks: schema, links, review; enforce: status-check, ruleset
+# content/gates/release.md:              type: gate; level: L2; checks: schema, links, review; enforce: status-check, ruleset
 agsc ci                                   # dist/gate.json; dist/forge/ruleset.json; dist/forge/status-checks.json
 agsc export --steer --target agents,claude,cursor   # dist/export/steer/: the same bytes at each tool's path
 agsc build                                # task pages show the state; a cluster of tasks is a board under /boards/
@@ -283,7 +283,7 @@ An agent that meets a node for the first time, with no human in the loop, does t
 5. **To change something**, prepare a proposal — `propose` or `remember` over `agsc mcp` or the page tools, or `agsc propose <slug>` on a clone — and hand it to the route the discovery document declares, or back to your caller. Never write to the content branch, merge, push or send anything to another node.
 6. **On a board**, claim with `propose({slug, task_state: "TASK_STATE_WORKING"})`, hold at most your lane's `max_claims`, and stop when the board is done, a task needs a person, or your budget is spent.
 
-The seven tools answer in one shape: `{ type, source, body, trust: "untrusted", license }`; a fault is the same envelope with `type: "error"` and a body of `code` and `message`, never a transport error. A coding agent that works *in* a node's repository reads the repository's `AGENTS.md` first.
+The seven tools answer in one shape: `{ type, source, body, trust: "untrusted", license }`; a fault is the same envelope with `type: "error"` and a body of `code` and `message`, never a transport error. A coding agent that works *in* a node's repository reads the repository's `AGENTS.md` first. To give a coding agent all of this page at once, install the [agent skill](/docs/agent-skill/).
 
 ## Hooks: connecting agents and tools to a node
 
@@ -291,6 +291,7 @@ Each route already exists in the engine; pick by what your tool reads. None need
 
 | Route | What the tool gets | Command | Suits |
 |---|---|---|---|
+| agent skill | one `SKILL.md` that teaches the agent the engine itself | download it, see the [agent skill](/docs/agent-skill/) page | any agent that reads Agent Skills |
 | steering file | one Markdown file at the path the coding agent reads every session | `agsc export --steer --target <name>` — `agents` (`AGENTS.md`), `claude`, `codex`, `cursor`, `copilot`, `gemini`, `kiro`, `windsurf`, `cline`, `aider`, `gabbe` | always-on context |
 | skill packs | one Agent Skills folder per cluster, lock-verified | `agsc skills`, `agsc skills install <dir>` | step-by-step procedures |
 | live tools | the seven tools and every item as a resource over the Model Context Protocol | `agsc mcp` | an assistant that searches while it works |
