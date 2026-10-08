@@ -34,7 +34,7 @@ Optional browser lanes, with `playwright-core` and `axe-core` installed **outsid
 repository (see each file's header):
 
 ```bash
-NODE_PATH=<dir>/node_modules CHROME_EXE=<chromium> node scripts/a11y.js   # both colour schemes, 0 violations expected
+NODE_PATH=<dir>/node_modules CHROME_EXE=<chromium> node scripts/a11y.js   # both colour schemes, desktop and phone width, 0 violations expected
 node scripts/page-tools-check.js                                        # the seven page tools, no browser needed
 ```
 

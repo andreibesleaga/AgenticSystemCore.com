@@ -18,4 +18,7 @@ stops on a rule id or a requirement id that does not exist.
 node scripts/build.js && node scripts/check.js   # from the repository root
 ```
 
+The six mode guides are in [guides/](guides/README.md), one page each under `/docs/guides/`;
+they are copies of the engine's `docs/guides/`, and the build stops if their code blocks differ.
+
 Start with `index.md` (the reading paths) and `start-here.md` (one path per reader).

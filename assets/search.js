@@ -1,11 +1,15 @@
 // Site search: same-origin, no dependencies, nothing leaves the browser (AGSC-06-05).
 // Loads /assets/search-site.json once (every page and every rule of this site) and ranks
-// entries by the query's tokens. Without JavaScript the page shows the full index instead.
+// entries by the query's tokens. Without JavaScript the page shows the full index instead, and
+// the search field stays hidden (the page's policy blocks a form submit, so a field without this
+// script would do nothing); this script shows it.
 (function () {
   'use strict';
   var form = document.getElementById('search-form'), input = document.getElementById('q'), out = document.getElementById('results');
   var status = document.getElementById('search-status'), fallback = document.getElementById('site-index');
   if (!form || !input || !out) return;
+  var box = document.getElementById('search-box');
+  if (box) box.hidden = false;
   var index = null, loading = null;
   var tokenize = function (s) { return s.normalize('NFC').toLowerCase().split(/[^\p{L}\p{Nd}\p{M}]+/u).filter(function (t) { return t.length >= 2; }); };
   var load = function () {

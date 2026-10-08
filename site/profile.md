@@ -39,7 +39,7 @@ A Level-0 publisher, such as a CMS or wiki export, publishes the same link set w
 
 ## Related-system links
 
-A node MAY link related discovery documents and systems, such as an llms.txt file, a VoID or DCAT description, an Agent2Agent Agent Card, an MCP server card, or an ontology or SPARQL endpoint. It uses IANA-registered relations only: `describedby`, `alternate`, `related`, `service-desc`, `service-doc`, `service-meta`, `collection`, `item` and `cite-as`, and each link carries `type`. `cite-as` (RFC 8574, admitted at `1.0.0-rc.6`) points at the address to cite instead of this node, such as the landing page of a release's DOI. The rule that fixes the relation names admits all nine, so a validator accepts every one of them (AGSC-06-10, AGSC-06-35). A reader ignores a related-system link it does not understand, and none affects conformance, a digest, the peer check or a walk.
+A node MAY link related discovery documents and systems, such as an llms.txt file, a VoID or DCAT description, an Agent2Agent Agent Card, an MCP server card, or an ontology or SPARQL endpoint. It uses IANA-registered relations only: `describedby`, `alternate`, `related`, `service-desc`, `service-doc`, `service-meta`, `collection`, `item` and `cite-as`, and each link carries `type`. `cite-as` (RFC 8574) points at the address to cite instead of this node, such as the landing page of a release's DOI. The rule that fixes the relation names admits all nine, so a validator accepts every one of them (AGSC-06-10, AGSC-06-35). A reader ignores a related-system link it does not understand, and none affects conformance, a digest, the peer check or a walk.
 
 ## Examples
 

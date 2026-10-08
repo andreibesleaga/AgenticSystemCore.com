@@ -18,7 +18,7 @@ Every item page, every guide page and the [compose page](/compose/) offer seven 
 
 ## Status
 
-The specification is at release candidate `1.0.0-rc.6`. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no standards body has reviewed or adopted it. Every machine-readable file on this site is written by the reference engine, from this repository's own content: the graph in its three forms, the search index, the chunk export, the skill packs, the item source views, the NOW state, the derived ledger and the discovery document. The pages you are reading are written by this repository's own generator, which keeps this site's own page layout. The [status page](/docs/status/) lists what is live and what is not.
+The specification is at release candidate `1.0.0-rc.7`. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no standards body has reviewed or adopted it. Every machine-readable file on this site is written by the reference engine, from this repository's own content: the graph in its three forms, the search index, the chunk export, the skill packs, the item source views, the NOW state, the derived ledger and the discovery document. The pages you are reading are written by this repository's own generator, which keeps this site's own page layout. The [status page](/docs/status/) lists what is live and what is not. The [changelog](/changelog/) lists every content version of this node.
 
 ## Limits
 

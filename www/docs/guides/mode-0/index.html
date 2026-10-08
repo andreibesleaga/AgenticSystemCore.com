@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mode 0 guide: a folder of notes becomes a checked site — AgenticSystemCore</title>
+<meta name="description" content="Guide to Mode 0 of AgenticSystemCore: a folder of Markdown notes becomes a checked static site, with every command and the lines it prints.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/guides/mode-0/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/guides/mode-0/">
+<meta property="og:title" content="Mode 0 guide: a folder of notes becomes a checked site">
+<meta property="og:description" content="Guide to Mode 0 of AgenticSystemCore: a folder of Markdown notes becomes a checked static site, with every command and the lines it prints.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Mode 0 guide: a folder of notes becomes a checked site","description":"Guide to Mode 0 of AgenticSystemCore: a folder of Markdown notes becomes a checked static site, with every command and the lines it prints.","url":"https://agenticsystemcore.com/docs/guides/mode-0/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Mode 0 guide: a folder of notes becomes a checked site</h1>
+<p class="summary"><strong>Summary</strong>For a person with Markdown notes: install the package, adopt the notes, add a security contact, commit once, check and build the site, change a note as a proposal, and get it ready to publish.</p>
+<p><strong>Who it is for:</strong> a person with a folder of Markdown notes, or a team with a handbook,
+who wants a website out of it that refuses to publish a broken link.</p>
+<p><strong>What you get:</strong> a static website of your notes, with search and every page also as
+Markdown; a graph of the notes; text files an assistant can read (<code>llms.txt</code>,
+<code>chunks.jsonl</code>); a discovery document that lists all of it with SHA-256 digests. No
+language model, no server, no account. A change to a note becomes a proposal a person
+merges.</p>
+<p><strong>Read after:</strong> <a href="/docs/guides/">the guides</a>. <strong>Next:</strong> <a href="/docs/guides/mode-1/">Mode 1</a>.</p>
+<p>---</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>You need Node.js 22.13 or later, <code>git</code> with your name and e-mail set, and a POSIX shell
+(<code>bash</code>; on Windows, Git Bash). Install the package once, in a working folder:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir agsc-work &amp;&amp; cd agsc-work
+npm install agentic-system-core
+export PATH=&quot;$PWD/node_modules/.bin:$PATH&quot;             # puts agsc and agsc-host on the PATH
+export ENGINE=&quot;$PWD/node_modules/agentic-system-core&quot;  # the package: examples, checkers, licence texts</code></pre>
+<p>The two <code>export</code> lines last for this shell only; run them again in a new terminal.
+Every command below was run on the package and printed the lines quoted under it
+(other lines it printed are left out). The engine repository's test <code>tests/docs/guides.test.js</code>
+runs them again on every change.</p>
+<h2 id="1-adopt-your-notes">1. Adopt your notes</h2>
+<p>Use your own folder of <code>.md</code> files, or make three notes to follow along:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir my-notes &amp;&amp; cd my-notes
+printf '# Sourdough starter\n\nFlour and water, fed once a day. How runny it is depends on its [hydration](%s).\n' hydration.md &gt; sourdough.md
+cat &gt; hydration.md &lt;&lt;'NOTE'
+# Hydration
+
+The weight of the water divided by the weight of the flour.
+NOTE
+cat &gt; oven-spring.md &lt;&lt;'NOTE'
+# Oven spring
+
+The last rise of a loaf, in the first minutes in a hot oven.
+NOTE
+agsc init</code></pre>
+<pre tabindex="0" data-lang="text"><code>wrote: content/concepts/hydration.md
+wrote: content/concepts/oven-spring.md
+wrote: content/concepts/sourdough.md
+wrote: agsc.config.json
+wrote: content/index.md
+before you build: add .well-known/security.txt with a Contact: line (RFC 9116); lint, build and ci report AGSC-E901 until it exists (AGSC-06-36)
+before you build: commit once, or set SOURCE_DATE_EPOCH, so the build has an instant (AGSC-04-09); the security contact's expiry is checked against it
+init: pass (0 error, 4 warn)</code></pre>
+<p>What <code>init</code> did, so nothing surprises you later:</p>
+<ul>
+<li>it <strong>moved</strong> each note into <code>content/concepts/</code> and put a short header at its top
+(a type, a title, <code>kind: explainer</code>, and who is accountable for it);</li>
+<li>it wrote <code>agsc.config.json</code> (the site's name is the folder's name; the address is the
+placeholder <code>http://localhost/</code>), <code>content/index.md</code> (the home page), a <code>.gitignore</code>
+and a <code>.env.example</code>;</li>
+<li>it took the accountable person's id from your git e-mail (the part before <code>@</code>). With no
+git e-mail it writes <code>human:unknown</code>; change <code>bundle.operator</code> in <code>agsc.config.json</code>
+and <code>operator:</code> in each note to <code>human:&lt;your-id&gt;</code> if you want a real name there.</li>
+</ul>
+<h2 id="2-add-a-security-contact-commit-once-check">2. Add a security contact, commit once, check</h2>
+<p>A published site must say where to report a security problem (RFC 9116), and a build
+needs an instant to stamp on what it writes. The commit gives it one:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir -p .well-known &amp;&amp; printf 'Contact: mailto:security@example.org\n' &gt; .well-known/security.txt
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'my notes'
+agsc ci</code></pre>
+<pre tabindex="0" data-lang="text"><code>ci: pass (0 error, 7 warn)
+warn: AGSC-E506 site.base is the development placeholder http://localhost/; set an https: base before publishing (AGSC-01-19) — agsc.config.json
+warn: AGSC-E408 a concept carries no description (AGSC-02-21) — content/concepts/hydration.md
+warn: AGSC-E305 &quot;hydration&quot; has no inbound Link and no clusters[] entry (AGSC-03-10) — content/concepts/hydration.md</code></pre>
+<p>Use your own address in <code>Contact:</code> (<code>mailto:</code> or <code>https:</code>). <code>agsc ci</code> checks every
+note, builds the site twice and compares the bytes, and verifies the result. A
+<strong>warning</strong> does not stop anything: here, notes without a one-line description, and
+notes no other note points at with a <em>typed</em> link (a link in the text is fine for
+readers but does not count; typed links are explained in the
+<a href="/docs/data-model/">data model</a>). An <strong>error</strong> stops the
+build and names the file and line.</p>
+<h2 id="3-build-and-look-at-it">3. Build, and look at it</h2>
+<p><code>ci</code> checks; <code>build</code> writes the site into <code>www/</code>:</p>
+<pre tabindex="0" data-lang="bash"><code>agsc build
+ls www www/.well-known</code></pre>
+<pre tabindex="0" data-lang="text"><code>wrote: 47 files under www/
+build: pass (0 error, 4 warn)
+index.html
+llms.txt
+graph.jsonld
+chunks.jsonl
+search.json
+knowledge-linkset
+security.txt</code></pre>
+<p>To read it in a browser, serve the folder (stop with Ctrl-C):</p>
+<pre tabindex="0" data-lang="bash"><code>agsc-host serve</code></pre>
+<pre tabindex="0" data-lang="text"><code>serving …/my-notes/www at http://127.0.0.1:8080/ — read-only; stop with Ctrl-C</code></pre>
+<p>Each note has a page under <code>/concepts/&lt;name&gt;/</code> and a Markdown copy under
+<code>/pages/&lt;name&gt;.md</code>; <code>/.well-known/knowledge-linkset</code> is the discovery document an agent
+reads first.</p>
+<h2 id="4-change-a-note-as-a-proposal">4. Change a note — as a proposal</h2>
+<p>Give <code>hydration</code> a description. A note's header is plain YAML between two <code>---</code> lines;
+this is the whole file after the edit:</p>
+<pre tabindex="0" data-lang="bash"><code>cat &gt; content/concepts/hydration.md &lt;&lt;'NOTE'
+---
+type: concept
+title: Hydration
+description: The weight of the water in a dough divided by the weight of the flour, as a percentage.
+aliases:
+  - hydration.md
+prov:
+  origin: human
+  operator: human:unknown
+kind: explainer
+---
+
+# Hydration
+
+The weight of the water divided by the weight of the flour. Many starters use equal weights of both.
+NOTE
+agsc lint --fix
+agsc propose hydration</code></pre>
+<pre tabindex="0" data-lang="text"><code>wrote: dist/proposal/1.patch
+wrote: dist/proposal/1.md
+run: git checkout -b proposal/1
+run: git add content/concepts/hydration.md &amp;&amp; git commit
+run: open a pull request with the body of dist/proposal/1.md
+propose: pass (0 error, 0 warn)</code></pre>
+<p>(In your own notes, keep the <code>operator:</code> line <code>init</code> wrote; <code>human:unknown</code> is what it
+writes when git has no e-mail.) <code>propose</code> compares your edit with the last commit and writes a patch and a pull-request
+text; it runs nothing. You run the lines it printed (with a commit message of your own):</p>
+<pre tabindex="0" data-lang="bash"><code>git checkout -q -b proposal/1
+git add content/concepts/hydration.md &amp;&amp; git commit -q -m 'hydration: a description'
+git log -1 --format=%s</code></pre>
+<pre tabindex="0" data-lang="text"><code>hydration: a description</code></pre>
+<p>On a forge (GitHub, GitLab, …) you push the branch and open the pull request; a person
+merges it.</p>
+<h2 id="5-before-you-publish">5. Before you publish</h2>
+<p>Three things a public site needs: its real <code>https:</code> address in <code>site.base</code>; the licence
+text of your notes (by default the Content Use Terms of the package — copy it in, or name
+another licence in <code>bundle.license_prose</code>); and the history checked:</p>
+<pre tabindex="0" data-lang="bash"><code>cp &quot;$ENGINE/LICENSE-CONTENT&quot; .
+node -e 'const f = &quot;agsc.config.json&quot;, fs = require(&quot;node:fs&quot;), c = JSON.parse(fs.readFileSync(f, &quot;utf8&quot;)); c.site.base = &quot;https://notes.example.org/&quot;; fs.writeFileSync(f, JSON.stringify(c, null, 2) + &quot;\n&quot;);'
+git add -A &amp;&amp; git commit -q -m 'ready to publish'
+agsc ci
+agsc build
+agsc verify --ledger</code></pre>
+<pre tabindex="0" data-lang="text"><code>ci: pass (0 error, 6 warn)
+wrote: 48 files under www/
+verify: pass (0 error, 0 warn)</code></pre>
+<p>The <code>node -e</code> line only sets <code>site.base</code>; editing the file by hand does the same. The new
+warning asks for a <code>PRIVACY.md</code> beside <code>LICENSE-CONTENT</code>, which <code>/legal/</code> then shows.
+Upload <code>www/</code> to any host that serves files over HTTPS; <code>agsc-host list</code> names the
+profiles the engine can write host settings for.</p>
+<h2 id="when-it-says-no">When it says no</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
+<thead><tr><th scope="col">What you see</th><th scope="col">Why</th><th scope="col">What to do</th></tr></thead>
+<tbody>
+<tr><td><code>error: AGSC-E901 no .well-known/security.txt in the Bundle root …</code></td><td>no security contact</td><td>step 2</td></tr>
+<tr><td><code>error: AGSC-E204 the build instant defaulted to 1970-01-01T00:00:00Z …</code></td><td>no commit and no <code>SOURCE_DATE_EPOCH</code></td><td>commit once, or <code>export SOURCE_DATE_EPOCH=$(date +%s)</code></td></tr>
+<tr><td><code>error: AGSC-E004 unknown configuration override AGSC_…</code></td><td>a shell variable whose name starts with <code>AGSC_</code> that the engine does not know</td><td><code>unset</code> it</td></tr>
+<tr><td><code>error: AGSC-E310 …</code> and <code>build</code> writes nothing</td><td>a link to a note that does not exist</td><td>fix the link at the file and line named</td></tr>
+<tr><td><code>agsc: command not found</code></td><td>the <code>export PATH=…</code> line was not run in this shell</td><td>run the two <code>export</code> lines again from the working folder</td></tr>
+</tbody></table></div>
+<h2 id="what-next">What next</h2>
+<ul>
+<li>Let an assistant read and cite these notes: <a href="/docs/guides/mode-1/">Mode 1</a>.</li>
+<li>Check every push on GitHub: the action in the root <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/README.md#connecting-agents-and-repositories">README</a>.</li>
+<li>The same mode on a ready-made folder, with more cases (stale notes, a broken link):
+<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/DEMOS.md#mode-0--the-self-correcting-wiki">DEMOS.md</a>.</li>
+</ul>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/guides/mode-0.md">Propose an edit</a> — opens <code>site/docs/guides/mode-0.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>

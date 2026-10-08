@@ -4,9 +4,9 @@
 bundle: https://agenticsystemcore.com/
 license: LicenseRef-AgenticSystemCore-Content-Use-1.0
 terms: LicenseRef-AgenticSystemCore-Content-Use-1.0
-spec_version: 1.0.0-rc.6
-bundle_version: v1.0.0+14.g35869ceda311
-generated_at: 2026-09-29T18:27:52Z
+spec_version: 1.0.0-rc.7
+bundle_version: v1.0.0+15.g655c904124e4
+generated_at: 2026-10-08T07:30:56Z
 assistance: content may be AI-assisted; each item states its origin in prov.origin and each accepted contribution carries an Assisted-by: trailer
 -->
 
@@ -113,9 +113,9 @@ Procedures for publishing and reading a node, each step naming the rule or the c
 
 ```text agsc-content
 
-A **Harness** is generated output. A composition takes an ordered selection of item slugs and the resolved graph and produces a verdict plus a Harness: exactly seven files, written outside `content/`, that describe a system built from the selected items: a JSON-LD record of the selection and its closure, a context file for agents, a Structurizr model, a Mermaid diagram, an arc42 skeleton, one decision record per selected item and one skill file per selected Procedure.
+A **Harness** is generated output. A composition takes an ordered selection of item slugs and the resolved graph and produces a verdict plus a Harness: files of seven kinds, written outside `content/`, that describe a system built from the selected items: a JSON-LD record of the selection and its closure, a context file for agents, a Structurizr model, a Mermaid diagram, an arc42 skeleton, one decision record per selected item and one skill file per selected Procedure.
 
-In agentic systems the word *harness* names the frame an agent runs inside: the scaffolding that embeds the agents and dictates the rules they follow. The specification uses the word in that sense, with one precision: a Harness here is that frame written down as files, not the running process. A runtime such as GABBE, kaiban-distributed, CrewAI or LangGraph renders the seven files into its own form and executes them; those renderings are never part of the Harness itself. In the ontology a Harness is a plan (`asc:Harness`, a kind of `prov:Plan`).
+In agentic systems the word *harness* names the frame an agent runs inside: the scaffolding that embeds the agents and dictates the rules they follow. The specification uses the word in that sense, with one precision: a Harness here is that frame written down as files, not the running process. A runtime such as GABBE, kaiban-distributed, CrewAI or LangGraph can start from these files or render them into its own form; such a rendering is never part of the Harness itself, and none ships with the reference engine at 1.0. In the ontology a Harness is a plan (`asc:Harness`, a kind of `prov:Plan`).
 
 A composition needs no network, key or server. A Harness is never authored and never stored as an item, and an invalid composition yields no Harness at all.
 ```
@@ -190,7 +190,7 @@ NOW is never an item.
 
 ```text agsc-content
 
-A **Procedure** is a plan a reader can execute. It may carry `when`, a one-line trigger that becomes the description of its exported skill file, and `inputs[]`; its body uses the headings `When`, `Steps` and `Checks`.
+A **Procedure** is a plan a reader can execute. It may carry `when`, a one-line trigger saying when it applies, and `inputs[]`; its body uses the headings `When`, `Steps` and `Checks`. Procedures are published in skill packs, one pack per cluster holding the cluster's published items, and the pack takes its description from the cluster; a skill imported from elsewhere arrives as a Procedure whose `when` is that skill's description.
 
 In the graph a Procedure is an `asc:Procedure`, a subclass of `prov:Plan`.
 ```

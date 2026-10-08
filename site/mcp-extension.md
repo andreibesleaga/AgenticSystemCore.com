@@ -10,7 +10,7 @@ A connected client can list a server's tools. It cannot tell from the protocol w
 
 MCP carries optional extensions in the capabilities a party reports. The protocol says: "Extensions are advertised in the `extensions` field of capabilities, which is a map of extension identifiers to per-extension settings objects" (Model Context Protocol, *Versioning and Compatibility*, revision `2026-07-28`). A server declaring this extension puts the identifier in that map (AGSC-11-18).
 
-Under that revision there is no moment at which the two sides agree on extensions once and for all. The same page says "There is no negotiation handshake. Every request carries its protocol version, and the server accepts or rejects each request independently", and "Servers **MUST** implement `server/discover`". So a server declaring this extension carries the identifier in the capabilities of its `server/discover` result and in the capabilities it reports per request; an `initialize` handshake belongs to the earlier revisions the same page calls legacy.
+Under that revision there is no moment at which the two sides agree on extensions once and for all. The same page says "There is no negotiation handshake. Every request carries its protocol version, and the server accepts or rejects each request independently", and "Servers **MUST** implement `server/discover`". So a server declaring this extension carries the identifier in the capabilities of its `server/discover` result and in the capabilities it reports per request; an `initialize` handshake belongs to the earlier revisions the same page calls legacy. The reference engine's own tool server, `agsc mcp`, is built on the official MCP SDK, which speaks the earlier revision `2025-11-25`: it declares the extension in the capabilities of its `initialize` result, and it answers `server/discover` with "Method not found".
 
 The settings object has exactly one member, `linkset`: the absolute `https` URL of the server's `/.well-known/knowledge-linkset`. A server must emit that member and must emit no other. That document is served as `application/linkset+json` with the profile `https://w3id.org/agentic-system-core/profile/agentic-knowledge` (AGSC-06-07, AGSC-11-04), and the [profile page](/specs/agentic-knowledge/) documents its shape. The specification pins the object and the way it is carried, and two conformance vectors hold the bytes (AGSC-11-18).
 
@@ -36,7 +36,7 @@ A server declaring the extension exposes exactly seven tools, as ordinary core M
 | `search` | Items matching a query, from the node's own index. |
 | `read` | One item, by its identifier. |
 | `links` | The typed links of one item. |
-| `compose` | The verdict and the Harness for a selection of items. |
+| `compose` | The verdict for a selection of items (AGSC-07-09); the Harness files themselves are written by `agsc compose` or offered by the compose page. |
 | `propose` | A proposal for review; it writes no content. |
 | `ask` | An answer over the published exports, citing at least one item. |
 | `remember` | A proposal that records one new item; it writes no content. |

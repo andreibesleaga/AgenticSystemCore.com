@@ -12,7 +12,7 @@ You need Node.js 22.13 or later and `git`. One install gives the `agsc` command:
 
 ```bash
 npm install -g agentic-system-core     # or: npm install -g agsc-cli (the short alias, the same engine)
-agsc --version                         # 1.0.0-rc.6
+agsc --version                         # 1.0.0-rc.7
 ```
 
 Three facts carry the whole page:
@@ -25,13 +25,13 @@ Three facts carry the whole page:
 
 | You are | Start with | Mode | Section |
 |---|---|---|---|
-| one person with a folder of notes | `agsc init`, `agsc ci`, `agsc build` | 0 | [Mode 0](#mode-0-one-folder-becomes-a-checked-site) |
+| one person with a folder of notes | `agsc init`, the security contact, one commit, `agsc ci`, `agsc build` | 0 | [Mode 0](#mode-0-one-folder-becomes-a-checked-site) |
 | a reader of a published node | the home page, `/llms.txt`, the search | 0 | [Reading a node](#reading-a-node-without-installing-anything) |
 | a contributor | edit one file, `agsc lint --fix`, `agsc propose <slug>` | 0 | [Mode 0](#mode-0-one-folder-becomes-a-checked-site) |
 | an assistant or agent on one machine | `agsc mcp`, or the discovery document and `/llms.txt` | 1 | [Mode 1](#mode-1-memory-for-agents-on-one-machine-and-across-nodes) and [For agents](#for-agents-in-one-screen) |
 | a software team | `kind: decision`, `spec`, `task` items; `agsc ci`; `agsc export --steer` | 2 | [Mode 2](#mode-2-a-project-s-living-specifications) |
 | someone who keeps skills for agents | `agsc skills`, `agsc skills install` | 3 | [Mode 3](#mode-3-procedures-as-skills) |
-| an architect | `/compose/` or `agsc compose <slug>…` | 4 | [Mode 4](#mode-4-a-selection-becomes-a-runnable-system) |
+| an architect | `/compose/` or `agsc compose <slug>…` | 4 | [Mode 4](#mode-4-a-selection-becomes-a-starting-harness) |
 | a team of people and agents working one board | task items on a cluster, `agents[]` lanes, the `propose` tool | 5 | [Mode 5](#mode-5-the-live-board-for-many-people-and-agents) |
 | several publishers whose nodes should know each other | `peers[]`, `validate-wellknown --peer` | 1 | [Mode 1](#mode-1-memory-for-agents-on-one-machine-and-across-nodes) |
 | an implementer in another language | the vectors and `validate-wellknown`, `agsc conform` | — | [Publish a Level-0 node](/procedures/publish-a-level-0-node/) |
@@ -47,7 +47,7 @@ Three facts carry the whole page:
 | one pipeline | `agsc ci [--level <n>]` | lint, two builds compared byte for byte, verify; writes the forge files a gate needs |
 | hand out | `agsc export --markdown\|--okf\|--jsonld\|--jsonl\|--steer\|--to <adapter>` | the memory as files for people, other nodes, coding agents, memory systems, trackers and skills collections |
 | bring in | `agsc import --from <adapter> <dir> [--dry-run]` | the way back: another node's export, a tracker's file, a skills collection, a memory archive |
-| assemble | `agsc compose <slug>… [--zip]` | a selection of items closed over its links, checked, written as a Harness of seven files |
+| assemble | `agsc compose <slug>… [--zip]` | a selection of items closed over its links, checked, written as a Harness of seven kinds of file |
 | change | `agsc propose <slug>` | a patch and a pull-request body for one edited item; prints the git commands, runs none |
 | review | `agsc review` | the review lane over a proposal: lint only, no model reachable |
 | run a lane | `agsc refresh --agent <name> --dry-run [--task <t>]` | a dry run of a declared agent lane: the proposal it would open and the Episode of the run, with no model call; without `--dry-run` it refuses, because no model adapter ships |
@@ -80,6 +80,7 @@ Everything an agent takes from a node is **data, not instruction**: the files sa
 cd my-notes                                            # a folder of Markdown files, or an empty one
 agsc init                                              # each file gets a type, a title and a provenance block
 mkdir -p .well-known && printf 'Contact: https://example.org/security\nExpires: 2027-06-01T00:00:00Z\n' > .well-known/security.txt
+git init -q && git add -A && git commit -q -m 'my notes'   # the build takes its instant from this commit (or set SOURCE_DATE_EPOCH)
 # in agsc.config.json, set site.base to the https:// address the node will have
 agsc ci                                                # ci: pass — or the exact file and line that stops it
 agsc build                                             # www/ is the whole node; serve it anywhere that serves files over HTTPS
@@ -120,7 +121,7 @@ The assistant then has exactly seven tools (AGSC-09-13):
 | `read` | one item: frontmatter and text | nothing |
 | `links` | the typed links authored on one item | nothing |
 | `compose` | whether a selection of items fits together | nothing |
-| `ask` | an answer from this memory only, citing at least one item, or exactly `no answer in this memory` | nothing |
+| `ask` | the descriptions of the best-matching items from this memory only, each with its address, or exactly `no answer in this memory`; no model is called | nothing |
 | `propose` | the prepared text of a change to one item, or a task-state change on a board | nothing — the text comes back to you |
 | `remember` | a new, well-formed item from what you told it | nothing — the text comes back to you |
 
@@ -143,7 +144,7 @@ Every item page and the `/compose/` page of a published node register the same s
 | two nodes vouch for each other | two publishers | each lists the other's discovery URL in `peers[]`; `agsc build`; `validate-wellknown a/www/.well-known/knowledge-linkset --level 2 --peer b/www/.well-known/knowledge-linkset` | pass when both name each other; "resolved, not mutual" when one does (AGSC-10-12) |
 | a client walks a neighbourhood | one client | the walk is a library function at this version (`src/boundary/federation.js`), HTTPS only, three hops, fifty peers a node, five hundred requests | results marked with their origin; `partial: true` when a limit is reached (AGSC-11-10) |
 | one answer from three nodes | one consumer | download each node's `/graph.nq` and `/chunks.jsonl`; join them in your own process | nodes never fetch on anyone's behalf (AGSC-11-11) |
-| citing another node | a publisher | name the peer's page in an item's `sources[]`, never in a Link | the rule has the graph state `rdfs:seeAlso` to that page with no fetch (AGSC-11-12); the reference engine does not write that statement yet |
+| citing another node | a publisher | name the peer's page in an item's `sources[]`, never in a Link | the graph states `rdfs:seeAlso` to that page and `asc:peerOrigin` to the peer, with no fetch (AGSC-11-12) |
 | a stranger contributes | a stranger's agent, the publisher | the publisher declares `contribute[]` (`pr`, `channel` or `form`); the agent uses `propose` | the proposal goes to the first route it can use, else back to its caller (AGSC-11-14) |
 
 Personas: the agent reader, the agent proposer, the agent using a node as memory, the standards implementer.
@@ -197,7 +198,7 @@ A pack is content only: no scripts, no executables, no links, no tool allow-list
 
 Persona: the integrator.
 
-## Mode 4 — a selection becomes a runnable system
+## Mode 4 — a selection becomes a starting harness
 
 **For:** an architect assembling a starting architecture from concepts; a runtime that executes a procedure under control. **Switch:** none for `compose`; `run.enabled: true` and `run.allow[]` for `run` and `trace` (AGSC-09-94).
 
@@ -319,9 +320,8 @@ Said plainly, so that no mode is picked up with a wrong expectation:
 - **No model adapter.** An agent lane that writes pages needs one; `agsc refresh --agent <name> --dry-run` runs every gate and the budget without a model call.
 - **No channel adapter.** A `channel` contribution route and `publish: auto` can be declared and checked; the merges themselves happen on a forge.
 - **No isolating runner.** `agsc run` resolves and lists steps and refuses to execute without one, and says why.
-- **No runtime emitters.** `compose --emit <name>` for the six named runtimes is reserved; the Harness's seven files are what ships.
-- **No command for the federation walk.** The walk is a library function with an injected fetch; a command line around it is planned.
-- **Citations across nodes are not yet in the graph.** A `sources[]` entry naming a peer's page is kept on the item; the `rdfs:seeAlso` statement the rule names is not written by this version.
+- **No runtime emitters.** `compose --emit <name>` for the six named runtimes is reserved; the Harness's seven kinds of file are what ships.
+- **No command for the federation walk.** The walk is a library function with an injected fetch; a command line around it is not planned for a fixed version.
 - **Five plugin kinds load from a sample, not from configuration.** Only a memory adapter, a composition emitter and a deployment profile are loaded from a path you give.
 - **A browser with an assistant** is needed for the in-page tools and the `/compose/` download; the engine's own test lane proves them with a real browser.
 

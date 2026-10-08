@@ -14,7 +14,7 @@ need `playwright-core` and `axe-core` installed outside the repository.
 | `llms.js` | the byte layout of `/llms.txt`, kept to compare with the engine's bytes |
 | `check.js` | the gate: two identical builds, the llms vectors, the discovery document at Levels 0 and 2, links, headers, contrast, the page tools, public hygiene |
 | `page-tools-check.js` | proves the seven page tools against the built site, with no browser |
-| `a11y.js` | optional: axe-core over every page in both colour schemes, CSP, third-party requests, keyboard checks |
+| `a11y.js` | optional: axe-core over every page in both colour schemes at a desktop and a phone width, each file served with the content type `_headers` gives it, CSP, third-party requests, keyboard checks |
 | `shots.js`, `compare-baseline.js` | optional: screenshots, and the "the site still looks the same" comparison against a baseline kept outside the repository (`AGSC_SITE_BASELINE`) |
 
 ```bash

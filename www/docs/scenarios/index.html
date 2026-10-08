@@ -60,7 +60,7 @@
 <tr><td><a href="#persona-k-live-board">persona-k-live-board</a></td><td>P12 self-driving team</td><td>5</td><td>8</td><td><a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a>, 064, 065</td></tr>
 <tr><td><a href="#persona-l-port-implementer">persona-l-port-implementer</a></td><td>P10 port implementer</td><td>1</td><td>2</td><td><a class="ref" href="/docs/requirements/#PRD-010">PRD-010</a>, 054, <a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a></td></tr>
 </tbody></table></div>
-<p><strong>P10 port implementer</strong> (added 2026-09-24): one scenario writes a Level-0 node without the engine and
+<p><strong>P10 port implementer</strong>: one scenario writes a Level-0 node without the engine and
 judges it with the shipped checker alone; the other runs the Python checker package over the same
 <code>tests/vectors/</code> as the engine's <code>conform</code> and compares the two reports vector by vector. The second
 one runs wherever that package's checkout sits beside the engine and a Python 3.9+ interpreter exists,
@@ -69,7 +69,7 @@ and is reported as skipped, with the reason, where it does not (<code>conditiona
 (<code>spec/09-conformance</code>).</p>
 <h2 id="the-feature-files">The feature files</h2>
 <h3 id="persona-0-dropin">persona-0-dropin: Drop-in user — plain Markdown becomes a live ontologic wiki</h3>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code>@persona-0 @PRD-053
+<pre tabindex="0" class="feature" data-lang="gherkin"><code>@persona-0 @<a class="ref" href="/docs/requirements/#PRD-053">PRD-053</a>
 Feature: Drop-in user — plain Markdown becomes a live ontologic wiki
   As a user with a folder of plain .md notes
   I want a living, linked, agent-readable wiki with zero configuration
@@ -78,16 +78,16 @@ Feature: Drop-in user — plain Markdown becomes a live ontologic wiki
   Scenario: Three commands from bare notes to a full local site
     Given a directory containing &quot;ideas.md&quot;, &quot;notes/agents.md&quot; and &quot;todo.md&quot; with no YAML frontmatter, and &quot;kept.md&quot; with a frontmatter block
     When I run &quot;npx agentic-system-core init&quot;
-    Then every adopted file gains exactly &quot;type&quot;, &quot;title&quot;, &quot;aliases&quot;, &quot;prov&quot; and &quot;kind&quot;, in that order, and every body byte is unchanged (AGSC-02-90)
-    And each adopted file is moved to &quot;content/concepts/&lt;slug&gt;.md&quot; with its original path recorded in &quot;aliases&quot; (AGSC-02-93)
+    Then every adopted file gains exactly &quot;type&quot;, &quot;title&quot;, &quot;aliases&quot;, &quot;prov&quot; and &quot;kind&quot;, in that order, and every body byte is unchanged (<a class="ref" href="/specs/02-item/#AGSC-02-90">AGSC-02-90</a>)
+    And each adopted file is moved to &quot;content/concepts/&lt;slug&gt;.md&quot; with its original path recorded in &quot;aliases&quot; (<a class="ref" href="/specs/02-item/#AGSC-02-93">AGSC-02-93</a>)
     And &quot;notes/agents.md&quot; is flattened to &quot;content/concepts/agents.md&quot;
-    And every relative link or image in an adopted body that no longer resolves is reported as warning &quot;AGSC-E507&quot; naming the original path, the new path and the reference, each referenced local file under the adoption root is copied to &quot;content/assets/&lt;original-relative-path&gt;&quot;, and no body byte is rewritten (AGSC-02-95)
-    And &quot;kept.md&quot;, which already had a frontmatter block, is untouched (AGSC-02-91)
-    And init prints its two &quot;before you build&quot; steps, the security contact and the crawler list it wrote into &quot;site.tdm_crawlers&quot; (AGSC-02-92)
-    And lint reports no error except the missing security contact &quot;AGSC-E901&quot; and the references &quot;AGSC-E507&quot; named, which stay &quot;AGSC-E310&quot; until repaired (AGSC-02-95)
-    When I add &quot;.well-known/security.txt&quot; with a &quot;Contact:&quot; line and repair the references &quot;AGSC-E507&quot; named
+    And every relative link or image in an adopted body that no longer resolves is reported as warning &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E507">AGSC-E507</a>&quot; naming the original path, the new path and the reference, each referenced local file under the adoption root is copied to &quot;content/assets/&lt;original-relative-path&gt;&quot;, and no body byte is rewritten (<a class="ref" href="/specs/02-item/#AGSC-02-95">AGSC-02-95</a>)
+    And &quot;kept.md&quot;, which already had a frontmatter block, is untouched (<a class="ref" href="/specs/02-item/#AGSC-02-91">AGSC-02-91</a>)
+    And init prints its two &quot;before you build&quot; steps, the security contact and the crawler list it wrote into &quot;site.tdm_crawlers&quot; (<a class="ref" href="/specs/02-item/#AGSC-02-92">AGSC-02-92</a>)
+    And lint reports no error except the missing security contact &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E901">AGSC-E901</a>&quot; and the references &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E507">AGSC-E507</a>&quot; named, which stay &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E310">AGSC-E310</a>&quot; until repaired (<a class="ref" href="/specs/02-item/#AGSC-02-95">AGSC-02-95</a>)
+    When I add &quot;.well-known/security.txt&quot; with a &quot;Contact:&quot; line and repair the references &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E507">AGSC-E507</a>&quot; named
     And I run &quot;npx agentic-system-core ci&quot;
-    Then ci passes offline with warnings only and writes its verdict to &quot;dist/gate.json&quot; (AGSC-02-92, AGSC-08-10)
+    Then ci passes offline with warnings only and writes its verdict to &quot;dist/gate.json&quot; (<a class="ref" href="/specs/02-item/#AGSC-02-92">AGSC-02-92</a>, <a class="ref" href="/specs/08-governance/#AGSC-08-10">AGSC-08-10</a>)
     When I run &quot;npx agentic-system-core build&quot;
     Then &quot;www/&quot; contains the site, &quot;graph.jsonld&quot;, &quot;llms.txt&quot; and &quot;/.well-known/knowledge-linkset&quot;
     And &quot;npx agentic-system-core mcp&quot; serves search, read and links over the same files
@@ -95,7 +95,7 @@ Feature: Drop-in user — plain Markdown becomes a live ontologic wiki
   Scenario: Re-running init over an adopted and built Bundle changes nothing
     Given a folder of bare notes adopted by &quot;npx agentic-system-core init&quot;, repaired, and built into &quot;www/&quot;
     When I run &quot;npx agentic-system-core init&quot; again
-    Then no file under &quot;content/&quot; changes and nothing under &quot;www/&quot;, &quot;dist/&quot; or &quot;content/assets/&quot; is adopted (AGSC-02-91)
+    Then no file under &quot;content/&quot; changes and nothing under &quot;www/&quot;, &quot;dist/&quot; or &quot;content/assets/&quot; is adopted (<a class="ref" href="/specs/02-item/#AGSC-02-91">AGSC-02-91</a>)
 
   Scenario: Publishing the adopted wiki
     Given the adopted Bundle from the previous scenario
@@ -103,7 +103,7 @@ Feature: Drop-in user — plain Markdown becomes a live ontologic wiki
     Then Cloudflare Pages serves the wiki from &quot;www/&quot; at my domain
     And re-running &quot;init&quot; changes nothing (idempotent adoption)</code></pre>
 <h3 id="persona-a-reader">persona-a-reader: Human reader finds a pattern with evidence</h3>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: PRD-002, PRD-011, PRD-013, PRD-014, PRD-015, PRD-025 · PLAN §6(a)
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-002">PRD-002</a>, <a class="ref" href="/docs/requirements/#PRD-011">PRD-011</a>, <a class="ref" href="/docs/requirements/#PRD-013">PRD-013</a>, <a class="ref" href="/docs/requirements/#PRD-014">PRD-014</a>, <a class="ref" href="/docs/requirements/#PRD-015">PRD-015</a>, <a class="ref" href="/docs/requirements/#PRD-025">PRD-025</a> · PLAN §6(a)
 @persona-a @mode-0
 Feature: Human reader finds a pattern with evidence
   As P1 (human reader: architect/engineer)
@@ -112,18 +112,18 @@ Feature: Human reader finds a pattern with evidence
 
   Background:
     Given the acceptance Bundle is built into &quot;www/&quot; for the site &quot;https://agenticsystemcore.com/&quot;
-    And an item with &quot;status: draft&quot; stays dark: no page, no link, no index entry (AGSC-06-30)
+    And an item with &quot;status: draft&quot; stays dark: no page, no link, no index entry (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-30">AGSC-06-30</a>)
 
-  @PRD-011 @PRD-025
+  @<a class="ref" href="/docs/requirements/#PRD-011">PRD-011</a> @<a class="ref" href="/docs/requirements/#PRD-025">PRD-025</a>
   Scenario: Home page states software-and-registry identity, no narrative
     When the reader opens &quot;/&quot;
     Then the page shows the Bundle's title and the summary of &quot;content/index.md&quot;
-    And its head carries the &quot;describedby&quot; link to &quot;/.well-known/knowledge-linkset&quot; (AGSC-06-25)
+    And its head carries the &quot;describedby&quot; link to &quot;/.well-known/knowledge-linkset&quot; (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-25">AGSC-06-25</a>)
     And the page links to &quot;/clusters/&quot;, &quot;/concepts/&quot;, &quot;/lessons/&quot;, &quot;/skills/&quot;, &quot;/now/&quot;, &quot;/compose/&quot; and &quot;/search/&quot;
     And the page introduces the node and links each non-empty index page with its count, listing no item itself
     And the page contains no &quot;start here&quot; link and no imposed reading order
 
-  @PRD-014
+  @<a class="ref" href="/docs/requirements/#PRD-014">PRD-014</a>
   Scenario: Reader searches via the prebuilt client-side index
     Given no server-side search endpoint exists
     When the reader types a query into the search box
@@ -131,26 +131,26 @@ Feature: Human reader finds a pattern with evidence
     And results are filtered client-side from the fetched inverted index
     And no network request is made to any third-party search service
 
-  @PRD-002 @PRD-013
+  @<a class="ref" href="/docs/requirements/#PRD-002">PRD-002</a> @<a class="ref" href="/docs/requirements/#PRD-013">PRD-013</a>
   Scenario: Reader opens a Concept page and sees evidence
     When the reader navigates to &quot;/concepts/a2a/&quot;
     Then the page shows the title, the description as its summary, the type and kind, the cluster &quot;Protocols&quot; and the provenance
-    And the page shows the SVG compiled from &quot;content/diagrams/a2a.diagram&quot; inline, named by &quot;diagram.alt&quot;, and no diagram route exists (AGSC-02-13)
-    And the page links its own &quot;/pages/a2a.md&quot; and &quot;/pages/a2a.jsonld&quot; (AGSC-06-02)
+    And the page shows the SVG compiled from &quot;content/diagrams/a2a.diagram&quot; inline, named by &quot;diagram.alt&quot;, and no diagram route exists (<a class="ref" href="/specs/02-item/#AGSC-02-13">AGSC-02-13</a>)
+    And the page links its own &quot;/pages/a2a.md&quot; and &quot;/pages/a2a.jsonld&quot; (<a class="ref" href="/specs/06-surfaces/#AGSC-06-02">AGSC-06-02</a>)
     And the Markdown view carries the &quot;sources&quot; entries with their &quot;verified&quot; dates and the &quot;evidence&quot; and &quot;maturity&quot; facets
-    And the graph carries the typed Link &quot;requires&quot; to &quot;mcp&quot; and its computed inverse on &quot;mcp&quot; (AGSC-03-04)
+    And the graph carries the typed Link &quot;requires&quot; to &quot;mcp&quot; and its computed inverse on &quot;mcp&quot; (<a class="ref" href="/specs/03-links/#AGSC-03-04">AGSC-03-04</a>)
     And the page offers &quot;Propose an edit&quot; as a plain link to the forge's edit view of &quot;content/concepts/a2a.md&quot;
 
-  @PRD-015
+  @<a class="ref" href="/docs/requirements/#PRD-015">PRD-015</a>
   Scenario: Reader inspects cluster membership and the NOW page
     When the reader navigates to &quot;/clusters/protocols/&quot;
     Then the page lists every published item that names the cluster, each with its description
     When the reader navigates to &quot;/now/&quot;
-    Then &quot;/now/&quot; and &quot;/now.md&quot; carry the line &quot;content version …, built at …, fingerprint …, specification …&quot; (AGSC-06-22)
+    Then &quot;/now/&quot; and &quot;/now.md&quot; carry the line &quot;content version …, built at …, fingerprint …, specification …&quot; (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-22">AGSC-06-22</a>)
     And they show the item counts, the stale item &quot;tool-use-retries&quot; and the open Lesson
     And both were generated purely from stored state, with no hand edit surviving a rebuild</code></pre>
 <h3 id="persona-b-contributor">persona-b-contributor: Human contributor fixes a page and passes a hard review gate</h3>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: PRD-039, PRD-040, PRD-041, PRD-042, PRD-050 · PLAN §6(b)
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-039">PRD-039</a>, <a class="ref" href="/docs/requirements/#PRD-040">PRD-040</a>, <a class="ref" href="/docs/requirements/#PRD-041">PRD-041</a>, <a class="ref" href="/docs/requirements/#PRD-042">PRD-042</a>, <a class="ref" href="/docs/requirements/#PRD-050">PRD-050</a> · PLAN §6(b)
 @persona-b @mode-0
 Feature: Human contributor fixes a page and passes a hard review gate
   As P2 (human contributor)
@@ -161,14 +161,14 @@ Feature: Human contributor fixes a page and passes a hard review gate
     Given the Bundle names the contribution target &quot;https://github.com/andreibesleaga/AgenticSystemCore.com&quot; with mode &quot;pr&quot;
     And the item &quot;content/concepts/a2a.md&quot; exists with a valid &quot;prov&quot; block
 
-  @PRD-039
+  @<a class="ref" href="/docs/requirements/#PRD-039">PRD-039</a>
   Scenario: Contributor opens the fork-and-edit URL from the page footer
     When the contributor reads the &quot;Propose an edit&quot; link on &quot;/concepts/a2a/&quot;
     Then it points at &quot;https://github.com/andreibesleaga/AgenticSystemCore.com/edit/HEAD/content/concepts/a2a.md&quot;, the forge's edit view of the default branch
     And it is a plain anchor: the page has no form, and nothing it loads comes from another origin
-    And the discovery document names the same target as its &quot;…rel#contribute&quot; link with mode &quot;pr&quot; (AGSC-11-14)
+    And the discovery document names the same target as its &quot;…rel#contribute&quot; link with mode &quot;pr&quot; (<a class="ref" href="/specs/11-boundary/#AGSC-11-14">AGSC-11-14</a>)
 
-  @PRD-040 @PRD-042
+  @<a class="ref" href="/docs/requirements/#PRD-040">PRD-040</a> @<a class="ref" href="/docs/requirements/#PRD-042">PRD-042</a>
   Scenario: Contributor commits with the required trailer and PR marker
     Given the contributor has edited frontmatter or body in the fork
     When the contributor commits the change
@@ -176,16 +176,16 @@ Feature: Human contributor fixes a page and passes a hard review gate
     And the PR body contains the marker &quot;&lt;!-- agsc:proposal v1 --&gt;&quot;
     And the PR body states rationale, affected slugs and &quot;prov.origin&quot;
 
-  @PRD-041 @PRD-042
+  @<a class="ref" href="/docs/requirements/#PRD-041">PRD-041</a> @<a class="ref" href="/docs/requirements/#PRD-042">PRD-042</a>
   Scenario: CI runs a lint-only review, no LLM call
     Given the contributor's change adds a concept with no description
     When the change runs &quot;npx agentic-system-core ci&quot;
-    Then ci runs lint, build, verify and forge, and &quot;dist/gate.json&quot; records each check with its findings (AGSC-08-10)
-    And two builds of the same change give the same bytes, which ci compares before it passes (AGSC-04-02)
+    Then ci runs lint, build, verify and forge, and &quot;dist/gate.json&quot; records each check with its findings (<a class="ref" href="/specs/08-governance/#AGSC-08-10">AGSC-08-10</a>)
+    And two builds of the same change give the same bytes, which ci compares before it passes (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-02">AGSC-04-02</a>)
     And every finding names its file, line and column
-    And no model or network call occurs anywhere in this lane (AGSC-08-30)
+    And no model or network call occurs anywhere in this lane (<a class="ref" href="/specs/08-governance/#AGSC-08-30">AGSC-08-30</a>)
 
-  @PRD-041 @PRD-050
+  @<a class="ref" href="/docs/requirements/#PRD-041">PRD-041</a> @<a class="ref" href="/docs/requirements/#PRD-050">PRD-050</a>
   Scenario: Maintainer reviews, ratifies and the change deploys
     Given the required CI status check is green
     When the maintainer adds &quot;verified: [{by: human:andreibesleaga, at: \&quot;2026-09-02\&quot;}]&quot; to the changed file
@@ -194,7 +194,7 @@ Feature: Human contributor fixes a page and passes a hard review gate
     And the change is live within approximately 2 minutes
     And &quot;prov.commit&quot; and &quot;prov.reviewer&quot; are derived at build time, never written into the file by CI</code></pre>
 <h3 id="persona-c-agent-mcp">persona-c-agent-mcp: Agent reader queries structured knowledge without scraping</h3>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: PRD-022, PRD-023, PRD-025 · PLAN §5.2 ToolTransport
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-022">PRD-022</a>, <a class="ref" href="/docs/requirements/#PRD-023">PRD-023</a>, <a class="ref" href="/docs/requirements/#PRD-025">PRD-025</a> · PLAN §5.2 ToolTransport
 @persona-c @mode-1
 Feature: Agent reader queries structured knowledge without scraping
   As P3 (agent reader)
@@ -202,52 +202,52 @@ Feature: Agent reader queries structured knowledge without scraping
   So that I can search, read and follow links without page-scraping, with results trust-labelled
 
   Background:
-    Given no remote MCP server is served and no &quot;agent-card.json&quot; is emitted at v1; both MAY be declared as surfaces (AGSC-06-34, AGSC-11-21)
+    Given no remote MCP server is served and no &quot;agent-card.json&quot; is emitted at v1; both MAY be declared as surfaces (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-34">AGSC-06-34</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-21">AGSC-11-21</a>)
 
-  @PRD-023
+  @<a class="ref" href="/docs/requirements/#PRD-023">PRD-023</a>
   Scenario: Agent starts the local stdio MCP server
     When the operator runs &quot;npx agentic-system-core mcp &lt;bundle-path&gt;&quot; from outside the Bundle
     Then the server starts and speaks JSON-RPC 2.0 over stdio
     And the server exposes exactly seven tools: &quot;search&quot;, &quot;read&quot;, &quot;links&quot;, &quot;compose&quot;, &quot;propose&quot;, &quot;ask&quot;, &quot;remember&quot;
 
-  @PRD-023 @PRD-024
+  @<a class="ref" href="/docs/requirements/#PRD-023">PRD-023</a> @<a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a>
   Scenario: The server reads the local Bundle, never the network
     When the server starts over the acceptance Bundle with every network call refused
     Then it answers &quot;search&quot;, &quot;read&quot; and &quot;links&quot; from the Bundle's own files
     And an item edited on disk is served as edited when the server next starts
-    And &quot;mcp&quot; given a URL instead of a Bundle directory is refused with &quot;AGSC-E003&quot; and exit 2 (AGSC-09-09)
+    And &quot;mcp&quot; given a URL instead of a Bundle directory is refused with &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E003">AGSC-E003</a>&quot; and exit 2 (<a class="ref" href="/specs/09-conformance/#AGSC-09-09">AGSC-09-09</a>)
 
-  @PRD-023
+  @<a class="ref" href="/docs/requirements/#PRD-023">PRD-023</a>
   Scenario: Agent calls search then read then links, all trust-labelled
     When the agent calls tool &quot;search&quot; with arguments &quot;{query: \&quot;protocol\&quot;}&quot;
-    Then the result is the envelope &quot;source&quot;, &quot;trust: untrusted&quot;, &quot;license&quot; and &quot;type&quot; around hits naming &quot;a2a&quot; and &quot;mcp&quot; (AGSC-08-18)
+    Then the result is the envelope &quot;source&quot;, &quot;trust: untrusted&quot;, &quot;license&quot; and &quot;type&quot; around hits naming &quot;a2a&quot; and &quot;mcp&quot; (<a class="ref" href="/specs/08-governance/#AGSC-08-18">AGSC-08-18</a>)
     When the agent calls tool &quot;read&quot; with argument &quot;{slug: \&quot;a2a\&quot;}&quot;
     Then the result returns the body and frontmatter of &quot;content/concepts/a2a.md&quot;
     When the agent calls tool &quot;links&quot; with argument &quot;{slug: \&quot;mcp\&quot;}&quot;
     Then the result lists the &quot;requires&quot; Link from &quot;a2a&quot; as its computed inverse &quot;required-by&quot;
 
-  @PRD-025
+  @<a class="ref" href="/docs/requirements/#PRD-025">PRD-025</a>
   Scenario: Non-MCP agent reads via llms.txt and RDF instead
     Given the agent has no MCP client
     When the agent fetches &quot;/llms.txt&quot;
-    Then every item is reachable from a listed page URL, and each item's Markdown is at &quot;/pages/&lt;slug&gt;.md&quot; (AGSC-06-14)
+    Then every item is reachable from a listed page URL, and each item's Markdown is at &quot;/pages/&lt;slug&gt;.md&quot; (<a class="ref" href="/specs/06-surfaces/#AGSC-06-14">AGSC-06-14</a>)
     When the agent instead fetches &quot;/graph.ttl&quot;
     Then the response loads into a standard RDF parser with zero blank nodes
 
 
-  @PRD-056
+  @<a class="ref" href="/docs/requirements/#PRD-056">PRD-056</a>
   Scenario: Agent uses the node as memory and knowledge base over MCP
     Given &quot;npx agentic-system-core mcp&quot; is running over the acceptance Bundle
     When the agent calls tool &quot;ask&quot; with &quot;What pattern handles tool-use retries?&quot;
-    Then the answer cites at least one item IRI from the Bundle (AGSC-09-14a)
+    Then the answer cites at least one item IRI from the Bundle (<a class="ref" href="/specs/09-conformance/#AGSC-09-14a">AGSC-09-14a</a>)
     And a question that shares no word with the Bundle returns exactly &quot;no answer in this memory&quot;
     When the agent calls tool &quot;remember&quot; with kind &quot;episode&quot;, a title, a body, its actor, the instant &quot;at&quot; and its operator
-    Then a conforming Episode item comes back as a Proposal with no finding (AGSC-09-14b)
-    And an episode without its declared actor is refused with &quot;AGSC-E003&quot;
+    Then a conforming Episode item comes back as a Proposal with no finding (<a class="ref" href="/specs/09-conformance/#AGSC-09-14b">AGSC-09-14b</a>)
+    And an episode without its declared actor is refused with &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E003">AGSC-E003</a>&quot;
     And nothing is written to the Bundle by the server
     And &quot;resources/list&quot; includes every item, &quot;graph.jsonld&quot; and &quot;llms.txt&quot;</code></pre>
 <h3 id="persona-d-agent-proposer">persona-d-agent-proposer: Agent proposer contributes a change humans ratify</h3>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: PRD-039, PRD-040, PRD-042, PRD-043 · PLAN §6(b), C5
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-039">PRD-039</a>, <a class="ref" href="/docs/requirements/#PRD-040">PRD-040</a>, <a class="ref" href="/docs/requirements/#PRD-042">PRD-042</a>, <a class="ref" href="/docs/requirements/#PRD-043">PRD-043</a> · PLAN §6(b), C5
 @persona-d @mode-1
 Feature: Agent proposer contributes a change humans ratify
   As P4 (agent proposer, operator-signed)
@@ -257,30 +257,30 @@ Feature: Agent proposer contributes a change humans ratify
   Background:
     Given the agent is operator-run and has a &quot;prov.operator&quot; identity &quot;human:&lt;gh-id&gt;&quot;
 
-  @PRD-042
+  @<a class="ref" href="/docs/requirements/#PRD-042">PRD-042</a>
   Scenario: Agent edits a Concept with a complete prov block
     When the agent edits &quot;content/concepts/&lt;slug&gt;.md&quot;
     Then the frontmatter carries &quot;prov: {origin: ai-assisted, agent: \&quot;claude-code/…\&quot;, model: \&quot;…\&quot;, operator: \&quot;human:&lt;gh-id&gt;\&quot;}&quot;
     And lint rejects the item if &quot;prov.origin&quot; or &quot;prov.operator&quot; is missing
 
-  @PRD-039
+  @<a class="ref" href="/docs/requirements/#PRD-039">PRD-039</a>
   Scenario: Agent normalizes and writes a local patch, never pushes
     Given the agent's edit of &quot;content/concepts/&lt;slug&gt;.md&quot; left keys out of schema order, a wikilink and no trailing LF
     When the agent runs &quot;npx agentic-system-core lint --fix&quot;
-    Then wikilinks, key order and trailing LF are normalized, and a second lint reports no error (AGSC-04-19, AGSC-03-12)
+    Then wikilinks, key order and trailing LF are normalized, and a second lint reports no error (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-19">AGSC-04-19</a>, <a class="ref" href="/specs/03-links/#AGSC-03-12">AGSC-03-12</a>)
     When the agent runs &quot;npx agentic-system-core propose &lt;slug&gt;&quot;
-    Then the CLI writes &quot;dist/proposal/1.patch&quot; and &quot;dist/proposal/1.md&quot;, the PR body opening with &quot;&lt;!-- agsc:proposal v1 --&gt;&quot; (AGSC-08-05)
-    And the CLI prints, but does not execute, &quot;git apply dist/proposal/1.patch&quot;, &quot;git checkout -b proposal/1&quot; and the pull-request step (AGSC-08-04)
+    Then the CLI writes &quot;dist/proposal/1.patch&quot; and &quot;dist/proposal/1.md&quot;, the PR body opening with &quot;&lt;!-- agsc:proposal v1 --&gt;&quot; (<a class="ref" href="/specs/08-governance/#AGSC-08-05">AGSC-08-05</a>)
+    And the CLI prints, but does not execute, &quot;git apply dist/proposal/1.patch&quot;, &quot;git checkout -b proposal/1&quot; and the pull-request step (<a class="ref" href="/specs/08-governance/#AGSC-08-04">AGSC-08-04</a>)
     And no network write occurs from the &quot;propose&quot; verb
 
-  @PRD-040
+  @<a class="ref" href="/docs/requirements/#PRD-040">PRD-040</a>
   Scenario: Operator runs the printed commands and the PR carries the trailer
     Given the operator has reviewed the printed commands
     When the operator runs them
     Then the resulting PR carries an &quot;Assisted-by:&quot; trailer and the &quot;prov&quot; block from the file
     And the PR follows the same CI/merge path as a human contributor's Proposal
 
-  @PRD-043
+  @<a class="ref" href="/docs/requirements/#PRD-043">PRD-043</a>
   Scenario: Fork-originated Proposals stay lint-only until labelled, capped at five
     Given four bot-authored PRs are already open from forks
     When a fifth bot-authored PR is opened from a fork
@@ -288,7 +288,7 @@ Feature: Agent proposer contributes a change humans ratify
     When a sixth bot-authored PR is opened from a fork
     Then the sixth PR is refused per the &quot;≤5 open bot PRs&quot; cap</code></pre>
 <h3 id="persona-e-architect">persona-e-architect: Architect turns Concepts into a starting architecture</h3>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: PRD-036, PRD-037, PRD-038 · PLAN §6(c)
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a>, <a class="ref" href="/docs/requirements/#PRD-037">PRD-037</a>, <a class="ref" href="/docs/requirements/#PRD-038">PRD-038</a> · PLAN §6(c)
 @persona-e @mode-4
 Feature: Architect turns Concepts into a starting architecture
   As P5 (architect / combiner)
@@ -299,13 +299,13 @@ Feature: Architect turns Concepts into a starting architecture
     Given &quot;/compose/&quot; loads &quot;/graph.jsonld&quot; and &quot;www/compose/agsc-core.js&quot;
     And &quot;www/compose/agsc-core.js&quot; is the &quot;src/composition/&quot; module set, bundled, with no &quot;node:&quot; import
 
-  @PRD-036
+  @<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a>
   Scenario: Selecting Concepts triggers requires-closure with an explanation
     When the architect ticks the Concept &quot;handoff&quot;
     Then the panel shows &quot;auto-added: supervisor ← required-by handoff&quot;
     And the addition carries an explanation path from the selection to &quot;supervisor&quot;
 
-  @PRD-036
+  @<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a>
   Scenario: Excludes mutex and warnings surface before download
     Given the architect has selected two Concepts related by &quot;excludes&quot;
     When the closure runs
@@ -315,7 +315,7 @@ Feature: Architect turns Concepts into a starting architecture
     Given a selected Concept has a &quot;uses&quot; target that is not selected
     Then the panel shows a soft warning for the missing &quot;uses&quot; target
 
-  @PRD-037
+  @<a class="ref" href="/docs/requirements/#PRD-037">PRD-037</a>
   Scenario: Architect names and downloads a seven-file Harness
     When the architect names the Harness &quot;harness-x&quot;
     And clicks &quot;Download&quot;
@@ -330,13 +330,13 @@ Feature: Architect turns Concepts into a starting architecture
       | skills/&lt;slug&gt;/SKILL.md            |
     And if browser zip writing is unavailable, files download individually as the documented fallback
 
-  @PRD-038
+  @<a class="ref" href="/docs/requirements/#PRD-038">PRD-038</a>
   Scenario: Browser output is byte-identical to the CLI for the same selection
     When the architect runs &quot;npx agentic-system-core compose a2a mcp supervisor --out ./harness-x/&quot; on the CLI
     And separately runs &quot;www/compose/agsc-core.js&quot; as &quot;/compose/&quot; does, over the published &quot;/graph.jsonld&quot;, in a context that holds nothing but the language
-    Then the Harness files from both paths are the same files, byte for byte (AGSC-07-13)</code></pre>
+    Then the Harness files from both paths are the same files, byte for byte (<a class="ref" href="/specs/07-composition/#AGSC-07-13">AGSC-07-13</a>)</code></pre>
 <h3 id="persona-f-integrator">persona-f-integrator: Integrator installs this knowledge into my agent</h3>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: PRD-032, PRD-033, PRD-034, PRD-035 · PLAN §6.a (Interchange)
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-032">PRD-032</a>, <a class="ref" href="/docs/requirements/#PRD-033">PRD-033</a>, <a class="ref" href="/docs/requirements/#PRD-034">PRD-034</a>, <a class="ref" href="/docs/requirements/#PRD-035">PRD-035</a> · PLAN §6.a (Interchange)
 @persona-f @mode-3
 Feature: Integrator installs this knowledge into my agent
   As P6 (integrator)
@@ -344,13 +344,13 @@ Feature: Integrator installs this knowledge into my agent
   So that my agent gains this knowledge without executing anything foreign
 
   Background:
-    Given the Bundle's skill packs are built, one per Cluster, each listed with its lockfile in &quot;skills/index.json&quot; (AGSC-07-19, AGSC-07-20)
+    Given the Bundle's skill packs are built, one per Cluster, each listed with its lockfile in &quot;skills/index.json&quot; (<a class="ref" href="/specs/07-composition/#AGSC-07-19">AGSC-07-19</a>, <a class="ref" href="/specs/07-composition/#AGSC-07-20">AGSC-07-20</a>)
     And every pack declares its licence &quot;LicenseRef-AgenticSystemCore-Content-Use-1.0&quot; (see LICENSE-CONTENT)
 
-  @PRD-033
+  @<a class="ref" href="/docs/requirements/#PRD-033">PRD-033</a>
   Scenario Outline: Integrator installs packs into one of the three supported trees
     When the integrator installs for &quot;&lt;tree&gt;&quot; with &quot;npx agentic-system-core skills install &lt;path&gt;&quot;
-    Then every pack is written under &quot;&lt;path&gt;&quot;, one &quot;SKILL.md&quot; per cluster directory, from the local build (AGSC-07-21)
+    Then every pack is written under &quot;&lt;path&gt;&quot;, one &quot;SKILL.md&quot; per cluster directory, from the local build (<a class="ref" href="/specs/07-composition/#AGSC-07-21">AGSC-07-21</a>)
     And re-running the same command changes nothing on disk
 
     Examples:
@@ -359,29 +359,29 @@ Feature: Integrator installs this knowledge into my agent
       | agents  | .agents/skills    |
       | github  | .github/skills    |
 
-  @PRD-032
+  @<a class="ref" href="/docs/requirements/#PRD-032">PRD-032</a>
   Scenario: Each installed pack is a valid agentskills.io SKILL.md
     When the integrator opens &quot;.claude/skills/&lt;cluster&gt;/SKILL.md&quot;
     Then its frontmatter declares &quot;name&quot;, equal to the pack's directory, &quot;description&quot; and &quot;license&quot;
     And &quot;description&quot; is at most 1024 characters and equals the cluster description
-    And the body lists each member with its type and canonical URL, its prose fenced as data (AGSC-07-16)
+    And the body lists each member with its type and canonical URL, its prose fenced as data (<a class="ref" href="/specs/07-composition/#AGSC-07-16">AGSC-07-16</a>)
 
-  @PRD-035
+  @<a class="ref" href="/docs/requirements/#PRD-035">PRD-035</a>
   Scenario: Installed packs are content-only and lockfile-verified
     When the integrator inspects the installed skill tree
-    Then no &quot;scripts/&quot; directory, executable bit, symlink or &quot;allowed-tools&quot; field is present (AGSC-07-15)
+    Then no &quot;scripts/&quot; directory, executable bit, symlink or &quot;allowed-tools&quot; field is present (<a class="ref" href="/specs/07-composition/#AGSC-07-15">AGSC-07-15</a>)
     And the SHA-256 of every installed file equals its &quot;lock&quot; entry in &quot;skills/index.json&quot;
-    And an update over a locally changed file is reported with its diff before it overwrites (AGSC-07-20)
+    And an update over a locally changed file is reported with its diff before it overwrites (<a class="ref" href="/specs/07-composition/#AGSC-07-20">AGSC-07-20</a>)
 
-  @PRD-034
+  @<a class="ref" href="/docs/requirements/#PRD-034">PRD-034</a>
   Scenario: Integrator's improved skill round-trips back as a Procedure
     Given the integrator has written a &quot;SKILL.md&quot; file locally
     When the integrator runs &quot;npx agentic-system-core skills import &lt;file&gt;&quot;
-    Then the file is mapped to &quot;content/procedures/&lt;name&gt;.md&quot; (AGSC-07-22)
+    Then the file is mapped to &quot;content/procedures/&lt;name&gt;.md&quot; (<a class="ref" href="/specs/07-composition/#AGSC-07-22">AGSC-07-22</a>)
     And its declared fields survive: &quot;description&quot; as &quot;description&quot;, &quot;license&quot; as &quot;x-skill-license&quot;, and the body byte for byte
     And lint reports no error for the new Procedure</code></pre>
 <h3 id="persona-g-team">persona-g-team: Project team keeps its agent-built specs governed</h3>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: PRD-028, PRD-029, PRD-030, PRD-031 · PLAN §6.a (Mode 2)
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-028">PRD-028</a>, <a class="ref" href="/docs/requirements/#PRD-029">PRD-029</a>, <a class="ref" href="/docs/requirements/#PRD-030">PRD-030</a>, <a class="ref" href="/docs/requirements/#PRD-031">PRD-031</a> · PLAN §6.a (Mode 2)
 @persona-g @mode-2
 Feature: Project team keeps its agent-built specs governed
   As P7 (project team, Mode 2)
@@ -393,36 +393,36 @@ Feature: Project team keeps its agent-built specs governed
     And the scaffold created &quot;agsc.config.json&quot;, &quot;content/index.md&quot;, &quot;.gitignore&quot; and &quot;.env.example&quot; and printed the two &quot;before you build&quot; steps
     And the team added &quot;.well-known/security.txt&quot; and keeps its principles, decisions, specs, tasks, one procedure, one lesson, one gate and one session log as items
 
-  @PRD-028
+  @<a class="ref" href="/docs/requirements/#PRD-028">PRD-028</a>
   Scenario: Team authors Mode-2 Concepts without a new item type
     When lint runs over the team's &quot;content/concepts/&lt;slug&gt;.md&quot; files of &quot;kind: principle&quot;, &quot;kind: decision&quot;, &quot;kind: spec&quot; and &quot;kind: task&quot;
     And over &quot;content/gates/&lt;slug&gt;.md&quot; and &quot;content/episodes/&lt;slug&gt;.md&quot; (session logs)
     Then lint accepts every kind without introducing a new &quot;type&quot;
-    And the five Mode-2 Link keys (`implements`, `verifies`, `covers`, `blocked-by`, `decided-by`) exist at 1.0 but are never required (AGSC-03-20)
+    And the five Mode-2 Link keys (`implements`, `verifies`, `covers`, `blocked-by`, `decided-by`) exist at 1.0 but are never required (<a class="ref" href="/specs/03-links/#AGSC-03-20">AGSC-03-20</a>)
 
-  @PRD-029
+  @<a class="ref" href="/docs/requirements/#PRD-029">PRD-029</a>
   Scenario: Team exports steer files for their coding agent
     When the team runs &quot;npx agentic-system-core export --steer&quot;
     Then &quot;AGENTS.md&quot;/&quot;CLAUDE.md&quot; bundles are rendered from NOW/Concept/Procedure/Gate/Lesson items
     And the output is byte-stable across repeated runs
     And the exported files are context only — enforcement happens in CI, not in the steer files themselves
 
-  @PRD-031
+  @<a class="ref" href="/docs/requirements/#PRD-031">PRD-031</a>
   Scenario: A Gate's checks compile into a required CI status check
     Given &quot;content/gates/&lt;slug&gt;.md&quot; declares &quot;checks: [schema, links, provenance, determinism, review]&quot; and &quot;enforce: [status-check]&quot;
     When &quot;npx agentic-system-core ci&quot; runs
-    Then each declared check becomes one named required status check in &quot;dist/forge/status-checks.json&quot; (AGSC-08-09, AGSC-08-12)
-    And &quot;dist/gate.json&quot; names the gate and its level (AGSC-08-10)
-    And after a change to the Gate's checks the next run never keeps the old status checks: it compiles the new ones, or reports the drift as &quot;AGSC-E707&quot; and overwrites nothing until the stale file is removed (AGSC-08-12)
+    Then each declared check becomes one named required status check in &quot;dist/forge/status-checks.json&quot; (<a class="ref" href="/specs/08-governance/#AGSC-08-09">AGSC-08-09</a>, <a class="ref" href="/specs/08-governance/#AGSC-08-12">AGSC-08-12</a>)
+    And &quot;dist/gate.json&quot; names the gate and its level (<a class="ref" href="/specs/08-governance/#AGSC-08-10">AGSC-08-10</a>)
+    And after a change to the Gate's checks the next run never keeps the old status checks: it compiles the new ones, or reports the drift as &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E707">AGSC-E707</a>&quot; and overwrites nothing until the stale file is removed (<a class="ref" href="/specs/08-governance/#AGSC-08-12">AGSC-08-12</a>)
 
-  @PRD-030
+  @<a class="ref" href="/docs/requirements/#PRD-030">PRD-030</a>
   Scenario: Team publishes its own specs as an instance of itself (should)
     When &quot;npx agentic-system-core build&quot; runs over the team's Bundle
     Then every published item of the team has its page, its Markdown view and its node in &quot;graph.jsonld&quot;
-    And the build names &quot;/specs/&quot; as the specification site's route, which a content node does not emit (AGSC-06-01)
-    And an item with &quot;status: draft&quot; is excluded from every page and every export (AGSC-06-30, AGSC-01-26)</code></pre>
+    And the build names &quot;/specs/&quot; as the specification site's route, which a content node does not emit (<a class="ref" href="/specs/06-surfaces/#AGSC-06-01">AGSC-06-01</a>)
+    And an item with &quot;status: draft&quot; is excluded from every page and every export (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-30">AGSC-06-30</a>, <a class="ref" href="/specs/01-bundle/#AGSC-01-26">AGSC-01-26</a>)</code></pre>
 <h3 id="persona-h-memory">persona-h-memory: Agent uses a node as external auditable memory</h3>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: PRD-022, PRD-026, PRD-027 · PLAN §5.2 ContentStore
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-022">PRD-022</a>, <a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a>, <a class="ref" href="/docs/requirements/#PRD-027">PRD-027</a> · PLAN §5.2 ContentStore
 @persona-h @mode-1
 Feature: Agent uses a node as external auditable memory
   As P8 (agent-as-memory, Mode 1)
@@ -432,54 +432,54 @@ Feature: Agent uses a node as external auditable memory
   Background:
     Given the read path reuses persona-c (MCP) and the write path reuses persona-d (proposer)
 
-  @PRD-026
+  @<a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a>
   Scenario: Agent exports the Bundle in three lossless forms
     Given the Bundle root carries the Content Use Terms as &quot;LICENSE-CONTENT&quot;
     When the agent runs &quot;npx agentic-system-core export --markdown&quot;
-    Then &quot;dist/export/markdown/&quot; contains the lint-normalized Bundle with no key lost (AGSC-01-26)
+    Then &quot;dist/export/markdown/&quot; contains the lint-normalized Bundle with no key lost (<a class="ref" href="/specs/01-bundle/#AGSC-01-26">AGSC-01-26</a>)
     When the agent runs &quot;npx agentic-system-core export --okf&quot;
     Then &quot;dist/export/okf/content/index.md&quot; carries &quot;okf_version&quot; and a &quot;content/log.md&quot; is added
     When the agent runs &quot;npx agentic-system-core export --jsonld&quot;
     Then &quot;dist/export/graph.jsonld&quot; equals &quot;www/graph.jsonld&quot; byte-for-byte
 
-  @PRD-026
+  @<a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a>
   Scenario: Exported Markdown Bundle opens unchanged as an Obsidian vault
     Given &quot;dist/export/markdown/&quot; was produced by &quot;export --markdown&quot;
     When the folder is opened as an Obsidian vault
     Then no file requires modification to render correctly
 
-  @PRD-026
+  @<a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a>
   Scenario: Agent imports a foreign OKF bundle idempotently
     When the agent runs &quot;npx agentic-system-core import ./some-okf-bundle --from okf&quot;
     Then each file is written under the folder of its type, a &quot;procedure&quot; under &quot;content/procedures/&quot;
-    And an unknown &quot;type&quot; value is imported as &quot;concept&quot; with the warning &quot;AGSC-E506&quot;, the original kept as &quot;x-okf-type&quot; (AGSC-01-22)
+    And an unknown &quot;type&quot; value is imported as &quot;concept&quot; with the warning &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E506">AGSC-E506</a>&quot;, the original kept as &quot;x-okf-type&quot; (<a class="ref" href="/specs/01-bundle/#AGSC-01-22">AGSC-01-22</a>)
     And colliding slugs are deduplicated with a &quot;-2&quot; suffix
     And a second run writes nothing and reports every item unchanged
     And &quot;npx agentic-system-core lint&quot; finds no error in the imported items except a concept &quot;kind&quot; the foreign bundle never declared
 
-  @PRD-027
+  @<a class="ref" href="/docs/requirements/#PRD-027">PRD-027</a>
   Scenario: memory:// URIs are documented as an alias only, never resolved
     Given an item's slug is &quot;a2a&quot; in bundle &quot;agenticsystemcore&quot;
     When documentation shows &quot;memory://agenticsystemcore/a2a&quot;
     Then it is documented strictly as an alias of &quot;https://agenticsystemcore.com/concepts/a2a/&quot;
     And no code path resolves a &quot;memory://&quot; URI over the network or filesystem</code></pre>
 <h3 id="persona-i-maintainer">persona-i-maintainer: Maintainer-as-operator keeps the site green with zero maintenance</h3>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: PRD-005, PRD-044, PRD-045, PRD-048, PRD-049 · PLAN §7
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-005">PRD-005</a>, <a class="ref" href="/docs/requirements/#PRD-044">PRD-044</a>, <a class="ref" href="/docs/requirements/#PRD-045">PRD-045</a>, <a class="ref" href="/docs/requirements/#PRD-048">PRD-048</a>, <a class="ref" href="/docs/requirements/#PRD-049">PRD-049</a> · PLAN §7
 @persona-i @mode-0
 Feature: Maintainer-as-operator keeps the site green with zero maintenance
   As P9 (maintainer-as-operator)
   I want one identical pipeline locally and in CI, plus an unattended weekly refresh
   So that the site stays green with no manual publishing step beyond git writes
 
-  @PRD-049
+  @<a class="ref" href="/docs/requirements/#PRD-049">PRD-049</a>
   Scenario: Local ci and CI ci run the identical pipeline
     When the maintainer runs &quot;npx agentic-system-core ci&quot; locally
-    Then the pipeline runs lint, then build twice with a byte comparison, then verify, and writes &quot;dist/gate.json&quot; (AGSC-04-02, AGSC-08-10)
-    And the exit code is 0 on success, 1 on a failed gate, 2 on a usage error (AGSC-09-08)
+    Then the pipeline runs lint, then build twice with a byte comparison, then verify, and writes &quot;dist/gate.json&quot; (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-02">AGSC-04-02</a>, <a class="ref" href="/specs/08-governance/#AGSC-08-10">AGSC-08-10</a>)
+    And the exit code is 0 on success, 1 on a failed gate, 2 on a usage error (<a class="ref" href="/specs/09-conformance/#AGSC-09-08">AGSC-09-08</a>)
     When the same commit runs &quot;ci&quot; in a fresh clone, as the shipped GitHub Action does with &quot;contents: read&quot;
     Then the exit code and &quot;dist/gate.json&quot; match the local run exactly
 
-  @PRD-005
+  @<a class="ref" href="/docs/requirements/#PRD-005">PRD-005</a>
   Scenario: Every build/ci run derives the whole verifiable ledger
     When &quot;agsc build&quot; or &quot;agsc ci&quot; completes successfully
     Then &quot;ledger.jsonl&quot; is recomputed from git history into the build output as lines &quot;{ts, kind, ref, actor, prev, hash}&quot;
@@ -490,7 +490,7 @@ Feature: Maintainer-as-operator keeps the site green with zero maintenance
     And the recomputed head equals the &quot;agsc-ledger-head&quot; attribute of the &quot;…rel#ledger&quot; link in the well-known file
     And tampering with any one line, or truncating the tail, makes &quot;verify --ledger&quot; fail
 
-  @PRD-044
+  @<a class="ref" href="/docs/requirements/#PRD-044">PRD-044</a>
   Scenario: The weekly refresh job reaches no network and never commits
     Given the cron &quot;29 5 * * 0&quot; fires &quot;refresh.yml&quot;
     When &quot;agsc build&quot; runs over the Bundle
@@ -500,46 +500,46 @@ Feature: Maintainer-as-operator keeps the site green with zero maintenance
     And it never creates a commit
     And running it again with unchanged findings is idempotent (no duplicate issue)
 
-  @PRD-048
+  @<a class="ref" href="/docs/requirements/#PRD-048">PRD-048</a>
   Scenario: The maintainer cuts a release and the packages publish with attestations
     When the maintainer pushes a tag &quot;v1.0.0&quot;
     Then &quot;release.yml&quot; runs on Node 24 with &quot;id-token: write&quot; and &quot;attestations: write&quot;
     And &quot;agentic-system-core&quot; (bin &quot;agsc&quot;) and the &quot;agsc-cli&quot; alias publish via npm trusted publishing
     And both packages carry &quot;actions/attest&quot; provenance
 
-  @PRD-045
+  @<a class="ref" href="/docs/requirements/#PRD-045">PRD-045</a>
   Scenario: Restore-from-zero reproduces the site from a bare clone
     When the maintainer clones the content repo fresh
     And runs &quot;npx agentic-system-core ci&quot;
     Then the rebuilt &quot;www/&quot; is byte-identical to the last published deploy
-    And the weekly attested snapshot and the per-release Zenodo deposit remain available as fallbacks</code></pre>
+    And the per-release Zenodo deposit remains available as a fallback</code></pre>
 <h3 id="persona-j-standards">persona-j-standards: Standards implementer adopts the discovery format on their own site</h3>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: PRD-024, PRD-025, PRD-050 · PLAN §7 (w3id conneg)
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a>, <a class="ref" href="/docs/requirements/#PRD-025">PRD-025</a>, <a class="ref" href="/docs/requirements/#PRD-050">PRD-050</a> · PLAN §7 (w3id conneg)
 @persona-j @mode-1
 Feature: Standards implementer adopts the discovery format on their own site
   As P11 (standards implementer)
   I want one well-known discovery file with an RFC 9264 linkset and content negotiation for the vocabulary
   So that I can adopt the pattern on my own site using only static files, no server code
 
-  @PRD-024
+  @<a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a>
   Scenario: Implementer discovers the linkset via the well-known URI
     When the implementer reads &quot;/.well-known/knowledge-linkset&quot; and the headers &quot;_headers&quot; serves it with
-    Then it is served as &quot;application/linkset+json&quot; with profile &quot;https://w3id.org/agentic-system-core/profile/agentic-knowledge&quot; and &quot;linkset&quot; is its sole top-level member (AGSC-06-17, AGSC-06-08)
+    Then it is served as &quot;application/linkset+json&quot; with profile &quot;https://w3id.org/agentic-system-core/profile/agentic-knowledge&quot; and &quot;linkset&quot; is its sole top-level member (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-17">AGSC-06-17</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>)
     And it is a RFC 9264 linkset with &quot;anchor&quot; equal to the site base
     And it links &quot;describedby&quot; to &quot;/graph.jsonld&quot;
     And it links relation &quot;https://w3id.org/agentic-system-core/rel#graph&quot; to &quot;/graph.nq&quot; and to &quot;/graph.ttl&quot;
-    And it links relation &quot;…rel#context&quot; to &quot;/ns/context.jsonld&quot;, and carries no &quot;…rel#ontology&quot; link, because a content node does not serve the vocabulary (AGSC-06-10)
+    And it links relation &quot;…rel#context&quot; to &quot;/ns/context.jsonld&quot;, and carries no &quot;…rel#ontology&quot; link, because a content node does not serve the vocabulary (<a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>)
     And it links relation &quot;…rel#now&quot; to &quot;/now.md&quot; and &quot;…rel#skills&quot; to &quot;/skills/index.json&quot;
     And it links &quot;alternate&quot; to &quot;/llms.txt&quot;, and every target on the node's own origin is a file the build emitted
 
-  @PRD-024
+  @<a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a>
   Scenario: Implementer verifies the link-set integrity attributes
     When the implementer reads the &quot;describedby&quot; link to &quot;/graph.jsonld&quot; inside &quot;/.well-known/knowledge-linkset&quot;
     Then it carries &quot;agsc-spec-version&quot;, &quot;agsc-generated-at&quot;, &quot;agsc-counts&quot; and &quot;agsc-bundle-hash&quot;, every value an array
     And the &quot;…rel#graph&quot; and &quot;…rel#ledger&quot; links each carry a &quot;digest&quot; of the form &quot;sha-256=:&lt;base64&gt;:&quot;
     And &quot;agsc-generated-at&quot; derives from &quot;SOURCE_DATE_EPOCH&quot;, never the wall clock
 
-  @PRD-050
+  @<a class="ref" href="/docs/requirements/#PRD-050">PRD-050</a>
   Scenario: Implementer content-negotiates the vocabulary via w3id
     When the implementer requests &quot;https://w3id.org/agentic-system-core/ns#Concept&quot; with &quot;Accept: text/turtle&quot;
     Then w3id's &quot;.htaccess&quot; issues a 303 redirect to &quot;/ns/agsc.ttl&quot;
@@ -549,21 +549,21 @@ Feature: Standards implementer adopts the discovery format on their own site
     Then the response is the &quot;/ns/&quot; HTML index
     And every redirect target is same-origin, never an open redirect
 
-  @PRD-025
+  @<a class="ref" href="/docs/requirements/#PRD-025">PRD-025</a>
   Scenario: Implementer falls back to llms.txt without any RDF tooling
     When the implementer fetches &quot;/llms.txt&quot;
     Then every published item is reachable from the listed links
     And no authentication or API key is required
 
-  @PRD-054
+  @<a class="ref" href="/docs/requirements/#PRD-054">PRD-054</a>
   Scenario: Implementer validates the published artifacts with the shipped tools
     When the implementer runs &quot;the shipped validate-wellknown tool on https://agenticsystemcore.com/.well-known/knowledge-linkset&quot;
     Then it exits 0 and prints an agsc.diagnostics.v1 envelope with verb &quot;validate-wellknown&quot;
     And running it against a linkset carrying an unregistered short name exits 1</code></pre>
 <h3 id="persona-k-live-board">persona-k-live-board: Self-driving team — agents and people finish a project's tasks on one live board</h3>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: PRD-063, PRD-064, PRD-065 · spec/08 §8.6, spec/10 §10.6, spec/01 AGSC-01-36…38
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a>, <a class="ref" href="/docs/requirements/#PRD-064">PRD-064</a>, <a class="ref" href="/docs/requirements/#PRD-065">PRD-065</a> · spec/08 §8.6, spec/10 §10.6, spec/01 <a class="ref" href="/specs/01-bundle/#AGSC-01-36">AGSC-01-36</a>…38
 # Source of truth: docs/PRD.md Amendment 8 and the rules named on each step
-@persona-k @mode-5 @PRD-063 @PRD-064 @PRD-065
+@persona-k @mode-5 @<a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a> @<a class="ref" href="/docs/requirements/#PRD-064">PRD-064</a> @<a class="ref" href="/docs/requirements/#PRD-065">PRD-065</a>
 Feature: Self-driving team — agents and people finish a project's tasks on one live board
   As P12 (a self-driving team of agents and people)
   I want a shared pull board that agents plan, claim and work on until it is done
@@ -575,81 +575,81 @@ Feature: Self-driving team — agents and people finish a project's tasks on one
     And a channel &quot;lane&quot; with author &quot;lane-bot&quot;, owner &quot;human:alice&quot; and publish &quot;auto&quot;
     And an agents[] entry &quot;worker&quot; of kind &quot;llm&quot; with tasks &quot;plan, claim, work, edit&quot; and types &quot;concept, episode, lesson&quot;, channel &quot;lane&quot;, budget_usd_month 5, enabled true
 
-  @PRD-064
+  @<a class="ref" href="/docs/requirements/#PRD-064">PRD-064</a>
   Scenario: An agent claims a task by proposing its working state
     When &quot;npx agentic-system-core refresh --agent worker&quot; runs
-    Then the agent opens a Proposal whose diff changes only task_state and modified of one task to &quot;TASK_STATE_WORKING&quot; (AGSC-10-17)
+    Then the agent opens a Proposal whose diff changes only task_state and modified of one task to &quot;TASK_STATE_WORKING&quot; (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-17">AGSC-10-17</a>)
     And the Proposal's items carry prov origin &quot;ai-generated&quot;, agent &quot;worker&quot;, the model and operator &quot;human:alice&quot;
-    And the Proposal contains one episode item with usage and outcome (AGSC-08-28 d)
-    And the auto-merge job merges it under every condition of AGSC-08-26 with the trailer &quot;Channel-Auto: lane&quot;
+    And the Proposal contains one episode item with usage and outcome (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a> d)
+    And the auto-merge job merges it under every condition of <a class="ref" href="/specs/08-governance/#AGSC-08-26">AGSC-08-26</a> with the trailer &quot;Channel-Auto: lane&quot;
     When &quot;npx agentic-system-core build&quot; runs
     Then &quot;/boards/sprint-1.json&quot; shows that task with state &quot;TASK_STATE_WORKING&quot; and claimed_by &quot;worker&quot;
 
-  @PRD-064
+  @<a class="ref" href="/docs/requirements/#PRD-064">PRD-064</a>
   Scenario: The board reaches done and the agent stops
     Given every task of &quot;sprint-1&quot; has been proposed to &quot;TASK_STATE_COMPLETED&quot; and merged
     When &quot;npx agentic-system-core build&quot; runs
     Then &quot;/boards/sprint-1.json&quot; carries done true
     When &quot;npx agentic-system-core refresh --agent worker&quot; runs
-    Then no Proposal is opened, because no board the agent may touch holds a claimable task (AGSC-10-17)
+    Then no Proposal is opened, because no board the agent may touch holds a claimable task (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-17">AGSC-10-17</a>)
 
-  @PRD-063
+  @<a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a>
   Scenario: The agent lane cannot reach the slow lane
     When the agent &quot;worker&quot; opens a Proposal that changes &quot;content/procedures/deploy.md&quot;
-    Then the Proposal is rejected with &quot;AGSC-E509&quot; before any lint runs (AGSC-08-28 c)
-    And a person, not the agent, is the only one who can change a procedure, a gate, a cluster or the configuration (AGSC-10-18)
+    Then the Proposal is rejected with &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E509">AGSC-E509</a>&quot; before any lint runs (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a> c)
+    And a person, not the agent, is the only one who can change a procedure, a gate, a cluster or the configuration (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-18">AGSC-10-18</a>)
 
-  @PRD-063
+  @<a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a>
   Scenario: The budget stops the lane for the month
     Given the episodes of &quot;worker&quot; this month sum to usage cost_usd 5
     When &quot;npx agentic-system-core refresh --agent worker&quot; runs
-    Then no model is called and the NOW page records the warning &quot;AGSC-E510&quot; (AGSC-08-28 e)
+    Then no model is called and the NOW page records the warning &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E510">AGSC-E510</a>&quot; (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a> e)
 
-  @PRD-063
+  @<a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a>
   Scenario: The build stays deterministic while the lane is non-deterministic
     Given the lane's Proposal claiming a task was merged with the trailer &quot;Channel-Auto: lane&quot;
     When &quot;npx agentic-system-core ci&quot; runs twice on the merged content
-    Then the two runs give the same verdict, two builds give byte-identical output, and no model or network call is reachable from lint, build, verify or ci (AGSC-08-30)
+    Then the two runs give the same verdict, two builds give byte-identical output, and no model or network call is reachable from lint, build, verify or ci (<a class="ref" href="/specs/08-governance/#AGSC-08-30">AGSC-08-30</a>)
     And &quot;npx agentic-system-core verify --ledger&quot; re-verifies the ledger, which records the lane's commit with mode &quot;auto&quot;
 
-  @PRD-065
+  @<a class="ref" href="/docs/requirements/#PRD-065">PRD-065</a>
   Scenario: The work-in-progress limit keeps the agent on one task
     Given &quot;worker&quot; already holds &quot;task-a&quot; in &quot;TASK_STATE_WORKING&quot; and max_claims is 1
     When &quot;worker&quot; proposes &quot;TASK_STATE_WORKING&quot; for &quot;task-b&quot; without completing &quot;task-a&quot;
-    Then the Proposal is rejected with &quot;AGSC-E511&quot; before any lint runs (AGSC-10-17)
+    Then the Proposal is rejected with &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E511">AGSC-E511</a>&quot; before any lint runs (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-17">AGSC-10-17</a>)
     When &quot;worker&quot; proposes &quot;TASK_STATE_COMPLETED&quot; for &quot;task-a&quot; and &quot;TASK_STATE_WORKING&quot; for &quot;task-b&quot; in one Proposal
     Then the Proposal is accepted and the board export shows &quot;task-b&quot; claimed_by &quot;worker&quot;
 
-  @PRD-065
+  @<a class="ref" href="/docs/requirements/#PRD-065">PRD-065</a>
   Scenario: A planner cannot flood the board
     Given max_new_items of &quot;worker&quot; is 20
     When &quot;worker&quot; opens a Proposal that creates 21 task concepts
-    Then the Proposal is rejected with &quot;AGSC-E511&quot; naming the count and the bound (AGSC-08-28 c)
+    Then the Proposal is rejected with &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E511">AGSC-E511</a>&quot; naming the count and the bound (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a> c)
 
-  @PRD-065
+  @<a class="ref" href="/docs/requirements/#PRD-065">PRD-065</a>
   Scenario: The node-wide cap and the .env file bound every model call
     Given agsc.config.json has budget.usd_month 10 and a .env file in the Bundle root with &quot;AGSC_BUDGET_USD_MONTH=4&quot;
     And the episodes of this month across every lane sum to usage cost_usd 4
     When &quot;npx agentic-system-core refresh --agent worker&quot; runs
-    Then no model is called and the NOW page records the warning &quot;AGSC-E510&quot; (AGSC-01-38, AGSC-08-25)
-    And &quot;npx agentic-system-core ci --json&quot; prints the override name &quot;AGSC_BUDGET_USD_MONTH&quot; and never its value (AGSC-01-37)
-    And a .env file tracked in the content branch is reported as &quot;AGSC-E403&quot;</code></pre>
+    Then no model is called and the NOW page records the warning &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E510">AGSC-E510</a>&quot; (<a class="ref" href="/specs/01-bundle/#AGSC-01-38">AGSC-01-38</a>, <a class="ref" href="/specs/08-governance/#AGSC-08-25">AGSC-08-25</a>)
+    And &quot;npx agentic-system-core ci --json&quot; prints the override name &quot;AGSC_BUDGET_USD_MONTH&quot; and never its value (<a class="ref" href="/specs/01-bundle/#AGSC-01-37">AGSC-01-37</a>)
+    And a .env file tracked in the content branch is reported as &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E403">AGSC-E403</a>&quot;</code></pre>
 <h3 id="persona-l-port-implementer">persona-l-port-implementer: Port implementer proves a second implementation conforms</h3>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: PRD-010, PRD-054, NFR-02 · spec/09 conformance, spec/10 Levels
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-010">PRD-010</a>, <a class="ref" href="/docs/requirements/#PRD-054">PRD-054</a>, <a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a> · spec/09 conformance, spec/10 Levels
 @persona-l @mode-1
 Feature: Port implementer proves a second implementation conforms
   As P10 (port implementer)
   I want the shipped checker and the shared vector set to judge my implementation, not the engine's code
   So that I can prove a port conforms from the specification's files alone
 
-  @PRD-054 @NFR-02
+  @<a class="ref" href="/docs/requirements/#PRD-054">PRD-054</a> @<a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a>
   Scenario: A Level-0 node written without the engine passes the shipped checker
     Given a publisher writes, without the engine, two Markdown items, &quot;graph.jsonld&quot;, &quot;llms.txt&quot; and &quot;/.well-known/knowledge-linkset&quot; with no digest and no &quot;agsc-*&quot; attribute
     When the port implementer runs the shipped &quot;validate-wellknown&quot; tool on that discovery file at Level 0
-    Then it exits 0 and reports &quot;pass&quot; (AGSC-10-02)
-    And the same file with a relation name that is neither registered nor an extension of the format exits 1 (AGSC-06-10)
+    Then it exits 0 and reports &quot;pass&quot; (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-02">AGSC-10-02</a>)
+    And the same file with a relation name that is neither registered nor an extension of the format exits 1 (<a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>)
 
-  @PRD-010 @NFR-02
+  @<a class="ref" href="/docs/requirements/#PRD-010">PRD-010</a> @<a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a>
   Scenario: The Python package's runner agrees with the engine on the shared vectors
     Given the Python checker package is checked out beside the engine
     When the port implementer runs the engine's &quot;conform&quot; and the Python package's &quot;run-vectors&quot; over the same &quot;tests/vectors/&quot;
@@ -658,7 +658,7 @@ Feature: Port implementer proves a second implementation conforms
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/scenarios.md">Propose an edit</a> — opens <code>site/docs/scenarios.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
 </footer>
 </body>
 </html>

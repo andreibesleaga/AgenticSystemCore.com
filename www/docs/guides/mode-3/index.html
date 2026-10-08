@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mode 3 guide: procedures as installable skills — AgenticSystemCore</title>
+<meta name="description" content="Guide to Mode 3 of AgenticSystemCore: procedures as installable skill packs with a lockfile, with every command and the lines it prints.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/guides/mode-3/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/guides/mode-3/">
+<meta property="og:title" content="Mode 3 guide: procedures as installable skills">
+<meta property="og:description" content="Guide to Mode 3 of AgenticSystemCore: procedures as installable skill packs with a lockfile, with every command and the lines it prints.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Mode 3 guide: procedures as installable skills","description":"Guide to Mode 3 of AgenticSystemCore: procedures as installable skill packs with a lockfile, with every command and the lines it prints.","url":"https://agenticsystemcore.com/docs/guides/mode-3/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Mode 3 guide: procedures as installable skills</h1>
+<p class="summary"><strong>Summary</strong>For a team with repeatable procedures: write a procedure, emit one skill pack per cluster with its lockfile, install it for an agent, publish it, and bring skills from elsewhere in.</p>
+<p><strong>Who it is for:</strong> a team whose procedures (how to cut a release, how to review a change)
+should be followed the same way by people and by coding agents, and someone who wants to
+bring skills written elsewhere into one checked place.</p>
+<p><strong>What you get:</strong> one skill pack per cluster, in the Agent Skills layout (<code>SKILL.md</code>),
+holding the cluster's procedures and the notes beside them; a lockfile with the SHA-256
+of every pack; one command that installs the packs into an agent's skill folder and
+refuses a pack that no longer matches its lock; the same packs published on the site;
+foreign skills brought in as procedures.</p>
+<p><strong>Read after:</strong> <a href="/docs/guides/mode-0/">Mode 0</a>. <strong>Next:</strong> <a href="/docs/guides/mode-4/">Mode 4</a>.</p>
+<p>---</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Node.js 22.13 or later, <code>git</code> with your name and e-mail set, a POSIX shell. Install once,
+in a working folder:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir agsc-work &amp;&amp; cd agsc-work
+npm install agentic-system-core
+export PATH=&quot;$PWD/node_modules/.bin:$PATH&quot;
+export ENGINE=&quot;$PWD/node_modules/agentic-system-core&quot;</code></pre>
+<p>Every command below was run on the package and printed the lines quoted under it
+(other lines are left out); the engine repository's test <code>tests/docs/guides.test.js</code> runs them again on every change.
+Write <code>human:&lt;your-id&gt;</code> wherever the files say <code>human:you</code>.</p>
+<h2 id="1-a-procedure-and-its-cluster">1. A procedure and its cluster</h2>
+<p>A <strong>procedure</strong> is a file under <code>content/procedures/</code> with three sections: <code>## When</code>
+(the situation), <code>## Steps</code> (numbered) and <code>## Checks</code> (how to know it worked), plus a
+one-line <code>when:</code> in its header. Its <code>clusters:</code> line names the pack it goes into. Here,
+one procedure and one note in the cluster <code>releasing</code>:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir -p my-skills/content/clusters my-skills/content/procedures my-skills/content/concepts &amp;&amp; cd my-skills
+cat &gt; content/clusters/releasing.md &lt;&lt;'ITEM'
+---
+type: cluster
+title: Releasing
+description: How this team cuts and checks a release, as steps an agent can follow.
+prov:
+  origin: human
+  operator: human:you
+---
+
+# Releasing
+
+The procedures and notes for a release.
+ITEM
+cat &gt; content/procedures/cut-a-release.md &lt;&lt;'ITEM'
+---
+type: procedure
+title: Cut a release
+description: The steps that turn a green main branch into a tagged, published release.
+clusters:
+  - releasing
+prov:
+  origin: human
+  operator: human:you
+when: The main branch is green and the change log is written
+---
+
+## When
+
+The main branch is green and the change log names every change.
+
+## Steps
+
+1. Run the whole test suite once more.
+2. Set the version in the package file and the change log.
+3. Tag the release commit and push the tag.
+
+## Checks
+
+The tag points at a commit whose test run is green.
+ITEM
+cat &gt; content/concepts/semantic-versioning.md &lt;&lt;'ITEM'
+---
+type: concept
+title: Semantic versioning
+description: A version number in three parts, where each part says what kind of change a release holds.
+clusters:
+  - releasing
+prov:
+  origin: human
+  operator: human:you
+kind: explainer
+---
+
+# Semantic versioning
+
+Major for a breaking change, minor for a new feature, patch for a fix.
+ITEM
+agsc init &gt; /dev/null
+mkdir -p .well-known &amp;&amp; printf 'Contact: mailto:security@example.org\n' &gt; .well-known/security.txt
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'release skills'
+agsc lint</code></pre>
+<pre tabindex="0" data-lang="text"><code>lint: pass (0 error, 1 warn)</code></pre>
+<h2 id="2-emit-the-packs">2. Emit the packs</h2>
+<pre tabindex="0" data-lang="bash"><code>agsc skills
+grep -E '^(name|description):|^- (members|item):' dist/skills/releasing/SKILL.md</code></pre>
+<pre tabindex="0" data-lang="text"><code>skills: 1 pack under dist/skills/ (one per Cluster, AGSC-07-19; index.json is the lockfile of AGSC-07-20)
+name: releasing
+description: How this team cuts and checks a release, as steps an agent can follow.
+- members: 2
+- item: http://localhost/procedures/cut-a-release/
+- item: http://localhost/concepts/semantic-versioning/</code></pre>
+<p>One pack per cluster, named after it, holding <strong>every</strong> published item of the cluster —
+the procedure, which is the part an agent follows, and the note beside it. Each item is
+quoted as data in a fenced block; a pack holds no scripts and no links to run.
+<code>dist/skills/index.json</code> is the lockfile: the SHA-256 of each pack file.</p>
+<h2 id="3-install-them-for-an-agent">3. Install them for an agent</h2>
+<pre tabindex="0" data-lang="bash"><code>agsc skills install .claude/skills
+agsc skills install .claude/skills</code></pre>
+<pre tabindex="0" data-lang="text"><code>skills install: 1 written, 0 unchanged under .claude/skills (AGSC-07-21; the lockfile of index.json was verified first)
+skills install: 0 written, 1 unchanged under .claude/skills (AGSC-07-21; the lockfile of index.json was verified first)</code></pre>
+<p>Use <code>.claude/skills</code> for Claude Code, <code>.agents/skills</code> (the default) or
+<code>.github/skills</code>. The second run writes nothing. If a pack was changed after it was
+emitted, nothing is installed: <code>skills install: nothing was installed — a pack does not match its lockfile (AGSC-07-20)</code>.</p>
+<h2 id="4-publish-them">4. Publish them</h2>
+<p><code>agsc build</code> serves the packs at <code>/skills/&lt;cluster&gt;/SKILL.md</code> with the lockfile at
+<code>/skills/index.json</code>, so an agent that downloads a pack can check it:</p>
+<pre tabindex="0" data-lang="bash"><code>agsc build
+node -e 'const c = require(&quot;node:crypto&quot;), f = require(&quot;node:fs&quot;); const i = JSON.parse(f.readFileSync(&quot;www/skills/index.json&quot;, &quot;utf8&quot;)); const p = i.packs.find((x) =&gt; x.name === &quot;releasing&quot;); console.log(&quot;served file equals its lock:&quot;, c.createHash(&quot;sha256&quot;).update(f.readFileSync(&quot;www/skills/releasing/SKILL.md&quot;)).digest(&quot;hex&quot;) === p.lock[&quot;SKILL.md&quot;]);'</code></pre>
+<pre tabindex="0" data-lang="text"><code>build: pass (0 error, 1 warn)
+served file equals its lock: true</code></pre>
+<h2 id="5-bring-skills-in">5. Bring skills in</h2>
+<p>A folder of skills in the Agent Skills layout (one <code>SKILL.md</code> per skill, as many public
+collections are) comes in as procedures in a cluster you name. The package carries a
+one-skill example; use your own folder the same way:</p>
+<pre tabindex="0" data-lang="bash"><code>agsc import --from skills --list &quot;$ENGINE/examples/demos/mode-3-skills/foreign&quot;
+agsc import &quot;$ENGINE/examples/demos/mode-3-skills/foreign&quot; --from skills --cluster releasing
+agsc skills &gt; /dev/null
+grep '^- item:' dist/skills/releasing/SKILL.md</code></pre>
+<pre tabindex="0" data-lang="text"><code>skills: [agentskills] skill plain-notes plain-notes/SKILL.md licence Apache-2.0 (license key) -&gt; importable
+import: 1 written, 0 replaced, 0 unchanged
+- item: http://localhost/procedures/plain-notes/</code></pre>
+<p><code>--list</code> shows what would come in and under which licence, and writes nothing. The
+imported file keeps its own licence (<code>x-skills-license</code>) and is marked
+<code>origin: imported</code>; read it before you commit it. A pack this format emitted goes back
+into its items with <code>agsc skills import &lt;file&gt;</code>
+(<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/DEMOS.md#mode-3--the-evolving-skills-library">DEMOS.md</a> shows it).</p>
+<h2 id="what-next">What next</h2>
+<ul>
+<li>Put procedures and concepts together into a starting harness: <a href="/docs/guides/mode-4/">Mode 4</a>.</li>
+<li>Every route a skill pack takes into an agent: <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONNECTORS.md#route-2--skill-packs">CONNECTORS.md</a>.</li>
+</ul>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/guides/mode-3.md">Propose an edit</a> — opens <code>site/docs/guides/mode-3.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>

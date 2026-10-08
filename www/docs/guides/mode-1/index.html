@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mode 1 guide: memory for an assistant, and nodes that check each other — AgenticSystemCore</title>
+<meta name="description" content="Guide to Mode 1 of AgenticSystemCore: a local tool server for an assistant and two nodes that check each other, with every command and the lines it prints.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/guides/mode-1/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/guides/mode-1/">
+<meta property="og:title" content="Mode 1 guide: memory for an assistant, and nodes that check each other">
+<meta property="og:description" content="Guide to Mode 1 of AgenticSystemCore: a local tool server for an assistant and two nodes that check each other, with every command and the lines it prints.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Mode 1 guide: memory for an assistant, and nodes that check each other","description":"Guide to Mode 1 of AgenticSystemCore: a local tool server for an assistant and two nodes that check each other, with every command and the lines it prints.","url":"https://agenticsystemcore.com/docs/guides/mode-1/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Mode 1 guide: memory for an assistant, and nodes that check each other</h1>
+<p class="summary"><strong>Summary</strong>For a developer connecting an AI assistant, and for two publishers: the local tool server and its seven tools, two nodes that name and check each other, and how to verify a published node by hand.</p>
+<p><strong>Who it is for:</strong> a developer who wants an AI assistant to search, read and cite a
+folder of notes; two publishers who want their nodes to name and check each other; an
+agent, or its operator, reading someone else's node.</p>
+<p><strong>What you get:</strong> a local tool server, <code>agsc mcp</code>, with seven tools over your Bundle —
+<code>search</code>, <code>read</code>, <code>links</code>, <code>compose</code>, <code>ask</code>, <code>propose</code>, <code>remember</code> — that runs on your
+computer, needs no key and writes nothing; two nodes that list each other as peers and a
+shipped checker that confirms it; the commands to verify any published node by hand.</p>
+<p><strong>Read after:</strong> <a href="/docs/guides/mode-0/">Mode 0</a>. <strong>Next:</strong> <a href="/docs/guides/mode-2/">Mode 2</a>.</p>
+<p>---</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Node.js 22.13 or later, <code>git</code> with your name and e-mail set, a POSIX shell. Install once,
+in a working folder:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir agsc-work &amp;&amp; cd agsc-work
+npm install agentic-system-core
+export PATH=&quot;$PWD/node_modules/.bin:$PATH&quot;
+export ENGINE=&quot;$PWD/node_modules/agentic-system-core&quot;</code></pre>
+<p>Every command below was run on the package and printed the lines quoted under it
+(other lines are left out); the engine repository's test <code>tests/docs/guides.test.js</code> runs them again on every change.</p>
+<h2 id="1-a-bundle-with-two-items">1. A Bundle with two items</h2>
+<p>The Bundle from <a href="/docs/guides/mode-0/">Mode 0</a> works. To follow along, write two items by hand —
+this is the whole format of an item: a header between <code>---</code> lines, then Markdown. The
+<code>related:</code> line is a <strong>typed link</strong>, which the graph and the tools follow:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir -p node-a/content/concepts &amp;&amp; cd node-a
+cat &gt; content/concepts/handoff.md &lt;&lt;'ITEM'
+---
+type: concept
+title: Handoff
+description: Passing work and its context from one agent to another, with a record of why it moved.
+prov:
+  origin: human
+  operator: human:you
+kind: explainer
+related:
+  - supervisor
+---
+
+# Handoff
+
+The sending agent writes what it knows, names the receiver, and stops acting.
+ITEM
+cat &gt; content/concepts/supervisor.md &lt;&lt;'ITEM'
+---
+type: concept
+title: Supervisor
+description: An agent that splits a task into parts and hands each part to another agent.
+prov:
+  origin: human
+  operator: human:you
+kind: explainer
+---
+
+# Supervisor
+
+It keeps the plan and checks each result before the next handoff.
+ITEM
+agsc init &gt; /dev/null
+mkdir -p .well-known &amp;&amp; printf 'Contact: mailto:security@example.org\n' &gt; .well-known/security.txt
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'start'
+agsc lint</code></pre>
+<pre tabindex="0" data-lang="text"><code>lint: pass (0 error, 1 warn)</code></pre>
+<p><code>init</code> found the two items already in place and wrote only the configuration and the
+home page. Write <code>human:&lt;your-id&gt;</code> instead of <code>human:you</code>.</p>
+<h2 id="2-connect-an-assistant">2. Connect an assistant</h2>
+<p>Your assistant starts the tool server itself. For Claude Code, from inside the Bundle:</p>
+<pre tabindex="0" data-lang="bash"><code>claude mcp add --transport stdio my-notes -- npx -y agsc-cli mcp</code></pre>
+<p>For an assistant that has no project folder (Claude Desktop), give the folder as an
+argument instead: <code>&quot;command&quot;: &quot;npx&quot;, &quot;args&quot;: [&quot;-y&quot;, &quot;agsc-cli&quot;, &quot;mcp&quot;, &quot;/path/to/node-a&quot;]</code>.
+The setup for Claude Desktop, Cursor, VS Code and Codex CLI is in
+<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md#5-setting-it-up">USING-WITH-ASSISTANTS.md</a>.</p>
+<p>To see what the assistant sees without one, the package has a small script that starts
+<code>agsc mcp</code>, makes one tool call and prints the answer:</p>
+<pre tabindex="0" data-lang="bash"><code>node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; ask '{&quot;question&quot;:&quot;who splits a task into parts&quot;}'
+node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; links '{&quot;slug&quot;:&quot;handoff&quot;}'</code></pre>
+<pre tabindex="0" data-lang="text"><code>  &quot;body&quot;: &quot;An agent that splits a task into parts and hands each part to another agent. Content Use Terms: LicenseRef-AgenticSystemCore-Content-Use-1.0.&quot;,
+    &quot;http://localhost/concepts/supervisor/&quot;
+  &quot;trust&quot;: &quot;untrusted&quot;,
+  &quot;type&quot;: &quot;answer&quot;
+        &quot;key&quot;: &quot;related&quot;,
+        &quot;target&quot;: &quot;supervisor&quot;</code></pre>
+<p>What to know about the answers:</p>
+<ul>
+<li><code>ask</code> calls no model. It returns the <strong>descriptions</strong> of the best-matching items with
+their addresses as citations, so good one-line descriptions give good answers.</li>
+<li>Every tool result is marked <code>&quot;trust&quot;: &quot;untrusted&quot;</code>: the text of a node is data for the
+assistant to read, never an instruction to follow.</li>
+<li><code>propose</code> and <code>remember</code> return prepared text; nothing is written. <code>remember</code> needs
+the accountable person (<code>&quot;operator&quot;: &quot;human:&lt;your-id&gt;&quot;</code>) or a declared agent lane.
+To cite a single chunk by its id, read <code>/chunks.jsonl</code> of the built site; the tools
+cite whole items by address.</li>
+</ul>
+<h2 id="3-two-nodes-that-check-each-other">3. Two nodes that check each other</h2>
+<p>Make a second node, give both a real address, and let each list the other as a peer
+(<code>peers</code> in <code>agsc.config.json</code>, one discovery address per peer). The small script below
+makes that edit; editing the two files by hand does the same:</p>
+<pre tabindex="0" data-lang="bash"><code>cd ..
+cp -r node-a node-b
+cat &gt; set-node.js &lt;&lt;'JS'
+// usage: node set-node.js &lt;bundle folder&gt; &lt;its https address&gt; &lt;the peer's https address&gt;
+const fs = require('node:fs');
+const [dir, base, peer] = process.argv.slice(2);
+const file = `${dir}/agsc.config.json`;
+const config = JSON.parse(fs.readFileSync(file, 'utf8'));
+config.bundle.id = dir;
+config.site.base = base;
+config.peers = [`${peer}.well-known/knowledge-linkset`];
+fs.writeFileSync(file, `${JSON.stringify(config, null, 2)}\n`);
+JS
+node set-node.js node-a https://a.example/ https://b.example/
+node set-node.js node-b https://b.example/ https://a.example/
+(cd node-a &amp;&amp; git commit -qam 'peer b' &amp;&amp; agsc build &gt; /dev/null)
+(cd node-b &amp;&amp; git commit -qam 'peer a' &amp;&amp; agsc build &gt; /dev/null)
+node &quot;$ENGINE/tools/validate-wellknown&quot; node-a/www/.well-known/knowledge-linkset --level 2 --peer node-b/www/.well-known/knowledge-linkset</code></pre>
+<pre tabindex="0" data-lang="text"><code>validate-wellknown pass (level 2): 22 input file(s) read, 0 error(s), 0 warning(s)</code></pre>
+<p>The checker reads both discovery documents, recomputes every digest they declare, and
+confirms that each names the other. If only one side lists the other, it fails with
+<code>resolved, not mutual</code>. Nodes never call each other: a client reads both.</p>
+<h2 id="4-read-a-published-node-by-hand">4. Read a published node by hand</h2>
+<p>This needs the network. The discovery document of any node is at one address:</p>
+<pre tabindex="0" data-lang="bash"><code>curl -s https://agenticsystemcore.com/.well-known/knowledge-linkset
+curl -s https://agenticsystemcore.com/llms.txt | openssl dgst -sha256 -binary | base64
+node &quot;$ENGINE/tools/validate-wellknown&quot; https://agenticsystemcore.com/.well-known/knowledge-linkset --level 2 --peer https://patterns.agenticsystemcore.com/.well-known/knowledge-linkset</code></pre>
+<p>The second line prints the same value the discovery document gives for <code>llms.txt</code>
+(<code>sha-256=:&lt;that value&gt;:</code>). On 6 October 2026 the third printed
+<code>validate-wellknown pass (level 2): 26 input file(s) read, 0 error(s), 0 warning(s)</code>.</p>
+<h2 id="5-take-the-memory-elsewhere">5. Take the memory elsewhere</h2>
+<p>Exports carry the licence of the prose with them, so copy the licence text in first
+(or name another licence in <code>bundle.license_prose</code>):</p>
+<pre tabindex="0" data-lang="bash"><code>cd node-a
+cp &quot;$ENGINE/LICENSE-CONTENT&quot; . &amp;&amp; git add LICENSE-CONTENT &amp;&amp; git commit -qm 'content terms'
+agsc export --okf
+agsc export --to llm-context
+ls dist/export/okf dist/export/llm-context</code></pre>
+<pre tabindex="0" data-lang="text"><code>export --okf: 5 files under dist/export/okf/ (AGSC-01-26; the export root carries LICENSE-CONTENT)
+LICENSE-CONTENT
+content
+llms-ctx.txt
+chunks-index.toon</code></pre>
+<p>The first is the Bundle itself, ready to be read back with <code>agsc import --from okf</code>; the
+second is one text file and one compact index for a model's context window.</p>
+<p><code>agsc export --to cogx</code> writes the memory archive that Cognee reads; the routes for
+other agent frameworks are in <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONNECTORS.md">CONNECTORS.md</a>.</p>
+<h2 id="what-next">What next</h2>
+<ul>
+<li>Turn a project's decisions, specifications and tasks into the same kind of memory:
+<a href="/docs/guides/mode-2/">Mode 2</a>.</li>
+<li>Everything the tool server does and never does: <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md">USING-WITH-ASSISTANTS.md</a>.</li>
+<li>Walking several nodes and joining their graphs is a library function at 1.0
+(<code>src/boundary/federation.js</code>), not a command; <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USE-CASES.md#d2--a-client-that-walks-a-neighbourhood">USE-CASES.md</a> says what it does.</li>
+</ul>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/guides/mode-1.md">Propose an edit</a> — opens <code>site/docs/guides/mode-1.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>

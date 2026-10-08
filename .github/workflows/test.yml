@@ -20,12 +20,13 @@
 #              repository's git log. A pull request builds its head commit, not the
 #              merge commit GitHub synthesises, for the same reason.
 #   Browser    the accessibility lane (`scripts/a11y.js`: axe-core over every page in
-#              both colour schemes, CSP, third-party requests, keyboard checks) needs
+#              both colour schemes at a desktop and a phone width, each file with the
+#              content type `_headers` gives it, CSP, third-party requests, keyboard
+#              checks) needs
 #              a browser and two packages installed outside the repository, so it
 #              runs only on request: a manual run with `a11y` ticked, or the
 #              repository variable AGSC_A11Y set to `true`.
-#   Secrets    ENGINE_TOKEN only, and only while the engine repository is private
-#              (see the engine checkout); once it is public none is needed.
+#   Secrets    none. The engine repository is public, so the default token reads it.
 #              Permissions: read the repositories, nothing else.
 #
 # Every action is pinned to a commit SHA with the version beside it — the SHAs the
@@ -73,12 +74,6 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: andreibesleaga/agentic-system-core
-          # While the engine repository is private, another repository's default
-          # token cannot read it, and the maintainer
-          # stores a fine-grained token with read access to the engine's contents
-          # as the repository secret ENGINE_TOKEN. Once the engine is public the
-          # default token suffices and the secret may be deleted.
-          token: ${{ secrets.ENGINE_TOKEN || github.token }}
           ref: ${{ inputs.engine_ref || env.ENGINE_REF }}
           path: agentic-system-core
           fetch-depth: 0
@@ -120,7 +115,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/a11y"
           cd "$RUNNER_TEMP/a11y"
           npm i --no-save --no-audit --no-fund playwright-core@1.62.1 axe-core@4.13.0
-      - name: axe-core over every page of the committed output, both colour schemes
+      - name: axe-core over every page of the committed output, both colour schemes, desktop and phone width
         working-directory: AgenticSystemCore.com
         shell: bash
         env:

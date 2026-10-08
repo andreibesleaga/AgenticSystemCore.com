@@ -14,7 +14,7 @@
 <meta property="og:url" content="https://agenticsystemcore.com/specs/mcp/">
 <meta property="og:title" content="MCP knowledge extension">
 <meta property="og:description" content="The reference text of com.agenticsystemcore/knowledge, the unofficial Model Context Protocol extension by which a server says that the knowledge it serves is also published as a static Bundle.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"MCP knowledge extension","url":"https://agenticsystemcore.com/specs/mcp/","identifier":"com.agenticsystemcore/knowledge","version":"1.0.0-rc.6","license":"https://www.apache.org/licenses/LICENSE-2.0","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/specs/"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"MCP knowledge extension","url":"https://agenticsystemcore.com/specs/mcp/","identifier":"com.agenticsystemcore/knowledge","version":"1.0.0-rc.7","license":"https://www.apache.org/licenses/LICENSE-2.0","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/specs/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
 <script src="/compose/webmcp.js" defer></script>
@@ -45,9 +45,9 @@
 <h2 id="status-heading">Status</h2>
 <dl class="meta">
 <dt>Extension identifier</dt><dd><code>com.agenticsystemcore/knowledge</code></dd>
-<dt>Protocol revision</dt><dd>Model Context Protocol <code>2026-07-28</code></dd>
+<dt>Protocol revision</dt><dd>Model Context Protocol <code>2026-07-28</code>, the revision this text is written against; the reference engine's tool server, <code>agsc mcp</code>, speaks the earlier revision <code>2025-11-25</code></dd>
 <dt>Standing</dt><dd>An unofficial extension under MCP SEP-2133, which says that "Unofficial extensions are not recognized by MCP governance and may be introduced and governed by developers outside the MCP organization". It needs no permission and has no registry entry, and it has not been submitted as an MCP SEP.</dd>
-<dt>Specification</dt><dd><code>1.0.0-rc.6</code>, a release candidate. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
+<dt>Specification</dt><dd><code>1.0.0-rc.7</code>, a release candidate. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
 <dt>This node</dt><dd>Does not declare the <code>mcp</code> surface: no tool server is published yet (<a class="ref" href="/specs/11-boundary/#AGSC-11-16">AGSC-11-16</a>).</dd>
 </dl>
 </section>
@@ -55,7 +55,7 @@
 <p>A connected client can list a server's tools. It cannot tell from the protocol whether the same content also exists as files it could fetch, cache, compare and verify without the server, nor check that a tool result matches what the publisher published. A server declaring this extension answers both questions: its knowledge is also published as a Bundle, and here is that Bundle's discovery document. The extension adds no method, no primitive and no message to the base protocol.</p>
 <h2 id="how-a-server-declares-it">How a server declares it</h2>
 <p>MCP carries optional extensions in the capabilities a party reports. The protocol says: &quot;Extensions are advertised in the <code>extensions</code> field of capabilities, which is a map of extension identifiers to per-extension settings objects&quot; (Model Context Protocol, <em>Versioning and Compatibility</em>, revision <code>2026-07-28</code>). A server declaring this extension puts the identifier in that map (<a class="ref" href="/specs/11-boundary/#AGSC-11-18">AGSC-11-18</a>).</p>
-<p>Under that revision there is no moment at which the two sides agree on extensions once and for all. The same page says &quot;There is no negotiation handshake. Every request carries its protocol version, and the server accepts or rejects each request independently&quot;, and &quot;Servers <strong>MUST</strong> implement <code>server/discover</code>&quot;. So a server declaring this extension carries the identifier in the capabilities of its <code>server/discover</code> result and in the capabilities it reports per request; an <code>initialize</code> handshake belongs to the earlier revisions the same page calls legacy.</p>
+<p>Under that revision there is no moment at which the two sides agree on extensions once and for all. The same page says &quot;There is no negotiation handshake. Every request carries its protocol version, and the server accepts or rejects each request independently&quot;, and &quot;Servers <strong>MUST</strong> implement <code>server/discover</code>&quot;. So a server declaring this extension carries the identifier in the capabilities of its <code>server/discover</code> result and in the capabilities it reports per request; an <code>initialize</code> handshake belongs to the earlier revisions the same page calls legacy. The reference engine's own tool server, <code>agsc mcp</code>, is built on the official MCP SDK, which speaks the earlier revision <code>2025-11-25</code>: it declares the extension in the capabilities of its <code>initialize</code> result, and it answers <code>server/discover</code> with &quot;Method not found&quot;.</p>
 <p>The settings object has exactly one member, <code>linkset</code>: the absolute <code>https</code> URL of the server's <code>/.well-known/knowledge-linkset</code>. A server must emit that member and must emit no other. That document is served as <code>application/linkset+json</code> with the profile <code>https://w3id.org/agentic-system-core/profile/agentic-knowledge</code> (<a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-04">AGSC-11-04</a>), and the <a href="/specs/agentic-knowledge/">profile page</a> documents its shape. The specification pins the object and the way it is carried, and two conformance vectors hold the bytes (<a class="ref" href="/specs/11-boundary/#AGSC-11-18">AGSC-11-18</a>).</p>
 <pre tabindex="0" data-lang="json"><code>{
   &quot;capabilities&quot;: {
@@ -75,7 +75,7 @@
 <tr><td><code>search</code></td><td>Items matching a query, from the node's own index.</td></tr>
 <tr><td><code>read</code></td><td>One item, by its identifier.</td></tr>
 <tr><td><code>links</code></td><td>The typed links of one item.</td></tr>
-<tr><td><code>compose</code></td><td>The verdict and the Harness for a selection of items.</td></tr>
+<tr><td><code>compose</code></td><td>The verdict for a selection of items (<a class="ref" href="/specs/07-composition/#AGSC-07-09">AGSC-07-09</a>); the Harness files themselves are written by <code>agsc compose</code> or offered by the compose page.</td></tr>
 <tr><td><code>propose</code></td><td>A proposal for review; it writes no content.</td></tr>
 <tr><td><code>ask</code></td><td>An answer over the published exports, citing at least one item.</td></tr>
 <tr><td><code>remember</code></td><td>A proposal that records one new item; it writes no content.</td></tr>
@@ -95,7 +95,7 @@
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/mcp-extension.md">Propose an edit</a> — opens <code>site/mcp-extension.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
 </footer>
 </body>
 </html>

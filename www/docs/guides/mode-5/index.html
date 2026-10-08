@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mode 5 guide: the live board — AgenticSystemCore</title>
+<meta name="description" content="Guide to Mode 5 of AgenticSystemCore: the live board with agent lanes, claims as proposals and their limits, with every command and the lines it prints.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/guides/mode-5/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/guides/mode-5/">
+<meta property="og:title" content="Mode 5 guide: the live board">
+<meta property="og:description" content="Guide to Mode 5 of AgenticSystemCore: the live board with agent lanes, claims as proposals and their limits, with every command and the lines it prints.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Mode 5 guide: the live board","description":"Guide to Mode 5 of AgenticSystemCore: the live board with agent lanes, claims as proposals and their limits, with every command and the lines it prints.","url":"https://agenticsystemcore.com/docs/guides/mode-5/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Mode 5 guide: the live board</h1>
+<p class="summary"><strong>Summary</strong>For people and agents sharing tasks: a board, an agent lane declared with its owner, budget and limits, a claim made as a proposal and accepted by a person, and the refusals that keep the board honest.</p>
+<p><strong>Who it is for:</strong> a team of people and agents working through a project's tasks
+together, who want every claim, change and decision to stay reviewable, and someone who
+wants to see how an agent lane is declared before connecting a model.</p>
+<p><strong>What you get:</strong> a board per cluster (<code>/boards/&lt;name&gt;.json</code> and a page) that says which
+tasks are open, who holds which, and whether the board is done; <strong>agent lanes</strong> declared
+in the configuration, each with its owner, its budget and its limit of tasks held at once;
+claims made as proposals (the tool server returns a patch and writes nothing) that take
+effect only when a person commits them; refusals for a task already held and for a lane
+over its limit. No model adapter ships with the engine: an agent's own run is shown as a
+dry run.</p>
+<p><strong>Read after:</strong> <a href="/docs/guides/mode-2/">Mode 2</a>. <strong>Next:</strong> the <a href="/docs/guides/">guides index</a>.</p>
+<p>---</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Node.js 22.13 or later, <code>git</code> with your name and e-mail set, a POSIX shell. Install once,
+in a working folder:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir agsc-work &amp;&amp; cd agsc-work
+npm install agentic-system-core
+export PATH=&quot;$PWD/node_modules/.bin:$PATH&quot;
+export ENGINE=&quot;$PWD/node_modules/agentic-system-core&quot;</code></pre>
+<p>Every command below was run on the package and printed the lines quoted under it
+(other lines are left out); the engine repository's test <code>tests/docs/guides.test.js</code> runs them again on every change.
+Write <code>human:&lt;your-id&gt;</code> wherever the files say <code>human:you</code>.</p>
+<h2 id="1-a-board-its-tasks-and-one-agent-lane">1. A board, its tasks, and one agent lane</h2>
+<p>The board is a cluster and its tasks, written as in <a href="/docs/guides/mode-2/">Mode 2</a>:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir -p my-board/content/clusters my-board/content/concepts &amp;&amp; cd my-board
+cat &gt; content/clusters/website.md &lt;&lt;'ITEM'
+---
+type: cluster
+title: Website
+description: The work on the project website, as tasks people and agents claim and finish.
+prov:
+  origin: human
+  operator: human:you
+---
+
+# Website
+
+The open work on the website.
+ITEM
+cat &gt; content/concepts/task-write-the-faq.md &lt;&lt;'ITEM'
+---
+type: concept
+title: Write the FAQ
+description: Write a page that answers the ten questions people ask most, one task on the website board.
+clusters:
+  - website
+prov:
+  origin: human
+  operator: human:you
+kind: task
+task_state: TASK_STATE_SUBMITTED
+---
+
+## Task
+
+Collect the ten most asked questions and answer each in three sentences.
+ITEM
+cat &gt; content/concepts/task-check-the-links.md &lt;&lt;'ITEM'
+---
+type: concept
+title: Check the links
+description: Check every link on the website once the FAQ is written, one task on the website board.
+clusters:
+  - website
+prov:
+  origin: human
+  operator: human:you
+kind: task
+task_state: TASK_STATE_SUBMITTED
+blocked-by:
+  - task-write-the-faq
+---
+
+## Task
+
+Follow every link and fix the broken ones.
+ITEM</code></pre>
+<p>The agent lane goes into <code>agsc.config.json</code>. These are the four blocks to add; the
+<code>node -e</code> line merges them into the file <code>init</code> wrote (by hand is the same):</p>
+<pre tabindex="0" data-lang="bash"><code>agsc init &gt; /dev/null
+mkdir -p .well-known &amp;&amp; printf 'Contact: mailto:security@example.org\n' &gt; .well-known/security.txt
+cat &gt; lanes.json &lt;&lt;'JSON'
+{
+  &quot;agents&quot;: [{ &quot;name&quot;: &quot;worker&quot;, &quot;kind&quot;: &quot;llm&quot;, &quot;model&quot;: &quot;your-model-id&quot;, &quot;author&quot;: &quot;board-bot&quot;, &quot;operator&quot;: &quot;human:you&quot;, &quot;channel&quot;: &quot;main&quot;, &quot;tasks&quot;: [&quot;claim&quot;, &quot;work&quot;, &quot;plan&quot;, &quot;refresh&quot;], &quot;types&quot;: [&quot;concept&quot;, &quot;episode&quot;], &quot;max_claims&quot;: 1, &quot;budget_usd_month&quot;: 1, &quot;enabled&quot;: true }],
+  &quot;channels&quot;: [{ &quot;name&quot;: &quot;main&quot;, &quot;adapter&quot;: &quot;github&quot;, &quot;author&quot;: &quot;board-bot&quot;, &quot;owner&quot;: &quot;human:you&quot; }],
+  &quot;contribute&quot;: [{ &quot;mode&quot;: &quot;pr&quot;, &quot;target&quot;: &quot;https://github.com/you/your-site&quot; }],
+  &quot;budget&quot;: { &quot;usd_month&quot;: 5 }
+}
+JSON
+node -e 'const fs = require(&quot;node:fs&quot;), c = JSON.parse(fs.readFileSync(&quot;agsc.config.json&quot;, &quot;utf8&quot;)); Object.assign(c, JSON.parse(fs.readFileSync(&quot;lanes.json&quot;, &quot;utf8&quot;))); fs.writeFileSync(&quot;agsc.config.json&quot;, JSON.stringify(c, null, 2) + &quot;\n&quot;);'
+rm lanes.json</code></pre>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
+<thead><tr><th scope="col">Block</th><th scope="col">What it says</th></tr></thead>
+<tbody>
+<tr><td><code>agents[]</code></td><td>one lane: its <code>name</code>; <code>kind</code> (<code>llm</code> or <code>process</code>); the <code>model</code> and <code>budget_usd_month</code> (both required for <code>llm</code>); the forge login it opens pull requests as (<code>author</code>); the person who answers for it (<code>operator</code>); its <code>channel</code>; the <code>tasks</code> it may do (<code>claim</code>, <code>work</code>, <code>plan</code>, <code>refresh</code>, <code>create</code>, <code>edit</code>, …); the item <code>types</code> it may touch (never a procedure, a gate or a cluster); <code>max_claims</code>, the number of tasks it may hold at once; <code>enabled</code></td></tr>
+<tr><td><code>channels[]</code></td><td>where the lane's proposals arrive: <code>name</code>, <code>adapter</code>, the same <code>author</code>, and the <code>owner</code>, the person whose choice <code>publish</code> records (<code>hitl</code>, the default: a person merges; <code>auto</code>: merged under that standing decision, on a forge)</td></tr>
+<tr><td><code>contribute[]</code></td><td>where outside agents and people may send proposals (<code>pr</code>, <code>form</code> or <code>channel</code>); published in the discovery document</td></tr>
+<tr><td><code>budget</code></td><td>the node's monthly cap on model spend; the lanes' budgets may not add up to more</td></tr>
+</tbody></table></div>
+<p>Commit, check and build, and read the board:</p>
+<pre tabindex="0" data-lang="bash"><code>git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'the board'
+agsc lint
+agsc build &gt; /dev/null
+node -e 'const b = require(&quot;./www/boards/website.json&quot;); console.log(&quot;done:&quot;, b.done); for (const t of b.tasks) console.log(t.slug, t.state, t.claimed_by || &quot;(unclaimed)&quot;);'</code></pre>
+<pre tabindex="0" data-lang="text"><code>lint: pass (0 error, 1 warn)
+done: false
+task-check-the-links TASK_STATE_SUBMITTED (unclaimed)
+task-write-the-faq TASK_STATE_SUBMITTED (unclaimed)</code></pre>
+<h2 id="2-the-lane-claims-a-task">2. The lane claims a task</h2>
+<p>An agent claims a task by proposing its new state through the tool server (or the same
+tool on a published page). The answer is a patch; nothing is written:</p>
+<pre tabindex="0" data-lang="bash"><code>MC=&quot;$ENGINE/examples/demos/agents/mcp-call.js&quot;
+node &quot;$MC&quot; propose '{&quot;agent&quot;:&quot;worker&quot;,&quot;at&quot;:&quot;2026-09-02&quot;,&quot;slug&quot;:&quot;task-write-the-faq&quot;,&quot;task_state&quot;:&quot;TASK_STATE_WORKING&quot;}' &gt; claim.json
+node -e 'const c = require(&quot;./claim.json&quot;); console.log(c.type, c.body.path); process.stdout.write(c.body.patch);'</code></pre>
+<pre tabindex="0" data-lang="text"><code>proposal content/concepts/task-write-the-faq.md
++modified: &quot;2026-09-02&quot;
+-task_state: TASK_STATE_SUBMITTED
++task_state: TASK_STATE_WORKING</code></pre>
+<h2 id="3-a-person-accepts-the-claim">3. A person accepts the claim</h2>
+<p>A person applies the patch and commits it with the trailer <code>Channel-Auto: &lt;lane&gt;</code>, which
+names the lane; on a forge this is the merge of the lane's pull request. The build reads
+the holder from that commit:</p>
+<pre tabindex="0" data-lang="bash"><code>node -e 'process.stdout.write(require(&quot;./claim.json&quot;).body.patch);' &gt; claim.patch
+git apply claim.patch &amp;&amp; git add content &amp;&amp; git commit -q -m 'claim task-write-the-faq' -m 'Channel-Auto: worker'
+agsc build &gt; /dev/null
+node -e 'const b = require(&quot;./www/boards/website.json&quot;); for (const t of b.tasks) console.log(t.slug, t.state, t.claimed_by || &quot;(unclaimed)&quot;);'</code></pre>
+<pre tabindex="0" data-lang="text"><code>task-check-the-links TASK_STATE_SUBMITTED (unclaimed)
+task-write-the-faq TASK_STATE_WORKING process:worker</code></pre>
+<p>From now on, any other claim of that task is refused (<code>AGSC-E511 … the first merged claim wins</code>), on the tool server and on the page alike.</p>
+<h2 id="4-limits-new-tasks-and-the-lane-s-own-run">4. Limits, new tasks and the lane's own run</h2>
+<pre tabindex="0" data-lang="bash"><code>MC=&quot;$ENGINE/examples/demos/agents/mcp-call.js&quot;
+node &quot;$MC&quot; propose '{&quot;agent&quot;:&quot;worker&quot;,&quot;at&quot;:&quot;2026-09-02&quot;,&quot;slug&quot;:&quot;task-check-the-links&quot;,&quot;task_state&quot;:&quot;TASK_STATE_WORKING&quot;}' | grep '&quot;message&quot;' || true
+node &quot;$MC&quot; remember '{&quot;agent&quot;:&quot;worker&quot;,&quot;body&quot;:&quot;Add a search box to the FAQ page.&quot;,&quot;cluster&quot;:&quot;website&quot;,&quot;kind&quot;:&quot;task&quot;,&quot;model&quot;:&quot;your-model-id&quot;,&quot;operator&quot;:&quot;human:you&quot;,&quot;title&quot;:&quot;Search the FAQ&quot;}' | grep -E '&quot;(path|task_state|type)&quot;'
+agsc refresh --agent worker --dry-run
+agsc refresh --agent ghost --dry-run || echo &quot;refresh exit $?&quot;</code></pre>
+<pre tabindex="0" data-lang="text"><code>    &quot;message&quot;: &quot;agent lane \&quot;worker\&quot; already holds 1 task(s) in TASK_STATE_WORKING; max_claims is 1 (AGSC-10-17)&quot;
+    &quot;path&quot;: &quot;content/concepts/search-the-faq.md&quot;,
+  &quot;type&quot;: &quot;proposal&quot;
+wrote: dist/proposal/1.patch
+refresh: pass (0 error, 0 warn)
+error: AGSC-E509 agent ghost is undeclared or disabled (AGSC-08-28)
+refresh exit 1</code></pre>
+<p>In order: the lane's second claim is refused by its limit of one; a new task filed
+through <code>remember</code> comes back as a proposal on the board it names; the lane's run, dry,
+writes the proposal it would open (with the Episode of the run) and prints the commands a
+person may run; a lane that is not declared is refused.</p>
+<h2 id="what-needs-something-you-may-not-have">What needs something you may not have</h2>
+<ul>
+<li><strong>A model.</strong> The engine ships no model adapter, so <code>refresh --agent &lt;lane&gt;</code> without
+<code>--dry-run</code> refuses; the budget, the lane's limits and the Episode are real, the model
+call is not made.</li>
+<li><strong>A forge.</strong> Pull requests, required checks and <code>publish: auto</code> merges happen on
+GitHub, GitLab or similar; <code>agsc ci</code> writes the files the forge needs (<a href="/docs/guides/mode-2/">Mode 2</a>).</li>
+</ul>
+<h2 id="what-next">What next</h2>
+<ul>
+<li>The same mode on a ready-made folder, with the page tools refusing the same claim:
+<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/DEMOS.md#mode-5--the-live-board">DEMOS.md</a>.</li>
+<li>Import a board from GitHub, Jira, Trello and other tools:
+<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USE-CASES.md#m7--a-teams-board-becomes-a-live-board">USE-CASES.md</a>.</li>
+<li>The rules: <a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a> (agent lanes), <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-17">AGSC-10-17</a> (claims) in <a href="/specs/">spec/</a>.</li>
+</ul>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/guides/mode-5.md">Propose an edit</a> — opens <code>site/docs/guides/mode-5.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>

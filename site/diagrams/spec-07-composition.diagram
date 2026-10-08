@@ -1,5 +1,5 @@
 canvas 560 300
-label "Composition: a selection of slugs runs through five fixed steps (closure over requires, hiding of superseded items, mutual exclusion, warnings, port wiring); steps one to four give the verdict, and only a valid verdict yields the Harness of seven files (highlighted)"
+label "Composition: a selection of slugs runs through five fixed steps (closure over requires, hiding of superseded items, mutual exclusion, warnings, port wiring); steps one to four give the verdict, and only a valid verdict yields the Harness of seven kinds of file (highlighted)"
 caption "The highlighted Harness is produced only after the verdict; the order of the five steps is fixed because reversing it changes verdicts."
 box sel 16 110 96 50 "selection|(slugs)"
 box s1 126 110 72 50 "1 closure"
@@ -18,7 +18,7 @@ arrow s2 s3
 arrow s3 s4
 arrow s4 s5
 box verdict 126 220 160 44 "verdict (valid?)"
-box harn 340 220 186 44 "Harness: seven files" acc
+box harn 340 220 186 44 "Harness: 7 kinds of file" acc
 arrow s4 verdict
 arrow verdict harn
 arrow s5 harn

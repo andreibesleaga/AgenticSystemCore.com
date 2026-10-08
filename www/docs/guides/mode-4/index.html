@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mode 4 guide: a selection becomes a starting harness — AgenticSystemCore</title>
+<meta name="description" content="Guide to Mode 4 of AgenticSystemCore: a selection of items becomes a starting harness, with every command and the lines it prints.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/guides/mode-4/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/guides/mode-4/">
+<meta property="og:title" content="Mode 4 guide: a selection becomes a starting harness">
+<meta property="og:description" content="Guide to Mode 4 of AgenticSystemCore: a selection of items becomes a starting harness, with every command and the lines it prints.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Mode 4 guide: a selection becomes a starting harness","description":"Guide to Mode 4 of AgenticSystemCore: a selection of items becomes a starting harness, with every command and the lines it prints.","url":"https://agenticsystemcore.com/docs/guides/mode-4/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Mode 4 guide: a selection becomes a starting harness</h1>
+<p class="summary"><strong>Summary</strong>For an architect: compose a selection of items into a harness of seven kinds of file and an archive, try the opt-in run verb, and record a run that happened elsewhere.</p>
+<p><strong>Who it is for:</strong> an architect or a developer who wants to pick a few patterns,
+procedures and decisions and get the files a system — or an agent runtime — starts from;
+anyone curious about the opt-in <code>run</code> verb.</p>
+<p><strong>What you get:</strong> <code>agsc compose</code> checks that a selection fits together (it pulls in what
+the selection requires, refuses items that exclude each other, warns about
+contradictions) and writes a <strong>Harness</strong>: seven kinds of file — agent instructions
+(<code>AGENTS.md</code>), a C4 model (<code>workspace.dsl</code>), a Mermaid diagram, an arc42 skeleton, one
+decision record per selected item, one skill file per selected procedure, and a JSON-LD
+record of it all — plus a zip archive. It is a starting point, not a running system: no
+rendering for a particular runtime ships, and <code>agsc run</code> lists a procedure's steps but
+executes nothing without an isolating runner.</p>
+<p><strong>Read after:</strong> <a href="/docs/guides/mode-3/">Mode 3</a>. <strong>Next:</strong> <a href="/docs/guides/mode-5/">Mode 5</a>.</p>
+<p>---</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Node.js 22.13 or later, <code>git</code> with your name and e-mail set, a POSIX shell. Install once,
+in a working folder:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir agsc-work &amp;&amp; cd agsc-work
+npm install agentic-system-core
+export PATH=&quot;$PWD/node_modules/.bin:$PATH&quot;
+export ENGINE=&quot;$PWD/node_modules/agentic-system-core&quot;</code></pre>
+<p>Every command below was run on the package and printed the lines quoted under it
+(other lines are left out); the engine repository's test <code>tests/docs/guides.test.js</code> runs them again on every change.
+Write <code>human:&lt;your-id&gt;</code> wherever the files say <code>human:you</code>.</p>
+<h2 id="1-items-with-typed-links">1. Items with typed links</h2>
+<p>Composition follows typed links: <code>requires</code> pulls the target in; <code>uses</code> warns when its
+target is not selected; <code>excludes</code> refuses the pair; <code>contradicts</code> warns when both are
+selected. Two concepts and one
+procedure whose step is a <code>run</code> block:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir -p my-system/content/concepts my-system/content/procedures &amp;&amp; cd my-system
+cat &gt; content/concepts/retry-with-backoff.md &lt;&lt;'ITEM'
+---
+type: concept
+title: Retry with backoff
+description: Call a failing service again after waiting longer each time, up to a fixed number of tries.
+prov:
+  origin: human
+  operator: human:you
+kind: explainer
+requires:
+  - idempotency-key
+---
+
+# Retry with backoff
+
+Wait one second, then two, then four; give up after five tries.
+ITEM
+cat &gt; content/concepts/idempotency-key.md &lt;&lt;'ITEM'
+---
+type: concept
+title: Idempotency key
+description: A key sent with a request so that the same request sent twice has the effect of one.
+prov:
+  origin: human
+  operator: human:you
+kind: explainer
+---
+
+# Idempotency key
+
+The service remembers each key it has seen and answers a repeat with the first result.
+ITEM
+cat &gt; content/procedures/smoke-test.md &lt;&lt;'ITEM'
+---
+type: procedure
+title: Smoke test
+description: The one command that shows the checkout service answers at all.
+prov:
+  origin: human
+  operator: human:you
+when: After every deploy of the checkout service
+uses:
+  - retry-with-backoff
+---
+
+## When
+
+After every deploy of the checkout service.
+
+## Steps
+
+```run
+echo checkout answers
+```
+
+## Checks
+
+```expect
+checkout answers
+```
+ITEM
+agsc init &gt; /dev/null
+mkdir -p .well-known &amp;&amp; printf 'Contact: mailto:security@example.org\n' &gt; .well-known/security.txt
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'checkout'
+agsc lint</code></pre>
+<pre tabindex="0" data-lang="text"><code>lint: pass (0 error, 1 warn)</code></pre>
+<h2 id="2-compose">2. Compose</h2>
+<pre tabindex="0" data-lang="bash"><code>agsc compose retry-with-backoff smoke-test --zip
+find dist/harness -type f | sed 's|^dist/harness/[^/]*/||' | sort</code></pre>
+<pre tabindex="0" data-lang="text"><code>verdict: {&quot;added&quot;:[{&quot;path&quot;:[[&quot;retry-with-backoff&quot;,&quot;requires&quot;,&quot;idempotency-key&quot;]],&quot;slug&quot;:&quot;idempotency-key&quot;}],&quot;conflicts&quot;:[],&quot;hidden&quot;:[],&quot;selection&quot;:[&quot;idempotency-key&quot;,&quot;retry-with-backoff&quot;,&quot;smoke-test&quot;],&quot;valid&quot;:true,&quot;warnings&quot;:[]}
+compose: pass (0 error, 0 warn)
+AGENTS.md
+arc42.md
+decisions/0001-retry-with-backoff.md
+decisions/0002-idempotency-key.md
+diagram.mmd
+harness.jsonld
+skills/smoke-test/SKILL.md
+workspace.dsl</code></pre>
+<p><code>idempotency-key</code> was <strong>added</strong> because <code>retry-with-backoff</code> requires it. The Harness is
+in <code>dist/harness/&lt;name&gt;/</code> and the archive beside it. On a built site, the page
+<code>/compose/</code> does the same in the browser, with the same bytes. A rendering for a named
+runtime (<code>--emit crewai</code> and the others the specification lists) is refused with
+<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E203"><code>AGSC-E203</code></a>; <code>--emit ./my-emitter.js</code> runs a rendering you write as a plugin
+(<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/PLUGINS.md">PLUGINS.md</a>).</p>
+<h2 id="3-the-run-verb-off-by-default">3. The <code>run</code> verb (off by default)</h2>
+<p><code>run</code> reads a procedure's <code>run</code> blocks. It is off until the configuration turns it on
+and names the programs a step may start:</p>
+<pre tabindex="0" data-lang="bash"><code>agsc run smoke-test --dry-run || echo &quot;run exit $?&quot;
+node -e 'const f = &quot;agsc.config.json&quot;, fs = require(&quot;node:fs&quot;), c = JSON.parse(fs.readFileSync(f, &quot;utf8&quot;)); c.run = { enabled: true, allow: [&quot;echo&quot;] }; c.budget = { usd_month: 5 }; fs.writeFileSync(f, JSON.stringify(c, null, 2) + &quot;\n&quot;);'
+git commit -qam 'run on'
+agsc run smoke-test --dry-run
+agsc run smoke-test || echo &quot;run exit $?&quot;</code></pre>
+<pre tabindex="0" data-lang="text"><code>error: AGSC-E004 run is disabled (run.enabled is false; AGSC-09-94)
+run exit 2
+run: step 1: echo checkout answers
+run: --dry-run: 1 step(s) resolved, nothing executed
+run exit 1</code></pre>
+<p>The <code>node -e</code> line adds two blocks to <code>agsc.config.json</code> (by hand is the same):
+<code>&quot;run&quot;: { &quot;enabled&quot;: true, &quot;allow&quot;: [&quot;echo&quot;] }</code> and <code>&quot;budget&quot;: { &quot;usd_month&quot;: 5 }</code>, the
+node's monthly cap on model spend. With <code>run</code> on, <code>--dry-run</code> lists the steps; <code>run</code>
+itself still refuses (<code>AGSC-E001 run executed nothing: …</code>), because the engine cannot
+promise a step &quot;no network&quot; without an operating-system sandbox, and none ships.</p>
+<h2 id="4-record-a-run-that-happened-elsewhere">4. Record a run that happened elsewhere</h2>
+<p>A run done by a CI job or an agent becomes an <strong>Episode</strong> with <code>trace</code>, and the NOW page
+counts its spend against the cap:</p>
+<pre tabindex="0" data-lang="bash"><code>STARTED=$(TZ=UTC git log -1 --format=%cd --date=format-local:%Y-%m-%dT%H:%M:%SZ)
+cat &gt; run1.json &lt;&lt;JSON
+{&quot;actor&quot;:&quot;process:deploy-bot&quot;,&quot;outcome&quot;:&quot;success&quot;,&quot;started&quot;:&quot;$STARTED&quot;,&quot;title&quot;:&quot;Smoke test after deploy&quot;,&quot;usage&quot;:{&quot;cost_usd&quot;:0.25,&quot;estimate&quot;:false,&quot;model&quot;:&quot;m&quot;,&quot;tokens_in&quot;:100,&quot;tokens_out&quot;:50}}
+JSON
+agsc trace run1.json
+git add -A &amp;&amp; git commit -qm 'a recorded run'
+agsc build &gt; /dev/null
+sed -n '/## Monthly spend/,/^- cap/p' www/now.md</code></pre>
+<pre tabindex="0" data-lang="text"><code>trace: wrote content/episodes/smoke-test-after-deploy.md (an Episode, through the AGSC-01-22/AGSC-02-14 import path; no process was executed)
+- spent: 0.25 USD
+- cap: 5 USD</code></pre>
+<p>The run record is a JSON object: who ran it (<code>actor</code>), the <code>outcome</code>, when it <code>started</code>
+(here the time of the last commit stands in for &quot;just now&quot;, because the NOW page counts
+a run's spend in the month it started), a <code>title</code>, and what it used. Unlike the other
+verbs, <code>trace</code> writes straight into <code>content/episodes/</code>; read the file before you commit
+it.</p>
+<h2 id="what-next">What next</h2>
+<ul>
+<li>Agents that claim and finish tasks on a shared board: <a href="/docs/guides/mode-5/">Mode 5</a>.</li>
+<li>The same mode on a ready-made folder, with the tool server's verdict and the page's:
+<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/DEMOS.md#mode-4--runnable-knowledge">DEMOS.md</a>.</li>
+<li>What each Harness file holds: <a href="/specs/07-composition/">spec/07-composition.md</a> (<a class="ref" href="/specs/07-composition/#AGSC-07-12">AGSC-07-12</a>).</li>
+</ul>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/guides/mode-4.md">Propose an edit</a> — opens <code>site/docs/guides/mode-4.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>

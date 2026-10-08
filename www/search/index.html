@@ -38,7 +38,7 @@
 <main id="main">
 <h1>Search</h1>
 <p class="summary"><strong>Summary</strong>Search every page and every rule of this site. The index is built with the site, and nothing you type leaves your browser.</p>
-<div class="search" role="search"><form class="search" id="search-form"><label for="q">Search pages and rules</label><input id="q" name="q" type="search" autocomplete="off" spellcheck="false"><button type="submit">Search</button></form></div>
+<div class="search" role="search" id="search-box" hidden><form class="search" id="search-form"><label for="q">Search pages and rules</label><input id="q" name="q" type="search" autocomplete="off" spellcheck="false"><button type="submit">Search</button></form></div>
 <p id="search-status" role="status" aria-live="polite"></p>
 <ol id="results"></ol>
 <section id="site-index" aria-labelledby="index-heading">
@@ -52,6 +52,13 @@
 <li><a href="/docs/data-model/">Data model</a>: Six kinds of item, one file shape, fourteen typed links, clusters for navigation, sources for evidence and a provenance record on everything: this is the whole vocabulary a node needs.</li>
 <li><a href="/docs/demos/">Demos</a>: Every mode and every persona as a small demo you can run in under five minutes from an empty folder: the exact commands, the lines they print, and the one thing each proves. Every command is run by a test in the engine repository, so this page cannot drift from the engine.</li>
 <li><a href="/docs/glossary/">Glossary</a>: Every term of the specification's language and every term of the ontology, with its definition and the rule that defines it, generated from the sources so that it cannot drift from them.</li>
+<li><a href="/docs/guides/">Guides</a>: Six short guides, one per mode: who each is for, what you get, the exact commands on files you write yourself, and the lines they print. Every command is run by a test in the engine repository.</li>
+<li><a href="/docs/guides/mode-0/">Mode 0 guide: a folder of notes becomes a checked site</a>: For a person with Markdown notes: install the package, adopt the notes, add a security contact, commit once, check and build the site, change a note as a proposal, and get it ready to publish.</li>
+<li><a href="/docs/guides/mode-1/">Mode 1 guide: memory for an assistant, and nodes that check each other</a>: For a developer connecting an AI assistant, and for two publishers: the local tool server and its seven tools, two nodes that name and check each other, and how to verify a published node by hand.</li>
+<li><a href="/docs/guides/mode-2/">Mode 2 guide: a project's decisions, specifications, tasks and gates</a>: For a team with coding assistants: the files for a decision, a specification, tasks and a gate; the board; the forge files a gate compiles to; one steering file for every assistant.</li>
+<li><a href="/docs/guides/mode-3/">Mode 3 guide: procedures as installable skills</a>: For a team with repeatable procedures: write a procedure, emit one skill pack per cluster with its lockfile, install it for an agent, publish it, and bring skills from elsewhere in.</li>
+<li><a href="/docs/guides/mode-4/">Mode 4 guide: a selection becomes a starting harness</a>: For an architect: compose a selection of items into a harness of seven kinds of file and an archive, try the opt-in run verb, and record a run that happened elsewhere.</li>
+<li><a href="/docs/guides/mode-5/">Mode 5 guide: the live board</a>: For people and agents sharing tasks: a board, an agent lane declared with its owner, budget and limits, a claim made as a proposal and accepted by a person, and the refusals that keep the board honest.</li>
 <li><a href="/docs/how-it-works/">How it works</a>: Files go in, every surface comes out, and nothing is published until a deterministic build has proved itself twice: this page walks through the build, the proposal lifecycle, discovery, import and export, and the safety rules.</li>
 <li><a href="/docs/how-to-use/">How to use it</a>: One page to pick up any of the six modes and use it now: what to install, the first commands for each kind of user — one person, one agent, or many people, agents and nodes together — the scenarios each mode covers, the switches in the configuration, and the hooks that connect agents and tools to a node.</li>
 <li><a href="/docs/introduction/">Introduction</a>: AgenticSystemCore turns a folder of Markdown files into a shared memory that people and software agents can both read, check, extend and run: a distributed brain whose meaning, form and rules are published, so any agent anywhere can use it, improve it and build systems from it.</li>
@@ -59,8 +66,8 @@
 <li><a href="/docs/reading-the-specification/">Reading the specification</a>: A key to the specification's notation: what the rule identifiers mean, how the key words MUST and SHOULD are used, what the small bracketed references at the end of each rule are, why some rules are marked reserved, and how error codes, vectors and Levels fit together.</li>
 <li><a href="/docs/requirements/">Requirements</a>: The product requirements document, frozen as the project's first baseline and published here for the specification version this site publishes: personas, functional requirements in EARS form with their acceptance criteria, non-functional requirements, non-goals and the definition of done.</li>
 <li><a href="/docs/scenarios/">Scenarios</a>: The behaviour of the system written as scenarios, one feature file per persona, in the Given/When/Then form of behaviour-driven development. Each scenario names the requirement it proves.</li>
-<li><a href="/docs/standards/">Standards and references</a>: Every standard this work stands on or defines, with its version and the date it was checked; the registrations it requests — two with IANA and one w3id.org namespace — and their current status; the related work it was compared against; and the publications that describe it.</li>
-<li><a href="/docs/start-here/">Start here</a>: One path through this site and its sources for each kind of reader: someone curious, a developer, an implementer in another language, and an agent. Each step is one page, in order.</li>
+<li><a href="/docs/standards/">Standards and references</a>: Every standard this work stands on or defines, with its version and the date it was checked; its registrations — two with IANA, one of them registered, and one w3id.org namespace — and their current status; the related work it was compared against; and the publications that describe it.</li>
+<li><a href="/docs/start-here/">Start here</a>: One path through this site and its sources for each kind of reader: someone with a folder of notes, someone curious, a developer, an implementer in another language, and an agent. Each step is one page, in order.</li>
 <li><a href="/docs/status/">Status</a>: What is live today, what is in preparation, and what has not been requested or granted yet. This page changes at each step and never says a name is registered before a registry does.</li>
 </ul>
 <h2 id="index-specification">Specification</h2>
@@ -72,10 +79,12 @@
 <li><a href="/specs/03-links/">AGSC-03 — Links: the fourteen keys, inverses, combiner semantics</a>: The fourteen typed links between items, the inverses the build computes, the integrity checks, and which links the combiner reads.</li>
 <li><a href="/specs/04-canonicalization/">AGSC-04 — Canonicalization and determinism</a>: Why two builds anywhere give the same bytes: canonical JSON, NFC text, one time format, fixed sort orders and SHA-256.</li>
 <li><a href="/specs/05-graph/">AGSC-05 — Graph: IRIs, RDF views, SKOS, PROV</a>: How items become a graph with web addresses, the three RDF views, the ontology and its alignment to SKOS, PROV-O and Dublin Core, and the byte-level pins.</li>
-<li><a href="/specs/06-surfaces/">AGSC-06 — Published surfaces: routes, discovery files, llms.txt</a>: Everything a node publishes: the fixed route set, the discovery document, llms.txt, the chunk export, the JSON-LD context, headers and budgets.</li>
-<li><a href="/specs/07-composition/">AGSC-07 — Composition: the closure algebra and the Harness</a>: How a selection of items becomes a verdict and a Harness: the five steps in their fixed order, the seven Harness files, skill packs, ports and saved architectures.</li>
+<li><a href="/specs/06-surfaces/">AGSC-06 — Published surfaces: routes, discovery files, llms.txt (part 1 of 2)</a>: Everything a node publishes: the fixed route set, the discovery document, llms.txt, the chunk export, the JSON-LD context, headers and budgets.</li>
+<li><a href="/specs/06-surfaces/page-2/">AGSC-06 — Published surfaces: routes, discovery files, llms.txt (part 2 of 2)</a>: Everything a node publishes: the fixed route set, the discovery document, llms.txt, the chunk export, the JSON-LD context, headers and budgets.</li>
+<li><a href="/specs/07-composition/">AGSC-07 — Composition: the closure algebra and the Harness</a>: How a selection of items becomes a verdict and a Harness: the five steps in their fixed order, the seven kinds of Harness file, skill packs, ports and saved architectures.</li>
 <li><a href="/specs/08-governance/">AGSC-08 — Governance: provenance, gates, lints, ledger</a>: Who made what and who approved it: provenance, sign-off trailers, gates, the four agent-safety lints, the optional agent lane and the ledger derived from git history.</li>
-<li><a href="/specs/09-conformance/">AGSC-09 — Conformance: classes, vectors, error codes, CLI contract</a>: How a claim is made and checked: classes and Levels, the vector format, the command-line contract, the error-code registry and the independent validators.</li>
+<li><a href="/specs/09-conformance/">AGSC-09 — Conformance: classes, vectors, error codes, CLI contract (part 1 of 2)</a>: How a claim is made and checked: classes and Levels, the vector format, the command-line contract, the error-code registry and the independent validators.</li>
+<li><a href="/specs/09-conformance/page-2/">AGSC-09 — Conformance: classes, vectors, error codes, CLI contract (part 2 of 2)</a>: How a claim is made and checked: classes and Levels, the vector format, the command-line contract, the error-code registry and the independent validators.</li>
 <li><a href="/specs/10-implementation-profiles/">AGSC-10 — Implementation profiles (conformance Levels 0–3)</a>: The four Levels of conformance, how an existing wiki or CMS becomes a node, how two nodes check each other, project mode with tasks and boards, and the live board.</li>
 <li><a href="/specs/11-boundary/">AGSC-11 — The node boundary: cross-origin access, federation, contribution, surfaces, visibility, retirement</a>: Where a node meets the outside: cross-origin access, the nine parts of federation, the plugin contract for every agent surface, visibility, retirement and tombstones.</li>
 <li><a href="/specs/agentic-knowledge/">Knowledge link set profile</a>: The profile of the discovery document: how a client finds it, what it looks like, the relations and attributes it may carry, and how it relates to other work.</li>
@@ -84,9 +93,9 @@
 <h2 id="index-vocabulary-and-items">Vocabulary and items</h2>
 <ul>
 <li><a href="/clusters/">Clusters</a>: The groupings this node uses to organise its items.</li>
-<li><a href="/clusters/guides/">Guides</a>: Procedures for publishing and reading a node, each step naming the rule or the check that proves it.</li>
-<li><a href="/clusters/project-board/">Project board</a>: The open work on the specification itself, kept as task items of this node, so the project's own plan is published the way the live board publishes any team's.</li>
-<li><a href="/clusters/vocabulary/">Vocabulary</a>: The terms of the specification's ubiquitous language: the six item types and the words that complete them.</li>
+<li><a href="/clusters/guides/">Guides cluster</a>: Procedures for publishing and reading a node, each step naming the rule or the check that proves it.</li>
+<li><a href="/clusters/project-board/">Project board cluster</a>: The open work on the specification itself, kept as task items of this node, so the project's own plan is published the way the live board publishes any team's.</li>
+<li><a href="/clusters/vocabulary/">Vocabulary cluster</a>: The terms of the specification's ubiquitous language: the six item types and the words that complete them.</li>
 <li><a href="/concepts/">Vocabulary</a>: The twelve terms of the specification, each on its own page with the rules that define it.</li>
 <li><a href="/concepts/bundle/">Bundle</a>: One directory tree of Markdown items plus exactly one agsc.config.json: the unit of publication and of conformance.</li>
 <li><a href="/concepts/cluster/">Cluster</a>: A navigational grouping of items. Membership is authored on the item, and nesting is expressed as membership.</li>
@@ -98,7 +107,7 @@
 <li><a href="/concepts/lesson/">Lesson</a>: Knowledge distilled from one or more episodes, carrying a severity of info, warn or block.</li>
 <li><a href="/concepts/link/">Link</a>: A typed relation between two items of one Bundle, written as a frontmatter key whose values are slugs.</li>
 <li><a href="/concepts/now/">NOW</a>: Generated context about the current state of a Bundle, such as counts and last build. NOW is never an item.</li>
-<li><a href="/concepts/procedure/">Procedure</a>: A plan a reader can execute: a trigger, steps and checks. A procedure exports one to one to a skill file.</li>
+<li><a href="/concepts/procedure/">Procedure</a>: A plan a reader can execute: a trigger, steps and checks. Procedures are published in skill packs, one pack per cluster.</li>
 <li><a href="/concepts/release-version-1-0-0/">Release version 1.0.0 of the specification</a>: Apply the items recorded against the release candidate, run the whole vector set with the reference engine, and tag version 1.0.0, at which the reference engine may first claim a conformance Level.</li>
 <li><a href="/concepts/source/">Source</a>: An external work cited by an item, written inline as a sources[] entry and published under a fragment IRI.</li>
 <li><a href="/procedures/">Procedures</a>: Step-by-step procedures derived from the specification, each step naming the rule or the check that proves it.</li>
@@ -113,6 +122,7 @@
 <ul>
 <li><a href="/">AgenticSystemCore</a>: An open format and a set of rules that turn a folder of Markdown into a wiki, a graph, an agent memory, a skills library, runnable architectures and a shared live board for agents and people, published here as a node of itself.</li>
 <li><a href="/about/">About</a>: Who writes AgenticSystemCore, how people and agents read this node, the status of the specification and how to get in touch.</li>
+<li><a href="/changelog/">Changelog</a>: Every content version this node has published, oldest first, each with the day and the commit it was tagged on.</li>
 <li><a href="/compose/">Compose</a>: Select items from this node and compute a Harness in the browser; the same page offers the seven tools to a browser assistant.</li>
 <li><a href="/episodes/">Episodes</a>: The episodes index of this node, empty for now: the route exists because the specification names it for every node.</li>
 <li><a href="/exports/">Machine-readable files</a>: Every machine-readable file this node publishes, what each is for, and which are pinned by a rule.</li>
@@ -130,7 +140,7 @@
 </section>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
 </footer>
 </body>
 </html>

@@ -12,4 +12,4 @@ description: "Status of AgenticSystemCore: what is live, what is in preparation,
 - **In preparation** means the work exists in the project's repositories and has not been published.
 - **Not requested** and **not filed** mean that no registry, editor or publisher has been approached yet. **Requested** and **filed** mean a request is pending. **Registered** or **published** is written only after the body in question shows the entry.
 
-The specification is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no standards body has reviewed or adopted it (AGSC-06-07 asks for a registration; it does not claim one).
+The specification is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no standards body has reviewed or adopted it. Of its two IANA names, the profile URI is registered in the Profile URIs registry, which registers on a first-come, first-served basis; the well-known suffix is not registered (AGSC-06-07).

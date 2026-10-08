@@ -17,6 +17,14 @@
   "peers": [
     "https://patterns.agenticsystemcore.com/.well-known/knowledge-linkset"
   ],
+  "related": [
+    {
+      "href": "https://agenticsystemcore.com/docs/",
+      "rel": "service-doc",
+      "title": "The guide: how the format works and how to use it",
+      "type": "text/html"
+    }
+  ],
   "site": {
     "author": "Andrei N. Besleaga",
     "base": "https://agenticsystemcore.com/",
@@ -31,7 +39,7 @@
     ],
     "title": "AgenticSystemCore"
   },
-  "spec_version": "1.0.0-rc.6",
+  "spec_version": "1.0.0-rc.7",
   "tags": {
     "allowed": [
       "discovery",

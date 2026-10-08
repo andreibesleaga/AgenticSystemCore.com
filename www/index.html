@@ -39,10 +39,26 @@
 <p class="summary"><strong>Summary</strong>An open format and a set of rules that turn a folder of Markdown into a wiki, a graph, an agent memory, a skills library, runnable architectures and a shared live board for agents and people, published here as a node of itself.</p>
 <p class="tagline">Auto-wiki, distributed agentic memory, live specifications, evolving skills, runnable architectures and a self-driving live board — one open format for people and agents. Reference Node Level-0 of the Agentic Knowledge Web.</p>
 <p class="lead">AgenticSystemCore turns one folder of Markdown into a website, a knowledge graph and a local tool server for AI assistants at once — every link typed, every published artefact carrying a digest a reader can check, every change merged by a person or by a rule that person recorded — so people, search engines and AI agents read the same checked knowledge, with no server, database or language model needed to build, check or publish it.</p>
+<ul>
+<li><a href="/docs/demos/">Try it in five minutes</a>: install the package and run each mode from an empty folder.</li>
+<li><a href="/docs/guides/">Use it on your own files</a>: one short guide per mode, every command with the lines it prints.</li>
+<li><a href="/docs/modes/">The six ways to use it</a>: one folder of files, six modes.</li>
+<li><a href="/specs/">Read the specification</a>: the rules, the schemas and the test cases.</li>
+</ul>
 <p>AgenticSystemCore is an open specification and reference implementation for knowledge that people and software agents can both read, verify and build on: a memory substrate that is deterministic, auditable, and governed by published conformance rules rather than by convention.</p>
 <p>This site publishes the specification and is itself a node of it: its vocabulary items, its discovery document, its graph and its agent-facing text file follow the rules they describe, and the discovery validator checks the site at Level 2 before every publish.</p>
+<h2 id="benefits">What each reader gets</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="What each reader gets"><table>
+<thead><tr><th scope="col">You are</th><th scope="col">You get</th><th scope="col">Where</th></tr></thead>
+<tbody>
+<tr><th scope="row">A person with notes</th><td>a wiki that checks and links itself, and a project's living memory</td><td><a href="/docs/guides/mode-0/">the Mode 0 guide</a>: <code>agsc init</code>, a security contact, one commit, <code>agsc ci</code>, <code>agsc build</code></td></tr>
+<tr><th scope="row">A team</th><td>a live board and shared skills</td><td><a href="/docs/modes/">the six modes</a>, <a href="/skills/">skill packs</a></td></tr>
+<tr><th scope="row">An agent or an assistant</th><td>memory it can find, verify and cite; tools on every item page</td><td><a href="/.well-known/knowledge-linkset">the discovery document</a>, <a href="/llms.txt">llms.txt</a>, <a href="/chunks.jsonl">the chunk export</a></td></tr>
+<tr><th scope="row">An implementer</th><td>a specification with vectors and standalone checkers, in any language</td><td><a href="/specs/">the specification</a>, <a href="/docs/reading-the-specification/">how to read it</a></td></tr>
+<tr><th scope="row">A publisher</th><td>static files, no server to run and nothing to pay for beyond hosting</td><td><a href="/procedures/publish-a-level-0-node/">publish a Level-0 node</a></td></tr>
+</tbody></table></div>
 <h2 id="different">What is different about it</h2>
-<p class="lead">Other systems have some of these. To the author's knowledge none has them together: a knowledge base a machine can find through registered web mechanisms, a digest on everything it points at, a typed graph with a published vocabulary, bytes pinned by conformance vectors, a person on every merge — directly, or by a standing rule that person recorded — and a starting harness out of the same files, with no server.</p>
+<p class="lead">Other systems have some of these. To the author's knowledge none has them together: a knowledge base a machine can find through registered web mechanisms, a digest on every artefact its discovery document links, a typed graph with a published vocabulary, bytes pinned by conformance vectors, a person on every merge — directly, or by a standing rule that person recorded — and a starting harness out of the same files, with no server.</p>
 <p>These are claims about the specification's text and its test vectors, not performance claims. The dated comparison with other systems is in the <a href="/docs/standards/#related-work">related work</a>, and the full sentence in the <a href="/docs/introduction/">introduction</a>.</p>
 <h2 id="compares">How it compares</h2>
 <p>What it shares with others' work, and how it differs:</p>
@@ -61,7 +77,7 @@
 <li><strong><a href="/docs/modes/#mode-1-distributed-agentic-memory">Distributed agentic memory</a></strong>Agents read, cite and propose; people ratify; nodes peer with each other.</li>
 <li><strong><a href="/docs/modes/#mode-2-live-specifications-and-the-memory-of-a-software-project">Live specifications</a></strong>A project's decisions, specs, tasks and gates as one governed memory.</li>
 <li><strong><a href="/docs/modes/#mode-3-the-evolving-skills-library">Evolving skills</a></strong>Procedures become skill packs; improved skills come back as Procedures.</li>
-<li><strong><a href="/docs/modes/#mode-4-runnable-knowledge">Runnable knowledge</a></strong>Select Concepts, get a Harness of seven files a runtime can execute.</li>
+<li><strong><a href="/docs/modes/#mode-4-runnable-knowledge">Runnable knowledge</a></strong>Select Concepts, get a starting Harness: seven kinds of file an architect or a runtime starts from.</li>
 <li><strong><a href="/docs/modes/#mode-5-the-live-board-self-driving-product-and-project-management">The live board</a></strong>Agents and people pull, claim and finish a project's tasks on one shared board until it is done.</li>
 </ul>
 <p>One folder of files, one format, six ways of using it. The <a href="/docs/modes/">six modes</a> explain each.</p>
@@ -70,8 +86,8 @@
 <ul class="modes">
 <li><strong><a href="/docs/modes/#mode-1-distributed-agentic-memory">Memory for one agent</a></strong>Run <code>agsc mcp</code> in a Bundle: an assistant gets seven tools to search, read, follow links and cite items by address, and nothing leaves the machine.</li>
 <li><strong><a href="/docs/modes/#mode-1-distributed-agentic-memory">Shared memory for many</a></strong>Every agent reads the same published files and changes them only by proposals a person ratifies.</li>
-<li><strong><a href="/skills/">A source of skills</a></strong>Procedures become skill packs with a lockfile of their digests, installable into agent tool folders.</li>
-<li><strong><a href="/compose/">Runnable procedures</a></strong>Selected Concepts become a harness of seven files a runtime can execute.</li>
+<li><strong><a href="/skills/">A source of skills</a></strong>Each cluster becomes one skill pack holding its items, procedures first, with a lockfile of their digests, installable into agent tool folders.</li>
+<li><strong><a href="/compose/">A starting harness</a></strong>Selected Concepts become a harness of seven kinds of file an architect or a runtime starts from; not a running system.</li>
 <li><strong><a href="/docs/modes/#mode-5-the-live-board-self-driving-product-and-project-management">A live board for a team of agents</a></strong>Agents claim and finish tasks until a board is done; decisions stay with people.</li>
 <li><strong><a href="/docs/how-it-works/">Knowledge across nodes</a></strong>A client reads several nodes' graph dumps and joins them on its own side, every foreign result marked with its origin.</li>
 </ul>
@@ -89,13 +105,13 @@
 <li><strong>Steering files for coding assistants:</strong> AGENTS.md, Aider, Claude Code, Cline, Codex, GitHub Copilot, Cursor, GABBE, Gemini CLI, Kiro, Windsurf.</li>
 <li><strong>Skills, both ways:</strong> plugin marketplaces, Claude Code plugins, Agent Skills folders, Cursor rules, Windsurf rules.</li>
 <li><strong>Project boards, both ways:</strong> this format's own board file, Asana, GitHub issues and projects, GitLab, Jira, Linear, plain Markdown, Notion, Obsidian Kanban, Todo.txt, Trello.</li>
-<li><strong>For assistants:</strong> a local MCP server (<code>agsc mcp</code>), and the same seven tools registered on every page of a built site for a browser's own agent.</li>
+<li><strong>For assistants:</strong> a local MCP server (<code>agsc mcp</code>), and the same seven tools registered on every item page and on <code>/compose/</code> of a built site for a browser's own agent.</li>
 <li><strong>In your repository:</strong> a GitHub Action that runs <code>agsc ci</code>, and a pre-commit hook that runs <code>agsc lint</code>.</li>
 <li><strong>Where a node can live:</strong> Cloudflare Pages, nginx or Apache, GitHub Pages behind a proxy, your own machine, a clone of the repository, IPFS through a gateway, a ledger-anchored record — any place that serves the files over HTTPS; <code>agsc-host list</code> says what each place can and cannot do.</li>
 </ul>
 <h2 id="brain">A distributed brain, with no server</h2>
 <p>Each node is a folder of files published as a static site. Nodes find and read each other through registered web mechanisms, every file they point at carries its digest, and they share one vocabulary. A node names its peers; a reader walks from one to the next. No node calls another, and no server sits in between. This node&#39;s peer is a second node, <a href="https://patterns.agenticsystemcore.com/">patterns.agenticsystemcore.com</a>: a demonstration node run by the same reference engine, whose sample content is a small set of well-known agent-system patterns described from public sources.</p>
-<figure class="diagram">
+<figure class="diagram" tabindex="0">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 270" role="img" aria-label="System overview: a folder of Markdown items and one configuration file goes through a deterministic build that emits pages for people, a graph, llms.txt with chunks, and the discovery document, which is highlighted" font-family="system-ui, sans-serif" font-size="14">
 <defs><marker id="ar-system-overview" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
 <g fill="none" stroke="currentColor" stroke-width="1.5">
@@ -127,34 +143,28 @@
 </svg>
 <figcaption>The highlighted discovery document is where an agent starts; people start at the pages. Both come from the same files.</figcaption>
 </figure>
-<h2 id="benefits">What each reader gets</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="What each reader gets"><table>
-<thead><tr><th scope="col">You are</th><th scope="col">You get</th><th scope="col">Where</th></tr></thead>
-<tbody>
-<tr><th scope="row">A person with notes</th><td>a wiki that checks and links itself, and a project's living memory</td><td><code>agsc init</code>, then <code>agsc ci</code></td></tr>
-<tr><th scope="row">A team</th><td>a live board and shared skills</td><td><a href="/docs/modes/">the six modes</a>, <a href="/skills/">skill packs</a></td></tr>
-<tr><th scope="row">An agent or an assistant</th><td>memory it can find, verify and cite; tools on every page</td><td><a href="/.well-known/knowledge-linkset">the discovery document</a>, <a href="/llms.txt">llms.txt</a>, <a href="/chunks.jsonl">the chunk export</a></td></tr>
-<tr><th scope="row">An implementer</th><td>a specification with vectors and standalone checkers, in any language</td><td><a href="/specs/">the specification</a>, <a href="/docs/reading-the-specification/">how to read it</a></td></tr>
-<tr><th scope="row">A publisher</th><td>static files, no server to run and nothing to pay for beyond hosting</td><td><a href="/procedures/publish-a-level-0-node/">publish a Level-0 node</a></td></tr>
-</tbody></table></div>
 <h2 id="measured">Measured, reproducible</h2>
-<p>Measured against specification 1.0.0-rc.6 with the reference engine; each command reproduces its line. None of these is a comparison with another system.</p>
+<p>Measured against specification 1.0.0-rc.7 with the reference engine; each command reproduces its line. None of these is a comparison with another system.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Measured, reproducible"><table>
 <thead><tr><th scope="col">What</th><th scope="col">Result</th><th scope="col">Reproduce with</th></tr></thead>
 <tbody>
-<tr><th scope="row">Conformance</th><td>171 vectors pass, 0 fail, of 171 (0 withdrawn); 322 of 332 active rules have a machine check</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer conformance --scratch &lt;dir&gt;</code></td></tr>
+<tr><th scope="row">Conformance</th><td>180 vectors pass, 0 fail, of 185 (5 withdrawn); 326 of 332 active rules have a machine check</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer conformance --scratch &lt;dir&gt;</code></td></tr>
 <tr><th scope="row">Determinism</th><td>49 files compared across two builds, and across time zones and locales: 0 differ</td><td><code>node bench/measure.js --layer determinism</code></td></tr>
-<tr><th scope="row">Security floor</th><td>85/85 seeded faults handled, 13/13 clean controls left alone. This proves neither safety nor the absence of new kinds of injection (AGSC-08-19)</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer security --scratch &lt;dir&gt;</code></td></tr>
-<tr><th scope="row">Accessibility</th><td>0 automated violations on the 61 pages this site had when it was measured, in the light and dark schemes; automated checks find only part of what matters, so this is a floor, not a claim</td><td><code>NODE_PATH=&lt;scratch&gt;/node_modules CHROME_EXE=&lt;chrome&gt; node bench/measure.js --layer a11y --nodes &lt;name&gt;=&lt;www&gt;,…</code></td></tr>
-<tr><th scope="row">Build scale</th><td>5,000 items built in 30.2 s, 10,000 in 58.5 s (median of three runs, one machine); 0 pages over the 100 KB budget</td><td><code>node bench/measure.js --layer perf --scratch &lt;dir&gt; --sizes 100,500,1000,5000,10000 --runs 3   # 2026-09-25, after the write-path change</code></td></tr>
-<tr><th scope="row">Tokens per chunk</th><td>median 94 tokens per chunk of this site's chunk export (cl100k_base)</td><td><code>NODE_PATH=&lt;scratch&gt;/node_modules node bench/measure.js --layer tokens --nodes &lt;name&gt;=&lt;www&gt;,… --exports &lt;name&gt;=&lt;dir&gt;,…</code></td></tr>
+<tr><th scope="row">Security floor</th><td>94/94 seeded faults handled, 13/13 clean controls left alone. This proves neither safety nor the absence of new kinds of injection (AGSC-08-19)</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer security --scratch &lt;dir&gt;</code></td></tr>
+<tr><th scope="row">Accessibility</th><td>0 automated violations on the 81 pages this site had when it was measured, in the light and dark schemes; automated checks find only part of what matters, so this is a floor, not a claim</td><td><code>NODE_PATH=&lt;scratch&gt;/node_modules CHROME_EXE=&lt;chrome&gt; node bench/measure.js --layer a11y --nodes &lt;name&gt;=&lt;www&gt;,…</code></td></tr>
+<tr><th scope="row">Build scale</th><td>5,000 items built in 40.2 s, 10,000 in 101.3 s (median of three runs, one machine); 0 pages over the 100 KB budget</td><td><code>node bench/measure.js --layer perf   # sizes 100 500 1000 5000 10000, 3 runs each, median</code></td></tr>
+<tr><th scope="row">Tokens per chunk</th><td>median 100 tokens per chunk of this site's chunk export (cl100k_base)</td><td><code>NODE_PATH=&lt;scratch&gt;/node_modules node bench/measure.js --layer tokens --nodes &lt;name&gt;=&lt;www&gt;,… --exports &lt;name&gt;=&lt;dir&gt;,…</code></td></tr>
 </tbody></table></div>
 <h2 id="get-started">Get started</h2>
-<p>In a folder of Markdown notes, with the command line installed:</p>
-<pre tabindex="0"><code>agsc init     # each note gets a type, a title and its provenance
+<p>Install the command line (Node.js 22.13 or later, <code>git</code>), then, in a folder of Markdown notes:</p>
+<pre tabindex="0"><code>npm install --global agentic-system-core   # puts agsc on the PATH
+agsc init     # each note gets a type, a title and its provenance
+mkdir -p .well-known &amp;&amp; printf 'Contact: mailto:you@example.org\n' &gt; .well-known/security.txt
+git init -q &amp;&amp; git add -A &amp;&amp; git commit -q -m 'my notes'   # the build takes its instant from this commit
 agsc ci       # lint, build twice, compare the bytes, verify
+agsc build    # the site, the graph and the agent files in www/
 agsc mcp      # give an assistant seven tools over the same folder</code></pre>
-<p>Before the first build, add <code>.well-known/security.txt</code> with a <code>Contact:</code> line; <code>agsc init</code> says so. The <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md">assistant setup guide</a> and the <a href="/docs/start-here/">start page for each kind of reader</a> go further.</p>
+<p>Without the security contact, <code>agsc ci</code> stops with <code>AGSC-E901</code>; without a commit (or <code>SOURCE_DATE_EPOCH</code>), with <code>AGSC-E204</code>. The <a href="/docs/guides/mode-0/">Mode 0 guide</a> walks through it with the lines each command prints, and the <a href="/docs/guides/">guides</a> do the same for every mode. The <a href="/docs/demos/">demos</a> run each mode from an empty folder; the <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md">assistant setup guide</a> and the <a href="/docs/start-here/">start page for each kind of reader</a> go further.</p>
 <h2 id="this-site">This site is a node of itself</h2>
 <p>Everything published here follows the rules it publishes: the vocabulary items, the discovery document, the graph and the agent-facing text file are written by the reference engine, and the discovery validator checks this site at Level 2 before every publish. The <a href="/docs/status/">status page</a> says which further parts are live.</p>
 <h2 id="start">Where to start</h2>
@@ -168,7 +178,7 @@ agsc mcp      # give an assistant seven tools over the same folder</code></pre>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/content/index.md">Propose an edit</a> — opens <code>content/index.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
 </footer>
 </body>
 </html>

@@ -44,7 +44,7 @@
 <h2 id="before-anything">Before anything</h2>
 <p>You need Node.js 22.13 or later and <code>git</code>. One install gives the <code>agsc</code> command:</p>
 <pre tabindex="0" data-lang="bash"><code>npm install -g agentic-system-core     # or: npm install -g agsc-cli (the short alias, the same engine)
-agsc --version                         # 1.0.0-rc.6</code></pre>
+agsc --version                         # 1.0.0-rc.7</code></pre>
 <p>Three facts carry the whole page:</p>
 <ul>
 <li><strong>A Bundle is a folder</strong> holding <code>agsc.config.json</code> and <code>content/</code> with one Markdown file per item. Every verb runs from inside that folder.</li>
@@ -55,13 +55,13 @@ agsc --version                         # 1.0.0-rc.6</code></pre>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
 <thead><tr><th scope="col">You are</th><th scope="col">Start with</th><th scope="col">Mode</th><th scope="col">Section</th></tr></thead>
 <tbody>
-<tr><td>one person with a folder of notes</td><td><code>agsc init</code>, <code>agsc ci</code>, <code>agsc build</code></td><td>0</td><td><a href="#mode-0-one-folder-becomes-a-checked-site">Mode 0</a></td></tr>
+<tr><td>one person with a folder of notes</td><td><code>agsc init</code>, the security contact, one commit, <code>agsc ci</code>, <code>agsc build</code></td><td>0</td><td><a href="#mode-0-one-folder-becomes-a-checked-site">Mode 0</a></td></tr>
 <tr><td>a reader of a published node</td><td>the home page, <code>/llms.txt</code>, the search</td><td>0</td><td><a href="#reading-a-node-without-installing-anything">Reading a node</a></td></tr>
 <tr><td>a contributor</td><td>edit one file, <code>agsc lint --fix</code>, <code>agsc propose &lt;slug&gt;</code></td><td>0</td><td><a href="#mode-0-one-folder-becomes-a-checked-site">Mode 0</a></td></tr>
 <tr><td>an assistant or agent on one machine</td><td><code>agsc mcp</code>, or the discovery document and <code>/llms.txt</code></td><td>1</td><td><a href="#mode-1-memory-for-agents-on-one-machine-and-across-nodes">Mode 1</a> and <a href="#for-agents-in-one-screen">For agents</a></td></tr>
 <tr><td>a software team</td><td><code>kind: decision</code>, <code>spec</code>, <code>task</code> items; <code>agsc ci</code>; <code>agsc export --steer</code></td><td>2</td><td><a href="#mode-2-a-project-s-living-specifications">Mode 2</a></td></tr>
 <tr><td>someone who keeps skills for agents</td><td><code>agsc skills</code>, <code>agsc skills install</code></td><td>3</td><td><a href="#mode-3-procedures-as-skills">Mode 3</a></td></tr>
-<tr><td>an architect</td><td><code>/compose/</code> or <code>agsc compose &lt;slug&gt;…</code></td><td>4</td><td><a href="#mode-4-a-selection-becomes-a-runnable-system">Mode 4</a></td></tr>
+<tr><td>an architect</td><td><code>/compose/</code> or <code>agsc compose &lt;slug&gt;…</code></td><td>4</td><td><a href="#mode-4-a-selection-becomes-a-starting-harness">Mode 4</a></td></tr>
 <tr><td>a team of people and agents working one board</td><td>task items on a cluster, <code>agents[]</code> lanes, the <code>propose</code> tool</td><td>5</td><td><a href="#mode-5-the-live-board-for-many-people-and-agents">Mode 5</a></td></tr>
 <tr><td>several publishers whose nodes should know each other</td><td><code>peers[]</code>, <code>validate-wellknown --peer</code></td><td>1</td><td><a href="#mode-1-memory-for-agents-on-one-machine-and-across-nodes">Mode 1</a></td></tr>
 <tr><td>an implementer in another language</td><td>the vectors and <code>validate-wellknown</code>, <code>agsc conform</code></td><td>—</td><td><a href="/procedures/publish-a-level-0-node/">Publish a Level-0 node</a></td></tr>
@@ -77,7 +77,7 @@ agsc --version                         # 1.0.0-rc.6</code></pre>
 <tr><td>one pipeline</td><td><code>agsc ci [--level &lt;n&gt;]</code></td><td>lint, two builds compared byte for byte, verify; writes the forge files a gate needs</td></tr>
 <tr><td>hand out</td><td><code>agsc export --markdown|--okf|--jsonld|--jsonl|--steer|--to &lt;adapter&gt;</code></td><td>the memory as files for people, other nodes, coding agents, memory systems, trackers and skills collections</td></tr>
 <tr><td>bring in</td><td><code>agsc import --from &lt;adapter&gt; &lt;dir&gt; [--dry-run]</code></td><td>the way back: another node's export, a tracker's file, a skills collection, a memory archive</td></tr>
-<tr><td>assemble</td><td><code>agsc compose &lt;slug&gt;… [--zip]</code></td><td>a selection of items closed over its links, checked, written as a Harness of seven files</td></tr>
+<tr><td>assemble</td><td><code>agsc compose &lt;slug&gt;… [--zip]</code></td><td>a selection of items closed over its links, checked, written as a Harness of seven kinds of file</td></tr>
 <tr><td>change</td><td><code>agsc propose &lt;slug&gt;</code></td><td>a patch and a pull-request body for one edited item; prints the git commands, runs none</td></tr>
 <tr><td>review</td><td><code>agsc review</code></td><td>the review lane over a proposal: lint only, no model reachable</td></tr>
 <tr><td>run a lane</td><td><code>agsc refresh --agent &lt;name&gt; --dry-run [--task &lt;t&gt;]</code></td><td>a dry run of a declared agent lane: the proposal it would open and the Episode of the run, with no model call; without <code>--dry-run</code> it refuses, because no model adapter ships</td></tr>
@@ -104,6 +104,7 @@ agsc --version                         # 1.0.0-rc.6</code></pre>
 <pre tabindex="0" data-lang="bash"><code>cd my-notes                                            # a folder of Markdown files, or an empty one
 agsc init                                              # each file gets a type, a title and a provenance block
 mkdir -p .well-known &amp;&amp; printf 'Contact: https://example.org/security\nExpires: 2027-06-01T00:00:00Z\n' &gt; .well-known/security.txt
+git init -q &amp;&amp; git add -A &amp;&amp; git commit -q -m 'my notes'   # the build takes its instant from this commit (or set SOURCE_DATE_EPOCH)
 # in agsc.config.json, set site.base to the https:// address the node will have
 agsc ci                                                # ci: pass — or the exact file and line that stops it
 agsc build                                             # www/ is the whole node; serve it anywhere that serves files over HTTPS</code></pre>
@@ -112,8 +113,8 @@ agsc build                                             # www/ is the whole node;
 <thead><tr><th scope="col">Scenario</th><th scope="col">Who</th><th scope="col">Do</th><th scope="col">Result</th></tr></thead>
 <tbody>
 <tr><td>personal notes become a site</td><td>one person</td><td>the six lines above</td><td>pages, graph, search, <code>llms.txt</code>, the discovery document</td></tr>
-<tr><td>a broken link must not go live</td><td>one person or a team</td><td><code>agsc lint</code> before <code>agsc build</code></td><td><a class="ref" href="/specs/09-conformance/#AGSC-E310"><code>AGSC-E310</code></a> names the file and line; <code>build</code> writes nothing</td></tr>
-<tr><td>a page goes out of date</td><td>one person</td><td>give the item <code>stale_after: &lt;instant&gt;</code></td><td>the NOW page lists it once the instant has passed (<a class="ref" href="/specs/06-surfaces/#AGSC-06-22">AGSC-06-22</a>)</td></tr>
+<tr><td>a broken link must not go live</td><td>one person or a team</td><td><code>agsc lint</code> before <code>agsc build</code></td><td><a class="ref" href="/specs/09-conformance/page-2/#AGSC-E310"><code>AGSC-E310</code></a> names the file and line; <code>build</code> writes nothing</td></tr>
+<tr><td>a page goes out of date</td><td>one person</td><td>give the item <code>stale_after: &lt;instant&gt;</code></td><td>the NOW page lists it once the instant has passed (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-22">AGSC-06-22</a>)</td></tr>
 <tr><td>something went wrong and must not again</td><td>a team</td><td>write a <code>lesson</code> item</td><td>the set of Lessons is the node's error record</td></tr>
 <tr><td>documentation in continuous integration</td><td>a team</td><td><code>uses: andreibesleaga/agentic-system-core@&lt;tag-or-sha&gt;</code> in a workflow</td><td><code>agsc ci</code> runs on every pull request with <code>contents: read</code></td></tr>
 <tr><td>checks before every commit</td><td>a team</td><td>the <code>agsc-lint</code> hook of the engine's <code>.pre-commit-hooks.yaml</code></td><td><code>agsc lint</code> runs when an item or the configuration changed</td></tr>
@@ -134,7 +135,7 @@ claude mcp add --transport stdio my-knowledge -- npx -y agsc-cli mcp</code></pre
 <tr><td><code>read</code></td><td>one item: frontmatter and text</td><td>nothing</td></tr>
 <tr><td><code>links</code></td><td>the typed links authored on one item</td><td>nothing</td></tr>
 <tr><td><code>compose</code></td><td>whether a selection of items fits together</td><td>nothing</td></tr>
-<tr><td><code>ask</code></td><td>an answer from this memory only, citing at least one item, or exactly <code>no answer in this memory</code></td><td>nothing</td></tr>
+<tr><td><code>ask</code></td><td>the descriptions of the best-matching items from this memory only, each with its address, or exactly <code>no answer in this memory</code>; no model is called</td><td>nothing</td></tr>
 <tr><td><code>propose</code></td><td>the prepared text of a change to one item, or a task-state change on a board</td><td>nothing — the text comes back to you</td></tr>
 <tr><td><code>remember</code></td><td>a new, well-formed item from what you told it</td><td>nothing — the text comes back to you</td></tr>
 </tbody></table></div>
@@ -154,7 +155,7 @@ claude mcp add --transport stdio my-knowledge -- npx -y agsc-cli mcp</code></pre
 <tr><td>two nodes vouch for each other</td><td>two publishers</td><td>each lists the other's discovery URL in <code>peers[]</code>; <code>agsc build</code>; <code>validate-wellknown a/www/.well-known/knowledge-linkset --level 2 --peer b/www/.well-known/knowledge-linkset</code></td><td>pass when both name each other; &quot;resolved, not mutual&quot; when one does (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a>)</td></tr>
 <tr><td>a client walks a neighbourhood</td><td>one client</td><td>the walk is a library function at this version (<code>src/boundary/federation.js</code>), HTTPS only, three hops, fifty peers a node, five hundred requests</td><td>results marked with their origin; <code>partial: true</code> when a limit is reached (<a class="ref" href="/specs/11-boundary/#AGSC-11-10">AGSC-11-10</a>)</td></tr>
 <tr><td>one answer from three nodes</td><td>one consumer</td><td>download each node's <code>/graph.nq</code> and <code>/chunks.jsonl</code>; join them in your own process</td><td>nodes never fetch on anyone's behalf (<a class="ref" href="/specs/11-boundary/#AGSC-11-11">AGSC-11-11</a>)</td></tr>
-<tr><td>citing another node</td><td>a publisher</td><td>name the peer's page in an item's <code>sources[]</code>, never in a Link</td><td>the rule has the graph state <code>rdfs:seeAlso</code> to that page with no fetch (<a class="ref" href="/specs/11-boundary/#AGSC-11-12">AGSC-11-12</a>); the reference engine does not write that statement yet</td></tr>
+<tr><td>citing another node</td><td>a publisher</td><td>name the peer's page in an item's <code>sources[]</code>, never in a Link</td><td>the graph states <code>rdfs:seeAlso</code> to that page and <code>asc:peerOrigin</code> to the peer, with no fetch (<a class="ref" href="/specs/11-boundary/#AGSC-11-12">AGSC-11-12</a>)</td></tr>
 <tr><td>a stranger contributes</td><td>a stranger's agent, the publisher</td><td>the publisher declares <code>contribute[]</code> (<code>pr</code>, <code>channel</code> or <code>form</code>); the agent uses <code>propose</code></td><td>the proposal goes to the first route it can use, else back to its caller (<a class="ref" href="/specs/11-boundary/#AGSC-11-14">AGSC-11-14</a>)</td></tr>
 </tbody></table></div>
 <p>Personas: the agent reader, the agent proposer, the agent using a node as memory, the standards implementer.</p>
@@ -195,8 +196,8 @@ agsc skills import ./their/SKILL.md           # a foreign skill comes back as a 
 <tr><td>rules from an editor become knowledge</td><td>a team</td><td><code>agsc import --from skills --layout cursor &lt;repo&gt;</code></td><td>each rule a concept of kind <code>explainer</code></td></tr>
 </tbody></table></div>
 <p>Persona: the integrator.</p>
-<h2 id="mode-4-a-selection-becomes-a-runnable-system">Mode 4 — a selection becomes a runnable system</h2>
-<p><strong>For:</strong> an architect assembling a starting architecture from concepts; a runtime that executes a procedure under control. <strong>Switch:</strong> none for <code>compose</code>; <code>run.enabled: true</code> and <code>run.allow[]</code> for <code>run</code> and <code>trace</code> (<a class="ref" href="/specs/09-conformance/#AGSC-09-94">AGSC-09-94</a>).</p>
+<h2 id="mode-4-a-selection-becomes-a-starting-harness">Mode 4 — a selection becomes a starting harness</h2>
+<p><strong>For:</strong> an architect assembling a starting architecture from concepts; a runtime that executes a procedure under control. <strong>Switch:</strong> none for <code>compose</code>; <code>run.enabled: true</code> and <code>run.allow[]</code> for <code>run</code> and <code>trace</code> (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-09-94">AGSC-09-94</a>).</p>
 <pre tabindex="0" data-lang="bash"><code>agsc compose handoff run-the-tests task-login-form --zip   # dist/harness/&lt;name&gt;/: harness.jsonld, AGENTS.md, workspace.dsl, diagram.mmd, arc42.md, decisions/, skills/, and one archive
 agsc compose --from my-architecture                        # re-run a saved architecture item's selection</code></pre>
 <p>The combiner runs five steps in a fixed order — requirements closure, hiding superseded items, mutual exclusions, warnings, port wiring — and a valid selection gives a Harness of seven file kinds, byte-identical from the <code>/compose/</code> page and from the command line (<a class="ref" href="/specs/07-composition/#AGSC-07-12">AGSC-07-12</a>, <a class="ref" href="/specs/07-composition/#AGSC-07-13">AGSC-07-13</a>). An invalid selection gives only the verdict.</p>
@@ -238,7 +239,7 @@ agsc trace run1.json             # a traced run becomes an Episode; the NOW page
 <tr><td>open a task</td><td><code>remember({kind: &quot;task&quot;, cluster: &quot;&lt;board&gt;&quot;, title, body})</code></td><td>a task in <code>TASK_STATE_SUBMITTED</code> on that board</td></tr>
 <tr><td>comment</td><td><code>remember({kind: &quot;lesson&quot;, about: &quot;&lt;task&gt;&quot;, title, body})</code></td><td>a lesson whose <code>related</code> names the task</td></tr>
 </tbody></table></div>
-<p>A person applies the patch and commits (<code>git apply</code>, or a pull request to the <code>contribute</code> target); the next build derives who holds the task from the history; from then on another claim of it is refused everywhere (<a class="ref" href="/specs/09-conformance/#AGSC-E511"><code>AGSC-E511</code></a>), and the first merged claim wins.</p>
+<p>A person applies the patch and commits (<code>git apply</code>, or a pull request to the <code>contribute</code> target); the next build derives who holds the task from the history; from then on another claim of it is refused everywhere (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E511"><code>AGSC-E511</code></a>), and the first merged claim wins.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table 38"><table>
 <thead><tr><th scope="col">Scenario</th><th scope="col">Who</th><th scope="col">Do</th><th scope="col">Result</th></tr></thead>
 <tbody>
@@ -281,16 +282,15 @@ agsc trace run1.json             # a traced run becomes an Episode; the NOW page
 <p>Two things to know about hooks. A steering file is context, not enforcement: to block an action no matter what an agent decides, use the agent's own pre-action hook or the CI check, which is what <code>agsc ci</code> and the forge files are for. And a Claude Code <code>CLAUDE.md</code> can import the node's file with one <code>@.agsc/CLAUDE.md</code> line, so your own instructions and the node's stay separate; the engine's <a href="https://github.com/andreibesleaga/agentic-system-core/tree/main/examples/connectors">connector examples</a> show this for Claude Code, Codex and Cursor.</p>
 <p>Eight kinds of plugin extend the engine without changing it — a memory adapter, a channel adapter, a forge shim, a deployment profile, a surface, a page tool, a composition emitter and a checker — under a forward-compatibility promise (<a class="ref" href="/specs/00-overview/#AGSC-00-24">AGSC-00-24</a>). At this version the engine loads a plugin you write for three of them: the memory adapter (<code>export --to &lt;path&gt;</code>, <code>import --from &lt;path&gt;</code>), the composition emitter (<code>compose --emit &lt;path&gt;</code>) and the deployment profile (<code>agsc-host emit &lt;path&gt;</code>). The engine's <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/PLUGINS.md">plugin guide</a> has the three rules every kind obeys.</p>
 <h2 id="where-a-node-lives">Where a node lives</h2>
-<p>A node is files, so it lives wherever files are served over HTTPS. <code>agsc-host list</code> names the hosting profiles the engine ships — Cloudflare Pages (the reference), any static server (nginx or Apache), GitHub Pages behind a header-setting proxy, the node's own machine (<code>agsc-host serve</code>, loopback only without a TLS terminator), a clone of the repository, IPFS through a gateway, a ledger-anchored record of each build — and each says plainly what that place cannot do. <code>agsc-host emit &lt;profile&gt;</code> writes that host's configuration from the build. The response headers the build wrote must be served as written (<a class="ref" href="/specs/06-surfaces/#AGSC-06-17">AGSC-06-17</a>); the engine's <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONNECTORS.md">connector guide</a> lists every profile.</p>
+<p>A node is files, so it lives wherever files are served over HTTPS. <code>agsc-host list</code> names the hosting profiles the engine ships — Cloudflare Pages (the reference), any static server (nginx or Apache), GitHub Pages behind a header-setting proxy, the node's own machine (<code>agsc-host serve</code>, loopback only without a TLS terminator), a clone of the repository, IPFS through a gateway, a ledger-anchored record of each build — and each says plainly what that place cannot do. <code>agsc-host emit &lt;profile&gt;</code> writes that host's configuration from the build. The response headers the build wrote must be served as written (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-17">AGSC-06-17</a>); the engine's <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONNECTORS.md">connector guide</a> lists every profile.</p>
 <h2 id="not-shipped-at-this-version">Not shipped at this version</h2>
 <p>Said plainly, so that no mode is picked up with a wrong expectation:</p>
 <ul>
 <li><strong>No model adapter.</strong> An agent lane that writes pages needs one; <code>agsc refresh --agent &lt;name&gt; --dry-run</code> runs every gate and the budget without a model call.</li>
 <li><strong>No channel adapter.</strong> A <code>channel</code> contribution route and <code>publish: auto</code> can be declared and checked; the merges themselves happen on a forge.</li>
 <li><strong>No isolating runner.</strong> <code>agsc run</code> resolves and lists steps and refuses to execute without one, and says why.</li>
-<li><strong>No runtime emitters.</strong> <code>compose --emit &lt;name&gt;</code> for the six named runtimes is reserved; the Harness's seven files are what ships.</li>
-<li><strong>No command for the federation walk.</strong> The walk is a library function with an injected fetch; a command line around it is planned.</li>
-<li><strong>Citations across nodes are not yet in the graph.</strong> A <code>sources[]</code> entry naming a peer's page is kept on the item; the <code>rdfs:seeAlso</code> statement the rule names is not written by this version.</li>
+<li><strong>No runtime emitters.</strong> <code>compose --emit &lt;name&gt;</code> for the six named runtimes is reserved; the Harness's seven kinds of file are what ships.</li>
+<li><strong>No command for the federation walk.</strong> The walk is a library function with an injected fetch; a command line around it is not planned for a fixed version.</li>
 <li><strong>Five plugin kinds load from a sample, not from configuration.</strong> Only a memory adapter, a composition emitter and a deployment profile are loaded from a path you give.</li>
 <li><strong>A browser with an assistant</strong> is needed for the in-page tools and the <code>/compose/</code> download; the engine's own test lane proves them with a real browser.</li>
 </ul>
@@ -306,7 +306,7 @@ agsc trace run1.json             # a traced run becomes an Episode; the NOW page
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/how-to-use.md">Propose an edit</a> — opens <code>site/docs/how-to-use.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
 </footer>
 </body>
 </html>

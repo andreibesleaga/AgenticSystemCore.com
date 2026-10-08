@@ -1,7 +1,7 @@
 ---
 type: concept
 title: "Procedure"
-description: "A plan a reader can execute: a trigger, steps and checks. A procedure exports one to one to a skill file."
+description: "A plan a reader can execute: a trigger, steps and checks. Procedures are published in skill packs, one pack per cluster."
 kind: term
 tags: [vocabulary, specification]
 clusters: [vocabulary]
@@ -20,6 +20,6 @@ sources:
     grade: primary
 ---
 
-A **Procedure** is a plan a reader can execute. It may carry `when`, a one-line trigger that becomes the description of its exported skill file, and `inputs[]`; its body uses the headings `When`, `Steps` and `Checks`.
+A **Procedure** is a plan a reader can execute. It may carry `when`, a one-line trigger saying when it applies, and `inputs[]`; its body uses the headings `When`, `Steps` and `Checks`. Procedures are published in skill packs, one pack per cluster holding the cluster's published items, and the pack takes its description from the cluster; a skill imported from elsewhere arrives as a Procedure whose `when` is that skill's description.
 
 In the graph a Procedure is an `asc:Procedure`, a subclass of `prov:Plan`.

@@ -61,12 +61,12 @@
 <h2 id="amendments">Amendments</h2>
 <p>A rule may close with a short italic note in parentheses, such as <em>(amended …)</em> or <em>(corrected …)</em>: the rule changed while the specification was drafted, and the note gives the date and says what changed and why. The note is not part of what the rule requires. Released sections are immutable: a change ships as a new version (<a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a>).</p>
 <h2 id="error-codes">Error codes</h2>
-<p>Every failure a conforming tool reports has a code of the form <code>AGSC-E&lt;nnn&gt;</code>, and each code has exactly one row in the <a href="/specs/09-conformance/#section-9-4">registry</a> naming the rule that raises it. The hundreds digit is the area: 0 command line, 1 parsing, 2 schema, 3 links, 4 lint, 5 provenance and adoption, 6 determinism, 7 ledger, 8 composition, 9 input, output and federation.</p>
+<p>Every failure a conforming tool reports has a code of the form <code>AGSC-E&lt;nnn&gt;</code>, and each code has exactly one row in the <a href="/specs/09-conformance/page-2/#section-9-4">registry</a> naming the rule that raises it. The hundreds digit is the area: 0 command line, 1 parsing, 2 schema, 3 links, 4 lint, 5 provenance and adoption, 6 determinism, 7 ledger, 8 composition, 9 input, output and federation.</p>
 <h2 id="vectors">Vectors</h2>
 <p>A vector is one JSON file with an input and an expected result, proving one rule (<a class="ref" href="/specs/09-conformance/#AGSC-09-04">AGSC-09-04</a>). Vectors are grouped by area; a required vector that is skipped counts as a failure; a withdrawn vector is kept for history and never run. Vectors are what a conformance claim asserts.</p>
 <h2 id="levels">Levels</h2>
 <p>An implementation claims exactly one Level: 0 publisher, 1 reader, 2 writer, 3 full engine (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-01">AGSC-10-01</a>). Each Level names the areas of vectors it must pass (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-02">AGSC-10-02</a> to <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-05">AGSC-10-05</a>), and each contains the one below. This site claims Level 0.</p>
-<figure class="diagram">
+<figure class="diagram" tabindex="0">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 260" role="img" aria-label="Conformance levels as nested boxes: Level 0 publisher (highlighted, static files only) sits inside Level 1 reader, inside Level 2 writer, inside Level 3 full engine" font-family="system-ui, sans-serif" font-size="14">
 <defs><marker id="ar-levels" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
 <g fill="none" stroke="currentColor" stroke-width="1.5">
@@ -93,7 +93,7 @@
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/reading-the-specification.md">Propose an edit</a> — opens <code>site/docs/reading-the-specification.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
 </footer>
 </body>
 </html>

@@ -39,8 +39,19 @@
 </header>
 <main id="main">
 <h1>Start here</h1>
-<p class="summary"><strong>Summary</strong>One path through this site and its sources for each kind of reader: someone curious, a developer, an implementer in another language, and an agent. Each step is one page, in order.</p>
+<p class="summary"><strong>Summary</strong>One path through this site and its sources for each kind of reader: someone with a folder of notes, someone curious, a developer, an implementer in another language, and an agent. Each step is one page, in order.</p>
 <p>AgenticSystemCore has several doors. Find yourself below and follow that path; each step is one page, in the order given. Every page explains; the <a href="/specs/">specification</a> decides.</p>
+<h2 id="if-you-have-a-folder-of-notes">If you have a folder of notes</h2>
+<p>1. The <a href="/docs/demos/">demos</a>: install the package and run Mode 0 on a few notes in five minutes; every command is shown with the lines it prints.
+2. The <a href="/docs/guides/mode-0/">Mode 0 guide</a>: on your own notes, <code>agsc init</code> in the folder, a security contact file, one commit, then <code>agsc ci</code> and <code>agsc build</code>, with the lines each prints; the <a href="/docs/guides/">other guides</a> do the same for each mode.
+3. The <a href="/docs/modes/">six modes</a>: what else the same folder can become once it is a checked site.</p>
+<h2 id="if-your-team-works-with-coding-assistants">If your team works with coding assistants</h2>
+<p>1. The <a href="/docs/guides/mode-2/">Mode 2 guide</a>: decisions, specifications, tasks and a gate as checked files, a board, and one steering file for every assistant.
+2. The <a href="/docs/guides/mode-3/">Mode 3</a> and <a href="/docs/guides/mode-5/">Mode 5</a> guides: the team's procedures as skills, and a board that agents and people share.</p>
+<h2 id="if-you-decide-whether-to-depend-on-it">If you decide whether to depend on it</h2>
+<p>1. The <a href="/docs/status/">status page</a>: what is live and the state of every outside step.
+2. The source repository's <code>GOVERNANCE.md</code> (&quot;Who stands behind this&quot;: one maintainer, open licences, no support promise and no schedule) and <code>SECURITY.md</code>.
+3. A live node to look at: <a href="https://patterns.agenticsystemcore.com/">patterns.agenticsystemcore.com</a>.</p>
 <h2 id="if-you-are-curious">If you are curious</h2>
 <p>1. The <a href="/docs/introduction/">introduction</a>: what this is, what is new about it, who it is for.
 2. The <a href="/docs/modes/">six modes</a>: six ways of using one folder of files, and <a href="/docs/how-to-use/">how to use it</a>: the first commands for each.
@@ -61,13 +72,13 @@
 3. <a href="/chunks.jsonl"><code>/chunks.jsonl</code></a>, the graph dumps and the <a href="/ns/">ontology</a>: for retrieval and for joining with other nodes.
 4. The <a href="/docs/agent-skill/">agent skill</a>: one file to load into a coding agent so it can use the engine in every mode.
 5. <a href="/docs/how-to-use/">How to use it</a>, the section for agents: what to fetch, in which order, and how to propose a change.
-6. On any page of this site, the seven page tools, when your browser offers them; everything from here is marked untrusted, and <code>propose</code> returns text for a person to review.</p>
+6. On every item page and on <code>/compose/</code> of this site, the seven page tools, when your browser offers them; everything from here is marked untrusted, and <code>propose</code> returns text for a person to review.</p>
 <h2 id="where-a-node-can-live">Where a node can live</h2>
-<p>A node is a set of files, so it can live wherever files can be served over HTTPS: a web host, a laptop, a small device, a clone of its repository, IPFS behind a gateway, or a web interface in front of a ledger that records each build. What the rules ask of the place is fixed — the discovery document and the routes, with the response headers the build wrote (<a class="ref" href="/specs/06-surfaces/#AGSC-06-17">AGSC-06-17</a>) — and a <em>hosting profile</em>, one of the plugin kinds (<a class="ref" href="/specs/00-overview/#AGSC-00-24">AGSC-00-24</a>), tells each kind of place how. No rule of version 1.x pins a transport other than HTTP. The <a href="/docs/architecture/">architecture</a> describes the deployment; the source repository's <code>docs/CONNECTORS.md</code> lists every profile and what it cannot do.</p>
+<p>A node is a set of files, so it can live wherever files can be served over HTTPS: a web host, a laptop, a small device, a clone of its repository, IPFS behind a gateway, or a web interface in front of a ledger that records each build. What the rules ask of the place is fixed — the discovery document and the routes, with the response headers the build wrote (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-17">AGSC-06-17</a>) — and a <em>hosting profile</em>, one of the plugin kinds (<a class="ref" href="/specs/00-overview/#AGSC-00-24">AGSC-00-24</a>), tells each kind of place how. No rule of version 1.x pins a transport other than HTTP. The <a href="/docs/architecture/">architecture</a> describes the deployment; the source repository's <code>docs/CONNECTORS.md</code> lists every profile and what it cannot do.</p>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/start-here.md">Propose an edit</a> — opens <code>site/docs/start-here.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
 </footer>
 </body>
 </html>

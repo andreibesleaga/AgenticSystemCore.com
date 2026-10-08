@@ -39,7 +39,7 @@ A rule may close with a short italic note in parentheses, such as *(amended …)
 
 ## Error codes
 
-Every failure a conforming tool reports has a code of the form `AGSC-E<nnn>`, and each code has exactly one row in the [registry](/specs/09-conformance/#section-9-4) naming the rule that raises it. The hundreds digit is the area: 0 command line, 1 parsing, 2 schema, 3 links, 4 lint, 5 provenance and adoption, 6 determinism, 7 ledger, 8 composition, 9 input, output and federation.
+Every failure a conforming tool reports has a code of the form `AGSC-E<nnn>`, and each code has exactly one row in the [registry](/specs/09-conformance/page-2/#section-9-4) naming the rule that raises it. The hundreds digit is the area: 0 command line, 1 parsing, 2 schema, 3 links, 4 lint, 5 provenance and adoption, 6 determinism, 7 ledger, 8 composition, 9 input, output and federation.
 
 ## Vectors
 

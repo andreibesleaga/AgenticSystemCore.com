@@ -137,7 +137,7 @@ Persona: the integrator.
 cp -r "$ENGINE/examples/demos/mode-4-compose" . && cd mode-4-compose
 git init -q -b main && git add -A && git commit -q -m 'runnable knowledge'
 agsc compose handoff run-the-tests task-login-form --zip   # dist/harness/<name>/ with AGENTS.md, arc42.md, decisions/, diagram.mmd, harness.jsonld, skills/, workspace.dsl, and the archive
-agsc compose handoff --emit crewai                          # error: AGSC-E001 … named by AGSC-07-18 but is not implemented at this milestone
+agsc compose handoff --emit crewai                          # error: AGSC-E203 … this distribution ships no rendering for it
 agsc run greet --dry-run                                    # run: step 1: echo hello … nothing executed
 agsc run fetch --dry-run                                    # [REFUSED: not in run.allow[]]
 agsc run greet                                              # error: AGSC-E001 run executed nothing … does not declare network isolation

@@ -1,10 +1,27 @@
 ---
 title: "Start here"
-summary: "One path through this site and its sources for each kind of reader: someone curious, a developer, an implementer in another language, and an agent. Each step is one page, in order."
+summary: "One path through this site and its sources for each kind of reader: someone with a folder of notes, someone curious, a developer, an implementer in another language, and an agent. Each step is one page, in order."
 description: "Where to start with AgenticSystemCore: a reading path for the public reader, the developer, the implementer and the agent."
 ---
 
 AgenticSystemCore has several doors. Find yourself below and follow that path; each step is one page, in the order given. Every page explains; the [specification](/specs/) decides.
+
+## If you have a folder of notes
+
+1. The [demos](/docs/demos/): install the package and run Mode 0 on a few notes in five minutes; every command is shown with the lines it prints.
+2. The [Mode 0 guide](/docs/guides/mode-0/): on your own notes, `agsc init` in the folder, a security contact file, one commit, then `agsc ci` and `agsc build`, with the lines each prints; the [other guides](/docs/guides/) do the same for each mode.
+3. The [six modes](/docs/modes/): what else the same folder can become once it is a checked site.
+
+## If your team works with coding assistants
+
+1. The [Mode 2 guide](/docs/guides/mode-2/): decisions, specifications, tasks and a gate as checked files, a board, and one steering file for every assistant.
+2. The [Mode 3](/docs/guides/mode-3/) and [Mode 5](/docs/guides/mode-5/) guides: the team's procedures as skills, and a board that agents and people share.
+
+## If you decide whether to depend on it
+
+1. The [status page](/docs/status/): what is live and the state of every outside step.
+2. The source repository's `GOVERNANCE.md` ("Who stands behind this": one maintainer, open licences, no support promise and no schedule) and `SECURITY.md`.
+3. A live node to look at: [patterns.agenticsystemcore.com](https://patterns.agenticsystemcore.com/).
 
 ## If you are curious
 
@@ -33,7 +50,7 @@ AgenticSystemCore has several doors. Find yourself below and follow that path; e
 3. [`/chunks.jsonl`](/chunks.jsonl), the graph dumps and the [ontology](/ns/): for retrieval and for joining with other nodes.
 4. The [agent skill](/docs/agent-skill/): one file to load into a coding agent so it can use the engine in every mode.
 5. [How to use it](/docs/how-to-use/), the section for agents: what to fetch, in which order, and how to propose a change.
-6. On any page of this site, the seven page tools, when your browser offers them; everything from here is marked untrusted, and `propose` returns text for a person to review.
+6. On every item page and on `/compose/` of this site, the seven page tools, when your browser offers them; everything from here is marked untrusted, and `propose` returns text for a person to review.
 
 ## Where a node can live
 

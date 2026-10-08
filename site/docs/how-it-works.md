@@ -24,7 +24,7 @@ A node may declare agents (AGSC-01-36): each with a model, a budget, the tasks i
 
 ## Discovery
 
-Every page carries a `describedby` link to `/.well-known/knowledge-linkset`, and the root route sends the same link as a header (AGSC-06-25, AGSC-11-05). That document is an RFC 9264 link set: one context anchored at the Bundle, whose relations point at the graph, llms.txt, the licence page, the documentation, the ontology and its JSON-LD context, the declared surfaces and the peers (AGSC-06-08 to AGSC-06-10). At Level 2 and above every artefact link carries a SHA-256 digest, so a reader can check that what it fetched is what was published (AGSC-06-08). The profile URI, resolved through w3id.org, leads to the [profile page](/specs/agentic-knowledge/) that explains the document.
+Every page carries a `describedby` link to `/.well-known/knowledge-linkset`, and the root route sends the same link as a header (AGSC-06-25, AGSC-11-05). That document is an RFC 9264 link set: one context anchored at the Bundle, whose relations point at the graph, llms.txt, the licence page, the documentation (the guide and the specification, as `service-doc`), the ontology and its JSON-LD context, the declared surfaces and the peers (AGSC-06-08 to AGSC-06-10). At Level 2 and above every artefact link carries a SHA-256 digest, so a reader can check that what it fetched is what was published (AGSC-06-08). The profile URI, resolved through w3id.org, leads to the [profile page](/specs/agentic-knowledge/) that explains the document.
 
 {{diagram:discovery-flow}}
 

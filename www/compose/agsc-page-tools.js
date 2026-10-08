@@ -4,7 +4,7 @@
 // function below is the SOURCE TEXT of the function Node runs, so the local
 // tools and the page tools cannot drift. No network beyond this origin, no key,
 // no server, no cookie, no storage.
-// spec_version: 1.0.0-rc.6
+// spec_version: 1.0.0-rc.7
 (function () {
 function pageTerms() {
   return 'LicenseRef-AgenticSystemCore-Content-Use-1.0';
@@ -75,6 +75,49 @@ function pageKindToType() {
   kinds.procedure = 'procedure';
   kinds.task = 'concept';
   return kinds;
+}
+function pageRememberFault(args, type, has) {
+  const line = /^[^\x00-\x1F\x7F\x85\u2028\u2029]*$/u;
+  const fault = (code, message) => ({ code, message: `${message} (AGSC-09-14b)` });
+  if (typeof args.kind !== 'string' || pageKindToType()[args.kind] === undefined) {
+    return fault('AGSC-E203', 'kind must be concept, episode, lesson, procedure or task');
+  }
+  if (args.about !== undefined && (typeof args.about !== 'string' || typeof has !== 'function' || !has(args.about))) {
+    return fault('AGSC-E301', 'about names no item of this Bundle');
+  }
+  const title = args.title;
+  if (typeof title !== 'string' || [...title].length < 3 || [...title].length > 120 || !line.test(title)) {
+    return fault('AGSC-E204', 'title must be text of 3 to 120 characters on one line (AGSC-02-24)');
+  }
+  if (args.operator !== undefined && (typeof args.operator !== 'string' || !/^human:[a-z0-9][a-z0-9._-]*$/u.test(args.operator))) {
+    return fault('AGSC-E204', 'operator must be human:<id> (AGSC-02-07)');
+  }
+  for (const key of ['agent', 'model']) {
+    if (args[key] !== undefined && (typeof args[key] !== 'string' || !line.test(args[key]))) {
+      return fault('AGSC-E204', `${key} must be text on one line (AGSC-02-24)`);
+    }
+  }
+  if (type === 'lesson' && args.severity !== undefined && ['info', 'warn', 'block'].indexOf(args.severity) === -1) {
+    return fault('AGSC-E203', 'severity must be info, warn or block');
+  }
+  if (type === 'episode') {
+    if (typeof args.at !== 'string' || !/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/u.test(args.at)) {
+      return fault('AGSC-E204', 'at must be an instant, YYYY-MM-DDTHH:MM:SSZ (AGSC-02-06)');
+    }
+    if (args.outcome !== undefined && ['success', 'partial', 'failure'].indexOf(args.outcome) === -1) {
+      return fault('AGSC-E203', 'outcome must be success, partial or failure');
+    }
+    const usage = args.usage;
+    if (usage !== null && typeof usage === 'object' && !Array.isArray(usage)) {
+      const wrong = (key, ok) => usage[key] !== undefined && !ok(usage[key]);
+      if (wrong('tokens_in', Number.isSafeInteger) || wrong('tokens_out', Number.isSafeInteger)
+        || wrong('cost_usd', Number.isFinite) || wrong('estimate', (v) => typeof v === 'boolean')
+        || wrong('model', (v) => typeof v === 'string' && line.test(v))) {
+        return fault('AGSC-E201', 'usage carries tokens_in and tokens_out as integers, cost_usd as a number, estimate as a boolean and model as one line (AGSC-02-14)');
+      }
+    }
+  }
+  return null;
 }
 function pageEnvelope(source, type, body) {
   return { body, license: pageTerms(), source, trust: 'untrusted', type };
@@ -636,7 +679,11 @@ function pageToolset(corpus, core) {
     },
 
     compose: (args) => {
-      const selection = Array.isArray(args.selection) ? args.selection : [];
+      // AGSC-09-13a: a selection that is not an array is not the empty one (finding G4).
+      if (!Array.isArray(args.selection)) {
+        return pageErrorEnvelope('compose', 'AGSC-E201', 'selection must be an array of slugs (AGSC-09-13)');
+      }
+      const selection = args.selection;
       const flat = model.items.map((i) => {
         const copy = { slug: i.slug, type: i.type };
         const fm = i.frontmatter || {};
@@ -733,6 +780,8 @@ function pageToolset(corpus, core) {
       if (args.actor !== undefined && !/^(?:human:[a-z0-9][a-z0-9._-]*|process:[a-z0-9][a-z0-9._-]*|[A-Za-z0-9][A-Za-z0-9._-]*\/[A-Za-z0-9][A-Za-z0-9._+-]*)$/u.test(String(args.actor))) {
         return pageErrorEnvelope('remember', 'AGSC-E204', 'actor must be human:<id>, process:<id> or <producer>/<version> (AGSC-02-09)');
       }
+      const refused = pageRememberFault(args, type, (slug) => bySlug[slug] !== undefined);
+      if (refused !== null) return pageErrorEnvelope('remember', refused.code, refused.message);
       const title = typeof args.title === 'string' ? args.title : '';
       const findings = [];
       // AGSC-09-14b (2026-09-25): the page has no identity to declare, so a call
@@ -1015,6 +1064,7 @@ function pageBoardMove(block, body, frontmatter, type, slug, args, claimedBy) {
     pageTypedScalars: pageTypedScalars,
     pageApplyTypes: pageApplyTypes,
     pageKindToType: pageKindToType,
+    pageRememberFault: pageRememberFault,
     pageEnvelope: pageEnvelope,
     pageErrorEnvelope: pageErrorEnvelope,
     pageBaseIri: pageBaseIri,

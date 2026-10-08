@@ -3,7 +3,7 @@
 // AgenticSystemCore composition algebra (AGSC-07-01, AGSC-07-13). GENERATED —
 // every function below is the SOURCE TEXT of the function the CLI runs, so the
 // two hosts cannot drift. No network, no key, no server.
-// spec_version: 1.0.0-rc.6
+// spec_version: 1.0.0-rc.7
 (function () {
 function compareCodePoint(a, b) {
   const x = [...String(a)];

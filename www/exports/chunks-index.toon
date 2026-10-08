@@ -5,12 +5,12 @@ chunks[21]{id,item,kind,section,ordinal,title,digest}:
   4e1148835e0535b6,episode,concept,"",0,Episode,f32eb6893099e66f
   a079891dcf540536,gate,concept,"",0,Gate,23fe4be09433617e
   b89264401f09339d,guides,cluster,"",0,Guides,0e49de8271a4bc4e
-  3253d319f6ec7dc1,harness,concept,"",0,Harness,3971c0a3fa152667
+  3253d319f6ec7dc1,harness,concept,"",0,Harness,79b00a7a72d276ef
   34a4c4976427befb,item,concept,"",0,Item,4d8cad3f058e8b77
   42df1a2db6882fdb,lesson,concept,"",0,Lesson,c731d55f9c300d7d
   06170a21be48b5c9,link,concept,"",0,Link,04bff56ba4048a91
   874a1048562869fb,now,concept,"",0,NOW,6703848349bb2529
-  e40ed2dfc40e0b52,procedure,concept,"",0,Procedure,769ef51ce7015566
+  e40ed2dfc40e0b52,procedure,concept,"",0,Procedure,79417266b7abb02c
   c4f75c2f0bb3d723,project-board,cluster,"",0,Project board,28cea1efc4d60728
   a6a70473dbf6e934,publish-a-level-0-node,procedure,checks,0,Publish a Level-0 node,d371ae88bed144c8
   5054b2c80f6cb7de,publish-a-level-0-node,procedure,steps,0,Publish a Level-0 node,33bc2f7ed5e14ed6

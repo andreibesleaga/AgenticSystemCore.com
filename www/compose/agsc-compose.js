@@ -5,7 +5,7 @@
 // No network beyond this origin, no key, no server, no cookie, no storage.
 (function () {
   var CORE = globalThis.AGSC_CORE;
-  var SPEC_VERSION = "1.0.0-rc.6";
+  var SPEC_VERSION = "1.0.0-rc.7";
   var LICENSE_PROSE = "LicenseRef-AgenticSystemCore-Content-Use-1.0";
   var state = { base: '', bodies: {}, instant: '', items: [], rows: [], selection: [], verdict: null, version: '' };
   globalThis.AGSC_COMPOSE = state;

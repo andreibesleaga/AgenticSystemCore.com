@@ -40,7 +40,7 @@
 <main id="main">
 <h1>Data model</h1>
 <p class="summary"><strong>Summary</strong>Six kinds of item, one file shape, fourteen typed links, clusters for navigation, sources for evidence and a provenance record on everything: this is the whole vocabulary a node needs.</p>
-<figure class="diagram">
+<figure class="diagram" tabindex="0">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" role="img" aria-label="Data model: a Bundle holds items of six types (concept, episode, procedure, lesson, cluster, gate); every item is one Markdown file with a YAML header (highlighted) that carries typed links to other items, a provenance record and sources" font-family="system-ui, sans-serif" font-size="14">
 <defs><marker id="ar-data-model" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
 <g fill="none" stroke="currentColor" stroke-width="1.5">
@@ -91,7 +91,7 @@
 <tbody>
 <tr><td>Concept</td><td>A unit of knowledge</td><td>Qualified by <code>kind</code>: <code>pattern</code>, <code>taxonomy</code>, <code>explainer</code>, <code>principle</code>, <code>decision</code>, <code>spec</code>, <code>task</code>, <code>term</code> (<a class="ref" href="/specs/02-item/#AGSC-02-12">AGSC-02-12</a>) or <code>architecture</code> (<a class="ref" href="/specs/02-item/#AGSC-02-97">AGSC-02-97</a>)</td></tr>
 <tr><td>Episode</td><td>Something that happened: a session, a run, an incident</td><td>Start, actor, outcome</td></tr>
-<tr><td>Procedure</td><td>Steps a reader can run</td><td>Exports one-to-one to a skill file</td></tr>
+<tr><td>Procedure</td><td>Steps a reader can run</td><td>Published in skill packs, one pack per Cluster (<a class="ref" href="/specs/07-composition/#AGSC-07-19">AGSC-07-19</a>)</td></tr>
 <tr><td>Lesson</td><td>Knowledge distilled from one or more Episodes</td><td>Carries a severity; the set of Lessons is the node's error record</td></tr>
 <tr><td>Cluster</td><td>A navigational grouping</td><td>Membership is authored on the item; at most one parent, at most three levels (<a class="ref" href="/specs/03-links/#AGSC-03-08">AGSC-03-08</a>)</td></tr>
 <tr><td>Gate</td><td>Checks a change must pass</td><td>Compiles to CI status checks (<a class="ref" href="/specs/08-governance/#AGSC-08-09">AGSC-08-09</a>); its runs are Episodes</td></tr>
@@ -130,7 +130,7 @@
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/data-model.md">Propose an edit</a> — opens <code>site/docs/data-model.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
 </footer>
 </body>
 </html>

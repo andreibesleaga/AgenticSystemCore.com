@@ -1,0 +1,24 @@
+canvas 460 340
+label "The vocabulary asc: has twelve classes, each a subclass of a W3C term. Bundle, Cluster and Concept (highlighted: the class of most items) extend SKOS, and Lesson is a kind of Concept; Procedure, Gate and Harness are PROV-O plans; Episode, Proposal and Review are PROV-O activities; Source and Attachment are PROV-O entities. A Concept points to its Sources, its Attachments and its Reviews, and items point to items through typed properties such as uses, implements, decides, verifies, covers, blocks and mentions"
+caption "The highlighted class is the one most items take. Every class extends a SKOS or PROV-O term, so a reader that knows only those vocabularies can still read the graph."
+region skos 10 26 136 274 "SKOS"
+box bundle 20 40 116 44 "Bundle|ConceptScheme"
+box cluster 20 98 116 44 "Cluster|Collection"
+box concept 20 162 116 44 "Concept|skos:Concept" acc
+box lesson 20 240 116 44 "Lesson"
+region plan 162 26 136 150 "PROV-O plans"
+box procedure 172 38 116 34 "Procedure"
+box gate 172 84 116 34 "Gate"
+box harness 172 130 116 34 "Harness"
+region activity 314 26 136 150 "PROV-O activities"
+box episode 324 38 116 34 "Episode"
+box proposal 324 84 116 34 "Proposal"
+box review 324 130 116 34 "Review"
+region entity 162 222 288 78 "PROV-O entities"
+box source 172 244 124 34 "Source"
+box attachment 316 244 124 34 "Attachment"
+arrow lesson concept
+arrow concept review via=382,196
+arrow concept source
+arrow concept attachment via=152,226;152,292;378,292
+note "items link to items: uses, implements, decides, verifies, blocks"

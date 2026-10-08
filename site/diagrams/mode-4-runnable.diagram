@@ -1,8 +1,8 @@
-label "Mode 4, runnable knowledge: a selection of Concepts goes through the combiner's five fixed steps to a Harness of seven files (highlighted), which runtimes render"
-caption "The highlighted Harness exists only for a valid selection; runtimes such as GABBE or kaiban-distributed are renderings of its seven files."
+label "Mode 4, runnable knowledge: a selection of Concepts goes through the combiner's five fixed steps to a Harness of seven kinds of file (highlighted), a starting point that a runtime would render"
+caption "The highlighted Harness exists only for a valid selection; a runtime such as GABBE or kaiban-distributed would render its files; no such rendering ships at 1.0."
 box sel 16 100 100 50 "select|Concepts"
 box comb 148 90 120 70 "combiner|5 fixed steps|no model, no key"
-box harn 300 90 140 70 "Harness|7 files: C4, arc42,|ADRs, gates, skills" acc
+box harn 300 90 140 70 "Harness|7 kinds of file: C4,|arc42, ADRs, skills" acc
 box rt 300 190 140 40 "runtime renderings"
 arrow sel comb
 arrow comb harn

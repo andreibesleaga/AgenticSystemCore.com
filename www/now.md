@@ -1,6 +1,6 @@
 # Now
 
-content version v1.0.0+14.g35869ceda311, built at 2026-09-29T18:27:52Z, fingerprint 6a667c2c5be2ab3d8e89e2d15ee1396c4c12148ad640c3ba6f393a1a1969833f, specification 1.0.0-rc.6
+content version v1.0.0+15.g655c904124e4, built at 2026-10-08T07:30:56Z, fingerprint d39b918b7575ec236ba12970233ad5151c055060dff258a933adfe6b44cff7b2, specification 1.0.0-rc.7
 
 ## Counts
 
@@ -13,6 +13,6 @@ content version v1.0.0+14.g35869ceda311, built at 2026-09-29T18:27:52Z, fingerpr
 
 ## Monthly spend
 
-- month: 2026-09
+- month: 2026-10
 - spent: 0 USD
 - cap: 10 USD

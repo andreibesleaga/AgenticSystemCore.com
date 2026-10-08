@@ -48,12 +48,12 @@ Two floors are never traded: the licence stack (NFR-10) and the clean-room rule 
 | C6 | At most 10 dollars a month of model spend; the gating lanes stay lint-only | No model call on `ci`, `review` or anything reachable from them; the optional review lane never gates a merge |
 | C7 | Clean room: the invariants are held outside every repository | One `clean-room` lint enforces the public derivations (AGSC-08-17): no book framing, no imposed sequence of pages, no whole-corpus emitter |
 | C8 | The capability plane is language-independent: files and ontologies define the system | No behaviour may exist that the specification and the vectors do not pin |
-| C9 | No network, wall clock or file system in the pure core; network only in `refresh` and `mcp` | Ports, enforced by tests |
+| C9 | No network, wall clock or file system in the pure core; at 1.0 no verb reaches the network, and the network port refuses every call | Ports, enforced by tests |
 | C10 | Determinism: canonical JSON, sorted keys, LF, NFC, UTC seconds, `SOURCE_DATE_EPOCH` | `verify` is a double build with a byte comparison, and it blocks merges |
 
-> **Amendment 2026-09-18 (ADR-019).** The "zero runtime dependencies" constraint (C1, ADR-002) is superseded. The reference engine uses actively maintained, permissively licensed libraries at exact pinned versions for the standard formats and protocols it reads and writes, with a committed lockfile, `npm ci` installs and an `npm audit` gate; only what the specification pins byte-for-byte and no library produces is written by hand. The specification itself never required zero dependencies; a port from the vectors alone (NFR-02) and every determinism rule are unchanged.
+> **Amendment (ADR-019).** The "zero runtime dependencies" constraint (C1, ADR-002) is superseded. The reference engine uses actively maintained, permissively licensed libraries at exact pinned versions for the standard formats and protocols it reads and writes, with a committed lockfile, `npm ci` installs and an `npm audit` gate; only what the specification pins byte-for-byte and no library produces is written by hand. The specification itself never required zero dependencies; a port from the vectors alone (NFR-02) and every determinism rule are unchanged.
 >
-> **Amendment 2026-09-18.** The reference engine is CommonJS and its floor is Node 22.12; the browser bundle stays ESM. The module system is a property of this one implementation, not of the specification — a conforming engine may be written in any language and any module system, and is judged only by the conformance vectors. *Note 2026-09-24: the floor was raised to Node 22.13.0, the first 22.x release that requires an ES-module library without printing a warning.*
+> **Amendment.** The reference engine is CommonJS and its floor is Node 22.13.0, the first 22.x release that requires an ES-module library without printing a warning; the browser bundle stays ESM. The module system is a property of this one implementation, not of the specification — a conforming engine may be written in any language and any module system, and is judged only by the conformance vectors.
 
 
 ## 4. Context
@@ -125,7 +125,7 @@ One bounded context corresponds to one `src/` directory, one specification secti
 
 {{diagram:proposal-lifecycle}}
 
-**Browser composition.** `/compose/` loads the graph and the browser bundle, which is the same composition module set with no Node imports. The user ticks Concepts; the closure runs client-side in the normative order (AGSC-07-04 to AGSC-07-08); the user names the Harness; the seven files are generated in memory and downloaded as a store-only zip, or file by file as the documented fallback. The bytes equal those of the command-line invocation for the same selection, and a vector asserts it (AGSC-07-13).
+**Browser composition.** `/compose/` loads the graph and the browser bundle, which is the same composition module set with no Node imports. The user ticks Concepts; the closure runs client-side in the normative order (AGSC-07-04 to AGSC-07-08); the user names the Harness; its files, of the seven kinds, are generated in memory and downloaded as a store-only zip, or file by file as the documented fallback. The bytes equal those of the command-line invocation for the same selection, and a vector asserts it (AGSC-07-13).
 
 ## 8. Deployment
 
@@ -140,7 +140,7 @@ Every action is pinned by commit hash; `pull_request_target` is never used; ther
 
 ### Where a node can live
 
-*Added 2026-09-24.* A node is a set of files, and so is its build; neither depends on a transport. It can be served from a web host, a laptop or a small device, a clone of its repository, IPFS behind an HTTP gateway, or a web interface in front of a store anchored in a ledger. What the rules ask of the place is fixed: an HTTPS origin that serves the discovery document and the routes with the response headers the build wrote (AGSC-06-01, AGSC-06-17, AGSC-11-05). How each kind of place is told is a *hosting profile*, one of the plugin kinds (AGSC-00-24): the reference engine's `agsc-host` command carries seven, from Cloudflare Pages (the reference, and this site's host) to nginx and Apache, GitHub Pages behind a proxy, a local server, a clone, IPFS and a ledger anchor that records the bundle hash and the content version of each build (AGSC-04-25). Each profile states what its place cannot do, and a conformance claim names its profile. No rule of version 1.x pins a transport other than HTTP.
+A node is a set of files, and so is its build; neither depends on a transport. It can be served from a web host, a laptop or a small device, a clone of its repository, IPFS behind an HTTP gateway, or a web interface in front of a store anchored in a ledger. What the rules ask of the place is fixed: an HTTPS origin that serves the discovery document and the routes with the response headers the build wrote (AGSC-06-01, AGSC-06-17, AGSC-11-05). How each kind of place is told is a *hosting profile*, one of the plugin kinds (AGSC-00-24): the reference engine's `agsc-host` command carries seven, from Cloudflare Pages (the reference, and this site's host) to nginx and Apache, GitHub Pages behind a proxy, a local server, a clone, IPFS and a ledger anchor that records the bundle hash and the content version of each build (AGSC-04-25). Each profile states what its place cannot do, and a conformance claim names its profile. No rule of version 1.x pins a transport other than HTTP.
 
 ## 9. Crosscutting concepts
 
@@ -149,14 +149,14 @@ Every action is pinned by commit hash; `pull_request_target` is never used; ther
 - **Error handling.** Exit 0 for success, 1 for findings or a failed gate, 2 for a usage error; diagnostics as JSON lines on standard error sorted by file, line, column and code; one code format, `AGSC-E<nnn>` ([AGSC-09 §9.3](/specs/09-conformance/#section-9-3)).
 - **Configuration.** Exactly one schema-validated `agsc.config.json`; precedence flags, then environment, then project, then user; unknown keys are errors.
 - **Logging.** None at runtime, because there is no runtime; the durable record is the ledger, git history and Episode items; no telemetry, cookies or beacons.
-- **Internationalisation.** Language variants of an item share its slug and address and are served under a language path with `hreflang` alternates (AGSC-01-13).
+- **Internationalisation.** Language variants of an item — sharing its slug and address, served under a language path with `hreflang` alternates — are reserved to 1.1 (AGSC-01-13); at 1.0 a variant file beside its primary is refused (`AGSC-E206`).
 
 ## 10. Decisions of record
 
 | ADR | Decision |
 |---|---|
 | 001 | Agent safety by structural defence, not by a classifier and not by sandboxing: trust-marked results, fenced prose, deterministic lints, identifier-only tools, inert skills, human merge; with the honest limit that hashes prove tampering, not safety |
-| 002 | Zero runtime dependencies, forever: Node built-ins only; a trivially auditable supply chain and portability to other runtimes — superseded 2026-09-18 by ADR-019 |
+| 002 | Zero runtime dependencies, forever: Node built-ins only; a trivially auditable supply chain and portability to other runtimes — superseded by ADR-019 |
 | 003 | Static only: Cloudflare Pages from `www/`, no servers, databases, queues or Workers; CI is the only backend |
 | 004 | One vocabulary, fourteen links: six item types with a `kind` qualifier on Concept, nine core keys with composition meaning and five Mode-2 keys for navigation |
 | 005 | Namespace content negotiation through the w3id `.htaccess`: zero project-owned server code and permanent addresses independent of the domain |
@@ -164,7 +164,7 @@ Every action is pinned by commit hash; `pull_request_target` is never used; ther
 | 007 | The Content Use Terms — or the prose licence the node names in their place — travel inside every export that carries prose |
 | 008 | JavaScript with JSDoc types and a language-independent capability plane: the definition is the specification, the schemas, the ontology and the vectors |
 | 009 | Five contexts rather than four; deferred, to be reopened only if the Interchange and Distribution boundary leaks |
-| 010 | Part II scope under the simplicity rule: `run` and `trace` opt-in and off by default, `conform` a thin verb over the vector runner, federation as a validator flag, runtime emitters as template renderings of the seven Harness files |
+| 010 | Part II scope under the simplicity rule: `run` and `trace` opt-in and off by default, `conform` a thin verb over the vector runner, federation as a validator flag, runtime emitters as template renderings of the seven kinds of Harness file |
 | 011 | A link set instead of a vendor manifest: the discovery document is an RFC 9264 link set with integrity on the links, one profile URI, no new media type or scheme |
 | 012 | Plugins are declared surfaces under the contract declare, pin, inherit, prove |
 | 013 | Two reference plugins, local MCP and WebMCP, with the same seven tools; the Agent Card only as an optional card beside a responder |

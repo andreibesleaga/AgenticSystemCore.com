@@ -1,5 +1,5 @@
 ---
-spec_version: "1.0.0-rc.6"
+spec_version: "1.0.0-rc.7"
 okf_version: "0.2"
 title: "AgenticSystemCore"
 description: "An open specification for knowledge that people and software agents can both read, verify and build on, published here as a node of itself."

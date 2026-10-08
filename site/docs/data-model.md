@@ -16,7 +16,7 @@ An item is one Markdown file with a YAML header between `---` lines (AGSC-02-01)
 |---|---|---|
 | Concept | A unit of knowledge | Qualified by `kind`: `pattern`, `taxonomy`, `explainer`, `principle`, `decision`, `spec`, `task`, `term` (AGSC-02-12) or `architecture` (AGSC-02-97) |
 | Episode | Something that happened: a session, a run, an incident | Start, actor, outcome |
-| Procedure | Steps a reader can run | Exports one-to-one to a skill file |
+| Procedure | Steps a reader can run | Published in skill packs, one pack per Cluster (AGSC-07-19) |
 | Lesson | Knowledge distilled from one or more Episodes | Carries a severity; the set of Lessons is the node's error record |
 | Cluster | A navigational grouping | Membership is authored on the item; at most one parent, at most three levels (AGSC-03-08) |
 | Gate | Checks a change must pass | Compiles to CI status checks (AGSC-08-09); its runs are Episodes |

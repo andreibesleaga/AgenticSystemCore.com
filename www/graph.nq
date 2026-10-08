@@ -1,7 +1,7 @@
 <https://agenticsystemcore.com/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Bundle> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
-<https://agenticsystemcore.com/> <https://w3id.org/agentic-system-core/ns#specVersion> "1.0.0-rc.6"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/> <https://w3id.org/agentic-system-core/ns#specVersion> "1.0.0-rc.7"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Cluster> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <http://www.w3.org/2004/02/skos/core#definition> "Procedures for publishing and reading a node, each step naming the rule or the check that proves it."@en <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <http://www.w3.org/2004/02/skos/core#member> <https://agenticsystemcore.com/procedures/publish-a-level-0-node/> <https://agenticsystemcore.com/> .
@@ -262,7 +262,7 @@
 <https://agenticsystemcore.com/concepts/now/#source-1> <http://purl.org/dc/terms/title> "AGSC-00-07"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/#source-1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Source> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/#source-1> <https://w3id.org/agentic-system-core/ns#grade> "primary"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
-<https://agenticsystemcore.com/concepts/now/#source-2> <http://purl.org/dc/terms/source> "https://agenticsystemcore.com/specs/06-surfaces/#AGSC-06-22"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/now/#source-2> <http://purl.org/dc/terms/source> "https://agenticsystemcore.com/specs/06-surfaces/page-2/#AGSC-06-22"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/#source-2> <http://purl.org/dc/terms/title> "AGSC-06-22"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/#source-2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Source> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/#source-2> <https://w3id.org/agentic-system-core/ns#grade> "primary"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
@@ -290,7 +290,7 @@
 <https://agenticsystemcore.com/concepts/procedure/#source-3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Source> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/procedure/#source-3> <https://w3id.org/agentic-system-core/ns#grade> "primary"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/procedure/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Concept> <https://agenticsystemcore.com/> .
-<https://agenticsystemcore.com/concepts/procedure/> <http://www.w3.org/2004/02/skos/core#definition> "A plan a reader can execute: a trigger, steps and checks. A procedure exports one to one to a skill file."@en <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/procedure/> <http://www.w3.org/2004/02/skos/core#definition> "A plan a reader can execute: a trigger, steps and checks. Procedures are published in skill packs, one pack per cluster."@en <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/procedure/> <http://www.w3.org/2004/02/skos/core#inScheme> <https://agenticsystemcore.com/> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/procedure/> <http://www.w3.org/2004/02/skos/core#prefLabel> "Procedure"@en <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/procedure/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .

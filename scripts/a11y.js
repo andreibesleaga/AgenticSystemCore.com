@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // Optional browser lane (not part of the zero-dependency gate): axe-core over every page of www/
-// in both colour schemes (WCAG 2.0/2.1/2.2 A+AA + best practices), CSP violations, third-party
-// requests, first-Tab skip link, horizontal scroll at 320 px, the 404 page and the search script.
+// in both colour schemes at a desktop width (1200 px) and at a phone width (390 px) (WCAG
+// 2.0/2.1/2.2 A+AA + best practices), CSP violations, third-party requests, first-Tab skip link,
+// horizontal scroll at 320 px, the 404 page and the search script. Every file is served with the
+// headers the generated `_headers` gives its address (Content-Type first), as the host serves it,
+// so a wrong content type in that file is seen here; a file `_headers` gives no type gets the
+// type of its extension.
 // Run after `node scripts/check.js`. Needs, outside the repository:
 //   npm i --no-save playwright-core@1.62.1 axe-core@4.13.0   (1.62.1 or a later 1.x works)
 //   CHROME_EXE=<path to a Chromium or chrome-headless-shell binary> node scripts/a11y.js
@@ -14,7 +18,19 @@ if (!process.env.CHROME_EXE) { console.error('a11y: set CHROME_EXE to a Chromium
 const WWW = process.env.SITE_A11Y_WWW ? path.resolve(process.env.SITE_A11Y_WWW) : path.resolve(__dirname, '..', (JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'agsc.config.json'), 'utf8')).build || {}).out || 'www');
 const AXE = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 const headers = fs.readFileSync(path.join(WWW, '_headers'), 'utf8');
-const CSP = /Content-Security-Policy: (.*)/.exec(headers)[1];
+// `_headers` as the host reads it: blocks of an address (a `*` matches any run of characters)
+// followed by indented `Name: value` lines. Every block whose address matches a request applies.
+const BLOCKS = [];
+for (const line of headers.split('\n')) {
+  if (/^\s*(#|$)/.test(line)) continue;
+  if (!/^\s/.test(line)) { BLOCKS.push({ re: new RegExp('^' + line.trim().split('*').map(x => x.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*') + '$'), headers: [] }); continue; }
+  const m = /^\s+([A-Za-z-]+):\s*(.*)$/.exec(line);
+  if (m && BLOCKS.length) BLOCKS[BLOCKS.length - 1].headers.push([m[1], m[2]]);
+}
+const headersFor = url => BLOCKS.filter(b => b.re.test(url)).flatMap(b => b.headers);
+const CSP = (headersFor('/').find(([n]) => n.toLowerCase() === 'content-security-policy') || [])[1];
+if (!CSP) { console.error('a11y: _headers gives no Content-Security-Policy for /'); process.exit(2); }
+const typeProblems = [];
 const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
 const pages = walk(WWW).filter(f => f.endsWith('index.html')).map(f => '/' + path.relative(WWW, path.dirname(f)).split(path.sep).join('/') + '/').map(p => p === '//' ? '/' : p).sort();
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.txt': 'text/plain' };
@@ -23,7 +39,10 @@ const srv = http.createServer((req, res) => {
   if (u === '/__axe.js') { res.setHeader('Content-Type', 'text/javascript'); return res.end(AXE); }
   let f = path.join(WWW, u.endsWith('/') ? u + 'index.html' : u);
   if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404, { 'Content-Type': 'text/html' }); return res.end(fs.readFileSync(path.join(WWW, '404.html'))); }
-  res.setHeader('Content-Type', TYPES[path.extname(f)] || 'application/octet-stream'); res.setHeader('Content-Security-Policy', CSP); res.end(fs.readFileSync(f));
+  const own = headersFor(u), types = [...new Set(own.filter(([n]) => n.toLowerCase() === 'content-type').map(([, v]) => v))];
+  if (types.length > 1) typeProblems.push(`${u}: _headers gives ${types.length} content types (${types.join(' | ')})`);
+  for (const [n, v] of own) if (n.toLowerCase() !== 'content-type') res.setHeader(n, v);
+  res.setHeader('Content-Type', types[0] || TYPES[path.extname(f)] || 'application/octet-stream'); res.end(fs.readFileSync(f));
 });
 srv.listen(0, async () => {
   const port = srv.address().port, base = `http://127.0.0.1:${port}`;
@@ -31,8 +50,11 @@ srv.listen(0, async () => {
   let violations = 0, cspViol = 0, thirdParty = 0, problems = [];
   // 'light' and 'dark' follow the system scheme; 'chosen-dark' is a light system with the
   // visitor's stored switcher choice 'dark' (the manual override of the theme switcher).
-  for (const scheme of ['light', 'dark', 'chosen-dark']) {
-    const ctx = await browser.newContext({ colorScheme: scheme === 'chosen-dark' ? 'light' : scheme, viewport: { width: 1200, height: 900 } });
+  // The same three at a desktop width, and the two system schemes again at a phone width
+  // (390 x 844), where diagrams and wide tables scroll inside their own box.
+  const RUNS = [['light', 1200], ['dark', 1200], ['chosen-dark', 1200], ['light', 390], ['dark', 390]];
+  for (const [scheme, width] of RUNS) {
+    const ctx = await browser.newContext({ colorScheme: scheme === 'chosen-dark' ? 'light' : scheme, viewport: width === 390 ? { width: 390, height: 844 } : { width: 1200, height: 900 } });
     if (scheme === 'chosen-dark') await ctx.addInitScript(() => { try { localStorage.setItem('agsc-theme', 'dark'); } catch (e) {} });
     for (const p of pages) {
       const page = await ctx.newPage();
@@ -41,9 +63,9 @@ srv.listen(0, async () => {
       await page.goto(base + p, { waitUntil: 'load' });
       await page.addScriptTag({ url: base + '/__axe.js' });
       const res = await page.evaluate(() => axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'] } }));
-      for (const v of res.violations) { violations++; problems.push(`${scheme} ${p}: ${v.id} (${v.impact}) ${v.nodes.length}x — ${v.nodes[0].target[0]}`); }
+      for (const v of res.violations) { violations++; problems.push(`${scheme} ${width}px ${p}: ${v.id} (${v.impact}) ${v.nodes.length}x — ${v.nodes[0].target[0]}`); }
       if (scheme === 'chosen-dark' && await page.evaluate(() => document.documentElement.getAttribute('data-theme')) !== 'dark') problems.push(`${p}: the stored theme choice is not applied`);
-      if (scheme === 'light') {
+      if (scheme === 'light' && width === 1200) {
         const sw = await page.evaluate(() => { const b = document.getElementById('theme'); const s = b && b.querySelector('select'); const n = s && s.getAttribute('aria-label'); const ul = document.querySelector('header.site ul'); const same = !ul || innerWidth < 1000 || Math.abs(s.getBoundingClientRect().top - ul.getBoundingClientRect().top) < 12; return !!(b && !b.hidden && s && n && same); });
         if (!sw) problems.push(`${p}: theme switcher missing, hidden, unnamed or not on the navigation line`);
         await page.keyboard.press('Tab');
@@ -89,7 +111,8 @@ srv.listen(0, async () => {
   }
   const r404 = await page.goto(base + '/no/such/page/'); console.log(`unknown path -> HTTP ${r404.status()}`);
   await browser.close(); srv.close();
-  console.log(`pages: ${pages.length} × 3 schemes (system light, system dark, chosen dark); axe violations: ${violations}; CSP violations: ${cspViol}; third-party requests: ${thirdParty}`);
+  console.log(`pages: ${pages.length} × 3 schemes (system light, system dark, chosen dark) at 1200 px, and × 2 (system light, system dark) at 390 px; axe violations: ${violations}; CSP violations: ${cspViol}; third-party requests: ${thirdParty}; content types from _headers`);
+  problems.push(...typeProblems);
   if (problems.length) { console.log(problems.join('\n')); process.exit(1); }
   console.log('a11y pass: OK');
 });

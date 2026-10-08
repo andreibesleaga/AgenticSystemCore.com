@@ -4,9 +4,9 @@
 bundle: https://agenticsystemcore.com/
 license: LicenseRef-AgenticSystemCore-Content-Use-1.0
 terms: LicenseRef-AgenticSystemCore-Content-Use-1.0
-spec_version: 1.0.0-rc.6
-bundle_version: v1.0.0+14.g35869ceda311
-generated_at: 2026-09-29T18:27:52Z
+spec_version: 1.0.0-rc.7
+bundle_version: v1.0.0+15.g655c904124e4
+generated_at: 2026-10-08T07:30:56Z
 assistance: content may be AI-assisted; each item states its origin in prov.origin and each accepted contribution carries an Assisted-by: trailer
 -->
 
@@ -32,5 +32,5 @@ assistance: content may be AI-assisted; each item states its origin in prov.orig
 - [Lesson](https://agenticsystemcore.com/concepts/lesson/): Knowledge distilled from one or more episodes, carrying a severity of info, warn or block.
 - [Link](https://agenticsystemcore.com/concepts/link/): A typed relation between two items of one Bundle, written as a frontmatter key whose values are slugs.
 - [NOW](https://agenticsystemcore.com/concepts/now/): Generated context about the current state of a Bundle, such as counts and last build. NOW is never an item.
-- [Procedure](https://agenticsystemcore.com/concepts/procedure/): A plan a reader can execute: a trigger, steps and checks. A procedure exports one to one to a skill file.
+- [Procedure](https://agenticsystemcore.com/concepts/procedure/): A plan a reader can execute: a trigger, steps and checks. Procedures are published in skill packs, one pack per cluster.
 - [Source](https://agenticsystemcore.com/concepts/source/): An external work cited by an item, written inline as a sources[] entry and published under a fragment IRI.

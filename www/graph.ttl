@@ -9,7 +9,7 @@
 <https://agenticsystemcore.com/> a asc:Bundle ;
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
-    asc:specVersion "1.0.0-rc.6" .
+    asc:specVersion "1.0.0-rc.7" .
 
 <https://agenticsystemcore.com/clusters/guides/> a asc:Cluster ;
     skos:definition "Procedures for publishing and reading a node, each step naming the rule or the check that proves it."@en ;
@@ -293,13 +293,13 @@
     a asc:Source ;
     asc:grade "primary" .
 
-<https://agenticsystemcore.com/concepts/now/#source-2> dcterms:source "https://agenticsystemcore.com/specs/06-surfaces/#AGSC-06-22" ;
+<https://agenticsystemcore.com/concepts/now/#source-2> dcterms:source "https://agenticsystemcore.com/specs/06-surfaces/page-2/#AGSC-06-22" ;
     dcterms:title "AGSC-06-22" ;
     a asc:Source ;
     asc:grade "primary" .
 
 <https://agenticsystemcore.com/concepts/procedure/> a asc:Concept ;
-    skos:definition "A plan a reader can execute: a trigger, steps and checks. A procedure exports one to one to a skill file."@en ;
+    skos:definition "A plan a reader can execute: a trigger, steps and checks. Procedures are published in skill packs, one pack per cluster."@en ;
     skos:inScheme <https://agenticsystemcore.com/> ;
     skos:prefLabel "Procedure"@en ;
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;

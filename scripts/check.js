@@ -14,7 +14,7 @@
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const ROOT = path.resolve(__dirname, '..');
 const ENGINE = path.resolve(ROOT, process.env.SITE_ENGINE || '../agentic-system-core');
-const SPEC_TAG = process.env.SITE_SPEC_TAG || '1.0.0-rc.6';
+const SPEC_TAG = process.env.SITE_SPEC_TAG || '1.0.0-rc.7';
 // The same parameter scripts/build.js reads: the vectors come from the release tag, and from the
 // engine's working tree while the candidate has not been tagged yet.
 const tagExists = cp.spawnSync('git', ['-C', ENGINE, 'rev-parse', '-q', '--verify', `${SPEC_TAG}^{commit}`], { stdio: 'ignore' }).status === 0;
