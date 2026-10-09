@@ -303,6 +303,20 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
   // the agent skill and its guide page
   'agent-skill/agentic-system-core/SKILL.md', 'docs/agent-skill/index.html'])
   ok(exists(path.join(WWW, need)), `missing route: /${need}`);
+// The scenarios (AGSC-06-21): /docs/scenarios/ carries the coverage table and one link per feature
+// file of the engine, and each feature file is a page of its own, /docs/scenarios/<file stem>/, so
+// that no page grows past the budget as scenarios are added.
+{
+  const index = path.join(WWW, 'docs/scenarios/index.html');
+  const indexHtml = exists(index) ? fs.readFileSync(index, 'utf8') : '';
+  for (const f of engineList('features').filter(x => x.endsWith('.feature'))) {
+    const stem = f.slice(0, -'.feature'.length), page = path.join(WWW, 'docs/scenarios', stem, 'index.html');
+    ok(exists(page), `missing route: /docs/scenarios/${stem}/ (the page of features/${f})`);
+    ok(indexHtml.includes(`href="/docs/scenarios/${stem}/"`), `/docs/scenarios/ does not link to /docs/scenarios/${stem}/`);
+    if (exists(page)) ok((fs.readFileSync(page, 'utf8').match(/<pre tabindex="0" class="feature" data-lang="gherkin">/g) || []).length === 1, `/docs/scenarios/${stem}/ must carry exactly one feature file`);
+  }
+  ok(!indexHtml.includes('class="feature"'), '/docs/scenarios/ must link to the feature files, not carry them');
+}
 // (7) the page tools: their inputs, their declaration, and the tools themselves RUN.
 {
   const index = exists(searchJson) ? JSON.parse(fs.readFileSync(searchJson, 'utf8')) : { docs: [] };

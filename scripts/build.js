@@ -1680,11 +1680,13 @@ const publicationsHtml = `<ul>
 <p>${STATUS.preprint ? `Cite the preprint by its DOI, <code>${esc(STATUS.preprint.doi)}</code>, and the specification by version.` : 'Until the preprint is published, cite the specification by version and tag:'}</p>
 <pre tabindex="0"><code>${esc(config.site.author)}. AgenticSystemCore specification ${esc(SPEC_VERSION)}, ${esc(SPEC_DATE)}. ${esc(BASE)}specs/</code></pre>
 `;
-const featuresCoverage = sectionOf(DOC.featuresReadme, '## Scenario-coverage table').replace(/`([a-z0-9-]+)\.feature`/g, (_, n) => `[${n}](#${n})`);
-const featuresHtml = FEATURES.map(f => {
-  const title = (/^\s*Feature: (.*)$/m.exec(f.src) || [, f.name])[1];
-  return `<h3 id="${esc(f.name)}">${esc(f.name)}: ${esc(title)}</h3>\n<pre tabindex="0" class="feature" data-lang="gherkin"><code>${linkIds(f.src.replace(/\n+$/, ''), { ruleLinks: true, page: 'scenarios' })}</code></pre>\n`;
-}).join('');
+// AGSC-06-21: /docs/scenarios/ carries the coverage table and one link per feature file; each feature
+// file is a page of its own, /docs/scenarios/<file stem>/, so that no page grows past the budget as
+// scenarios are added. The id on each entry keeps an older link to /docs/scenarios/#<file stem> landing.
+const featuresCoverage = sectionOf(DOC.featuresReadme, '## Scenario-coverage table').replace(/`([a-z0-9-]+)\.feature`/g, (_, n) => `[${n}](/docs/scenarios/${n}/)`);
+const featureTitle = f => (/^\s*Feature: (.*)$/m.exec(f.src) || [, f.name])[1];
+const featureUrl = f => `/docs/scenarios/${f.name}/`;
+const featuresHtml = `<ul>\n${FEATURES.map(f => `<li id="${esc(f.name)}"><a href="${esc(featureUrl(f))}"><code>${esc(f.name)}.feature</code></a>: ${esc(featureTitle(f))}</li>`).join('\n')}\n</ul>\n`;
 const relatedWork = ['## 1. One sentence', '## 3. The agent-discovery mechanisms', '## 4. Adjacent work', '## 5. What is new here'].map(h => {
   const line = DOC.related.split('\n').find(l => l.startsWith(h));
   return `### ${line.replace(/^## /, '')}\n\n${sectionOf(DOC.related, h)}`;
@@ -1731,6 +1733,19 @@ for (const f of DOCS) {
     body: md(body, { ...o, slots }) + editLink('site', `site/docs/${f}`),
   });
 }
+FEATURES.forEach((f, k) => {
+  const url = featureUrl(f), title = featureTitle(f), prev = FEATURES[k - 1], next = FEATURES[k + 1];
+  const n = (f.src.match(/^\s*Scenario(?: Outline)?:/gm) || []).length;
+  const link = (x, rel) => `<a href="${esc(featureUrl(x))}" rel="${rel}"><code>${esc(x.name)}.feature</code></a>`;
+  const around = `<p>One of the feature files of the <a href="/docs/scenarios/">scenarios</a>, where the coverage table names the requirements each file proves.${prev ? ` Previous: ${link(prev, 'prev')}.` : ''}${next ? ` Next: ${link(next, 'next')}.` : ''}</p>\n`;
+  addPage(url, {
+    title: `Scenarios: ${title}`, summary: `The ${n === 1 ? 'scenario' : `${n} scenarios`} of the feature file ${f.name}.feature, in the Given/When/Then form the reference engine runs; each names the requirement it proves.`,
+    description: `The behaviour-driven scenarios of ${f.name}.feature: ${title}.`, section: '/docs/', wide: true,
+    scripts: PAGE_TOOL_SCRIPTS,
+    jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: `Scenarios: ${title}`, description: `The behaviour-driven scenarios of ${f.name}.feature: ${title}.`, url: ORIGIN + url, author: { '@type': 'Person', name: config.site.author }, isPartOf: `${BASE}docs/scenarios/` },
+    body: around + `<pre tabindex="0" class="feature" data-lang="gherkin"><code>${linkIds(f.src.replace(/\n+$/, ''), { ruleLinks: true, page: `scenarios/${f.name}` })}</code></pre>\n` + editLink('engine', `features/${f.name}.feature`),
+  });
+});
 checkPatternsProse();
 
 // AGSC-06-24: `/about/` carries a Quickstart — one path of at most ten lines per persona,
