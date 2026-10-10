@@ -1050,7 +1050,7 @@ const regText = {
   wellknown: { 'not-requested': STATUS.draft ? 'Not registered. Its registration in the Well-Known URIs registry (RFC 8615) is asked for in the Internet-Draft, which is posted; no request has been sent to the registry.' : 'Not yet requested. The suffix <code>knowledge-linkset</code> will be requested for the Well-Known URIs registry (RFC 8615) through an Internet-Draft; it is not registered.', requested: 'Requested for the Well-Known URIs registry (RFC 8615); not yet registered.', registered: 'Registered in the Well-Known URIs registry (RFC 8615).' }[STATUS.wellknown],
   profile: { 'not-filed': 'Not yet filed in the Profile URIs registry (RFC 7284).', filed: 'Filed in the Profile URIs registry (RFC 7284); not yet registered.', registered: 'Registered in the Profile URIs registry (RFC 7284).' }[STATUS.profile],
   draft: STATUS.draft ? `<a href="https://datatracker.ietf.org/doc/${esc(STATUS.draft.replace(/-\d{2}$/, ''))}/"><code>${esc(STATUS.draft)}</code></a>` : 'Not yet posted.',
-  w3id: STATUS.w3id ? 'The namespace <code>https://w3id.org/agentic-system-core/</code> resolves.' : 'The namespace <code>https://w3id.org/agentic-system-core/</code> does not resolve yet; the pull request to w3id.org is open and not yet merged.',
+  w3id: STATUS.w3id ? 'The namespace <code>https://w3id.org/agentic-system-core/</code> resolves to this site. Its permanent addresses redirect (HTTP 303) to the pages and files they name: the vocabulary at <code>/ns</code> and its versioned copies, by content negotiation to the vocabulary file in the format asked for; the two specification pages at <code>/specs/mcp/</code> and <code>/specs/agentic-knowledge/</code>; and the profile URI at <code>/profile/agentic-knowledge</code>.' : 'The namespace <code>https://w3id.org/agentic-system-core/</code> does not resolve yet; the pull request to w3id.org is open and not yet merged.',
   preprint: STATUS.preprint ? `Published: <a href="https://doi.org/${esc(STATUS.preprint.doi)}">${esc(STATUS.preprint.title)}</a> (${esc(STATUS.preprint.date)}), DOI <code>${esc(STATUS.preprint.doi)}</code>.` : 'In preparation; not yet published.',
 };
 
@@ -1652,7 +1652,7 @@ const statusRows = [
   ['Independent validators', 'Published', `The nine checker contracts of ${REF('AGSC-09-90')} &#8212; seven validators and two generators &#8212; ship in the published npm package beside its artefact counter and its benchmark tool; the maintainer&#39;s own tools stay in the repository. One validator, for the discovery document, checks this site at Level 2 before every publish.`],
   ['Contribution channel', 'Live', `Declared in the <a href="${WELLKNOWN}">discovery document</a> as a pull-request target (${REF('AGSC-11-14')}), and every page generated from a source file carries a <em>Propose an edit</em> link to that file. Nothing is written without a person merging it.`],
   ...(PATTERNS_NODE ? [['Second node (live demonstration)', 'Live', `A second node, at <code>patterns.agenticsystemcore.com</code>, is online: a live demonstration of the reference engine, running on a small sample of well-known agent-system patterns described from public sources. Its published items are in the repository <a href="https://github.com/andreibesleaga/agsc-demo-node">agsc-demo-node</a>. ${PEERS.length ? `Each names the other as a peer in its discovery document, and the mutual check of ${REF('AGSC-10-12')} passes.` : 'It is not declared as a peer yet.'}`]] : []),
-  ['Papers', 'Submitted', 'A journal letter was submitted on 2026-10-01 and is under review; nothing is accepted.'],
+  ['Papers', 'Submitted', 'Papers based on this work have been submitted for review; none is published yet. This page names a paper once it is published.'],
 ];
 const statusTable = `<div class="table-wrap" tabindex="0" role="region" aria-label="Status"><table>
 <thead><tr><th scope="col">What</th><th scope="col">State</th><th scope="col">Detail</th></tr></thead>
@@ -1674,7 +1674,7 @@ const registrationsTable = `<div class="table-wrap" tabindex="0" role="region" a
 const publicationsHtml = `<ul>
 <li><strong>Preprint.</strong> ${regText.preprint}${STATUS.preprint ? '' : ' It will establish the specification, its vectors and its discovery layer as of the tagged release, with a persistent identifier.'}</li>
 <li><strong>Internet-Draft.</strong> ${regText.draft}</li>
-<li><strong>Papers.</strong> A journal letter was submitted on 2026-10-01 and is under review; nothing is accepted.</li>
+<li><strong>Papers.</strong> Papers based on this work have been submitted for review; none is published yet. This page names a paper once it is published.</li>
 </ul>
 <h3 id="how-to-cite">How to cite</h3>
 <p>${STATUS.preprint ? `Cite the preprint by its DOI, <code>${esc(STATUS.preprint.doi)}</code>, and the specification by version.` : 'Until the preprint is published, cite the specification by version and tag:'}</p>
