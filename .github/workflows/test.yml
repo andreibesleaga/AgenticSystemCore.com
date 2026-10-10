@@ -1,10 +1,15 @@
 # The gate of this site, on every push and every pull request.
 #
 #   What runs  the engine repository is checked out beside this one and installed;
-#              then `node scripts/build.js && node scripts/check.js` (two identical
-#              builds compared with each other; `build.js` overwrites the
-#              committed `www-next` first, so a stale committed output is not
-#              caught here: rebuild and commit after every engine change; the discovery document at
+#              the tests of the gate's own helpers (`scripts/*.test.*`, no network);
+#              on a pull request that changes `www/`, `node scripts/check.js` alone,
+#              so the committed output is compared with a fresh build of the commit
+#              it names (its content version, AGSC-04-25), which is how a release
+#              pull request that commits `www/` on its own is proved; then
+#              `node scripts/build.js && node scripts/check.js` (two identical
+#              builds compared with each other; `build.js` overwrites `www/` in the
+#              runner first, so this step proves the sources, not the committed
+#              output: rebuild and commit after every engine change; the discovery document at
 #              Levels 0 and 2; links, headers, contrast, the page tools, public
 #              hygiene), `node scripts/page-tools-check.js` (the seven page tools
 #              proved against the built site, no browser) and the engine's hygiene
@@ -14,7 +19,9 @@
 #              The build instant is the engine's last commit (or the release tag's),
 #              so the site is rebuilt and committed whenever the engine changes what
 #              it emits; a red run after an engine change means exactly that. Set the
-#              variable to a tag or a commit to pin. A manual run can name another ref.
+#              variable to a tag or a commit to pin. A manual run can name another ref,
+#              and another specification tag (`spec_tag`, read by the scripts as
+#              SITE_SPEC_TAG), for a run whose default tag does not exist yet.
 #   History    both checkouts take the full history: the release tag must be visible
 #              to the generator, and the content version derives from this
 #              repository's git log. A pull request builds its head commit, not the
@@ -46,6 +53,11 @@ on:
         required: false
         default: ''
         type: string
+      spec_tag:
+        description: 'specification tag the site is built from (empty = the default in scripts/build.js)'
+        required: false
+        default: ''
+        type: string
       a11y:
         description: 'also run the browser lane (scripts/a11y.js)'
         required: false
@@ -62,6 +74,8 @@ jobs:
   site:
     name: site (build, gate, page tools, hygiene)
     runs-on: ubuntu-latest
+    env:
+      SITE_SPEC_TAG: ${{ inputs.spec_tag }}
     steps:
       - name: this repository, with its history
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -85,6 +99,21 @@ jobs:
       - name: install the engine
         working-directory: agentic-system-core
         run: npm ci
+      - name: the tests of the gate's own helpers (no network)
+        working-directory: AgenticSystemCore.com
+        run: node --test scripts/built-commit.test.js scripts/live-check.test.mjs
+      - name: the committed output, on a pull request that changes it
+        if: ${{ github.event_name == 'pull_request' }}
+        working-directory: AgenticSystemCore.com
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if git diff --quiet "$BASE_SHA...HEAD" -- www; then
+            echo "this pull request does not change www/: the committed output is not checked here"
+          else
+            node scripts/check.js
+          fi
       - name: build twice and run the gate
         working-directory: AgenticSystemCore.com
         run: node scripts/build.js && node scripts/check.js

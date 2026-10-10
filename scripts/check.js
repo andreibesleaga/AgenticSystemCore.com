@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// Site v0 gate. Run before every commit: `node scripts/check.js`. Exit 0 pass, 1 fail.
+// Site v0 gate: `node scripts/check.js`, before the output is committed and again on the commit
+// that holds it. Exit 0 pass, 1 fail.
 // No network. Checks: (0) every page has a summary line, every diagram a name and a caption, every rule its trace line, no e-mail address; (1) determinism — two builds are byte-identical and equal the committed
-// www/; (2) the llms layout against vectors disc-0013/disc-0014 of the specification;
+// www/, both run at the commit the output's content version names when only www/ changed since; (2) the llms layout against vectors disc-0013/disc-0014 of the specification;
 // (3) the discovery document with the engine's tools/validate-wellknown at Level 0;
 // (3b) every frozen copy of the vocabulary under /ns/<version>/ by SHA-256, beside the copy of the
 // current version;
@@ -46,13 +47,23 @@ const rel = f => path.relative(WWW, f).split(path.sep).join('/');
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'agsc-site-'));
 // Removed on every way out — a failed build throws before the end of this file.
 process.on('exit', () => fs.rmSync(tmp, { recursive: true, force: true }));
-const build = out => cp.execFileSync(process.execPath, [path.join(__dirname, 'build.js'), '--out', out], { stdio: ['ignore', 'pipe', 'inherit'], env: process.env });
+// WHERE THE TWO BUILDS RUN. The output records its content version (AGSC-04-25), which names the
+// commit the build ran on; the output itself is committed one commit later, so a build at HEAD
+// would name that later commit and never equal the committed bytes. When the output names another
+// commit and this tree differs from it only inside the output folder, both builds run in a scratch
+// checkout of that commit (scripts/built-commit.js); otherwise they run here, as before.
+const BUILT = require('./built-commit.js').resolve({ root: ROOT, out: WWW });
+const BUILD_ROOT = BUILT.use ? require('./built-commit.js').checkoutAt(ROOT, BUILT.commit, path.join(tmp, 'built-commit')) : ROOT;
+const build = out => cp.execFileSync(process.execPath, [path.join(BUILD_ROOT, 'scripts', 'build.js'), '--out', out], { stdio: ['ignore', 'pipe', 'inherit'], env: { ...process.env, SITE_ENGINE: ENGINE } });
 build(path.join(tmp, 'a')); build(path.join(tmp, 'b'));
 const same = (x, y) => { try { cp.execFileSync('diff', ['-r', x, y], { stdio: 'pipe' }); return true; } catch (e) { return e.stdout.toString().split('\n').slice(0, 5).join('\n'); } };
 const d1 = same(path.join(tmp, 'a'), path.join(tmp, 'b'));
 ok(d1 === true, `build is not reproducible (AGSC-04-02):\n${d1}`);
 const d2 = fs.existsSync(WWW) ? same(path.join(tmp, 'a'), WWW) : 'www/ missing';
-ok(d2 === true, `committed output directory differs from a fresh build — run node scripts/build.js:\n${d2}`);
+const stale = BUILT.commit && BUILT.differs.length
+  ? `the committed output names content version ${BUILT.recorded}, built at ${BUILT.commit.slice(0, 12)}, and this tree differs from that commit outside the output folder in ${BUILT.differs.length} path(s), first ${BUILT.differs[0]}: rebuild, then commit the output on its own.\n`
+  : '';
+ok(d2 === true, `committed output directory differs from a fresh build — run node scripts/build.js:\n${stale}${d2}`);
 
 // (2) llms vectors
 const llms = require('./llms.js');

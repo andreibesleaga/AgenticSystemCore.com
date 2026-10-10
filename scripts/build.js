@@ -134,6 +134,10 @@ const FOOTER_YEAR = GENERATED_AT.slice(0, 4);
 // The one short name for the state this build publishes, derived by the ENGINE's own function
 // from THIS repository's git log and the build instant — never typed, never configured, never
 // stored. With no `v*` tag anywhere it is AGSC-04-25's branch 3: `0.0.0+<commits>.g<12 hex>`.
+// Only tags that start with `v` reach the git-log file (AGSC-08-20b), so a tag meant to name this
+// site's content starts with `v`; any other tag is not read here. The version names the commit the
+// build runs on, and the output is committed after it, on its own: scripts/check.js then builds at
+// the commit the output names (scripts/built-commit.js), not at the commit that holds the output.
 let GIT_LOG = null; // the AGSC-08-20b git-log file of this repository: the content version and the ledger read it
 const BUNDLE_VERSION = (() => {
   const GIT_LOG_FORMAT = '--format=%x1e%H%x1f%P%x1f%ct%x1f%D%x1f%s';
