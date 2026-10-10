@@ -11,7 +11,7 @@
 // the graph, in a machine view — landing on the page that carries it, since a section over the
 // page budget is published in parts; (5) machine files: JSON parses, NFC, one trailing LF,
 // _headers and _redirects content, sitemap targets; (6) WCAG contrast of the colour tokens in
-// both schemes.
+// both schemes; (7) the page tools; (8) the content gate, scripts/check-content.js.
 'use strict';
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const ROOT = path.resolve(__dirname, '..');
@@ -104,12 +104,25 @@ else {
 // `tools/gen-ns` derives /ns/context.jsonld, /ns/agsc.ttl and /ns/agsc.rdf from ontology/agsc.ttl
 // and, with --check, compares them with the bytes a site publishes. Zero errors AND zero warnings
 // is the bar: a warning here means this site carries a second derivation of a file the engine
-// already derives, which is exactly the drift removed.
+// already derives, which is exactly the drift removed. The generator and its inputs come from the
+// same specification source the build used: at the tag in tag mode (an archive of the tag's
+// `tools/gen-ns`, `ontology/`, `spec/` and `package.json`, with the engine's installed libraries),
+// from the working tree otherwise, so that a vocabulary changed in the working tree does not fail a
+// build that publishes the tagged one.
 {
-  const gen = path.join(ENGINE, 'tools', 'gen-ns');
+  let root = ENGINE;
+  if (SPEC_SOURCE === 'tag') {
+    root = path.join(tmp, 'gen-ns-root');
+    fs.mkdirSync(root);
+    const archive = cp.spawnSync('git', ['-C', ENGINE, 'archive', '--format=tar', SPEC_TAG, 'tools/gen-ns', 'ontology', 'spec', 'package.json'], { maxBuffer: 256 * 1024 * 1024 });
+    if (archive.status === 0) cp.execFileSync('tar', ['-x', '-C', root], { input: archive.stdout });
+    else fails.push(`cannot archive the vocabulary generator at tag ${SPEC_TAG}: ${String(archive.stderr)}`);
+  }
+  const gen = path.join(root, 'tools', 'gen-ns');
   if (!fs.existsSync(gen)) fails.push(`generator not found: ${gen}`);
   else {
-    const r = cp.spawnSync(process.execPath, [gen, '--check', path.join(WWW, 'ns'), '--json', ENGINE], { encoding: 'utf8' });
+    const childEnv = { ...process.env, NODE_PATH: [path.join(ENGINE, 'node_modules'), process.env.NODE_PATH].filter(Boolean).join(path.delimiter) };
+    const r = cp.spawnSync(process.execPath, [gen, '--check', path.join(WWW, 'ns'), '--json', root], { encoding: 'utf8', env: childEnv });
     let env = null; try { env = JSON.parse(r.stdout); } catch { /* reported below */ }
     ok(r.status === 0 && env && env.status === 'pass' && env.counts.error === 0 && env.counts.warn === 0,
       `gen-ns --check on /ns/ is not clean: ${r.stdout}${r.stderr}`);
@@ -270,6 +283,8 @@ for (const f of files.filter(f => f.endsWith('.html'))) {
 // (5) machine files
 for (const f of files) {
   const r = rel(f), b = fs.readFileSync(f);
+  // The one binary file: the touch icon, copied from assets/ as it is (scripts/check-content.js checks its size).
+  if (r === 'apple-touch-icon.png') { ok(b.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex')), `${r}: not a PNG`); continue; }
   if (/\.(png|jpe?g|gif|webp|ico|woff2?)$/.test(r)) { fails.push(`${r}: binary asset not expected in site v0`); continue; }
   const s = b.toString('utf8');
   if (!Buffer.from(s, 'utf8').equals(b)) { fails.push(`${r}: not UTF-8`); continue; }
@@ -407,5 +422,8 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
     }
 }
 
+// (8) the content gate: sentences and routes that must stay true for the version this site publishes.
+for (const f of require('./check-content.js').check(WWW)) fails.push(`content: ${f}`);
+
 if (fails.length) { process.stderr.write(fails.map(f => `FAIL ${f}`).join('\n') + `\ncheck: ${fails.length} failure(s)\n`); process.exit(1); }
-process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/, vocabulary copies ${[...Object.keys(FROZEN_NS), currentVocabulary].filter((v, i, a) => a.indexOf(v) === i).map(v => `/ns/${v}/`).join(' and ')}${Object.keys(FROZEN_NS).length ? ` (${Object.keys(FROZEN_NS).join(', ')} frozen by SHA-256)` : ''}, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} reserved on ${specPageCount} specification pages with every rule link on its page, headers, contrast, public hygiene\n`);
+process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/ (spec from ${SPEC_SOURCE === 'tag' ? `tag ${SPEC_TAG}` : 'the working tree'}), content, vocabulary copies ${[...Object.keys(FROZEN_NS), currentVocabulary].filter((v, i, a) => a.indexOf(v) === i).map(v => `/ns/${v}/`).join(' and ')}${Object.keys(FROZEN_NS).length ? ` (${Object.keys(FROZEN_NS).join(', ')} frozen by SHA-256)` : ''}, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} reserved on ${specPageCount} specification pages with every rule link on its page, headers, contrast, public hygiene\n`);

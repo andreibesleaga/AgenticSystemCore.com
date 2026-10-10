@@ -317,7 +317,7 @@ A node is files, so it lives wherever files are served over HTTPS. `agsc-host li
 
 Said plainly, so that no mode is picked up with a wrong expectation:
 
-- **No model adapter.** An agent lane that writes pages needs one; `agsc refresh --agent <name> --dry-run` runs every gate and the budget without a model call.
+- **No model adapter.** `agsc refresh --agent <name> --dry-run` runs every gate and the budget without a model call; a live run is made by an agent outside the engine, with its own model, as a client of `agsc mcp` or the page tools (AGSC-08-28).
 - **No channel adapter.** A `channel` contribution route and `publish: auto` can be declared and checked; the merges themselves happen on a forge.
 - **No isolating runner.** `agsc run` resolves and lists steps and refuses to execute without one, and says why.
 - **No runtime emitters.** `compose --emit <name>` for the six named runtimes is reserved; the Harness's seven kinds of file are what ships.

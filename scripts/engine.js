@@ -61,12 +61,12 @@ function build({ engine, config, epoch, privacy, securityTxt }) {
 
   copyTree(path.join(ROOT, 'content'), path.join(scratch, 'content'));
   fs.copyFileSync(path.join(ROOT, 'LICENSE-CONTENT'), path.join(scratch, 'LICENSE-CONTENT'));
-  // The two AUTHORED inputs of the scratch Bundle name routes of the published site that the
-  // scratch Bundle itself does not emit — the privacy notice links `/about/#contact` and the
-  // security contact names `/docs/compliance/` as its policy. The engine refuses to emit a link
-  // to a route it does not build (AGSC-E901), and it is right to: on the PUBLISHED site both
-  // targets exist, but in this shadow they do not. So the shadow's copies carry the label without
-  // the link, and its policy points at `/legal/`, which the shadow does emit. Neither file is
+  // The two AUTHORED inputs of the scratch Bundle. The privacy notice links `/about/#contact`, a
+  // route of the published site that the scratch Bundle itself does not emit. The engine refuses
+  // to emit a link to a route it does not build (AGSC-E901), and it is right to: on the PUBLISHED
+  // site the target exists, but in this shadow it does not. So the shadow's copy carries the label
+  // without the link. The security contact's policy is the engine repository's SECURITY.md; the
+  // shadow's copy points at `/legal/`, which the shadow does emit. Neither file is
   // adopted from the engine — `/legal/` and `/.well-known/security.txt` are this generator's —
   // and no adopted route reads either of them, so nothing published depends on this.
   const unlinked = md => md.replace(/\[([^\]]+)\]\((\/[^)\s]*)\)/g, '$1');

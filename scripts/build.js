@@ -872,7 +872,9 @@ const SECURITY_TXT = [
   `Expires: ${iso(EPOCH + 364 * 86400)}`,
   'Preferred-Languages: en',
   `Canonical: ${BASE}.well-known/security.txt`,
-  `Policy: ${BASE}docs/compliance/`,
+  // Policy (RFC 9116 §2.5.7) is the vulnerability disclosure policy: the engine repository's SECURITY.md,
+  // which names the two Contact routes above in the same order.
+  `Policy: ${FORGE.engine}/blob/main/SECURITY.md`,
 ].join('\n') + '\n';
 const ENGINE_BUILD = require('./engine.js').build({
   engine: ENGINE, config, epoch: EPOCH, privacy: read('site/privacy.md'), securityTxt: SECURITY_TXT,
@@ -1034,6 +1036,7 @@ function page({ url, title, heading, summary, description, body, jsonld, section
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="${url === '/' ? 'website' : 'article'}">
 <meta property="og:url" content="${esc(canonical)}">
 <meta property="og:title" content="${esc(title)}">
@@ -1117,7 +1120,7 @@ const MODE_CARDS = [
   ['Auto-wiki', 'Markdown in, a checked and linked website out; no model needed.', '/docs/modes/#mode-0-the-automatic-self-correcting-wiki'],
   ['Distributed agentic memory', 'Agents read, cite and propose; people ratify; nodes peer with each other.', '/docs/modes/#mode-1-distributed-agentic-memory'],
   ['Live specifications', 'A project\'s decisions, specs, tasks and gates as one governed memory.', '/docs/modes/#mode-2-live-specifications-and-the-memory-of-a-software-project'],
-  ['Evolving skills', 'Procedures become skill packs; improved skills come back as Procedures.', '/docs/modes/#mode-3-the-evolving-skills-library'],
+  ['Evolving skills', 'Each cluster becomes a skill pack of its published items; improved skills come back as Procedures.', '/docs/modes/#mode-3-the-evolving-skills-library'],
   ['Runnable knowledge', 'Select Concepts, get a starting Harness: seven kinds of file an architect or a runtime starts from.', '/docs/modes/#mode-4-runnable-knowledge'],
   ['The live board', 'Agents and people pull, claim and finish a project\'s tasks on one shared board until it is done.', '/docs/modes/#mode-5-the-live-board-self-driving-product-and-project-management'],
 ];
@@ -1173,7 +1176,7 @@ ${md(index.body)}<h2 id="benefits">What each reader gets</h2>
 <thead><tr><th scope="col">You are</th><th scope="col">You get</th><th scope="col">Where</th></tr></thead>
 <tbody>
 <tr><th scope="row">A person with notes</th><td>a wiki that checks and links itself, and a project's living memory</td><td><a href="/docs/guides/mode-0/">the Mode 0 guide</a>: <code>agsc init</code>, a security contact, one commit, <code>agsc ci</code>, <code>agsc build</code></td></tr>
-<tr><th scope="row">A team</th><td>a live board and shared skills</td><td><a href="/docs/modes/">the six modes</a>, <a href="/skills/">skill packs</a></td></tr>
+<tr><th scope="row">A team</th><td>a live board and shared skills</td><td><a href="/docs/modes/">the six modes</a>, <a href="/skills/">skill packs</a>, <a href="/boards/project-board/">this site's own board</a></td></tr>
 <tr><th scope="row">An agent or an assistant</th><td>memory it can find, verify and cite; tools on every item page</td><td><a href="${WELLKNOWN}">the discovery document</a>, <a href="/llms.txt">llms.txt</a>, <a href="/chunks.jsonl">the chunk export</a></td></tr>
 <tr><th scope="row">An implementer</th><td>a specification with vectors and standalone checkers, in any language</td><td><a href="/specs/">the specification</a>, <a href="/docs/reading-the-specification/">how to read it</a></td></tr>
 <tr><th scope="row">A publisher</th><td>static files, no server to run and nothing to pay for beyond hosting</td><td><a href="/procedures/publish-a-level-0-node/">publish a Level-0 node</a></td></tr>
@@ -1185,7 +1188,7 @@ ${md(index.body)}<h2 id="benefits">What each reader gets</h2>
 <p>What it shares with others' work, and how it differs:</p>
 <ul>
 <li><strong>LLM wikis</strong> (<a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f">Andrej Karpathy's idea</a>, the <a href="https://github.com/decodingai-magazine/llm-wiki-workshop">Decoding AI workshop</a>): the same aim — Markdown pages, sources kept apart, knowledge prepared in advance. There a model writes pages and a link's kind lives in prose; here links are typed, deterministic checks find orphans and stale links, and a model proposes but never merges.</li>
-<li><strong><a href="https://technicspub.com/ontology-pipeline/">The Ontology Pipeline</a></strong> (Jessica Talisman): six stages from controlled vocabulary to knowledge graph. The graph stage works today, the others in part; the next version is planned to follow them. No compatibility is claimed.</li>
+<li><strong><a href="https://technicspub.com/ontology-pipeline/">The Ontology Pipeline</a></strong> (Jessica Talisman): six stages from controlled vocabulary to knowledge graph. The graph stage works today, the others in part; version 1.1 is planned to follow them. No compatibility is claimed.</li>
 <li><strong>Google's <a href="https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md">Open Knowledge Format</a></strong>: also Markdown with a header, but link kinds stay in prose; no discovery layer or digests.</li>
 <li><strong><a href="https://llmstxt.org/">llms.txt</a></strong>: a node publishes one, with a fixed grammar, beside a discovery document giving each artefact's digest.</li>
 <li><strong>Agent discovery</strong> (<a href="https://datatracker.ietf.org/doc/draft-jimenez-dawn-discovery-landscape/">IETF survey</a>) finds who can act; this finds what is known. <a href="https://www.rfc-editor.org/info/rfc9727">RFC 9727 (api-catalog)</a> is the design precedent.</li>
@@ -1820,6 +1823,9 @@ const QUICKSTART = [
   ['P9', 'Maintainer', ['agsc ci', 'agsc verify --ledger', 'agsc refresh --agent <name> --dry-run   (an agent lane declared in agsc.config.json)']],
   ['P10', 'Port implementer', ['read spec/, schema/, ontology/ and tests/vectors/', 'run the vector set against your engine', 'agsc conform --level <n>   to write the claim']],
   ['P11', 'Standards implementer', ['fetch /.well-known/knowledge-linkset', 'validate-wellknown <file> --level 2', 'follow rel="describedby" from any page']],
+  // P12 is a persona of the requirements (Mode 5) that the quickstart rule does not list yet; its
+  // path is this site's content, beyond what AGSC-06-24 asks.
+  ['P12', 'Self-driving team on a live board', ['author task items in a cluster', 'agsc build   (the board renders as a page and a JSON file)', 'agsc mcp', 'call propose with a task_state to claim or move a task', 'a person reviews and merges the proposal']],
 ];
 const quickstartHtml = () => {
   for (const [id, , steps] of QUICKSTART) {
@@ -1898,7 +1904,7 @@ addPage('/legal/', {
 <p>Specification <code>${esc(SPEC_VERSION)}</code>, tagged on ${esc(SPEC_DATE)}, is the version in which this work was first made public, together with its reference engine, its vocabulary, its schemas and its conformance vectors. ${STATUS.preprint ? `The permanent record is the Zenodo deposit <a href="https://doi.org/${esc(STATUS.preprint.doi)}">${esc(STATUS.preprint.doi)}</a> of ${esc(STATUS.preprint.date)}: the paper, and a sealed archive of the tagged sources whose SHA-256 digests are listed in the deposit&#39;s <code>SHA256SUMS</code> file, with an OpenTimestamps proof of that list.` : 'The permanent record &#8212; a deposit with a persistent identifier holding the paper and a sealed archive of the tagged sources, with their SHA-256 digests and an OpenTimestamps proof of them &#8212; is named here once it is published.'}</p>
 <p>Everything these artefacts describe &#8212; the format, the rules, the discovery mechanism, the vocabulary and the designs of the engine &#8212; is published so that it is on the public record from that date, and it is free to implement under the licences on this page. Publication does not stop anyone from applying for a patent; it places what is published here in the state of the art against which the novelty of a later application is judged.</p>
 <h2 id="signals">Machine-readable signals</h2>
-<p>The same policy is stated three ways (${REF('AGSC-06-18')}): the AI-usage signals of <a href="/robots.txt"><code>/robots.txt</code></a>, the TDM reservation in <a href="/.well-known/tdmrep.json"><code>/.well-known/tdmrep.json</code></a>, and the <code>schema:license</code> and <code>schema:usageInfo</code> members of <a href="/graph.jsonld"><code>/graph.jsonld</code></a> together with the provenance header of <a href="/llms.txt"><code>/llms.txt</code></a>. The reservation of text and data mining does not limit what the law of your country allows researchers to do without permission.</p>
+<p>The same policy is stated three ways (${REF('AGSC-06-18')}): the per-crawler groups of <a href="/robots.txt"><code>/robots.txt</code></a>, the TDM reservation in <a href="/.well-known/tdmrep.json"><code>/.well-known/tdmrep.json</code></a>, and the <code>schema:license</code> and <code>schema:usageInfo</code> members of <a href="/graph.jsonld"><code>/graph.jsonld</code></a> together with the provenance header of <a href="/llms.txt"><code>/llms.txt</code></a>. The reservation of text and data mining does not limit what the law of your country allows researchers to do without permission.</p>
 <h2 id="ai-assistance">How this text was written</h2>
 <p>${esc(config.site.author)} writes and maintains this work with the help of AI assistants. A person decides what is written and why. An assistant drafts and checks text under the author&#39;s direction. The author reads, edits and approves every sentence before it is published, and answers for all of it.</p>
 <p>Every item on this node records how its text was made &#8212; written by a person, written with AI assistance, generated by a model, or imported from elsewhere &#8212; and names the person accountable for it. You can read that record on the item&#39;s own page and in the machine-readable views.</p>
@@ -2016,6 +2022,7 @@ for (const f of LLM_CONTEXT) put(`exports/${f}`, ENGINE_BUILD.exports.get(f));
     ['/pages/&lt;slug&gt;.md', 'text/markdown', 'The source file of one item, exactly as it is stored.'],
     ['/pages/&lt;slug&gt;.jsonld', 'application/ld+json', 'One item as RDF, on its own.'],
     ['/skills/index.json', 'application/json', 'The skill packs and their digests.'],
+    ['/boards/index.json', 'application/json', 'The live boards of this node. Each board is also a page, such as <a href="/boards/project-board/">the project board</a>, and a JSON file.'],
     ['/now.md', 'text/markdown', 'The state of this node at the last build.'],
     ['/ledger.jsonl', 'application/jsonl', 'The derived ledger: one hash-chained line per commit of this site\'s history and one for the build, re-verifiable offline. Its head is on the ledger link of the discovery document.'],
     ['/ns/context.jsonld', 'application/ld+json', 'The JSON-LD context the graph files use.'],
@@ -2100,6 +2107,9 @@ const SKILL_PACKS = [...ENGINE_BUILD.files.keys()].filter(r => /^\/skills\/[^/]+
 for (const r of SKILL_PACKS) putEngine(r);
 const BOARD_ROUTES = [...ENGINE_BUILD.files.keys()].filter(r => r.startsWith('/boards/')).sort();
 for (const r of BOARD_ROUTES) putEngine(r);
+// The board pages are the engine's bytes, so they are not in `routes` (the search index has no text
+// of theirs); they are pages of this site all the same, so the sitemap lists them (AGSC-06-19).
+const BOARD_PAGES = BOARD_ROUTES.filter(r => r.endsWith('/index.html')).map(r => r.slice(0, -'index.html'.length));
 // AGSC-06-13a: both files are the ENGINE's bytes. This generator's own layout function — which
 // `scripts/check.js` proves against the tagged vectors disc-0013 and disc-0014 on every run — is
 // still produced and COMPARED, so the vector lane keeps meaning something: `/llms.txt` must be
@@ -2156,7 +2166,7 @@ const blocked = [...ROBOTS.matchAll(/^User-agent: (.+)$\n[^\n]*\nDisallow: \/$/g
 if (blocked.join(',') !== TDM_CRAWLERS.join(',')) die(`robots.txt blocks ${blocked.join(', ') || 'nothing'} but site.tdm_crawlers[] names ${TDM_CRAWLERS.join(', ')} (AGSC-06-18)`);
 if (!(/ai-train=no/.test(ROBOTS) && TDM.every(r => r['tdm-reservation'] === 1) && ENGINE_GRAPH['@graph'][0][ctxKey('schema:license')] === LICENSE_PROSE && LLMS.index.includes(`terms: ${TERMS_ID}`) && TERMS_TEXT.includes('text and data mining rights are expressly reserved'))) die('licence dialects diverge (AGSC-06-18)');
 routes.sort(byCode);
-put('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes.map(r => `<url><loc>${esc(ORIGIN + r)}</loc><lastmod>${GENERATED_AT.slice(0, 10)}</lastmod></url>`).join('\n')}\n</urlset>\n`);
+put('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...routes, ...BOARD_PAGES].sort(byCode).map(r => `<url><loc>${esc(ORIGIN + r)}</loc><lastmod>${GENERATED_AT.slice(0, 10)}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 
 // _headers: ONE block per address. Cloudflare Pages merges blocks whose patterns differ, but when
 // the same address is written twice it keeps only the later block, which once dropped the
@@ -2246,6 +2256,11 @@ put('_redirects', `# Generated by scripts/build.js — do not hand-edit (AGSC-06
 
 // assets
 for (const f of ['assets/site.css', 'assets/search.js', 'favicon.svg']) { const s = read(`assets/${path.basename(f)}`); checkText(f, s); put(f, s); }
+// The touch icon phones ask for at /apple-touch-icon.png, named by every page head: the icon of
+// assets/favicon.svg drawn edge to edge (the phone rounds the corners itself) at 180 × 180 px,
+// rendered once with a headless Chromium screenshot and stripped of its date chunks. Its bytes are
+// an input, copied as they are.
+put('apple-touch-icon.png', fs.readFileSync(path.join(ROOT, 'assets', 'apple-touch-icon.png')));
 // The stylesheet is also the engine's default theme (src/distribution/theme.js), so every
 // engine-built node looks like this site; the two copies must be the same bytes.
 if (read('assets/site.css') !== engineTheme.stylesheet()) die('assets/site.css differs from the engine default theme (src/distribution/theme.js): change both together');

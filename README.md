@@ -45,8 +45,8 @@ node scripts/page-tools-check.js                                        # the se
 | [content/](content/README.md) | the Bundle's items: vocabulary Concepts, Clusters, a procedure, the project board |
 | [site/](site/README.md) | the authored pages that are not items: the guide, about, privacy, the profile page, diagrams, summaries |
 | [scripts/](scripts/README.md) | the generator, the gate and the optional lanes |
-| `assets/` | the stylesheet (the engine's default theme, byte for byte), the search script, the icon |
-| [docs/](docs/BUILD.md) | how the site is built, with a diagram |
+| [assets/](assets/README.md) | the stylesheet (the engine's default theme, byte for byte), the search script, the icon, as SVG and as the 180-pixel PNG touch icon |
+| [docs/](docs/README.md) | how the site is built, with a diagram |
 | `www/` | the built site, committed; Cloudflare Pages serves it as is |
 
 ## Two switches
