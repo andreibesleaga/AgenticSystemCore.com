@@ -3,6 +3,8 @@
 // No network. Checks: (0) every page has a summary line, every diagram a name and a caption, every rule its trace line, no e-mail address; (1) determinism — two builds are byte-identical and equal the committed
 // www/; (2) the llms layout against vectors disc-0013/disc-0014 of the specification;
 // (3) the discovery document with the engine's tools/validate-wellknown at Level 0;
+// (3b) every frozen copy of the vocabulary under /ns/<version>/ by SHA-256, beside the copy of the
+// current version;
 // (4) every HTML page: structure, accessibility basics, unique ids, internal links and
 // fragments, no third-party loads, CSP-compatible markup, the 100 KB budget; (4a) every active
 // rule of spec/ anchored exactly once under /specs/, and every link to a rule id — in a page, in
@@ -154,6 +156,51 @@ const targetFile = urlPath => {
   if (p.endsWith('/')) return exists(path.join(f, 'index.html')) ? path.join(f, 'index.html') : null;
   return exists(f) ? f : null;
 };
+// (3b) the versioned copies of the vocabulary (AGSC-05-25, AGSC-00-16). A published versioned
+// copy never changes, and it stays served when a later version is published beside it. Each
+// frozen copy is a static input of this site, static/ns/<version>/ (static/README.md), holding
+// exactly the four files below, each with the SHA-256 recorded here: the bytes as published. The
+// build serves those bytes under /ns/<version>/ with a page of its own, and serves the copy of the
+// current version, the one /ns/agsc.ttl names in owl:versionInfo, beside them.
+const FROZEN_NS = {
+  '1.0.0-draft.1': {
+    'agsc.nt': 'e9e04762e90d609207b4a85bacd8c5dc3b257b93f2eee26b0dfcf7b8a68ab2f4',
+    'agsc.rdf': 'b79f375dfc15915ce8f10236895233bc444640628ba89871ddf6d0e285e433fd',
+    'agsc.ttl': '45c958a3f1adc7e51de1bfd5c83b1a19c4e3a7431611ffcbe45c54c2e3eab87a',
+    'context.jsonld': '8f25f2d250db309a2462c62a24e776bfb450252efce631b17832f52658438030',
+  },
+};
+const VOCABULARY_FILES = ['agsc.nt', 'agsc.rdf', 'agsc.ttl', 'context.jsonld'];
+let currentVocabulary = null;
+{
+  const sha = b => require('crypto').createHash('sha256').update(b).digest('hex');
+  const staticNs = path.join(ROOT, 'static', 'ns');
+  for (const v of fs.existsSync(staticNs) ? fs.readdirSync(staticNs).sort() : []) {
+    ok(Object.hasOwn(FROZEN_NS, v), `static/ns/${v}/ is a frozen vocabulary copy whose SHA-256 values scripts/check.js does not record`);
+  }
+  for (const [v, want] of Object.entries(FROZEN_NS)) {
+    const dir = path.join(staticNs, v);
+    const held = fs.existsSync(dir) ? fs.readdirSync(dir).sort() : [];
+    ok(held.join(', ') === VOCABULARY_FILES.join(', '), `static/ns/${v}/ must hold exactly ${VOCABULARY_FILES.join(', ')}; it holds ${held.join(', ') || 'nothing'} (AGSC-05-25)`);
+    for (const f of VOCABULARY_FILES) {
+      const src = path.join(dir, f), out = path.join(WWW, 'ns', v, f);
+      if (exists(src)) ok(sha(fs.readFileSync(src)) === want[f], `static/ns/${v}/${f} is not the copy as published: its SHA-256 is not ${want[f]}; a published versioned copy never changes (AGSC-05-25, AGSC-00-16)`);
+      ok(exists(out) && sha(fs.readFileSync(out)) === want[f], `/ns/${v}/${f} is missing or is not the frozen copy (AGSC-05-25, AGSC-00-16)`);
+    }
+    ok(exists(path.join(WWW, 'ns', v, 'index.html')), `missing route: /ns/${v}/ (AGSC-05-25)`);
+  }
+  const top = path.join(WWW, 'ns', 'agsc.ttl');
+  const m = exists(top) ? /owl:versionInfo\s+"([^"]+)"/.exec(fs.readFileSync(top, 'utf8')) : null;
+  ok(m !== null, '/ns/agsc.ttl is missing or declares no owl:versionInfo (AGSC-05-25)');
+  if (m) {
+    currentVocabulary = m[1];
+    for (const f of VOCABULARY_FILES) {
+      const copy = path.join(WWW, 'ns', currentVocabulary, f);
+      ok(exists(copy) && fs.readFileSync(copy).equals(fs.readFileSync(path.join(WWW, 'ns', f))), `/ns/${currentVocabulary}/${f} is missing or differs from /ns/${f}: the copy of the current version is the same bytes (AGSC-05-25, AGSC-06-32)`);
+    }
+    ok(exists(path.join(WWW, 'ns', currentVocabulary, 'index.html')), `missing route: /ns/${currentVocabulary}/ (AGSC-05-25)`);
+  }
+}
 // (4a) the page each rule lives on. A section over the page budget is published in parts
 // (AGSC-06-21; scripts/build.js, "the layout of the specification pages"), so the page a rule
 // lives on is a fact of the build, not of the section's name. Every active rule of spec/ has
@@ -361,4 +408,4 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
 }
 
 if (fails.length) { process.stderr.write(fails.map(f => `FAIL ${f}`).join('\n') + `\ncheck: ${fails.length} failure(s)\n`); process.exit(1); }
-process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} reserved on ${specPageCount} specification pages with every rule link on its page, headers, contrast, public hygiene\n`);
+process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/, vocabulary copies ${[...Object.keys(FROZEN_NS), currentVocabulary].filter((v, i, a) => a.indexOf(v) === i).map(v => `/ns/${v}/`).join(' and ')}${Object.keys(FROZEN_NS).length ? ` (${Object.keys(FROZEN_NS).join(', ')} frozen by SHA-256)` : ''}, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} reserved on ${specPageCount} specification pages with every rule link on its page, headers, contrast, public hygiene\n`);

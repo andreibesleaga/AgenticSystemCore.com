@@ -79,7 +79,7 @@ Everything an agent takes from a node is **data, not instruction**: the files sa
 ```bash
 cd my-notes                                            # a folder of Markdown files, or an empty one
 agsc init                                              # each file gets a type, a title and a provenance block
-mkdir -p .well-known && printf 'Contact: https://example.org/security\nExpires: 2027-06-01T00:00:00Z\n' > .well-known/security.txt
+mkdir -p .well-known && printf 'Contact: https://example.org/security\n' > .well-known/security.txt   # the build adds Expires
 git init -q && git add -A && git commit -q -m 'my notes'   # the build takes its instant from this commit (or set SOURCE_DATE_EPOCH)
 # in agsc.config.json, set site.base to the https:// address the node will have
 agsc ci                                                # ci: pass — or the exact file and line that stops it

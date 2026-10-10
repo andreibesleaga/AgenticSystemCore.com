@@ -1,11 +1,20 @@
 #!/usr/bin/env node
 // Optional browser lane (not part of the zero-dependency gate): axe-core over every page of www/
-// in both colour schemes at a desktop width (1200 px) and at a phone width (390 px) (WCAG
-// 2.0/2.1/2.2 A+AA + best practices), CSP violations, third-party requests, first-Tab skip link,
-// horizontal scroll at 320 px, the 404 page and the search script. Every file is served with the
-// headers the generated `_headers` gives its address (Content-Type first), as the host serves it,
-// so a wrong content type in that file is seen here; a file `_headers` gives no type gets the
-// type of its extension.
+// in both colour schemes at a phone width (390 px), a tablet width (768 px) and a desktop width
+// (1280 px), and with the visitor's stored dark choice at 1280 px (WCAG 2.0/2.1/2.2 A+AA + best
+// practices); CSP violations, third-party requests, first-Tab skip link, the 404 page and the
+// search script. Besides axe it measures what decides how a page reads:
+//   - no page scrolls sideways at 320, 390, 768 or 1280 px (WCAG 1.4.10);
+//   - prose lines: at 768 and 1280 px no line of running text in the main column is longer
+//     than 80 characters (WCAG 1.4.8; the stylesheet aims at about 70). Code blocks, tables,
+//     diagrams and the card grid are not prose and are not measured; a diagram caption is;
+//   - whole words in tables: no word of three or more letters is split across two lines inside
+//     a table cell, at any of the three widths. A word inside code or a link may break anywhere
+//     (a long identifier or address must not widen the page); those breaks are counted apart
+//     and reported, not failed.
+// Every file is served with the headers the generated `_headers` gives its address (Content-Type
+// first), as the host serves it, so a wrong content type in that file is seen here; a file
+// `_headers` gives no type gets the type of its extension.
 // Run after `node scripts/check.js`. Needs, outside the repository:
 //   npm i --no-save playwright-core@1.62.1 axe-core@4.13.0   (1.62.1 or a later 1.x works)
 //   CHROME_EXE=<path to a Chromium or chrome-headless-shell binary> node scripts/a11y.js
@@ -34,6 +43,55 @@ const typeProblems = [];
 const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
 const pages = walk(WWW).filter(f => f.endsWith('index.html')).map(f => '/' + path.relative(WWW, path.dirname(f)).split(path.sep).join('/') + '/').map(p => p === '//' ? '/' : p).sort();
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.txt': 'text/plain' };
+// The reading measures (they run inside the page; layout does not depend on the colour scheme,
+// so they run once per width, in the light scheme).
+const MAX_LINE = 80; // characters in one rendered line of prose (WCAG 1.4.8)
+const SIZES = { 390: { width: 390, height: 844 }, 768: { width: 768, height: 1024 }, 1280: { width: 1280, height: 900 } };
+/** The longest rendered line of prose in the main column, in characters, and whether any block wraps. */
+function proseLines() {
+  const main = document.querySelector('main');
+  if (!main) return { longest: 0, wraps: false, sample: '' };
+  const NOT_PROSE = 'pre, table, .table-wrap, svg, .modes, script, style, figure > :not(figcaption)';
+  const blockOf = el => { while (el && el !== main && getComputedStyle(el).display.startsWith('inline')) el = el.parentElement; return el; };
+  const one = document.createRange();
+  let longest = 0, sample = '', wraps = false, block = null, top = 0, height = 0, text = '';
+  const close = () => { const n = text.trim().length; if (n > longest) { longest = n; sample = text.trim(); } text = ''; };
+  const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (!node.parentElement || node.parentElement.closest(NOT_PROSE)) continue;
+    const b = blockOf(node.parentElement);
+    for (let i = 0; i < node.data.length; i++) {
+      one.setStart(node, i); one.setEnd(node, i + 1);
+      const r = one.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) continue; // collapsed white space
+      if (b !== block) { close(); block = b; top = r.top; height = r.height; }
+      else if (r.top > top + height / 2) { close(); wraps = true; top = r.top; height = r.height; }
+      text += node.data[i] === '\n' || node.data[i] === '\t' ? ' ' : node.data[i];
+    }
+  }
+  close();
+  return { longest, wraps, sample: sample.slice(0, 60) };
+}
+/** Words of three or more letters split across two lines inside a table cell: outside code and links, and inside them. */
+function splitWords() {
+  const one = document.createRange();
+  const found = { plain: [], codeOrLink: 0 };
+  for (const cell of document.querySelectorAll('th, td')) {
+    const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      for (const m of node.data.matchAll(/\p{L}{3,}/gu)) {
+        one.setStart(node, m.index); one.setEnd(node, m.index + m[0].length);
+        const tops = [...one.getClientRects()].filter(r => r.width > 0).map(r => r.top);
+        if (!tops.some(t => Math.abs(t - tops[0]) > 2)) continue;
+        if (node.parentElement.closest('code, a')) found.codeOrLink++;
+        else found.plain.push(m[0]);
+      }
+    }
+  }
+  return found;
+}
+const sideways = () => document.documentElement.scrollWidth > document.documentElement.clientWidth;
+const median = xs => { const v = [...xs].sort((a, b) => a - b); return v.length ? (v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2) : 0; };
 const srv = http.createServer((req, res) => {
   const u = decodeURIComponent(req.url.split('?')[0]);
   if (u === '/__axe.js') { res.setHeader('Content-Type', 'text/javascript'); return res.end(AXE); }
@@ -47,14 +105,16 @@ const srv = http.createServer((req, res) => {
 srv.listen(0, async () => {
   const port = srv.address().port, base = `http://127.0.0.1:${port}`;
   const browser = await chromium.launch({ executablePath: process.env.CHROME_EXE, headless: true });
-  let violations = 0, cspViol = 0, thirdParty = 0, problems = [];
+  let violations = 0, cspViol = 0, thirdParty = 0, problems = [], scrolling = 0;
+  const longest = { 768: [], 1280: [] }, split = { 390: 0, 768: 0, 1280: 0 }, splitInCode = { 390: 0, 768: 0, 1280: 0 };
   // 'light' and 'dark' follow the system scheme; 'chosen-dark' is a light system with the
   // visitor's stored switcher choice 'dark' (the manual override of the theme switcher).
-  // The same three at a desktop width, and the two system schemes again at a phone width
-  // (390 x 844), where diagrams and wide tables scroll inside their own box.
-  const RUNS = [['light', 1200], ['dark', 1200], ['chosen-dark', 1200], ['light', 390], ['dark', 390]];
+  // Both system schemes at a phone (390 x 844), a tablet (768 x 1024) and a desktop width
+  // (1280 x 900), and the chosen dark scheme at the desktop width. At 390 px diagrams and wide
+  // tables scroll inside their own box; the page itself never scrolls sideways.
+  const RUNS = [['light', 390], ['dark', 390], ['light', 768], ['dark', 768], ['light', 1280], ['dark', 1280], ['chosen-dark', 1280]];
   for (const [scheme, width] of RUNS) {
-    const ctx = await browser.newContext({ colorScheme: scheme === 'chosen-dark' ? 'light' : scheme, viewport: width === 390 ? { width: 390, height: 844 } : { width: 1200, height: 900 } });
+    const ctx = await browser.newContext({ colorScheme: scheme === 'chosen-dark' ? 'light' : scheme, viewport: SIZES[width] });
     if (scheme === 'chosen-dark') await ctx.addInitScript(() => { try { localStorage.setItem('agsc-theme', 'dark'); } catch (e) {} });
     for (const p of pages) {
       const page = await ctx.newPage();
@@ -65,16 +125,26 @@ srv.listen(0, async () => {
       const res = await page.evaluate(() => axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'] } }));
       for (const v of res.violations) { violations++; problems.push(`${scheme} ${width}px ${p}: ${v.id} (${v.impact}) ${v.nodes.length}x — ${v.nodes[0].target[0]}`); }
       if (scheme === 'chosen-dark' && await page.evaluate(() => document.documentElement.getAttribute('data-theme')) !== 'dark') problems.push(`${p}: the stored theme choice is not applied`);
-      if (scheme === 'light' && width === 1200) {
+      if (await page.evaluate(sideways)) { scrolling++; problems.push(`${scheme} ${p}: horizontal scroll at ${width}px`); }
+      if (scheme === 'light') {
+        const words = await page.evaluate(splitWords);
+        split[width] += words.plain.length; splitInCode[width] += words.codeOrLink;
+        if (words.plain.length) problems.push(`${width}px ${p}: ${words.plain.length} word(s) split across lines in a table cell (${words.plain.slice(0, 5).join(', ')})`);
+        if (width !== 390) {
+          const prose = await page.evaluate(proseLines);
+          if (prose.wraps) longest[width].push(prose.longest);
+          if (prose.longest > MAX_LINE) problems.push(`${width}px ${p}: a prose line of ${prose.longest} characters (more than ${MAX_LINE}): "${prose.sample}…"`);
+        }
+      }
+      if (scheme === 'light' && width === 1280) {
         const sw = await page.evaluate(() => { const b = document.getElementById('theme'); const s = b && b.querySelector('select'); const n = s && s.getAttribute('aria-label'); const ul = document.querySelector('header.site ul'); const same = !ul || innerWidth < 1000 || Math.abs(s.getBoundingClientRect().top - ul.getBoundingClientRect().top) < 12; return !!(b && !b.hidden && s && n && same); });
         if (!sw) problems.push(`${p}: theme switcher missing, hidden, unnamed or not on the navigation line`);
         await page.keyboard.press('Tab');
         const first = await page.evaluate(() => { const a = document.activeElement; return a && a.className === 'skip' && getComputedStyle(a).top !== '-48px'; });
         if (!first) problems.push(`${p}: first Tab does not reveal the skip link`);
         await page.setViewportSize({ width: 320, height: 800 });
-        const hs = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
-        if (hs) problems.push(`${p}: horizontal scroll at 320px`);
-        await page.setViewportSize({ width: 1200, height: 900 });
+        if (await page.evaluate(sideways)) { scrolling++; problems.push(`${p}: horizontal scroll at 320px`); }
+        await page.setViewportSize(SIZES[1280]);
       }
       await page.close();
     }
@@ -111,7 +181,10 @@ srv.listen(0, async () => {
   }
   const r404 = await page.goto(base + '/no/such/page/'); console.log(`unknown path -> HTTP ${r404.status()}`);
   await browser.close(); srv.close();
-  console.log(`pages: ${pages.length} × 3 schemes (system light, system dark, chosen dark) at 1200 px, and × 2 (system light, system dark) at 390 px; axe violations: ${violations}; CSP violations: ${cspViol}; third-party requests: ${thirdParty}; content types from _headers`);
+  console.log(`pages: ${pages.length} × 2 schemes (system light, system dark) at 390, 768 and 1280 px, and the chosen dark scheme at 1280 px; axe violations: ${violations}; CSP violations: ${cspViol}; third-party requests: ${thirdParty}; content types from _headers`);
+  console.log(`pages scrolling sideways (320, 390, 768, 1280 px): ${scrolling}`);
+  for (const w of [768, 1280]) console.log(`prose at ${w} px: ${longest[w].length} pages with wrapped prose; median of each page's longest line ${median(longest[w])} characters, longest ${Math.max(0, ...longest[w])} (at most ${MAX_LINE})`);
+  console.log(`words split across lines in table cells (390 / 768 / 1280 px): ${split[390]} / ${split[768]} / ${split[1280]}; breaks inside code or a link, allowed: ${splitInCode[390]} / ${splitInCode[768]} / ${splitInCode[1280]}`);
   problems.push(...typeProblems);
   if (problems.length) { console.log(problems.join('\n')); process.exit(1); }
   console.log('a11y pass: OK');

@@ -34,7 +34,7 @@ Optional browser lanes, with `playwright-core` and `axe-core` installed **outsid
 repository (see each file's header):
 
 ```bash
-NODE_PATH=<dir>/node_modules CHROME_EXE=<chromium> node scripts/a11y.js   # both colour schemes, desktop and phone width, 0 violations expected
+NODE_PATH=<dir>/node_modules CHROME_EXE=<chromium> node scripts/a11y.js   # both colour schemes at 390, 768 and 1280 px, 0 violations expected
 node scripts/page-tools-check.js                                        # the seven page tools, no browser needed
 ```
 
@@ -61,7 +61,15 @@ node scripts/page-tools-check.js                                        # the se
 
 Edit `content/` or `site/`, never the built output. Every page carries a "Propose an edit"
 link to its source file here; a change arrives as a pull request, the gate runs, and a
-person merges it. Security reports: the engine repository's `SECURITY.md`.
+person merges it. [CONTRIBUTING.md](CONTRIBUTING.md) says how, and the
+[code of conduct](CODE_OF_CONDUCT.md) applies. Security reports go to this repository's
+private vulnerability reporting, as [SECURITY.md](SECURITY.md) says, never to a public issue.
+
+By contributing you sign off under the contributor agreement of the format,
+`CONTRIBUTOR-AGREEMENT` in the engine repository (token `CA-v1`): you keep the copyright
+in your text and grant the maintainer a non-exclusive licence to publish it here and in
+other collections and editions the maintainer makes from this node's items; you may
+choose, contribution by contribution, to assign it instead. Your name stays on the item.
 
 ## How this is made
 

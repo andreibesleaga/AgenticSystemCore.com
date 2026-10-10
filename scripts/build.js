@@ -687,17 +687,47 @@ function parseTurtle(src) {
 }
 const TTL = engineFile('ontology/agsc.ttl');
 checkText('ontology/agsc.ttl', TTL);
-const onto = parseTurtle(TTL);
 const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
 const XSD = 'http://www.w3.org/2001/XMLSchema#';
 const OWL = 'http://www.w3.org/2002/07/owl#', RDFS = 'http://www.w3.org/2000/01/rdf-schema#';
 const ONTOLOGY_IRI = 'https://w3id.org/agentic-system-core/ns';
-const tri = (s, p) => onto.triples.filter(t => t.s === s && t.p === p).map(t => t.o);
-const one = (s, p) => (tri(s, p)[0] || {}).v;
-const VERSION_INFO = one(ONTOLOGY_IRI, OWL + 'versionInfo');
+// One vocabulary file, read: its triples and the accessors the /ns/ pages use. The current
+// version is ontology/agsc.ttl; each frozen copy below is read from its own Turtle file.
+function vocabularyOf(ttl) {
+  const parsed = parseTurtle(ttl);
+  const tri = (s, p) => parsed.triples.filter(t => t.s === s && t.p === p).map(t => t.o);
+  const one = (s, p) => (tri(s, p)[0] || {}).v;
+  const ascSubjects = [...new Set(parsed.triples.map(t => t.s))].filter(s => s.startsWith(NS)).sort(byCode);
+  const kindOf = s => { const ts = tri(s, RDF_TYPE).map(o => o.v); return ts.includes(OWL + 'Class') ? 'class' : ts.includes(OWL + 'ObjectProperty') ? 'object' : ts.includes(OWL + 'DatatypeProperty') ? 'datatype' : 'other'; };
+  return { onto: parsed, tri, one, ascSubjects, kindOf, versionInfo: one(ONTOLOGY_IRI, OWL + 'versionInfo') };
+}
+const VOCABULARY = vocabularyOf(TTL);
+const { onto, tri, one, ascSubjects, kindOf } = VOCABULARY;
+const VERSION_INFO = VOCABULARY.versionInfo;
 if (!VERSION_INFO) die('ontology: owl:versionInfo missing (AGSC-05-25)');
-const ascSubjects = [...new Set(onto.triples.map(t => t.s))].filter(s => s.startsWith(NS)).sort(byCode);
-const kindOf = s => { const ts = tri(s, RDF_TYPE).map(o => o.v); return ts.includes(OWL + 'Class') ? 'class' : ts.includes(OWL + 'ObjectProperty') ? 'object' : ts.includes(OWL + 'DatatypeProperty') ? 'datatype' : 'other'; };
+// ------------------------------------------------------------------ the frozen copies of the vocabulary (AGSC-05-25, AGSC-00-16)
+// A versioned copy, once published under /ns/<version>/, never changes, and it stays served when a
+// later version is published beside it. Each one is kept as a static input of this site,
+// static/ns/<version>/ (static/README.md): the four files exactly as published, which
+// scripts/check.js holds by SHA-256. The build serves those bytes, never a regeneration, and gives
+// each copy its page; the copy of the current version is generated from ontology/agsc.ttl as before,
+// and if a frozen copy carries the same version, the generated files must be its bytes.
+const VOCABULARY_FILES = ['agsc.nt', 'agsc.rdf', 'agsc.ttl', 'context.jsonld'];
+const FROZEN_NS = new Map(); // version -> Map(file name -> bytes as published)
+{
+  const dir = path.join(ROOT, 'static', 'ns');
+  for (const e of fs.existsSync(dir) ? fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => byCode(a.name, b.name)) : []) {
+    if (!e.isDirectory()) die(`static/ns/${e.name}: only one folder per frozen vocabulary version belongs here (static/README.md)`);
+    const held = fs.readdirSync(path.join(dir, e.name)).sort(byCode);
+    if (held.join(', ') !== VOCABULARY_FILES.join(', ')) die(`static/ns/${e.name}/ must hold exactly ${VOCABULARY_FILES.join(', ')}; it holds ${held.join(', ') || 'nothing'} (AGSC-05-25)`);
+    const copy = new Map(VOCABULARY_FILES.map(f => [f, fs.readFileSync(path.join(dir, e.name, f))]));
+    const said = vocabularyOf(copy.get('agsc.ttl').toString('utf8')).versionInfo;
+    if (said !== e.name) die(`static/ns/${e.name}/agsc.ttl says owl:versionInfo ${said}, not ${e.name} (AGSC-05-25)`);
+    FROZEN_NS.set(e.name, copy);
+  }
+}
+// Every versioned copy this site serves, in code-point order: the frozen ones and the current one.
+const SERVED_NS = [...new Set([...FROZEN_NS.keys(), VERSION_INFO])].sort(byCode);
 
 const ntTerm = o => {
   const escLit = v => v.replace(/[\\"\n\r\t]|[\x00-\x1f]/g, c => ({ '\\': '\\\\', '"': '\\"', '\n': '\\n', '\r': '\\r', '\t': '\\t' }[c] || '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0')));
@@ -871,13 +901,19 @@ const ENGINE_ROUTES_KEPT = new Map([
   ['/404.html', 'an HTML page'],
   ['/assets/site.css', 'the engine default theme; this site publishes the same bytes from assets/site.css (checked below)'],
   ['/assets/theme.js', 'the engine theme switcher; this site publishes the engine\'s own bytes'],
-  ['/ns/1.0.0-draft.1/context.jsonld', 'emitted here beside the other versioned vocabulary documents this namespace site serves'],
+  // The versioned context copies, one per version this site serves: the frozen ones from static/ns/,
+  // the current one generated here beside the other versioned vocabulary documents.
+  ...SERVED_NS.map(v => [`/ns/${v}/context.jsonld`, FROZEN_NS.has(v) ? `the frozen copy of version ${v}, served from static/ns/${v}/` : 'emitted here beside the other versioned vocabulary documents this namespace site serves']),
   ['/search/agsc-search.js', 'the engine\'s /search/ page script; this site keeps its own /search/ page and /assets/search.js over assets/search-site.json (every page, section, rule and error code, which the scratch Bundle does not carry)'],
 ]);
 {
   const adopted = r => ADOPTED.includes(r) || ADOPTED_PREFIX.some(pre => r.startsWith(pre));
+  // An engine working tree whose vocabulary is already newer than the tagged specification this
+  // build publishes emits the versioned context of ITS version. This site serves the versions above
+  // and names /ns/context.jsonld in its own graph, so that one route is left out, not adopted.
+  const engineAhead = r => /^\/ns\/[^/]+\/context\.jsonld$/.test(r) && SPEC_SOURCE === 'tag';
   const unaccounted = [...ENGINE_BUILD.files.keys()]
-    .filter(r => !adopted(r) && !ENGINE_ROUTES_KEPT.has(r) && !r.endsWith('index.html') && !r.startsWith('/compose/'));
+    .filter(r => !adopted(r) && !ENGINE_ROUTES_KEPT.has(r) && !engineAhead(r) && !r.endsWith('index.html') && !r.startsWith('/compose/'));
   if (unaccounted.length) die(`the engine emits routes this generator neither adopts nor accounts for: ${unaccounted.join(', ')}`);
 }
 
@@ -1490,35 +1526,48 @@ ${figure('agentic-knowledge')}`,
   });
 }
 
-// ontology pages and files
-function nsPage(url, versioned) {
-  const rows = kind => ascSubjects.filter(s => kindOf(s) === kind).map(s => {
+// The vocabulary page and files of one route: `/ns/` (the current version, unversioned), or one
+// versioned copy `/ns/<version>/` — the current version's, generated here, or a frozen one,
+// whose page is written from its own Turtle and whose files are its bytes as published.
+function nsPage(url, versioned, V = VOCABULARY) {
+  const current = V === VOCABULARY;
+  const version = V.versionInfo;
+  const rows = kind => V.ascSubjects.filter(s => V.kindOf(s) === kind).map(s => {
     const name = s.slice(NS.length);
-    const details = onto.triples.filter(t => t.s === s && ![RDF_TYPE, RDFS + 'label', RDFS + 'comment', RDFS + 'isDefinedBy'].includes(t.p))
+    const details = V.onto.triples.filter(t => t.s === s && ![RDF_TYPE, RDFS + 'label', RDFS + 'comment', RDFS + 'isDefinedBy'].includes(t.p))
       .map(t => `<code>${esc(qname(t.p))}</code> ${t.o.t === 'iri' ? `<code>${esc(t.o.v.startsWith(NS) ? 'asc:' + t.o.v.slice(NS.length) : (() => { try { return qname(t.o.v); } catch { return t.o.v; } })())}</code>` : esc(t.o.v)}`)
       .sort(byCode);
-    return `<tr id="${esc(name)}"><th scope="row"><code>asc:${esc(name)}</code></th><td>${esc(one(s, RDFS + 'label') || name)}</td><td>${linkIds(one(s, RDFS + 'comment') || '', { ruleLinks: true, page: 'ns' })}</td><td>${details.join('<br>')}</td></tr>`;
+    return `<tr id="${esc(name)}"><th scope="row"><code>asc:${esc(name)}</code></th><td>${esc(V.one(s, RDFS + 'label') || name)}</td><td>${linkIds(V.one(s, RDFS + 'comment') || '', { ruleLinks: true, page: 'ns' })}</td><td>${details.join('<br>')}</td></tr>`;
   }).join('\n');
   const tbl = (id, title, kind) => `<h2 id="${id}">${title}</h2>\n<div class="table-wrap" tabindex="0" role="region" aria-label="${title}"><table>\n<thead><tr><th scope="col">Term</th><th scope="col">Label</th><th scope="col">Definition</th><th scope="col">Axioms</th></tr></thead>\n<tbody>\n${rows(kind)}\n</tbody></table></div>\n`;
-  const counts = ['class', 'object', 'datatype'].map(k => ascSubjects.filter(s => kindOf(s) === k).length);
+  const counts = ['class', 'object', 'datatype'].map(k => V.ascSubjects.filter(s => V.kindOf(s) === k).length);
   // The vocabulary diagram is drawn by hand (site/diagrams/vocabulary.diagram); it must name every
   // class of the vocabulary, and its text alternative says "twelve", so a class added or removed
-  // stops the build until the drawing is updated.
-  {
+  // stops the build until the drawing is updated. It shows the current version only.
+  if (current) {
     const src = read('site/diagrams/vocabulary.diagram');
     const classes = ascSubjects.filter(s => kindOf(s) === 'class').map(s => s.slice(NS.length));
     const missing = classes.filter(c => !new RegExp(`^box \\S+ [\\d ]+"${c}(\\||")`, 'm').test(src));
     if (missing.length) die(`site/diagrams/vocabulary.diagram does not draw the class(es) ${missing.join(', ')}`);
     if (classes.length !== 12 || !/twelve classes/.test(src)) die(`the vocabulary has ${classes.length} classes; update the count in site/diagrams/vocabulary.diagram`);
   }
-  const prefix = versioned ? `/ns/${VERSION_INFO}/` : '/ns/';
+  const prefix = versioned ? `/ns/${version}/` : '/ns/';
+  // What the closing paragraph says about the copies. The unversioned page names the copy of the
+  // current version and every frozen one; a frozen page that is not the current version says so.
+  const earlier = [...FROZEN_NS.keys()].filter(v => v !== VERSION_INFO);
+  const nsLink = v => `<a href="/ns/${esc(v)}/"><code>/ns/${esc(v)}/</code></a>`;
+  const copies = versioned
+    ? `This is the copy of version <code>${esc(version)}</code>.${current ? '' : ` It never changes, and it stays served beside the copy of the current version, ${nsLink(VERSION_INFO)} (${REF('AGSC-05-25')}).`}`
+    : `${[`The copy of this version is at ${nsLink(VERSION_INFO)}`,
+      ...(earlier.length ? [`the copy of each earlier version stays served and never changes: ${earlier.map(nsLink).join(', ')}`] : []),
+      ...(/-/.test(VERSION_INFO) ? ['the pre-release version path stays in use until the specification reaches 1.0.0'] : [])].join('; ')} (${REF('AGSC-05-25')}).`;
   addPage(url, {
-    title: `${one(ONTOLOGY_IRI, 'http://purl.org/dc/terms/title')}${versioned ? ` ${VERSION_INFO}` : ''}`, summary: summaryOf('/ns/'), description: versioned ? `The copy of version ${VERSION_INFO} of the vocabulary: ${one(ONTOLOGY_IRI, 'http://purl.org/dc/terms/description')}` : one(ONTOLOGY_IRI, 'http://purl.org/dc/terms/description'), section: '/ns/', wide: true,
-    jsonld: { '@context': 'https://schema.org', '@type': 'DefinedTermSet', name: one(ONTOLOGY_IRI, 'http://purl.org/dc/terms/title'), url: BASE + url.slice(1), identifier: ONTOLOGY_IRI, version: VERSION_INFO, license: 'https://creativecommons.org/publicdomain/zero/1.0/', hasDefinedTerm: ascSubjects.map(s => ({ '@type': 'DefinedTerm', termCode: 'asc:' + s.slice(NS.length), name: one(s, RDFS + 'label') || s.slice(NS.length), url: `${BASE}${url.slice(1)}#${s.slice(NS.length)}` })) },
-    body: `<p>${esc(one(ONTOLOGY_IRI, 'http://purl.org/dc/terms/description'))}</p>
+    title: `${V.one(ONTOLOGY_IRI, 'http://purl.org/dc/terms/title')}${versioned ? ` ${version}` : ''}`, summary: summaryOf('/ns/'), description: versioned ? `The copy of version ${version} of the vocabulary: ${V.one(ONTOLOGY_IRI, 'http://purl.org/dc/terms/description')}` : V.one(ONTOLOGY_IRI, 'http://purl.org/dc/terms/description'), section: '/ns/', wide: true,
+    jsonld: { '@context': 'https://schema.org', '@type': 'DefinedTermSet', name: V.one(ONTOLOGY_IRI, 'http://purl.org/dc/terms/title'), url: BASE + url.slice(1), identifier: ONTOLOGY_IRI, version, license: 'https://creativecommons.org/publicdomain/zero/1.0/', hasDefinedTerm: V.ascSubjects.map(s => ({ '@type': 'DefinedTerm', termCode: 'asc:' + s.slice(NS.length), name: V.one(s, RDFS + 'label') || s.slice(NS.length), url: `${BASE}${url.slice(1)}#${s.slice(NS.length)}` })) },
+    body: `<p>${esc(V.one(ONTOLOGY_IRI, 'http://purl.org/dc/terms/description'))}</p>
 <dl class="meta">
 <dt>Namespace</dt><dd><code>${NS}</code></dd>
-<dt>Version IRI</dt><dd><code>${esc(one(ONTOLOGY_IRI, OWL + 'versionIRI'))}</code> (<code>owl:versionInfo</code> ${esc(VERSION_INFO)})</dd>
+<dt>Version IRI</dt><dd><code>${esc(V.one(ONTOLOGY_IRI, OWL + 'versionIRI'))}</code> (<code>owl:versionInfo</code> ${esc(version)})</dd>
 <dt>Terms</dt><dd>${counts[0]} classes, ${counts[1]} object properties, ${counts[2]} datatype properties</dd>
 <dt>Licence</dt><dd><a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a></dd>
 <dt>Profile</dt><dd>OWL 2 RL (${REF('AGSC-05-22')})</dd>
@@ -1529,23 +1578,28 @@ ${versioned ? '' : figure('vocabulary')}<h2 id="representations">Representations
 <li><a href="${prefix}context.jsonld">JSON-LD context</a>, <code>application/ld+json</code>, generated from the Turtle (${REF('AGSC-06-32')}).</li>
 <li><a href="${prefix}agsc.rdf">RDF/XML</a>, <code>application/rdf+xml</code>, and <a href="${prefix}agsc.nt">N-Triples</a>, <code>application/n-triples</code>, both generated from the Turtle. Most browsers download these two rather than showing them.</li>
 ${versioned ? '' : '<li>The JSON Schemas of the specification, <a href="/ns/schema/item.schema.json">item</a>, <a href="/ns/schema/bundle.schema.json">bundle</a> and <a href="/ns/schema/config.schema.json">configuration</a>, <code>application/json</code>, at the addresses their <code>$id</code> names.</li>\n'}</ul>
-<p>${STATUS.w3id ? 'The namespace IRI negotiates between these representations through w3id.org' : 'Once the w3id.org redirects are registered, the namespace IRI will negotiate between these representations'} (${REF('AGSC-06-06')}). ${versioned ? `This is the copy of version <code>${esc(VERSION_INFO)}</code>.` : `The copy of this version is at <a href="/ns/${esc(VERSION_INFO)}/"><code>/ns/${esc(VERSION_INFO)}/</code></a>; the pre-release version path stays in use until the specification reaches 1.0.0 (${REF('AGSC-05-25')}).`}</p>
+<p>${STATUS.w3id ? 'The namespace IRI negotiates between these representations through w3id.org' : 'Once the w3id.org redirects are registered, the namespace IRI will negotiate between these representations'} (${REF('AGSC-06-06')}). ${copies}</p>
 ${tbl('classes', 'Classes', 'class')}${tbl('object-properties', 'Object properties', 'object')}${tbl('datatype-properties', 'Datatype properties', 'datatype')}`,
   });
-  put(`${prefix.slice(1)}agsc.ttl`, TTL);
-  put(`${prefix.slice(1)}agsc.nt`, NT);
-  put(`${prefix.slice(1)}agsc.rdf`, RDFXML);
+  const frozen = versioned ? FROZEN_NS.get(version) : undefined;
+  if (!current) { for (const f of VOCABULARY_FILES) put(`${prefix.slice(1)}${f}`, frozen.get(f)); return; }
   // AGSC-06-32: the JSON-LD context is the engine's for the unversioned route, which is the one
   // AGSC-06-01 names; the immutable versioned copy beside the other vocabulary documents this
   // namespace site serves is compared against it and must be the same bytes.
   const ctxBytes = versioned ? jcs(CONTEXT) + '\n' : String(putEngine('/ns/context.jsonld'));
-  if (versioned) {
-    if (ctxBytes !== String(ENGINE_BUILD.files.get('/ns/context.jsonld'))) die(`${prefix}context.jsonld differs from the engine's /ns/context.jsonld`);
-    put(`${prefix.slice(1)}context.jsonld`, ctxBytes);
+  if (versioned && ctxBytes !== String(ENGINE_BUILD.files.get('/ns/context.jsonld'))) die(`${prefix}context.jsonld differs from the engine's /ns/context.jsonld`);
+  const generated = new Map([['agsc.ttl', TTL], ['agsc.nt', NT], ['agsc.rdf', RDFXML], ...(versioned ? [['context.jsonld', ctxBytes]] : [])]);
+  // A frozen copy of the current version: what ontology/agsc.ttl generates must be its bytes. A
+  // vocabulary that changed under the same version would rewrite a published copy (AGSC-05-25).
+  if (frozen) {
+    const changed = VOCABULARY_FILES.filter(f => !frozen.get(f).equals(Buffer.from(generated.get(f), 'utf8')));
+    if (changed.length) die(`ontology/agsc.ttl says owl:versionInfo ${version}, whose copy static/ns/${version}/ is frozen, but generates other bytes for ${changed.join(', ')}: a changed vocabulary takes a new version (AGSC-05-25, AGSC-00-16)`);
   }
+  for (const [f, bytes] of [...generated].sort((a, b) => byCode(a[0], b[0]))) put(`${prefix.slice(1)}${f}`, frozen ? frozen.get(f) : bytes);
 }
 nsPage('/ns/', false);
-nsPage(`/ns/${VERSION_INFO}/`, true);
+// Every versioned copy, in code-point order of its version: the frozen ones and the current one.
+for (const v of SERVED_NS) nsPage(`/ns/${v}/`, true, v === VERSION_INFO ? VOCABULARY : vocabularyOf(FROZEN_NS.get(v).get('agsc.ttl').toString('utf8')));
 // The three JSON Schemas at the addresses their `$id`s name, `/ns/schema/<name>.schema.json`, so a
 // validator that dereferences an `$id` finds the schema. The bytes are the engine's files at the
 // specification version this site publishes; an `$id` that names another address stops the build.
