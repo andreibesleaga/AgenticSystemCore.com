@@ -10,7 +10,8 @@
 // fragments, no third-party loads, CSP-compatible markup, the 100 KB budget; (4a) every active
 // rule of spec/ anchored exactly once under /specs/, and every link to a rule id — in a page, in
 // the graph, in a machine view — landing on the page that carries it, since a section over the
-// page budget is published in parts; (5) machine files: JSON parses, NFC, one trailing LF,
+// page budget is published in parts; (4b) every diagram: no arrow runs through a box or over a
+// label it does not start or end at; (5) machine files: JSON parses, NFC, one trailing LF,
 // _headers and _redirects content, sitemap targets; (6) WCAG contrast of the colour tokens in
 // both schemes; (7) the page tools; (8) the content gate, scripts/check-content.js.
 'use strict';
@@ -291,6 +292,70 @@ for (const f of files.filter(f => f.endsWith('.html'))) {
   }
 }
 
+// (4b) diagram geometry: no arrow runs through a box, or over a label, that it does not start or
+// end at. The compiler (scripts/diagram.js) clips an arrow to the borders of its two boxes, so an
+// arrow that touches a box's inside, or a label's extent, anywhere else draws over another box or
+// its text. Read from the inline SVG each page carries: boxes are the `rx="6"` rectangles and the
+// circles (a region, `rx="8"`, is a dashed boundary that arrows cross on purpose), arrows are the
+// paths with an arrowhead, labels are the text lines outside every box, their width estimated
+// with the compiler's own glyph table. A box or label is shrunk by a small margin first, so an
+// arrow that ends on a border, or passes along one, is not a crossing.
+const diagramCrossings = svg => {
+  const attr = (tag, n) => { const m = new RegExp(`\\s${n}="([^"]*)"`).exec(tag); return m === null ? NaN : Number(m[1]); };
+  const unesc = s => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+  const boxes = [...svg.matchAll(/<rect\b[^>]*>/g)].filter(m => /\srx="6"/.test(m[0]))
+    .map(m => ({ x: attr(m[0], 'x'), y: attr(m[0], 'y'), w: attr(m[0], 'width'), h: attr(m[0], 'height'), lines: [] }))
+    .concat([...svg.matchAll(/<circle\b[^>]*>/g)].map(m => { const r = attr(m[0], 'r'); return { x: attr(m[0], 'cx') - r, y: attr(m[0], 'cy') - r, w: 2 * r, h: 2 * r, lines: [] }; }));
+  const labels = [];
+  for (const m of svg.matchAll(/<text x="([^"]+)" y="([^"]+)" font-size="([^"]+)"(?: text-anchor="(start|end)")?>([^<]*)<\/text>/g)) {
+    const x = Number(m[1]), y = Number(m[2]), size = Number(m[3]), text = unesc(m[5]);
+    const inside = boxes.find(b => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h);
+    if (inside) { inside.lines.push(text); continue; }
+    const w = textW(text, size), x0 = m[4] === 'start' ? x : m[4] === 'end' ? x - w : x - w / 2;
+    labels.push({ x: x0, y: y - size * 0.75, w, h: size * 0.95, what: `the label "${text}"` });
+  }
+  const shapes = boxes.map(b => ({ ...b, what: `the box "${b.lines.join(' ')}"` })).concat(labels);
+  // Liang–Barsky: does the segment a–b enter the inside of rectangle s shrunk by `margin` (a
+  // negative margin grows it: a label's width is an estimate, so it gets 2 px of room)?
+  const enters = (a, b, s, margin) => {
+    const dx = b.x - a.x, dy = b.y - a.y; let t0 = 0, t1 = 1;
+    for (const [p, q] of [[-dx, a.x - (s.x + margin)], [dx, s.x + s.w - margin - a.x], [-dy, a.y - (s.y + margin)], [dy, s.y + s.h - margin - a.y]]) {
+      if (p === 0) { if (q <= 0) return false; continue; }
+      const r = q / p;
+      if (p < 0) { if (r > t1) return false; if (r > t0) t0 = r; } else { if (r < t0) return false; if (r < t1) t1 = r; }
+    }
+    return t1 - t0 > 1e-9;
+  };
+  const found = []; let arrows = 0;
+  for (const m of svg.matchAll(/<path d="([^"]+)" marker-end="[^"]*"[^>]*>/g)) {
+    arrows++;
+    const pts = [...m[1].matchAll(/[ML](-?[\d.]+) (-?[\d.]+)/g)].map(p => ({ x: Number(p[1]), y: Number(p[2]) }));
+    const crossed = new Set();
+    for (let i = 1; i < pts.length; i++) for (const s of shapes) if (enters(pts[i - 1], pts[i], s, s.lines ? 1 : -2)) crossed.add(s.what);
+    for (const what of crossed) found.push(`the arrow ${m[1]} runs through ${what}`);
+  }
+  return { found, arrows };
+};
+const { compile: compileDiagram, textW } = require('./diagram.js');
+// The check must see a crossing when there is one: a known-bad and a known-good figure first.
+{
+  const head = 'label "a figure that tests the geometry check"\ncaption "a figure that tests the geometry check"\n';
+  const bad = diagramCrossings(compileDiagram('geometry-bad', `${head}box a 16 100 60 40 "a" acc\nbox b 100 100 60 40 "b"\nbox c 184 100 60 40 "c"\narrow a c\nbox d 16 20 60 40 "d"\nbox e 184 20 60 40 "e"\ntext 130 44 "over"\narrow d e\n`).svg);
+  ok(bad.found.length === 2 && bad.found.some(f => f.includes('the box "b"')) && bad.found.some(f => f.includes('the label "over"')), `the diagram geometry check does not see an arrow through a box and over a label: ${JSON.stringify(bad.found)}`);
+  const good = diagramCrossings(compileDiagram('geometry-good', `${head}box a 16 100 60 40 "a" acc\nbox b 100 100 60 40 "b"\nbox c 184 100 60 40 "c"\narrow a c via=46,60;214,60\ntext 130 52 "over"\narrow b a\n`).svg);
+  ok(good.found.length === 0 && good.arrows === 2, `the diagram geometry check reports a crossing where there is none: ${JSON.stringify(good.found)}`);
+}
+let diagramArrows = 0;
+for (const f of files.filter(f => f.endsWith('.html'))) {
+  for (const m of fs.readFileSync(f, 'utf8').matchAll(/<figure class="diagram"[^>]*>([\s\S]*?)<\/figure>/g)) {
+    const id = (/<marker id="ar-([^"]+)"/.exec(m[1]) || [])[1];
+    const { found, arrows } = diagramCrossings(m[1]);
+    diagramArrows += arrows;
+    for (const x of found) fails.push(`${rel(f)}: diagram ${id} (site/diagrams/${id}.diagram): ${x}; re-route it with via= or move the boxes`);
+  }
+}
+ok(diagramArrows > 0, 'no diagram arrow found on any page: the diagram geometry check read nothing');
+
 // (5) machine files
 for (const f of files) {
   const r = rel(f), b = fs.readFileSync(f);
@@ -437,4 +502,4 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
 for (const f of require('./check-content.js').check(WWW)) fails.push(`content: ${f}`);
 
 if (fails.length) { process.stderr.write(fails.map(f => `FAIL ${f}`).join('\n') + `\ncheck: ${fails.length} failure(s)\n`); process.exit(1); }
-process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/ (spec from ${SPEC_SOURCE === 'tag' ? `tag ${SPEC_TAG}` : 'the working tree'}), content, vocabulary copies ${[...Object.keys(FROZEN_NS), currentVocabulary].filter((v, i, a) => a.indexOf(v) === i).map(v => `/ns/${v}/`).join(' and ')}${Object.keys(FROZEN_NS).length ? ` (${Object.keys(FROZEN_NS).join(', ')} frozen by SHA-256)` : ''}, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} reserved on ${specPageCount} specification pages with every rule link on its page, headers, contrast, public hygiene\n`);
+process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/ (spec from ${SPEC_SOURCE === 'tag' ? `tag ${SPEC_TAG}` : 'the working tree'}), content, vocabulary copies ${[...Object.keys(FROZEN_NS), currentVocabulary].filter((v, i, a) => a.indexOf(v) === i).map(v => `/ns/${v}/`).join(' and ')}${Object.keys(FROZEN_NS).length ? ` (${Object.keys(FROZEN_NS).join(', ')} frozen by SHA-256)` : ''}, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, diagram geometry (${diagramArrows} arrows clear of every other box and label), ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} reserved on ${specPageCount} specification pages with every rule link on its page, headers, contrast, public hygiene\n`);

@@ -1,11 +1,11 @@
 canvas 520 280
 label "Bounded contexts: Knowledge feeds Composition, Distribution (highlighted) and Interchange; Governance feeds Distribution; the Boundary context wraps cross-origin access, peers, declared surfaces and visibility around everything that faces outside"
 caption "The highlighted Distribution context renders what Knowledge validated and adds nothing; the Boundary is the layer that keeps external drafts from moving the core."
-box k 16 30 140 60 "Knowledge|items, links, graph"
-box g 16 110 140 60 "Governance|prov, gates, ledger"
-box c 190 30 140 60 "Composition|closure, Harness"
-box d 190 110 140 60 "Distribution|routes, surfaces" acc
-box i 190 190 140 50 "Interchange|import, export"
+box k 16 60 140 60 "Knowledge|items, links, graph"
+box g 16 170 140 60 "Governance|prov, gates, ledger"
+box i 190 20 140 50 "Interchange|import, export"
+box c 190 90 140 60 "Composition|closure, Harness"
+box d 190 170 140 60 "Distribution|routes, surfaces" acc
 region b 350 20 154 230 "Boundary"
 box b1 362 40 130 40 "cross-origin"
 box b2 362 90 130 40 "peers, walk"

@@ -1,7 +1,7 @@
 canvas 520 300
 label "Boundary: this node declares its surfaces (highlighted: llms-txt, chunks, mcp, webmcp, a2a-card, solid, responder), its visibility and its retirement; a browser reads it cross-origin, and an agent walks peer nodes over HTTPS with a hop limit; nodes never call nodes"
 caption "The highlighted declaration is the plugin contract: declare, pin, inherit, prove. Everything that crosses the dashed border is static and client-side."
-region node 160 20 200 260 "this node"
+region node 160 20 200 250 "this node"
 box surf 174 40 172 100 "declared surfaces:|llms-txt · chunks · mcp|webmcp · a2a-card · solid|responder" acc
 box vis 174 156 172 44 "public or restricted"
 box tomb 174 216 172 44 "retire · tombstone"
@@ -11,5 +11,6 @@ box peer 394 60 110 50 "peer node"
 box agent 394 160 110 50 "agent walks|peers"
 arrow agent peer
 arrow agent node
-text 447 126 "HTTPS only, hop limit 3" size=10
+text 455 131 "HTTPS only," size=10 left
+text 455 143 "hop limit 3" size=10 left
 note "static and client-side: nodes never call nodes"

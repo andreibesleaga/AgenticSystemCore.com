@@ -8,9 +8,9 @@ box r2 174 74 256 30 "graph, search.json, chunks, llms.txt"
 box r3 174 112 256 30 "/.well-known/knowledge-linkset" acc
 box r4 174 150 256 30 "headers, sitemap, robots, security.txt"
 box r5 174 188 256 30 "ledger, boards, skills, /ns/"
-arrow build r1
-arrow build r2
+arrow build r1 via=142,51
+arrow build r2 via=142,89
 arrow build r3
-arrow build r4
-arrow build r5
+arrow build r4 via=142,165
+arrow build r5 via=142,203
 note "exactly this set, nothing more — so a reader knows what to expect"

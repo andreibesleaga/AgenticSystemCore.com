@@ -12,12 +12,12 @@ box item 130 110 260 44 "an item: one Markdown file + YAML header" acc
 box links 28 180 200 44 "14 typed links between items"
 box prov 260 180 110 44 "provenance"
 box src 392 180 100 44 "sources|(citations)"
-arrow concept item
+arrow concept item via=64,124
 arrow episode item
 arrow procedure item
 arrow lesson item
 arrow cluster item
-arrow gate item
+arrow gate item via=464,124
 arrow item links
 arrow item prov
 arrow item src

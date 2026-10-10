@@ -11,13 +11,13 @@ box out2 364 72 140 34 "JSON-LD, JSONL, RDF"
 box out3 364 120 140 34 "steer files (AGENTS.md)"
 box out4 364 168 140 34 "skill packs"
 box out5 364 216 140 34 "llms.txt, chunks, Harness"
-arrow in1 core
+arrow in1 core via=180,41
 arrow in2 core
 arrow in3 core
 arrow in4 core
-arrow core out1
+arrow core out1 via=346,41
 arrow core out2
 arrow core out3
 arrow core out4
-arrow core out5
+arrow core out5 via=346,233
 note "lossless in and out; every prose export carries the Content Use Terms"
