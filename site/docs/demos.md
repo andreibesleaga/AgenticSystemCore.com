@@ -30,7 +30,7 @@ agsc init                                          # adopts the notes, writes th
 mkdir -p .well-known && cp ../security.txt .well-known/security.txt
 cp ../boiling-point.md content/concepts/boiling-point.md
 printf 'Salt it like [pasta water](%s).\n' salting.md >> content/concepts/brewing.md
-agsc lint                                          # error: AGSC-E310 … resolves to nothing … brewing.md:4
+agsc lint                                          # error: AGSC-E310 … resolves to nothing … brewing.md:15
 agsc build                                         # error: AGSC-E901 … emits no route for it; nothing under www/
 grep -v salting content/concepts/brewing.md > brewing.tmp && mv brewing.tmp content/concepts/brewing.md
 agsc build                                         # build: pass — www/ holds the site, graph.jsonld, llms.txt, search.json, the discovery document
