@@ -8,6 +8,8 @@ tags: [specification, procedure]
 clusters: [project-board]
 prov:
   origin: ai-assisted
+  agent: "Claude Code"
+  model: "Claude (Anthropic)"
   operator: "human:andreibesleaga"
 sources:
   - resource: "https://agenticsystemcore.com/specs/10-implementation-profiles/#AGSC-10-05"

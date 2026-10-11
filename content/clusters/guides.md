@@ -5,6 +5,8 @@ description: "Procedures for publishing and reading a node, each step naming the
 tags: [procedure, discovery]
 prov:
   origin: ai-assisted
+  agent: "Claude Code"
+  model: "Claude (Anthropic)"
   operator: "human:andreibesleaga"
 ---
 

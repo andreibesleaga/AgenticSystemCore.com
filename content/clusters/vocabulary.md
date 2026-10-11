@@ -5,6 +5,8 @@ description: "The terms of the specification's ubiquitous language: the six item
 tags: [vocabulary, specification]
 prov:
   origin: ai-assisted
+  agent: "Claude Code"
+  model: "Claude (Anthropic)"
   operator: "human:andreibesleaga"
 ---
 

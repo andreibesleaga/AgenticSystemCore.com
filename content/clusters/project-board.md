@@ -5,6 +5,8 @@ description: "The open work on the specification itself, kept as task items of t
 tags: [specification, procedure]
 prov:
   origin: ai-assisted
+  agent: "Claude Code"
+  model: "Claude (Anthropic)"
   operator: "human:andreibesleaga"
 ---
 
