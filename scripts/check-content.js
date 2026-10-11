@@ -63,6 +63,20 @@ function check(www) {
   }
   ok(text('docs/reading-the-specification/index.html').includes(`${KEY_WORDS} are used`), `/docs/reading-the-specification/ does not list all eleven key words (${KEY_WORDS})`);
 
+  // Counts the scenario and demo pages quote: the feature files are the ones /docs/scenarios/ links,
+  // one per persona, and a page that names how many there are names that number.
+  const scenarioHtml = read('docs/scenarios/index.html');
+  const featureFiles = new Set([...scenarioHtml.matchAll(/href="\/docs\/scenarios\/(persona-[a-z0-9-]+)\/"/g)].map(m => m[1])).size;
+  ok(featureFiles > 0, '/docs/scenarios/ links no feature file');
+  const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+  const count = w => (/^\d+$/.test(w) ? Number(w) : WORDS.indexOf(w.toLowerCase()));
+  for (const [page, html] of [['/docs/scenarios/', scenarioHtml], ['/docs/demos/', read('docs/demos/index.html')]]) {
+    for (const m of html.matchAll(/\b([A-Za-z]+|\d+) (?:Gherkin feature files|feature files|personas)\b/g)) {
+      const n = count(m[1]);
+      if (n >= 0) ok(n === featureFiles, `${page} says "${m[0]}"; /docs/scenarios/ links ${featureFiles} feature files, one per persona`);
+    }
+  }
+
   // The about page: a quickstart for the self-driving team (P12) after P0–P11.
   const about = read('about/index.html');
   ok(about.includes('id="quickstart-p12"'), '/about/ has no quickstart for P12, the self-driving team on a live board');
