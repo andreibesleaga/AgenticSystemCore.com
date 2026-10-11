@@ -8,7 +8,7 @@
 //
 //   node scripts/build.js [--out <dir>]      (default: www)
 //   SOURCE_DATE_EPOCH=<seconds> node scripts/build.js
-//   SITE_ENGINE=<path> SITE_SPEC_TAG=<tag>   (defaults: ../agentic-system-core, 1.0.0-rc.7)
+//   SITE_ENGINE=<path> SITE_SPEC_TAG=<tag>   (defaults: ../agentic-system-core, 1.0.0)
 //   SITE_SPEC_SOURCE=tag|worktree            (default: tag when the tag exists, else worktree)
 'use strict';
 const fs = require('fs'), path = require('path'), crypto = require('crypto'), cp = require('child_process');
@@ -16,7 +16,7 @@ const { compile: compileDiagram } = require('./diagram.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const ENGINE = path.resolve(ROOT, process.env.SITE_ENGINE || '../agentic-system-core');
-const SPEC_TAG = process.env.SITE_SPEC_TAG || '1.0.0-rc.7';
+const SPEC_TAG = process.env.SITE_SPEC_TAG || '1.0.0';
 // Output directory: `build.out` of agsc.config.json, `www` — the folder Cloudflare Pages serves,
 // so a push to `main` publishes what this script wrote.
 const CONFIG_OUT = (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www';
