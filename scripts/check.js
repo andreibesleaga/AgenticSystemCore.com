@@ -13,7 +13,8 @@
 // page budget is published in parts; (4b) every diagram: no arrow runs through a box or over a
 // label it does not start or end at; (5) machine files: JSON parses, NFC, one trailing LF,
 // _headers and _redirects content, sitemap targets; (6) WCAG contrast of the colour tokens in
-// both schemes; (7) the page tools; (8) the content gate, scripts/check-content.js.
+// both schemes; (7) the page tools; (8) the content gate, scripts/check-content.js; (9) the release
+// gate, scripts/check-release.js.
 'use strict';
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const ROOT = path.resolve(__dirname, '..');
@@ -500,6 +501,9 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
 
 // (8) the content gate: sentences and routes that must stay true for the version this site publishes.
 for (const f of require('./check-content.js').check(WWW)) fails.push(`content: ${f}`);
+// (9) the release gate, scripts/check-release.js: no page calls a final version a release candidate,
+// the status page's checkable rows agree with the engine, and the releases feed /changelog.xml.
+for (const f of require('./check-release.js').check(WWW, { engine: ENGINE, specTag: SPEC_TAG, specSource: SPEC_SOURCE })) fails.push(`release: ${f}`);
 
 if (fails.length) { process.stderr.write(fails.map(f => `FAIL ${f}`).join('\n') + `\ncheck: ${fails.length} failure(s)\n`); process.exit(1); }
-process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/ (spec from ${SPEC_SOURCE === 'tag' ? `tag ${SPEC_TAG}` : 'the working tree'}), content, vocabulary copies ${[...Object.keys(FROZEN_NS), currentVocabulary].filter((v, i, a) => a.indexOf(v) === i).map(v => `/ns/${v}/`).join(' and ')}${Object.keys(FROZEN_NS).length ? ` (${Object.keys(FROZEN_NS).join(', ')} frozen by SHA-256)` : ''}, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, diagram geometry (${diagramArrows} arrows clear of every other box and label), ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} reserved on ${specPageCount} specification pages with every rule link on its page, headers, contrast, public hygiene\n`);
+process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/ (spec from ${SPEC_SOURCE === 'tag' ? `tag ${SPEC_TAG}` : 'the working tree'}), content, vocabulary copies ${[...Object.keys(FROZEN_NS), currentVocabulary].filter((v, i, a) => a.indexOf(v) === i).map(v => `/ns/${v}/`).join(' and ')}${Object.keys(FROZEN_NS).length ? ` (${Object.keys(FROZEN_NS).join(', ')} frozen by SHA-256)` : ''}, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, diagram geometry (${diagramArrows} arrows clear of every other box and label), ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} reserved on ${specPageCount} specification pages with every rule link on its page, headers, contrast, content, release wording and the releases feed, public hygiene\n`);

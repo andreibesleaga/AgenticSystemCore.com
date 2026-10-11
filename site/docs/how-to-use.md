@@ -86,6 +86,8 @@ agsc ci                                                # ci: pass — or the exa
 agsc build                                             # www/ is the whole node; serve it anywhere that serves files over HTTPS
 ```
 
+To put `www/` online and check the live address at Level 2 with both checkers, follow the [publishing guide](/docs/guides/publish/); when a command says no, look its code up on the [troubleshooting](/docs/guides/troubleshooting/) page.
+
 To change something after that: edit the file, then `agsc lint --fix`, then `agsc propose <slug>`. The proposal is a patch plus a pull-request body under `dist/proposal/`; the engine prints the git commands and runs none (AGSC-08-03). In the repository, a pull request runs the same `agsc ci` and a person merges.
 
 | Scenario | Who | Do | Result |

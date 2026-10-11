@@ -27,7 +27,7 @@ Most rules end with a bracketed note such as `[PRD-002]` or `[PRD-022, RFC 9264]
 
 ## Drafted rules
 
-When a next release candidate is being drafted in the engine repository, its identifiers are shown here with a dotted underline and no link until it is tagged and published; none are pending now.
+When the next version is being drafted in the engine repository, its identifiers are shown here with a dotted underline and no link until it is tagged and published; none are pending now.
 
 ## Reserved rules
 

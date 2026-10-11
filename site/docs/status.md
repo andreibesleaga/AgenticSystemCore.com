@@ -6,9 +6,14 @@ description: "Status of AgenticSystemCore: what is live, what is in preparation,
 
 {{status-table}}
 
+Each release of the specification is announced in the [Releases feed (RSS)](/changelog.xml), with a short summary and a link to its change log.
+
 ## How to read this page
 
 - **Live** means served on this site and checkable now.
+- **Published** means released to the place the row names: a package registry, the MCP Registry, the agent-skill files, a conformance statement.
+- **Experimental** means served, on a browser feature that is still a draft.
+- **Planned** means intended for a later version, with no date; nothing of it is served now.
 - **In preparation** means the work exists in the project's repositories and has not been published.
 - **Not requested** and **not filed** mean that no registry, editor or publisher has been approached yet. **Requested** and **filed** mean a request is pending. **Registered** or **published** is written only after the body in question shows the entry.
 

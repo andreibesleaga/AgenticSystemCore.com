@@ -165,6 +165,22 @@ const BUNDLE_VERSION = (() => {
 })();
 
 const SPEC_DATE = iso(Number(git('log', '-1', '--format=%ct', SPEC_SOURCE === 'tag' ? SPEC_TAG : 'HEAD').trim())).slice(0, 10);
+// WHAT THE PUBLISHED VERSION IS CALLED. A version with a pre-release part (`1.0.0-rc.7`) is a
+// release candidate; a version without one (`1.0.0`) is a release. A build from the working tree
+// publishes a version not tagged yet, a draft of it. Every status sentence below takes its words
+// from here, so that no page calls a release a candidate (scripts/check-release.js checks it).
+const PRERELEASE = v => /-/.test(v);
+const specState = v => SPEC_SOURCE === 'tag'
+  ? (PRERELEASE(v) ? `a release candidate tagged on ${esc(SPEC_DATE)}` : `released and tagged on ${esc(SPEC_DATE)}`)
+  : (PRERELEASE(v) ? 'a draft release candidate, not yet tagged' : 'a draft of this version, not yet tagged');
+// THE RELEASES (scripts/release-feed.js): the tags of the engine repository that name a
+// specification version and have a section in the change log this build reads, newest first, each
+// dated by its tag. They feed /changelog.xml and the first-publication sentence of /legal/.
+const releaseFeed = require('./release-feed.js');
+const RELEASES = releaseFeed.releases(
+  git('for-each-ref', '--format=%(refname:short) %(creatordate:unix)', 'refs/tags').split('\n').filter(Boolean)
+    .map(l => { const [name, unix] = l.split(' '); return { name, unix: Number(unix) }; }),
+  engineFile('CHANGELOG.md'));
 
 // ------------------------------------------------------------------ YAML failsafe subset (AGSC-02-02/03)
 function parseYaml(text, file) {
@@ -240,8 +256,8 @@ let RULE_INDEX = new Map(); // rule id or error code -> the spec page that carri
 let RULE_INDEX_DECIDED = false; // false until every section is laid out; a rule link derived before that could name the wrong part
 let REQ_IDS = new Set();    // PRD-nnn / NFR-nn ids that the requirements page defines
 const RULES_WITHOUT_TRACE = []; // rules whose source carries no trailing trace bracket (reported at the end)
-// Rules and codes drafted for the next release candidate in the engine working tree: the guide may cite
-// them, rendered unlinked and marked, until the next candidate is tagged and SITE_SPEC_TAG moves
+// Rules and codes drafted for the next version in the engine working tree: the guide may cite
+// them, rendered unlinked and marked, until the next version is tagged and SITE_SPEC_TAG moves
 // (then empty this set again). Empty now: every identifier the guide cites is in the published
 // specification.
 const PENDING_RULES = new Set();
@@ -266,7 +282,7 @@ function linkIds(text, o) {
     let t = null;
     if (!o.inLink) t = m[0].startsWith('AGSC') ? idTarget(m[0], o) : (REQ_IDS.has(m[0]) && o.page !== 'requirements' ? `/docs/requirements/#${m[0]}` : null);
     const pending = !t && !o.inLink && (PENDING_RULES.has(m[0]) || PENDING_REQS.has(m[0]));
-    out += esc(text.slice(last, m.index)) + (t ? `<a class="ref" href="${esc(t)}">${esc(m[0])}</a>` : pending ? `<span class="ref pending" title="drafted for the next release candidate; not yet in the published ${SPEC_VERSION}">${esc(m[0])}</span>` : esc(m[0]));
+    out += esc(text.slice(last, m.index)) + (t ? `<a class="ref" href="${esc(t)}">${esc(m[0])}</a>` : pending ? `<span class="ref pending" title="drafted for the next version; not yet in the published ${SPEC_VERSION}">${esc(m[0])}</span>` : esc(m[0]));
     last = m.index + m[0].length;
   }
   return out + esc(text.slice(last));
@@ -1037,6 +1053,7 @@ function page({ url, title, heading, summary, description, body, jsonld, section
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${esc(canonical)}">
 <link rel="describedby" href="${WELLKNOWN}" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -1080,7 +1097,7 @@ const itemMeta = it => {
 const sourcesList = it => (it.fm.sources || []).length ? `<h2 id="sources">Sources</h2>\n<ol class="sources">\n${it.fm.sources.map((s, k) => `<li id="source-${k + 1}"><a${REF_LABEL.test(String(s.title || '')) ? ' class="ref"' : ''} href="${esc(s.resource.startsWith(BASE) ? '/' + s.resource.slice(BASE.length) : s.resource)}">${esc(s.title || s.resource)}</a></li>`).join('\n')}\n</ol>\n` : '';
 const statusBlock = () => `<section class="status" aria-labelledby="status-heading">
 <h2 id="status-heading">Status of this document</h2>
-<p>Specification <code>${esc(SPEC_VERSION)}</code>, ${SPEC_SOURCE === 'tag' ? `a release candidate tagged on ${esc(SPEC_DATE)}` : 'a draft release candidate, not yet tagged'}. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no standards body has reviewed or adopted it. Released sections are immutable; a correction ships as a new version.</p>
+<p>Specification <code>${esc(SPEC_VERSION)}</code>, ${specState(SPEC_VERSION)}. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no standards body has reviewed or adopted it. Released sections are immutable; a correction ships as a new version.</p>
 </section>
 `;
 // "Propose an edit": a plain link to the forge's edit-in-browser view of the page's own source
@@ -1171,7 +1188,7 @@ addPage('/', {
 <p class="lead">AgenticSystemCore turns one folder of Markdown into a website, a knowledge graph and a local tool server for AI assistants at once — every link typed, every published artefact carrying a digest a reader can check, every change merged by a person or by a rule that person recorded — so people, search engines and AI agents read the same checked knowledge, with no server, database or language model needed to build, check or publish it.</p>
 <ul>
 <li><a href="/docs/demos/">Try it in five minutes</a>: install the package and run each mode from an empty folder.</li>
-<li><a href="/docs/guides/">Use it on your own files</a>: one short guide per mode, every command with the lines it prints.</li>
+<li><a href="/docs/guides/">Use it on your own files</a>: seven short guides, one per mode and one for publishing, every command with the lines it prints.</li>
 <li><a href="/docs/modes/">The six ways to use it</a>: one folder of files, six modes.</li>
 <li><a href="/specs/">Read the specification</a>: the rules, the schemas and the test cases.</li>
 </ul>
@@ -1477,7 +1494,7 @@ ${rows.map(r => `<tr${idOf ? ` id="${idOf(r)}"` : ''}><th scope="row">${nameCell
 <h2 id="status-heading">Status</h2>
 <dl class="meta">
 <dt>Profile URI</dt><dd><code>${PROFILE}</code></dd>
-<dt>Specification</dt><dd><code>${esc(SPEC_VERSION)}</code>, a release candidate. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
+<dt>Specification</dt><dd><code>${esc(SPEC_VERSION)}</code>, ${specState(SPEC_VERSION)}. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
 <dt>Well-known URI</dt><dd>${regText.wellknown}</dd>
 <dt>Profile URI registration</dt><dd>${regText.profile}</dd>
 <dt>Internet-Draft</dt><dd>${regText.draft}</dd>
@@ -1516,7 +1533,7 @@ ${figure('agentic-knowledge')}`,
 <dt>Extension identifier</dt><dd><code>${esc(MCP_EXTENSION)}</code></dd>
 <dt>Protocol revision</dt><dd>Model Context Protocol <code>${esc(MCP_REVISION)}</code>, the revision this text is written against; the reference engine's tool server, <code>agsc mcp</code>, speaks the earlier revision <code>2025-11-25</code></dd>
 <dt>Standing</dt><dd>An unofficial extension under MCP SEP-2133, which says that "Unofficial extensions are not recognized by MCP governance and may be introduced and governed by developers outside the MCP organization". It needs no permission and has no registry entry, and it has not been submitted as an MCP SEP.</dd>
-<dt>Specification</dt><dd><code>${esc(SPEC_VERSION)}</code>, a release candidate. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
+<dt>Specification</dt><dd><code>${esc(SPEC_VERSION)}</code>, ${specState(SPEC_VERSION)}. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
 <dt>This node</dt><dd>Does not declare the <code>mcp</code> surface: no tool server is published yet (${R('AGSC-11-16')}).</dd>
 </dl>
 </section>
@@ -1699,21 +1716,49 @@ addPage('/compose/', {
 });
 
 // the guide (site/docs/*.md, hand-authored, plus the tagged documents rendered through slots)
+// THE STATUS PAGE (/docs/status/). One table, What | State | Detail. Every row is true on the day
+// this build is published, and stays true while the packages of the same version are published
+// after it (the site goes first, the packages from their tag an hour later): so no row names a
+// package version. The facts a row states — the tool names, the MCP revision, the registry name,
+// the vocabulary's counts — are read from the engine, and scripts/check-release.js checks them.
+// States: Live (served here now), Published, Experimental, Planned (a later version; nothing
+// served), and the registration states of STATUS.
+const WORD = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const TOOL_NAMES = engineSurfaces.TOOL_NAMES;
+const SERVER_JSON = JSON.parse(engineFile('server.json'));
+const TERMS = { class: 0, object: 0, datatype: 0 };
+for (const t of ascSubjects.map(kindOf)) if (t in TERMS) TERMS[t]++;
+// The reference engine's claim lives in its conformance statement, under this exact heading
+// (docs/CONFORMANCE-STATEMENTS.md, "The reference engine's claim"), at the tag this site is built from.
+const CLAIM_URL = `${FORGE.engine}/blob/${SPEC_SOURCE === 'tag' ? SPEC_TAG : 'main'}/docs/CONFORMANCE-STATEMENTS.md#the-reference-engines-claim`;
+const FEED_LINK_HTML = '<a href="/changelog.xml">Releases feed (RSS)</a>';
 const statusRows = [
-  ['Specification <code>' + esc(SPEC_VERSION) + '</code>', SPEC_SOURCE === 'tag' ? 'Live' : 'Draft', SPEC_SOURCE === 'tag' ? `Tagged on ${esc(SPEC_DATE)}; twelve sections at <a href="/specs/">/specs/</a>; the vocabulary and the vectors are frozen at the tag.` : 'A draft release candidate, not yet tagged; twelve sections at <a href="/specs/">/specs/</a>. The vocabulary and the vectors freeze at the tag.'],
-  ['This site as a node of its own specification', 'Live', `Items, <a href="/graph.jsonld"><code>graph.jsonld</code></a> with <a href="/graph.nq"><code>graph.nq</code></a> and <a href="/graph.ttl"><code>graph.ttl</code></a>, <a href="/llms.txt"><code>llms.txt</code></a>, <a href="/chunks.jsonl"><code>chunks.jsonl</code></a>, the <a href="/skills/">skill packs</a>, the <a href="/now/">NOW page</a> and the <a href="${WELLKNOWN}">discovery document</a>. The discovery validator checks it at Level 2 before every publish, and every digest it declares is compared with the bytes served. It claims Level 0 against the specification version above (${REF('AGSC-00-12')}); the reference engine&#39;s own Level-3 claim waits for its <code>1.0.0</code> release (${REF('AGSC-10-05')}).`],
+  ['Specification <code>' + esc(SPEC_VERSION) + '</code>', SPEC_SOURCE === 'tag' ? 'Live' : 'Draft', SPEC_SOURCE === 'tag' ? `${PRERELEASE(SPEC_VERSION) ? 'A release candidate, tagged' : 'Released and tagged'} on ${esc(SPEC_DATE)}; twelve sections at <a href="/specs/">/specs/</a>; the vocabulary and the vectors are frozen at the tag.` : `${PRERELEASE(SPEC_VERSION) ? 'A draft release candidate' : 'A draft of this version'}, not yet tagged; twelve sections at <a href="/specs/">/specs/</a>. The vocabulary and the vectors freeze at the tag.`],
+  ['This site as a node of its own specification', 'Live', `Items, <a href="/graph.jsonld"><code>graph.jsonld</code></a> with <a href="/graph.nq"><code>graph.nq</code></a> and <a href="/graph.ttl"><code>graph.ttl</code></a>, <a href="/llms.txt"><code>llms.txt</code></a>, <a href="/chunks.jsonl"><code>chunks.jsonl</code></a>, the <a href="/skills/">skill packs</a>, the <a href="/now/">NOW page</a> and the <a href="${WELLKNOWN}">discovery document</a>. The discovery validator checks it at Level 2 before every publish, and every digest it declares is compared with the bytes served. It claims Level 0 against the specification version above (${REF('AGSC-00-12')})${PRERELEASE(SPEC_VERSION) ? `; the reference engine&#39;s own Level-3 claim waits for its <code>1.0.0</code> release (${REF('AGSC-10-05')})` : ''}.`],
   ['The machine files, written by the reference engine', 'Live', `Every file above is emitted by <code>agsc build</code> over this repository's own content, and this site republishes those bytes rather than deriving them a second time. The pages of this site are written by this repository's own generator, which keeps the hand-written guide; the engine writes the same design for every other node. See <a href="/exports/">the list of machine-readable files</a>.`],
   ['Ontology files', 'Live', `Turtle, JSON-LD context, RDF/XML and N-Triples at <a href="/ns/">/ns/</a>.`],
+  ['Vocabulary and semantics', 'Live', `The vocabulary is a small OWL 2 RL ontology of ${TERMS.class + TERMS.object + TERMS.datatype} terms (${TERMS.class} classes, ${TERMS.object} object properties and ${TERMS.datatype} datatype properties) aligned to SKOS, PROV-O and Dublin Core (${REF('AGSC-05-22')}); an informative file in the engine repository maps its terms to AgentO and DCAT. Each vocabulary version keeps a fixed copy under <code>/ns/&lt;version&gt;/</code> (${REF('AGSC-05-25')}). A writer publishes each node&#39;s graph as JSON-LD, N-Quads and Turtle, and each item as JSON-LD (${REF('AGSC-06-01')}).`],
   ['Namespace through w3id.org', STATUS.w3id ? 'Live' : 'Not yet resolving', regText.w3id],
   ['Well-known URI <code>knowledge-linkset</code>', { 'not-requested': 'Not requested', requested: 'Requested', registered: 'Registered' }[STATUS.wellknown], regText.wellknown],
   ['Profile URI', { 'not-filed': 'Not filed', filed: 'Filed', registered: 'Registered' }[STATUS.profile], regText.profile],
   ['Internet-Draft', STATUS.draft ? 'Posted' : 'Not yet posted', regText.draft + (STATUS.draft ? '' : ' It will describe the discovery layer only, request the registration of the well-known suffix <code>knowledge-linkset</code>, and record the fields of the profile URI, which is registered separately in the Profile URIs registry.')],
   ['Preprint', STATUS.preprint ? 'Published' : 'In preparation', regText.preprint],
-  ['Reference engine <code>agsc</code>', 'Published', 'The engine is written, and it builds this site: every machine-readable file here is emitted by <code>agsc build</code> over this repository&#39;s own content. Published as <code>agentic-system-core</code> (short alias <code>agsc-cli</code>) on npm and as <code>agentic-system-core</code> on PyPI, at <code>1.0.0-rc.7</code>.'],
+  ['Reference engine <code>agsc</code>', 'Published', 'The engine is written, and it builds this site: every machine-readable file here is emitted by <code>agsc build</code> over this repository&#39;s own content. Its packages are in the next row.'],
+  ['Packages on npm and PyPI', 'Published', 'The engine as <a href="https://www.npmjs.com/package/agentic-system-core"><code>agentic-system-core</code></a> on npm, with the short alias <a href="https://www.npmjs.com/package/agsc-cli"><code>agsc-cli</code></a>; the Python checker and reader as <a href="https://pypi.org/project/agentic-system-core/"><code>agentic-system-core</code></a> on PyPI. Each version of the specification is published as the package version of the same number, from its release tag, after this site; a registry&#39;s page shows the latest version published.'],
+  ['Local MCP tool server', 'Published', `<code>agsc mcp</code> serves a Bundle to an assistant on the same machine over stdio, speaking MCP revision <code>${esc(engineSurfaces.MCP_PROTOCOL_VERSION)}</code>: ${WORD[TOOL_NAMES.length]} tools (${TOOL_NAMES.map(n => `<code>${esc(n)}</code>`).join(', ')}), the items, <code>graph.jsonld</code> and <code>llms.txt</code> as read-only resources, and one prompt (${REF('AGSC-09-14b')}). Listed in the MCP Registry as <code>${esc(SERVER_JSON.name)}</code>.`],
+  ['WebMCP page tools', 'Experimental', `The same ${WORD[TOOL_NAMES.length]} tools, offered to an assistant running in the visitor&#39;s browser on every item and guide page and on <a href="/compose/">/compose/</a>, declared in the discovery document as the <code>webmcp</code> surface with the access class <code>consent</code> (${REF('AGSC-11-16')}). WebMCP is a draft report of a W3C Community Group, and a browser runs the tools only where it supports that draft: see <a href="/about/#tools-for-browser-assistants">tools for browser assistants</a>.`],
+  ['Agent skill', 'Published', 'A <a href="/agent-skill/agentic-system-core/SKILL.md"><code>SKILL.md</code></a> in the Agent Skills format, with two reference files, that teaches a coding agent the six modes; the engine repository ships the same files as a Claude Code plugin with a plugin marketplace file. How to install it: <a href="/docs/agent-skill/">the agent skill page</a>.'],
+  ...(PRERELEASE(SPEC_VERSION) ? [] : [['Reference engine conformance claim', 'Published', `The reference engine claims Level 3 against specification <code>${esc(SPEC_VERSION)}</code>, the full engine (${REF('AGSC-10-05')}): the claim, with the cases it passed, is in <a href="${esc(CLAIM_URL)}">its conformance statement</a>.`]]),
   ['Independent validators', 'Published', `The nine checker contracts of ${REF('AGSC-09-90')} &#8212; seven validators and two generators &#8212; ship in the published npm package beside its artefact counter and its benchmark tool; the maintainer&#39;s own tools stay in the repository. One validator, for the discovery document, checks this site at Level 2 before every publish.`],
+  ['Modes for people and agents', 'Live', 'Six modes over one folder of files, from a wiki that checks itself (Mode 0) to a live board that people and agents work through together (Mode 5). People use the command line and the pages; agents use the discovery document, the tool server, the page tools, the exports and the skill packs. See <a href="/docs/modes/">the six modes</a> and <a href="/docs/guides/">the guides</a>, one for each mode and one for publishing.'],
+  ['How it compares', 'Live', 'What it shares with llms.txt, the Open Knowledge Format, LLM wikis, agent-discovery work, RFC 9727 and Wikibase, and how it differs: <a href="/#compares">on the front page</a>; the dated comparison is in the <a href="/docs/standards/#related-work">related work</a>.'],
   ['Contribution channel', 'Live', `Declared in the <a href="${WELLKNOWN}">discovery document</a> as a pull-request target (${REF('AGSC-11-14')}), and every page generated from a source file carries a <em>Propose an edit</em> link to that file. Nothing is written without a person merging it.`],
   ...(PATTERNS_NODE ? [['Second node (live demonstration)', 'Live', `A second node, at <code>patterns.agenticsystemcore.com</code>, is online: a live demonstration of the reference engine, running on a small sample of well-known agent-system patterns described from public sources. Its published items are in the repository <a href="https://github.com/andreibesleaga/agsc-demo-node">agsc-demo-node</a>. ${PEERS.length ? `Each names the other as a peer in its discovery document, and the mutual check of ${REF('AGSC-10-12')} passes.` : 'It is not declared as a peer yet.'}`]] : []),
+  ['Releases feed', 'Live', '<a href="/changelog.xml"><code>/changelog.xml</code></a>, RSS 2.0: one entry per release of the specification, newest first, each with a short summary and a link to its section of the change log.'],
   ['Papers', 'Submitted', 'Papers based on this work have been submitted for review; none is published yet. This page names a paper once it is published.'],
+  ['Hosted tool server', 'Planned', 'A remote MCP responder a node can run, so that agents connect to it over the network instead of starting a local process; planned for a later version.'],
+  ['Messages into a node', 'Planned', 'Channel ingest: notes sent from a chat or e-mail channel arrive as proposals for a person to review; planned for a later version.'],
+  ['A change feed on every node', 'Planned', 'Each node publishes a feed of what changed between its releases; planned for a later version. This site&#39;s own releases feed is in the row above.'],
 ];
 const statusTable = `<div class="table-wrap" tabindex="0" role="region" aria-label="Status"><table>
 <thead><tr><th scope="col">What</th><th scope="col">State</th><th scope="col">Detail</th></tr></thead>
@@ -1752,8 +1797,8 @@ const relatedWork = ['## 1. One sentence', '## 3. The agent-discovery mechanisms
   const line = DOC.related.split('\n').find(l => l.startsWith(h));
   return `### ${line.replace(/^## /, '')}\n\n${sectionOf(DOC.related, h)}`;
 }).join('\n');
-// a folder README describes the source folder, not a page; site/docs/guides/ holds the six mode
-// guides under /docs/guides/ (index.md is /docs/guides/ itself)
+// a folder README describes the source folder, not a page; site/docs/guides/ holds the seven guides
+// and the troubleshooting page under /docs/guides/ (index.md is /docs/guides/ itself)
 const pagesOf = dir => fs.readdirSync(path.join(ROOT, 'site/docs', dir)).filter(f => f.endsWith('.md') && f !== 'README.md').sort().map(f => dir ? `${dir}/${f}` : f);
 const DOCS = [...pagesOf(''), ...pagesOf('guides')];
 const WIDE_DOCS = new Set(['architecture', 'requirements', 'scenarios', 'standards', 'compliance', 'glossary', 'how-to-use']);
@@ -1858,12 +1903,13 @@ const quickstartHtml = () => {
       rows.push(m.slice(1));
     }
   } else if (!/published no tagged version/.test(engineHtml)) die('the engine\'s /changelog/ has neither a table nor its empty-state sentence');
-  const body = rows.length === 0
+  const feedLine = `<p>${FEED_LINK_HTML}: one entry for each release of the specification, with a short summary and a link to that release&#39;s section of the <a href="${FORGE.engine}/blob/main/CHANGELOG.md">change log</a>.</p>\n`;
+  const body = feedLine + (rows.length === 0
     ? '<p>This node has published no tagged content version yet.</p>\n'
     : `<p>Each row is a tag of this site's repository, the day of its commit and the commit itself. These are this node's content versions, numbered on their own; they are not versions of the specification. The content version of the last build is on the <a href="/now/">NOW page</a> and in the discovery document; the specification's own releases are listed in its <a href="${FORGE.engine}/blob/main/CHANGELOG.md">change log</a>.</p>\n`
       + '<div class="table-wrap" tabindex="0" role="region" aria-label="Content versions"><table>\n<thead><tr><th scope="col">Version</th><th scope="col">Date</th><th scope="col">Commit</th></tr></thead>\n<tbody>\n'
       + rows.map(([v, d, c]) => `<tr><th scope="row"><code>${esc(v)}</code></th><td>${esc(d)}</td><td><a href="${esc(`${FORGE.site}/commit/${c}`)}"><code>${esc(c.slice(0, 12))}</code></a></td></tr>`).join('\n')
-      + '\n</tbody></table></div>\n';
+      + '\n</tbody></table></div>\n');
   addPage('/changelog/', {
     title: 'Changelog', summary: summaryOf('/changelog/'), description: 'Every content version this node has published, with its date and commit.', section: null,
     body,
@@ -1876,6 +1922,8 @@ addPage('/about/', {
   jsonld: { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'About AgenticSystemCore', url: `${BASE}about/`, author: { '@type': 'Person', name: config.site.author, sameAs: ['https://orcid.org/0009-0001-3464-5283', 'https://github.com/andreibesleaga', CONTACT_URL] } },
   body: md(read('site/about.md'), { ruleLinks: true }).replace('<h2 id="status">', quickstartHtml() + '<h2 id="status">') + editLink('site', 'site/about.md'),
 });
+// The day this work was first made public: the oldest release tag (scripts/release-feed.js).
+const FIRST_PUBLIC = RELEASES.length ? RELEASES[RELEASES.length - 1] : null;
 // AGSC-06-18 pins the text the identifier names: the file `LICENSE-CONTENT`
 // at the root of the specification's distribution, with this SHA-256 over its bytes. The Bundle
 // root carries its own copy; both are checked to be that text, or `/legal/` would publish terms
@@ -1905,7 +1953,7 @@ addPage('/legal/', {
 <h2 id="citing">Citing and quoting</h2>
 <p>Cite this work as <a href="/docs/standards/#how-to-cite">the standards page</a> shows: the specification by its version, and the paper by its DOI once it is published. Clause 3 of the Content Use Terms lets anyone quote the prose, with attribution to this node&#39;s address and the item&#39;s address, in any work that adds their own contribution; the licences of the specification, the engine and the vocabulary allow more. Nothing on this page limits a quotation, or any other use, that the law of your country allows without permission.</p>
 <h2 id="prior-art">First publication and prior art</h2>
-<p>Specification <code>${esc(SPEC_VERSION)}</code>, tagged on ${esc(SPEC_DATE)}, is the version in which this work was first made public, together with its reference engine, its vocabulary, its schemas and its conformance vectors. ${STATUS.preprint ? `The permanent record is the Zenodo deposit <a href="https://doi.org/${esc(STATUS.preprint.doi)}">${esc(STATUS.preprint.doi)}</a> of ${esc(STATUS.preprint.date)}: the paper, and a sealed archive of the tagged sources whose SHA-256 digests are listed in the deposit&#39;s <code>SHA256SUMS</code> file, with an OpenTimestamps proof of that list.` : 'The permanent record &#8212; a deposit with a persistent identifier holding the paper and a sealed archive of the tagged sources, with their SHA-256 digests and an OpenTimestamps proof of them &#8212; is named here once it is published.'}</p>
+<p>${FIRST_PUBLIC && FIRST_PUBLIC.name !== SPEC_VERSION ? `This work was first made public with the specification&#39;s first public ${PRERELEASE(FIRST_PUBLIC.name) ? 'release candidate' : 'release'}, tagged on ${esc(FIRST_PUBLIC.date)}, together with its reference engine, its vocabulary, its schemas and its conformance vectors. Specification <code>${esc(SPEC_VERSION)}</code>, tagged on ${esc(SPEC_DATE)}, is the version this site publishes.` : `Specification <code>${esc(SPEC_VERSION)}</code>, tagged on ${esc(SPEC_DATE)}, is the version in which this work was first made public, together with its reference engine, its vocabulary, its schemas and its conformance vectors.`} ${STATUS.preprint ? `The permanent record is the Zenodo deposit <a href="https://doi.org/${esc(STATUS.preprint.doi)}">${esc(STATUS.preprint.doi)}</a> of ${esc(STATUS.preprint.date)}: the paper, and a sealed archive of the tagged sources whose SHA-256 digests are listed in the deposit&#39;s <code>SHA256SUMS</code> file, with an OpenTimestamps proof of that list.` : 'The permanent record &#8212; a deposit with a persistent identifier holding the paper and a sealed archive of the tagged sources, with their SHA-256 digests and an OpenTimestamps proof of them &#8212; is named here once it is published.'}</p>
 <p>Everything these artefacts describe &#8212; the format, the rules, the discovery mechanism, the vocabulary and the designs of the engine &#8212; is published so that it is on the public record from that date, and it is free to implement under the licences on this page. Publication does not stop anyone from applying for a patent; it places what is published here in the state of the art against which the novelty of a later application is judged.</p>
 <h2 id="signals">Machine-readable signals</h2>
 <p>The same policy is stated three ways (${REF('AGSC-06-18')}): the per-crawler groups of <a href="/robots.txt"><code>/robots.txt</code></a>, the TDM reservation in <a href="/.well-known/tdmrep.json"><code>/.well-known/tdmrep.json</code></a>, and the <code>schema:license</code> and <code>schema:usageInfo</code> members of <a href="/graph.jsonld"><code>/graph.jsonld</code></a> together with the provenance header of <a href="/llms.txt"><code>/llms.txt</code></a>. The reservation of text and data mining does not limit what the law of your country allows researchers to do without permission.</p>
@@ -2181,6 +2229,11 @@ put('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http:
 // one by one: a pattern `/exports/*` would also match the index page `/exports/`.
 const EXPORT_FILES = LLM_CONTEXT.map(f => `/exports/${f}`);
 const PUBLIC_ARTEFACT = ['/.well-known/knowledge-linkset', '/graph.jsonld', '/graph.nq', '/graph.ttl', '/llms.txt', '/llms-full.txt', '/search.json', '/pages/*.md', '/pages/*.jsonld', '/ns/*', '/chunks.jsonl', '/ledger.jsonl', '/now.md', '/skills/*', '/boards/*', ...EXPORT_FILES];
+// The releases feed (scripts/release-feed.js): RSS 2.0, one item per release tag, newest first,
+// named by every page head and linked from /changelog/ and /docs/status/. A file of this site
+// only: the engine's per-node feed is the reserved name `build.feed` of a later version.
+try { put('changelog.xml', releaseFeed.rss({ origin: ORIGIN, engineRepo: FORGE.engine, releases: RELEASES })); } catch (e) { die(e.message); }
+PUBLIC_ARTEFACT.push('/changelog.xml');
 const HEADER_BLOCKS = new Map(); // address -> header lines, in the order they are written
 const addHeaders = (route, ...lines) => { if (!HEADER_BLOCKS.has(route)) HEADER_BLOCKS.set(route, []); HEADER_BLOCKS.get(route).push(...lines); };
 addHeaders('/*', 'X-Content-Type-Options: nosniff', 'X-Frame-Options: DENY', 'Referrer-Policy: strict-origin-when-cross-origin',
@@ -2191,6 +2244,7 @@ addHeaders('/.well-known/knowledge-linkset', `Content-Type: application/linkset+
 for (const [route, type, ...rest] of [
   ['/.well-known/tdmrep.json', 'application/json; charset=utf-8'],
   ['/.well-known/security.txt', 'text/plain; charset=utf-8'],
+  ['/changelog.xml', 'application/rss+xml; charset=utf-8'],
   ['/graph.jsonld', 'application/ld+json; charset=utf-8'],
   ['/search.json', 'application/json; charset=utf-8'],
   ['/pages/*.md', 'text/markdown; charset=utf-8; variant=GFM'],
