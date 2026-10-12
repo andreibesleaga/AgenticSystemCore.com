@@ -18,11 +18,11 @@ const RELEASE_TAG = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
 /** Five to ten plain lines per release, newest release first. */
 const SUMMARIES = {
   '1.0.0': [
-    'Version 1.0.0 adds no section and no rule, and renumbers and removes none: a Bundle that conforms to the last release candidate conforms to it, unless it breaks one of the rules the change log lists as now reported.',
+    'Version 1.0.0 adds one section, §0.7, which lists the documents the rules already cite normatively, and adds, renumbers and removes no rule: a Bundle that conforms to the last release candidate conforms to it, unless it breaks one of the rules the change log lists as now reported.',
     'Defect fixes against rules that already stood, in the engine and in both discovery checkers, each proved by a test written first.',
     'Every clarified rule carries a dated amendment note, and the change log lists every rule amended since the last release candidate.',
     'The vocabulary is inside OWL 2 RL and OWL 2 DL; its fixed copy /ns/1.0.0/ is served beside the frozen /ns/1.0.0-draft.1/.',
-    'New conformance cases, a new export area among them, each passed by the engine and cross-checked by the Python checker where it runs the area.',
+    'New conformance cases, a new export area among them, each passed by the engine and cross-checked by the Python checker where it runs the case.',
     'The reference engine publishes its own Level-3 conformance claim.',
     'Security: agsc-host writes nothing outside the Bundle, its local server refuses a request for a foreign host name, and the slow patterns found on hostile input are linear scans.',
     'Continuous integration: a coverage gate inside a required leg, both packages packed and installed on every leg, Node 26 and a weekly run.',

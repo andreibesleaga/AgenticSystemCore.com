@@ -64,6 +64,16 @@ test('every written summary has five to ten plain lines, without the words publi
   }
 });
 
+test('the 1.0.0 summary says what the version adds: one section, and no rule', () => {
+  const lines = feed.SUMMARIES['1.0.0'];
+  const text = lines.join('\n');
+  assert.ok(!/adds no section/i.test(text), 'the specification of 1.0.0 adds a section, so the summary must not say it adds none');
+  assert.ok(text.includes('one section, §0.7'), 'the summary names the section 1.0.0 adds');
+  assert.ok(/adds, renumbers and removes no rule/.test(lines[0]), 'the opening line still says no rule is added, renumbered or removed');
+  assert.ok(text.includes('where it runs the case'), 'the cross-check line says the Python checker runs the case');
+  assert.ok(!text.includes('where it runs the area'), 'the cross-check line does not say the Python checker runs the area');
+});
+
 test('the well-formedness check sees a broken feed', () => {
   assert.match(xmlFault('<?xml version="1.0" encoding="UTF-8"?>\n<rss><channel></rss>\n'), /closes the wrong element/);
   assert.match(xmlFault('<?xml version="1.0" encoding="UTF-8"?>\n<rss>a & b</rss>\n'), /bad entity/);
