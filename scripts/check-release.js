@@ -94,6 +94,29 @@ function check(www, opts = {}) {
     }
   }
 
+  // (1b) The day the specification is dated by. Built from a tag, every page dates the version by
+  // the TAG (its `creatordate`, as a UTC day, the same instant the releases feed gives as the
+  // item's pubDate), never by the commit it points to: the two fall on different days whenever a
+  // release is tagged a day after its last commit. Each page named here must carry the date, and no
+  // page may date the version by any other day.
+  if (SPEC_SOURCE === 'tag') {
+    // A ref that is not a tag has no tag date: then the commit's date, as scripts/build.js takes it.
+    const unix = Number(git('for-each-ref', '--format=%(creatordate:unix)', `refs/tags/${SPEC_TAG}`).trim() || git('log', '-1', '--format=%ct', SPEC_TAG).trim());
+    const day = new Date(unix * 1000).toISOString().slice(0, 10);
+    // "<version>, released and tagged on <day>", "<version> Live Released and tagged on <day>",
+    // "<version>, tagged on <day>" and the citation line "specification <version>, <day>".
+    const dated = new RegExp(`(?<![\\w.+-])${ver}[^.]{0,40}?(?:tagged on |, )(\\d{4}-\\d{2}-\\d{2})`, 'g');
+    const where = {
+      'specs/index.html': 'the specification index', 'specs/00-overview/index.html': 'the status block of the specification',
+      'specs/agentic-knowledge/index.html': 'the profile page', 'specs/mcp/index.html': 'the MCP extension page',
+      'docs/status/index.html': 'the status row', 'legal/index.html': 'the first-publication sentence', 'docs/standards/index.html': 'the citation line',
+    };
+    for (const [r, what] of Object.entries(where)) ok(new RegExp(dated.source).test(text(read(r))), `/${r.replace(/index\.html$/, '')}: ${what} does not date specification ${SPEC_VERSION}`);
+    for (const r of pages) {
+      for (const m of text(read(r)).matchAll(dated)) ok(m[1] === day, `/${r.replace(/index\.html$/, '')}: dates specification ${SPEC_VERSION} ${m[1]}, not ${day}, the day of the tag ${SPEC_TAG}: "${m[0]}"`);
+    }
+  }
+
   // (2) The status page: the rows a reader acts on, each with the facts the engine can confirm.
   const statusHtml = read('docs/status/index.html');
   const rows = new Map();

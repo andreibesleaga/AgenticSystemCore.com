@@ -48,7 +48,7 @@ function check(www) {
   ok(!home.includes('Procedures become skill packs'), 'the home mode card still says "Procedures become skill packs"');
   ok(!/runnable architectures/i.test(home), 'the home page still says "runnable architectures"');
   ok(!/runnable architectures/i.test(read('llms.txt') + read('assets/search-site.json')), 'a machine view of the home page still says "runnable architectures"');
-  ok(home.includes('version 1.1 is planned to follow them'), 'the home page names no version for what is planned');
+  ok(home.includes('version 1.1 is planned to follow them'), 'the home page does not say "version 1.1 is planned to follow them": it must name the version planned to follow the Ontology Pipeline');
   ok(!home.includes('the next version is planned'), 'the home page still says "the next version is planned"');
 
   // The guide pages.

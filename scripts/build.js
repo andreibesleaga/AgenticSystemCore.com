@@ -164,7 +164,12 @@ const BUNDLE_VERSION = (() => {
   return derived.version;
 })();
 
-const SPEC_DATE = iso(Number(git('log', '-1', '--format=%ct', SPEC_SOURCE === 'tag' ? SPEC_TAG : 'HEAD').trim())).slice(0, 10);
+// The day the specification is dated by on every page: built from a tag, the TAG's own date (its
+// `creatordate`, the date the releases feed gives the same release), not the date of the commit it
+// points to, which can be a day earlier; from the working tree (or a ref that is not a tag), the
+// date of the commit.
+const SPEC_TAG_DATE = SPEC_SOURCE === 'tag' ? git('for-each-ref', '--format=%(creatordate:unix)', `refs/tags/${SPEC_TAG}`).trim() : '';
+const SPEC_DATE = iso(Number(SPEC_TAG_DATE || git('log', '-1', '--format=%ct', SPEC_SOURCE === 'tag' ? SPEC_TAG : 'HEAD').trim())).slice(0, 10);
 // WHAT THE PUBLISHED VERSION IS CALLED. A version with a pre-release part (`1.0.0-rc.7`) is a
 // release candidate; a version without one (`1.0.0`) is a release. A build from the working tree
 // publishes a version not tagged yet, a draft of it. Every status sentence below takes its words
