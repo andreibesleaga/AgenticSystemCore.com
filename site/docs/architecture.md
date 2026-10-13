@@ -142,6 +142,8 @@ Every action is pinned by commit hash; `pull_request_target` is never used; ther
 
 A node is a set of files, and so is its build; neither depends on a transport. It can be served from a web host, a laptop or a small device, a clone of its repository, IPFS behind an HTTP gateway, or a web interface in front of a store anchored in a ledger. What the rules ask of the place is fixed: an HTTPS origin that serves the discovery document and the routes with the response headers the build wrote (AGSC-06-01, AGSC-06-17, AGSC-11-05). How each kind of place is told is a *hosting profile*, one of the plugin kinds (AGSC-00-24): the reference engine's `agsc-host` command carries seven, from Cloudflare Pages (the reference, and this site's host) to nginx and Apache, GitHub Pages behind a proxy, a local server, a clone, IPFS and a ledger anchor that records the bundle hash and the content version of each build (AGSC-04-25). Each profile states what its place cannot do, and a conformance claim names its profile. No rule of version 1.x pins a transport other than HTTP.
 
+*(Note of 2026-10-12, for 1.0.0.)* The lanes above are the planned shape. At 1.0.0 the site is published by the host's git integration from the committed `www/` of the main branch; the demonstration node by the maintainer's upload of a checked build; no workflow of any repository holds a secret (every repository's secrets list is empty); and the weekly job is a read-only live check of the published addresses.
+
 ## 9. Crosscutting concepts
 
 - **Determinism.** Canonical JSON, sorted keys, LF, NFC, UTC seconds, `SOURCE_DATE_EPOCH`, code-point file ordering, no blank nodes; `verify` blocks merges ([AGSC-04](/specs/04-canonicalization/)).
@@ -212,9 +214,9 @@ The assets are the content repository, the engine repository and its packages, t
 | Prompt injection through merged content reaching agents | Trust-marked results, fenced prose, the injection scan at error severity for agent-authored changes, identifier-only tools, inert skills, human merge |
 | A malicious proposal editing schemas, the ontology, types or identifiers, or an ingest pull request posing as a channel | A ruleset requiring a pull request, one approval, a code owner and a green pipeline; a single bypass identity that the ingest job cannot reach; code owners on the schema and ontology; forks lint-only until labelled |
 | A look-alike package name | Trusted publishing with attestations on both packages; canonical names documented |
-| Theft of a CI token | Read-only defaults with per-job elevation, actions pinned by hash, never `pull_request_target`, secrets only in the deploy job |
+| Theft of a CI token | Read-only defaults with per-job elevation, actions pinned by hash, never `pull_request_target`, secrets only in the deploy job (the planned lane; at 1.0.0 no job holds a token — see the note at the end of §8) |
 | Tampering with the w3id redirects | A fixed table of same-origin targets reviewed by the w3id maintainers; immutable versioned copies; a digest on the ontology link |
-| A deploy from a compromised CI run | A scoped, short-lived host token; an attested weekly snapshot as the known-good redeploy; `verify` reproduces the site from any clone |
+| A deploy from a compromised CI run | A scoped, short-lived host token; an attested weekly snapshot as the known-good redeploy; `verify` reproduces the site from any clone (the planned lane; at 1.0.0 no job holds a token — see the note at the end of §8) |
 | Malicious parser input | The parser controls above and a single parse-error type |
 | Secrets or personal data merged into a page | The secrets and personal-data lints; push protection once public |
 | A skill pack carrying executables | The content-only rule on both export and install, a hash lockfile, a diff before every update |

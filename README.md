@@ -30,6 +30,10 @@ Needs Node 22.13 or later and the engine repository at `../agentic-system-core` 
 `SITE_ENGINE=<path>`), with its `npm ci` done. `SOURCE_DATE_EPOCH` fixes the build
 instant; without it the instant comes from the last commit.
 
+Run both commands with the same `SITE_ENGINE` and `SOURCE_DATE_EPOCH`: the gate rebuilds
+the site and compares the result with `www/`, so a variable set on one line only makes the
+comparison fail.
+
 Optional browser lanes, with `playwright-core` and `axe-core` installed **outside** this
 repository (see each file's header):
 

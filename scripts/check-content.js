@@ -63,6 +63,12 @@ function check(www) {
   }
   ok(text('docs/reading-the-specification/index.html').includes(`${KEY_WORDS} are used`), `/docs/reading-the-specification/ does not list all eleven key words (${KEY_WORDS})`);
 
+  // The architecture page and the publishing guide: what holds at 1.0.0, not only the planned shape.
+  const arch = text('docs/architecture/index.html');
+  ok(arch.includes('no workflow of any repository holds a secret') && (arch.match(/at 1\.0\.0 no job holds a token/g) || []).length === 2, '/docs/architecture/ does not say that no workflow of any repository holds a secret, with its two CI-token threat rows qualified "at 1.0.0"');
+  const publish = text('docs/guides/publish/index.html');
+  ok(publish.includes('http://localhost:8080/') && publish.includes('--dev'), '/docs/guides/publish/ does not say how to check a node served on your own machine (site.base http://localhost:8080/ and --dev)');
+
   // Counts the scenario and demo pages quote: the feature files are the ones /docs/scenarios/ links,
   // one per persona, and a page that names how many there are names that number.
   const scenarioHtml = read('docs/scenarios/index.html');

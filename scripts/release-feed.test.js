@@ -11,7 +11,7 @@ const CHANGELOG = [
   '## [1.0.0-rc.7] - 2026-10-08', '', '## [1.0.0-rc.6] - 2026-09-29', '',
 ].join('\n');
 const TAGS = [
-  { name: '1.0.0-rc.3', unix: 1789635610 }, // a tag with no section of the change log
+  { name: '2.0.0-rc.1', unix: 1820000000 }, // a tag with no section of the change log
   { name: '1.0.0-rc.6', unix: 1790706477 },
   { name: 'v1.0.0-rc.6', unix: 1790706477 }, // a package tag
   { name: '1.0.0-rc.7', unix: 1791445525 },

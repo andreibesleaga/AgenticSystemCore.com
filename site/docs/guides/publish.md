@@ -164,6 +164,8 @@ connection only when the command line says so:
 python3 -m agentic_system_core.cli validate-wellknown https://notes.example.org/.well-known/knowledge-linkset --level 2 --allow-network
 ```
 
+**On your own machine first.** `agsc-host serve` prints `http://127.0.0.1:8080/`, but both checkers compare the discovery document's anchor with the origin they fetched it from, and the configuration admits `http://localhost(:port)/` as the one non-HTTPS `site.base`. To check a node served locally at Level 2, set `site.base` to `http://localhost:8080/`, rebuild, serve, and run each checker on `http://localhost:8080/.well-known/knowledge-linkset --level 2 --dev` (the Python checker also needs `--allow-network`); use `localhost`, not `127.0.0.1`, in both places. `--dev` admits plain `http` to a loopback address and nothing else (AGSC-09-93).
+
 Both checkers print one line per finding and exit 0 on a pass, 1 on a finding. Run the
 check again after every upload; a scheduled run (once a week, say) tells you when a host
 setting has changed under you.
