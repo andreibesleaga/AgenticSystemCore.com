@@ -7,9 +7,11 @@
 <meta name="description" content="Guide to Mode 0 of AgenticSystemCore: a folder of Markdown notes becomes a checked static site, with every command and the lines it prints.">
 <link rel="canonical" href="https://agenticsystemcore.com/docs/guides/mode-0/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/docs/guides/mode-0/">
 <meta property="og:title" content="Mode 0 guide: a folder of notes becomes a checked site">
@@ -92,8 +94,14 @@ placeholder <code>http://localhost/</code>), <code>content/index.md</code> (the 
 and a <code>.env.example</code>;</li>
 <li>it took the accountable person's id from your git e-mail (the part before <code>@</code>). With no
 git e-mail it writes <code>human:unknown</code>; change <code>bundle.operator</code> in <code>agsc.config.json</code>
-and <code>operator:</code> in each note to <code>human:&lt;your-id&gt;</code> if you want a real name there.</li>
+and <code>operator:</code> in each note to <code>human:&lt;your-id&gt;</code> if you want a real name there;</li>
+<li>it <strong>left out</strong> any note that already begins with a header (a first line <code>---</code> closed
+by a later <code>---</code>), even one with no <code>type:</code> line: such a note stays where it is,
+unchanged, and is not published. <code>init</code> names each one:</li>
 </ul>
+<pre tabindex="0" data-lang="text"><code>left as is: handoff.md already has a frontmatter block, so init neither changes nor moves it (AGSC-02-91); it is not an item until it has a type and lives under content/&lt;type-plural&gt;/ (AGSC-01-02)</code></pre>
+<p>To publish such a note, delete its header (keep the text) and run <code>agsc init</code> again: it
+adopts the note like the others and leaves the rest as they are.</p>
 <h2 id="2-add-a-security-contact-commit-once-check">2. Add a security contact, commit once, check</h2>
 <p>A published site must say where to report a security problem (RFC 9116), and a build
 needs an instant to stamp on what it writes. The commit gives it one:</p>
@@ -127,6 +135,7 @@ security.txt</code></pre>
 <p>To read it in a browser, serve the folder (stop with Ctrl-C):</p>
 <pre tabindex="0" data-lang="bash"><code>agsc-host serve</code></pre>
 <pre tabindex="0" data-lang="text"><code>serving …/my-notes/www at http://127.0.0.1:8080/ — read-only; stop with Ctrl-C</code></pre>
+<p>To run the checkers against this address, see the <a href="/docs/guides/publish/#6-check-it-live">publishing guide §6</a> — <code>localhost</code>, not <code>127.0.0.1</code>, in <code>site.base</code> and on the command line.</p>
 <p>Each note has a page under <code>/concepts/&lt;name&gt;/</code> and a Markdown copy under
 <code>/pages/&lt;name&gt;.md</code>; <code>/.well-known/knowledge-linkset</code> is the discovery document an agent
 reads first.</p>
@@ -183,19 +192,23 @@ verify: pass (0 error, 0 warn)</code></pre>
 <p>The <code>node -e</code> line only sets <code>site.base</code>; editing the file by hand does the same. The new
 warning asks for a <code>PRIVACY.md</code> beside <code>LICENSE-CONTENT</code>, which <code>/legal/</code> then shows.
 Upload <code>www/</code> to any host that serves files over HTTPS; <code>agsc-host list</code> names the
-profiles the engine can write host settings for.</p>
+profiles the engine can write host settings for, and the <a href="/docs/guides/publish/">publishing guide</a>
+takes the node from here to a live address and checks it there.</p>
 <h2 id="when-it-says-no">When it says no</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
 <thead><tr><th scope="col">What you see</th><th scope="col">Why</th><th scope="col">What to do</th></tr></thead>
 <tbody>
 <tr><td><code>error: AGSC-E901 no .well-known/security.txt in the Bundle root …</code></td><td>no security contact</td><td>step 2</td></tr>
 <tr><td><code>error: AGSC-E204 the build instant defaulted to 1970-01-01T00:00:00Z …</code></td><td>no commit and no <code>SOURCE_DATE_EPOCH</code></td><td>commit once, or <code>export SOURCE_DATE_EPOCH=$(date +%s)</code></td></tr>
-<tr><td><code>error: AGSC-E004 unknown configuration override AGSC_…</code></td><td>a shell variable whose name starts with <code>AGSC_</code> that the engine does not know</td><td><code>unset</code> it</td></tr>
+<tr><td><code>error: AGSC-E004 environment variable AGSC_… is not a configuration name this engine knows; unset it (AGSC-01-37)</code></td><td>a shell variable whose name starts with <code>AGSC_</code> that the engine does not know; nothing is written until it is gone</td><td><code>unset</code> it (<code>env</code> lists the variables; when the message names the <code>.env</code> file instead, remove that line)</td></tr>
 <tr><td><code>error: AGSC-E310 …</code> and <code>build</code> writes nothing</td><td>a link to a note that does not exist</td><td>fix the link at the file and line named</td></tr>
 <tr><td><code>agsc: command not found</code></td><td>the <code>export PATH=…</code> line was not run in this shell</td><td>run the two <code>export</code> lines again from the working folder</td></tr>
 </tbody></table></div>
+<p>Every other code the guides and the demos print is on the <a href="/docs/guides/troubleshooting/">troubleshooting</a>
+page, with its cause and what to do.</p>
 <h2 id="what-next">What next</h2>
 <ul>
+<li>Put the site online and check it live: <a href="/docs/guides/publish/">Publish</a>.</li>
 <li>Let an assistant read and cite these notes: <a href="/docs/guides/mode-1/">Mode 1</a>.</li>
 <li>Check every push on GitHub: the action in the root <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/README.md#connecting-agents-and-repositories">README</a>.</li>
 <li>The same mode on a ready-made folder, with more cases (stale notes, a broken link):

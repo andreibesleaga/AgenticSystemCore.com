@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scenarios: Self-driving team — agents and people finish a project's tasks on one live board — AgenticSystemCore</title>
+<meta name="description" content="The behaviour-driven scenarios of persona-k-live-board.feature: Self-driving team — agents and people finish a project's tasks on one live board.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/scenarios/persona-k-live-board/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/scenarios/persona-k-live-board/">
+<meta property="og:title" content="Scenarios: Self-driving team — agents and people finish a project's tasks on one live board">
+<meta property="og:description" content="The behaviour-driven scenarios of persona-k-live-board.feature: Self-driving team — agents and people finish a project's tasks on one live board.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Scenarios: Self-driving team — agents and people finish a project's tasks on one live board","description":"The behaviour-driven scenarios of persona-k-live-board.feature: Self-driving team — agents and people finish a project's tasks on one live board.","url":"https://agenticsystemcore.com/docs/scenarios/persona-k-live-board/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/scenarios/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main" class="wide">
+<h1>Scenarios: Self-driving team — agents and people finish a project's tasks on one live board</h1>
+<p class="summary"><strong>Summary</strong>The 12 scenarios of the feature file persona-k-live-board.feature, in the Given/When/Then form the reference engine runs; each names the requirement it proves.</p>
+<p>One of the feature files of the <a href="/docs/scenarios/">scenarios</a>, where the coverage table names the requirements each file proves. Previous: <a href="/docs/scenarios/persona-j-standards/" rel="prev"><code>persona-j-standards.feature</code></a>. Next: <a href="/docs/scenarios/persona-l-port-implementer/" rel="next"><code>persona-l-port-implementer.feature</code></a>.</p>
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a>, <a class="ref" href="/docs/requirements/#PRD-064">PRD-064</a>, <a class="ref" href="/docs/requirements/#PRD-065">PRD-065</a> · spec/08 §8.6, spec/10 §10.6, spec/01 <a class="ref" href="/specs/01-bundle/#AGSC-01-36">AGSC-01-36</a>…38
+# Source of truth: docs/PRD.md Amendment 8 and the rules named on each step
+@persona-k @mode-5 @<a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a> @<a class="ref" href="/docs/requirements/#PRD-064">PRD-064</a> @<a class="ref" href="/docs/requirements/#PRD-065">PRD-065</a>
+Feature: Self-driving team — agents and people finish a project's tasks on one live board
+  As P12 (a self-driving team of agents and people)
+  I want a shared pull board that agents plan, claim and work on until it is done
+  So that product and project management runs itself under the guards a person configured once
+
+  An agent lane works the board as a client of the tool server (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a>): every
+  call returns a prepared Proposal, and a person, or a standing decision, applies and
+  merges it. The lane run of &quot;refresh --agent &lt;name&gt; --dry-run&quot; does everything up to
+  the opening of the Proposal and calls no model, so the stop conditions of the lane
+  run here too.
+
+  Background:
+    Given a Bundle with a board cluster &quot;sprint-1&quot; holding tasks of kind task with task_state &quot;TASK_STATE_SUBMITTED&quot;
+    And agsc.config.json declares contribute[]
+    And a channel &quot;lane&quot; with author &quot;lane-bot&quot;, owner &quot;human:alice&quot; and publish &quot;auto&quot;
+    And an agents[] entry &quot;worker&quot; of kind &quot;llm&quot; with tasks &quot;plan, claim, work, edit&quot; and types &quot;concept, episode, lesson&quot;, channel &quot;lane&quot;, budget_usd_month 5, enabled true
+
+  @<a class="ref" href="/docs/requirements/#PRD-064">PRD-064</a> @agent @matrix-A11
+  Scenario: An agent claims a task by proposing its working state through the tool server
+    Given the Bundle is a git repository of one commit with fixed dates
+    When the agent &quot;worker&quot; calls propose for &quot;task-a&quot; with task_state &quot;TASK_STATE_WORKING&quot; through the tool server
+    Then the prepared Proposal's patch changes only task_state and modified of &quot;task-a&quot;, and the tool server wrote nothing (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-17">AGSC-10-17</a>)
+    When the operator applies the prepared patch with git apply
+    And a commit &quot;Claim task-a&quot; carrying the trailer &quot;Channel-Auto: worker&quot;
+    And the Bundle is built
+    Then &quot;/boards/sprint-1.json&quot; shows &quot;task-a&quot; with state &quot;TASK_STATE_WORKING&quot; and claimed_by &quot;process:worker&quot; (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-13">AGSC-10-13</a>)
+
+  @<a class="ref" href="/docs/requirements/#PRD-064">PRD-064</a> @agent
+  Scenario: A forge merges the agent's claim automatically
+    Given the lane's claim of &quot;task-a&quot; was prepared through the tool server
+    When the auto-merge job merges it under every condition of <a class="ref" href="/specs/08-governance/#AGSC-08-26">AGSC-08-26</a> with the trailer &quot;Channel-Auto: worker&quot;
+    Then the content branch holds the claim with no person's merge decision, and the ledger records it with mode &quot;auto&quot; (<a class="ref" href="/specs/08-governance/#AGSC-08-29">AGSC-08-29</a>)
+
+  @<a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a> @agent @matrix-A11
+  Scenario: The agent lane cannot reach the slow lane
+    When the agent &quot;worker&quot; calls remember with kind &quot;procedure&quot; through the tool server
+    Then the tool server refuses it with &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E509">AGSC-E509</a>&quot; and prepares nothing (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a>)
+    And the same procedure from the person &quot;human:alice&quot; is prepared, and a gate is refused to every caller (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-18">AGSC-10-18</a>)
+
+  @<a class="ref" href="/docs/requirements/#PRD-065">PRD-065</a> @agent @matrix-A11
+  Scenario: The work-in-progress limit keeps the agent on one task
+    Given &quot;worker&quot; already holds &quot;task-a&quot; in &quot;TASK_STATE_WORKING&quot; and max_claims is 1
+    When the agent &quot;worker&quot; calls propose for &quot;task-b&quot; with task_state &quot;TASK_STATE_WORKING&quot; through the tool server
+    Then the tool server refuses it with &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E511">AGSC-E511</a>&quot; and prepares nothing (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-17">AGSC-10-17</a>)
+    When the agent &quot;worker&quot; calls propose for &quot;task-a&quot; with task_state &quot;TASK_STATE_COMPLETED&quot; through the tool server
+    And the operator applies the prepared patch with git apply
+    And a commit &quot;Complete task-a&quot; carrying the trailer &quot;Channel-Auto: worker&quot;
+    And the agent &quot;worker&quot; calls propose for &quot;task-b&quot; with task_state &quot;TASK_STATE_WORKING&quot; through the tool server
+    And the operator applies the prepared patch with git apply
+    And a commit &quot;Claim task-b&quot; carrying the trailer &quot;Channel-Auto: worker&quot;
+    And the Bundle is built
+    Then &quot;/boards/sprint-1.json&quot; shows &quot;task-b&quot; with state &quot;TASK_STATE_WORKING&quot; and claimed_by &quot;process:worker&quot; (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-13">AGSC-10-13</a>)
+    When the agent &quot;worker&quot; calls propose for &quot;task-b&quot; with task_state &quot;TASK_STATE_COMPLETED&quot; through the tool server
+    And the operator applies the prepared patch with git apply
+    And a commit &quot;Complete task-b&quot; carrying the trailer &quot;Channel-Auto: worker&quot;
+    And the Bundle is built
+    Then &quot;/boards/sprint-1.json&quot; carries done true (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-13">AGSC-10-13</a>)
+
+  @<a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a> @agent @matrix-A12
+  Scenario: The lane's budget stops a dry run for the month
+    Given the episodes of &quot;worker&quot; this month sum to usage cost_usd 5
+    When the agent runs &quot;agsc refresh --agent worker --dry-run --json&quot; under the network trap
+    Then the command exits 0
+    And the Bundle does not hold &quot;dist/proposal/1.patch&quot;
+    And the JSON envelope carries the warning &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E510">AGSC-E510</a>&quot;
+    And no network call was attempted
+
+  @<a class="ref" href="/docs/requirements/#PRD-065">PRD-065</a> @agent @matrix-A12
+  Scenario: The node-wide cap stops every lane
+    Given agsc.config.json has budget.usd_month 10
+    And a .env file in the Bundle root, ignored by git, sets &quot;AGSC_BUDGET_USD_MONTH&quot; to &quot;6&quot;
+    And the episodes of &quot;worker&quot; this month sum to usage cost_usd 3
+    And the episodes of &quot;planner&quot; this month sum to usage cost_usd 3
+    When the agent runs &quot;agsc refresh --agent worker --dry-run --json&quot; under the network trap
+    Then the command exits 0
+    And the Bundle does not hold &quot;dist/proposal/1.patch&quot;
+    And the JSON envelope carries the warning &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E510">AGSC-E510</a>&quot;
+
+  @<a class="ref" href="/docs/requirements/#PRD-065">PRD-065</a> @human @matrix-H10
+  Scenario: ci --json names the budget override and never its value
+    Given agsc.config.json has budget.usd_month 10
+    And a .env file in the Bundle root, ignored by git, sets &quot;AGSC_BUDGET_USD_MONTH&quot; to &quot;6&quot;
+    And the Bundle is a git repository of one commit with fixed dates
+    When the operator runs &quot;agsc ci --json&quot; under the network trap
+    Then the command exits 0
+    And the output names &quot;AGSC_BUDGET_USD_MONTH&quot;
+    And the output never carries the value the .env file gave &quot;AGSC_BUDGET_USD_MONTH&quot; (<a class="ref" href="/specs/01-bundle/#AGSC-01-37">AGSC-01-37</a>)
+
+  @<a class="ref" href="/docs/requirements/#PRD-064">PRD-064</a> @agent @matrix-A12
+  Scenario: A done board stops the lane
+    Given every task of &quot;sprint-1&quot; is in &quot;TASK_STATE_COMPLETED&quot;
+    When the Bundle is built
+    Then &quot;/boards/sprint-1.json&quot; carries done true (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-13">AGSC-10-13</a>)
+    When the agent runs &quot;agsc refresh --agent worker --dry-run&quot; under the network trap
+    Then the command exits 0
+    And the Bundle does not hold &quot;dist/proposal/1.patch&quot;
+    And the output names &quot;nothing can be claimed&quot;
+
+  @<a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a> @human @matrix-H10
+  Scenario: The NOW page shows the budget warning when a cap is reached
+    Given agsc.config.json has budget.usd_month 10
+    And the episodes of &quot;worker&quot; this month sum to usage cost_usd 10
+    When the operator runs &quot;agsc build --json&quot; under the network trap
+    Then the command exits 0
+    And the JSON envelope carries the warning &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E510">AGSC-E510</a>&quot;
+    And &quot;now.md&quot; and &quot;now/index.html&quot; of the built node name &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E510">AGSC-E510</a>&quot; (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a>)
+
+  @<a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a> @agent @matrix-A12
+  Scenario: A dry run without a build instant is refused like build
+    Given the Bundle has no git history and its security.txt leaves Expires to the build
+    And the environment variable &quot;SOURCE_DATE_EPOCH&quot; is unset
+    When the operator runs &quot;agsc build --json&quot; under the network trap
+    Then the command exits 1
+    And the JSON envelope carries the error &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E204">AGSC-E204</a>&quot;
+    When the agent runs &quot;agsc refresh --agent worker --dry-run --json&quot; under the network trap
+    Then the command exits 1
+    And the JSON envelope carries the error &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E204">AGSC-E204</a>&quot;
+    And the Bundle does not hold &quot;dist/proposal/1.patch&quot;
+
+  @<a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a> @human @matrix-H10
+  Scenario: The build stays deterministic while the lane is non-deterministic
+    Given the lane's Proposal claiming a task was merged with the trailer &quot;Channel-Auto: lane&quot;
+    When &quot;npx agentic-system-core ci&quot; runs twice on the merged content
+    Then the two runs give the same verdict, two builds give byte-identical output, and no model or network call is reachable from lint, build, verify or ci (<a class="ref" href="/specs/08-governance/#AGSC-08-30">AGSC-08-30</a>)
+    And &quot;npx agentic-system-core verify --ledger&quot; re-verifies the ledger, which records the lane's commit with mode &quot;auto&quot;
+
+  @<a class="ref" href="/docs/requirements/#PRD-065">PRD-065</a> @agent
+  Scenario: A planner cannot flood the board
+    Given max_new_items of &quot;worker&quot; is 20
+    When &quot;worker&quot; opens a Proposal that creates 21 task concepts
+    Then the Proposal is rejected with &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E511">AGSC-E511</a>&quot; naming the count and the bound (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a> c)</code></pre>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/agentic-system-core/edit/main/features/persona-k-live-board.feature">Propose an edit</a> — opens <code>features/persona-k-live-board.feature</code> in the specification repository; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>

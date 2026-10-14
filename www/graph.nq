@@ -1,13 +1,14 @@
 <https://agenticsystemcore.com/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Bundle> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
-<https://agenticsystemcore.com/> <https://w3id.org/agentic-system-core/ns#specVersion> "1.0.0-rc.7"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/> <https://w3id.org/agentic-system-core/ns#specVersion> "1.0.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Cluster> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <http://www.w3.org/2004/02/skos/core#definition> "Procedures for publishing and reading a node, each step naming the rule or the check that proves it."@en <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <http://www.w3.org/2004/02/skos/core#member> <https://agenticsystemcore.com/procedures/publish-a-level-0-node/> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <http://www.w3.org/2004/02/skos/core#prefLabel> "Guides"@en <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/clusters/guides/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/project-board/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Cluster> <https://agenticsystemcore.com/> .
@@ -16,6 +17,7 @@
 <https://agenticsystemcore.com/clusters/project-board/> <http://www.w3.org/2004/02/skos/core#prefLabel> "Project board"@en <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/project-board/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/project-board/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/clusters/project-board/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/project-board/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/project-board/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/vocabulary/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Cluster> <https://agenticsystemcore.com/> .
@@ -35,6 +37,7 @@
 <https://agenticsystemcore.com/clusters/vocabulary/> <http://www.w3.org/2004/02/skos/core#prefLabel> "Vocabulary"@en <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/vocabulary/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/vocabulary/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/clusters/vocabulary/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/vocabulary/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/vocabulary/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/bundle/#source-1> <http://purl.org/dc/terms/source> "https://agenticsystemcore.com/specs/00-overview/#AGSC-00-04"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
@@ -60,6 +63,7 @@
 <https://agenticsystemcore.com/concepts/bundle/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/bundle/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/bundle/> <https://w3id.org/agentic-system-core/ns#kind> "term"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/bundle/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/bundle/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/bundle/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/bundle/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/bundle/#source-1> <https://agenticsystemcore.com/> .
@@ -89,6 +93,7 @@
 <https://agenticsystemcore.com/concepts/cluster/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/cluster/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/cluster/> <https://w3id.org/agentic-system-core/ns#kind> "term"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/cluster/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/cluster/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/cluster/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/cluster/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/cluster/#source-1> <https://agenticsystemcore.com/> .
@@ -114,6 +119,7 @@
 <https://agenticsystemcore.com/concepts/concept/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/concept/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/concept/> <https://w3id.org/agentic-system-core/ns#kind> "term"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/concept/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/concept/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/concept/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/concept/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/concept/#source-1> <https://agenticsystemcore.com/> .
@@ -134,6 +140,7 @@
 <https://agenticsystemcore.com/concepts/episode/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/episode/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/episode/> <https://w3id.org/agentic-system-core/ns#kind> "term"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/episode/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/episode/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/episode/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/episode/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/episode/#source-1> <https://agenticsystemcore.com/> .
@@ -153,6 +160,7 @@
 <https://agenticsystemcore.com/concepts/gate/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/gate/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/gate/> <https://w3id.org/agentic-system-core/ns#kind> "term"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/gate/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/gate/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/gate/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/gate/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/gate/#source-1> <https://agenticsystemcore.com/> .
@@ -176,6 +184,7 @@
 <https://agenticsystemcore.com/concepts/harness/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/harness/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/harness/> <https://w3id.org/agentic-system-core/ns#kind> "term"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/harness/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/harness/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/harness/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/harness/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/harness/#source-1> <https://agenticsystemcore.com/> .
@@ -204,6 +213,7 @@
 <https://agenticsystemcore.com/concepts/item/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/item/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/item/> <https://w3id.org/agentic-system-core/ns#kind> "term"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/item/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/item/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/item/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/item/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/item/#source-1> <https://agenticsystemcore.com/> .
@@ -229,6 +239,7 @@
 <https://agenticsystemcore.com/concepts/lesson/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/lesson/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/lesson/> <https://w3id.org/agentic-system-core/ns#kind> "term"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/lesson/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/lesson/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/lesson/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/lesson/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/lesson/#source-1> <https://agenticsystemcore.com/> .
@@ -253,6 +264,7 @@
 <https://agenticsystemcore.com/concepts/link/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/link/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/link/> <https://w3id.org/agentic-system-core/ns#kind> "term"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/link/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/link/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/link/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/link/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/link/#source-1> <https://agenticsystemcore.com/> .
@@ -273,6 +285,7 @@
 <https://agenticsystemcore.com/concepts/now/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/> <https://w3id.org/agentic-system-core/ns#kind> "term"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/now/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/now/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/now/#source-1> <https://agenticsystemcore.com/> .
@@ -296,6 +309,7 @@
 <https://agenticsystemcore.com/concepts/procedure/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/procedure/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/procedure/> <https://w3id.org/agentic-system-core/ns#kind> "term"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/procedure/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/procedure/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/procedure/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/procedure/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/procedure/#source-1> <https://agenticsystemcore.com/> .
@@ -310,17 +324,18 @@
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/#source-2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Source> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/#source-2> <https://w3id.org/agentic-system-core/ns#grade> "primary"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Concept> <https://agenticsystemcore.com/> .
-<https://agenticsystemcore.com/concepts/release-version-1-0-0/> <http://www.w3.org/2004/02/skos/core#definition> "Apply the items recorded against the release candidate, run the whole vector set with the reference engine, and tag version 1.0.0, at which the reference engine may first claim a conformance Level."@en <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/release-version-1-0-0/> <http://www.w3.org/2004/02/skos/core#definition> "The items recorded against the release candidates were applied, the whole vector set was run with the reference engine, and version 1.0.0 was tagged, with the reference engine's own conformance claim."@en <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/> <http://www.w3.org/2004/02/skos/core#inScheme> <https://agenticsystemcore.com/> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/> <http://www.w3.org/2004/02/skos/core#prefLabel> "Release version 1.0.0 of the specification"@en <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/> <https://w3id.org/agentic-system-core/ns#kind> "task"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/release-version-1-0-0/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/release-version-1-0-0/#source-1> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/release-version-1-0-0/#source-2> <https://agenticsystemcore.com/> .
-<https://agenticsystemcore.com/concepts/release-version-1-0-0/> <https://w3id.org/agentic-system-core/ns#taskState> "TASK_STATE_SUBMITTED"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/release-version-1-0-0/> <https://w3id.org/agentic-system-core/ns#taskState> "TASK_STATE_COMPLETED"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/source/#source-1> <http://purl.org/dc/terms/source> "https://agenticsystemcore.com/specs/02-item/#AGSC-02-10"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/source/#source-1> <http://purl.org/dc/terms/title> "AGSC-02-10"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/source/#source-1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Source> <https://agenticsystemcore.com/> .
@@ -336,6 +351,7 @@
 <https://agenticsystemcore.com/concepts/source/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/source/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/source/> <https://w3id.org/agentic-system-core/ns#kind> "term"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/concepts/source/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/source/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/source/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/concepts/source/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/concepts/source/#source-1> <https://agenticsystemcore.com/> .
@@ -353,6 +369,7 @@
 <https://agenticsystemcore.com/procedures/publish-a-level-0-node/> <http://www.w3.org/2004/02/skos/core#prefLabel> "Publish a Level-0 node"@en <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/procedures/publish-a-level-0-node/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/procedures/publish-a-level-0-node/> <https://schema.org/usageInfo> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/procedures/publish-a-level-0-node/> <https://w3id.org/agentic-system-core/ns#model> "Claude (Anthropic)"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/procedures/publish-a-level-0-node/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/procedures/publish-a-level-0-node/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/procedures/publish-a-level-0-node/> <https://w3id.org/agentic-system-core/ns#source> <https://agenticsystemcore.com/procedures/publish-a-level-0-node/#source-1> <https://agenticsystemcore.com/> .

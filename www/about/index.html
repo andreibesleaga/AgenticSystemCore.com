@@ -7,9 +7,11 @@
 <meta name="description" content="Who writes AgenticSystemCore, how to read this node, the status of the specification and how to get in touch.">
 <link rel="canonical" href="https://agenticsystemcore.com/about/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/about/">
 <meta property="og:title" content="About">
@@ -123,8 +125,16 @@
 <li><code>validate-wellknown &lt;file&gt; --level 2</code></li>
 <li><code>follow rel=&quot;describedby&quot; from any page</code></li>
 </ol>
+<h3 id="quickstart-p12">P12 &#8212; Self-driving team on a live board</h3>
+<ol>
+<li><code>author task items in a cluster</code></li>
+<li><code>agsc build   (the board renders as a page and a JSON file)</code></li>
+<li><code>agsc mcp</code></li>
+<li><code>call propose with a task_state to claim or move a task</code></li>
+<li><code>a person reviews and merges the proposal</code></li>
+</ol>
 <h2 id="status">Status</h2>
-<p>The specification is at release candidate <code>1.0.0-rc.7</code>. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no standards body has reviewed or adopted it. Every machine-readable file on this site is written by the reference engine, from this repository's own content: the graph in its three forms, the search index, the chunk export, the skill packs, the item source views, the NOW state, the derived ledger and the discovery document. The pages you are reading are written by this repository's own generator, which keeps this site's own page layout. The <a href="/docs/status/">status page</a> lists what is live and what is not. The <a href="/changelog/">changelog</a> lists every content version of this node.</p>
+<p>The specification is at version <code>1.0.0</code>. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no standards body has reviewed or adopted it. Every machine-readable file on this site is written by the reference engine, from this repository's own content: the graph in its three forms, the search index, the chunk export, the skill packs, the item source views, the NOW state, the derived ledger and the discovery document. The pages you are reading are written by this repository's own generator, which keeps this site's own page layout. The <a href="/docs/status/">status page</a> lists what is live and what is not. The <a href="/changelog/">changelog</a> lists every content version of this node.</p>
 <h2 id="limits">Limits</h2>
 <p>The specification states its own limit (<a class="ref" href="/specs/08-governance/#AGSC-08-19">AGSC-08-19</a>):</p>
 <blockquote>

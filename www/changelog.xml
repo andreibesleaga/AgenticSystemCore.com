@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>AgenticSystemCore releases</title>
+<link>https://agenticsystemcore.com/changelog/</link>
+<description>Each release of the AgenticSystemCore specification and its reference engine, newest first, with a short summary and a link to its change log.</description>
+<language>en</language>
+<atom:link href="https://agenticsystemcore.com/changelog.xml" rel="self" type="application/rss+xml"/>
+<item>
+<title>1.0.0</title>
+<link>https://github.com/andreibesleaga/agentic-system-core/blob/1.0.0/CHANGELOG.md#100---2026-10-14</link>
+<guid isPermaLink="false">1.0.0</guid>
+<pubDate>Wed, 14 Oct 2026 10:21:52 GMT</pubDate>
+<description>&lt;ul&gt;&lt;li&gt;Version 1.0.0 adds one section, §0.7, which lists the documents the rules already cite normatively, and adds, renumbers and removes no rule: a Bundle that conforms to the last release candidate conforms to it, unless it breaks one of the rules the change log lists as now reported.&lt;/li&gt;&lt;li&gt;Defect fixes against rules that already stood, in the engine and in both discovery checkers, each proved by a test written first.&lt;/li&gt;&lt;li&gt;Every clarified rule carries a dated amendment note, and the change log lists every rule amended since the last release candidate.&lt;/li&gt;&lt;li&gt;The vocabulary is inside OWL 2 RL and OWL 2 DL; its fixed copy /ns/1.0.0/ is served beside the frozen /ns/1.0.0-draft.1/.&lt;/li&gt;&lt;li&gt;New conformance cases, a new export area among them, each passed by the engine and cross-checked by the Python checker where it runs the case.&lt;/li&gt;&lt;li&gt;The reference engine publishes its own Level-3 conformance claim.&lt;/li&gt;&lt;li&gt;Security: agsc-host writes nothing outside the Bundle, its local server refuses a request for a foreign host name, and the slow patterns found on hostile input are linear scans.&lt;/li&gt;&lt;li&gt;Continuous integration: a coverage gate inside a required leg, both packages packed and installed on every leg, Node 26 and a weekly run.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/andreibesleaga/agentic-system-core/blob/1.0.0/CHANGELOG.md#100---2026-10-14&quot;&gt;The change log of 1.0.0&lt;/a&gt;, every change in full. &lt;a href=&quot;https://agenticsystemcore.com/changelog/&quot;&gt;The content versions of this site&lt;/a&gt;.&lt;/p&gt;</description>
+</item>
+<item>
+<title>1.0.0-rc.7</title>
+<link>https://github.com/andreibesleaga/agentic-system-core/blob/1.0.0-rc.7/CHANGELOG.md#100-rc7---2026-10-08</link>
+<guid isPermaLink="false">1.0.0-rc.7</guid>
+<pubDate>Thu, 08 Oct 2026 07:45:25 GMT</pubDate>
+<description>&lt;ul&gt;&lt;li&gt;A release candidate of defect fixes, clarifications and documentation: a Bundle that conforms to the previous candidate keeps building.&lt;/li&gt;&lt;li&gt;lint, build and ci now refuse or warn about input that was already outside the rules, such as a build folder inside content/ or dist/, or a site address with a path.&lt;/li&gt;&lt;li&gt;The agent skill: a SKILL.md with two reference files, also shipped as a Claude Code plugin with a plugin marketplace file.&lt;/li&gt;&lt;li&gt;server.json, the entry that lists the local tool server in the MCP Registry.&lt;/li&gt;&lt;li&gt;Six short guides, one per mode, each run as a test on every change and shipped in the npm package.&lt;/li&gt;&lt;li&gt;The Internet-Draft on the discovery layer, posted as an individual Internet-Draft.&lt;/li&gt;&lt;li&gt;Conformance cases for the tool server's resources and prompt, its seven tools and the Level-2 discovery document.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/andreibesleaga/agentic-system-core/blob/1.0.0-rc.7/CHANGELOG.md#100-rc7---2026-10-08&quot;&gt;The change log of 1.0.0-rc.7&lt;/a&gt;, every change in full. &lt;a href=&quot;https://agenticsystemcore.com/changelog/&quot;&gt;The content versions of this site&lt;/a&gt;.&lt;/p&gt;</description>
+</item>
+<item>
+<title>1.0.0-rc.6</title>
+<link>https://github.com/andreibesleaga/agentic-system-core/blob/1.0.0-rc.6/CHANGELOG.md#100-rc6---2026-09-29</link>
+<guid isPermaLink="false">1.0.0-rc.6</guid>
+<pubDate>Tue, 29 Sep 2026 18:27:57 GMT</pubDate>
+<description>&lt;ul&gt;&lt;li&gt;The specification made public as a release candidate: twelve chapters of numbered rules, three JSON Schemas, an OWL 2 RL vocabulary and expected-byte conformance vectors.&lt;/li&gt;&lt;li&gt;The reference engine, agentic-system-core on npm with the short alias agsc-cli: the agsc command line lints a Bundle, builds it into a static knowledge node and composes items into a Harness.&lt;/li&gt;&lt;li&gt;A local MCP tool server, and the same seven tools in every published page.&lt;/li&gt;&lt;li&gt;The nine independent checkers: seven validators and two generators that anyone can run against any distribution of the format.&lt;/li&gt;&lt;li&gt;The Python package agentic-system-core on PyPI: the discovery checker, the conformance-vector runner and a small reading API.&lt;/li&gt;&lt;li&gt;This site, with the specification's pages, the profile page and the namespace pages the vocabulary's identifiers resolve to.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/andreibesleaga/agentic-system-core/blob/1.0.0-rc.6/CHANGELOG.md#100-rc6---2026-09-29&quot;&gt;The change log of 1.0.0-rc.6&lt;/a&gt;, every change in full. &lt;a href=&quot;https://agenticsystemcore.com/changelog/&quot;&gt;The content versions of this site&lt;/a&gt;.&lt;/p&gt;</description>
+</item>
+</channel>
+</rss>

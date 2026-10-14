@@ -7,9 +7,11 @@
 <meta name="description" content="The AgenticSystemCore product requirements (PRD): personas, EARS requirements PRD-001 to PRD-065, non-functional requirements NFR-01 to NFR-13, non-goals and amendments.">
 <link rel="canonical" href="https://agenticsystemcore.com/docs/requirements/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/docs/requirements/">
 <meta property="og:title" content="Requirements">
@@ -64,11 +66,23 @@
 <tr><td>P11</td><td>Standards implementer</td><td>Adopt the discovery format on my site</td></tr>
 <tr><td>P12</td><td>Self-driving team (Mode 5)</td><td>Let agents and people plan, claim and finish a project's tasks on one live board until it is done</td></tr>
 </tbody></table></div>
+<h3 id="section-1-1">1.1 Amendment 12 — three more personas (2026-10-09)</h3>
+<p>The rows above stand as written; these three are added. Each one uses requirements this
+document already carries, so no requirement id is added, and each has a feature file of its own
+under <code>features/</code> (persona-m, persona-n and persona-o).</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 2"><table>
+<thead><tr><th scope="col">#</th><th scope="col">Persona</th><th scope="col">Job to be done</th><th scope="col">Modes</th><th scope="col">Requirements it exercises</th></tr></thead>
+<tbody>
+<tr><td>P13</td><td>Security reviewer or auditor</td><td>Judge whether a node and its engine can be trusted, from evidence I can run again offline: the ledger and its anchor, the security contact, the fence around untrusted prose, the secret and personal-data checks, the served headers, and what the tools do with hostile input</td><td>0 and 1 (the reviewer reads every mode the same way)</td><td>PRD-005, PRD-023, PRD-047, PRD-050, PRD-053, PRD-062, PRD-065, NFR-07</td></tr>
+<tr><td>P14</td><td>Researcher</td><td>Measure a node with the shipped kit, offline, get the same numbers every time, and cite exactly the node, its content version, the specification version and the engine I measured</td><td>0 and 1</td><td>PRD-010, PRD-022, PRD-047, PRD-060, NFR-04, NFR-05</td></tr>
+<tr><td>P15</td><td>Restricted publisher</td><td>Say in public that my node exists and where a reader asks for access, while its content stays gated, and still pass the conformance checks on the public view</td><td>0</td><td>PRD-024, PRD-057</td></tr>
+</tbody></table></div>
 <p>---</p>
 <h2 id="2-functional-requirements-ears">2. Functional requirements (EARS)</h2>
 <p>Scope: <strong>v1</strong> = must; <strong>should</strong> = S1–S8; <strong>v1.x</strong> = later. Every <code>should</code> and <code>v1.x</code> cell reads as v1.0 (Amendment 6).</p>
+<p><em>Note (2026-10-10): the cells that do not read as v1.0 are listed in the &quot;Note to the scope cells that Amendment 6 reads as v1.0&quot; near the end of this document; the capabilities planned for 1.1 are in the &quot;Notes at 1.0.0&quot; after it.</em></p>
 <h3 id="section-2-1">2.1 Cross-cutting: engine &amp; CLI</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 2"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 3"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Acceptance</th><th scope="col">Scope</th></tr></thead>
 <tbody>
 <tr id="PRD-001"><td>PRD-001</td><td>WHEN a verb is invoked, THE SYSTEM SHALL support exactly <code>init lint build verify ci export import compose propose review refresh skills mcp</code>, rejecting others.</td><td>13 names; unknown verb exits 2.</td><td>v1</td></tr>
@@ -83,7 +97,7 @@
 <tr id="PRD-010"><td>PRD-010</td><td>THE SYSTEM SHALL ship normative <code>spec/00–09</code> and ≥10 <code>tests/vectors/</code> so any language can reimplement the format from files alone.</td><td>Each spec section has ≥1 vector.</td><td>v1 (<code>conform</code>, <code>/conformance/</code>: v1.x)</td></tr>
 </tbody></table></div>
 <h3 id="section-2-2">2.2 Mode 0: auto-wiki (default, no LLM)</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 3"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 4"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Acceptance</th><th scope="col">Scope</th></tr></thead>
 <tbody>
 <tr id="PRD-011"><td>PRD-011</td><td>WHEN <code>build</code> runs, THE SYSTEM SHALL emit the fixed route set (<code>/</code>, <code>/concepts/</code>, <code>/clusters/</code>, <code>/search/</code>, <code>/now/</code>, <code>/lessons/</code>, <code>/compose/</code>, <code>/skills/</code>, <code>/specs/</code>, <code>/ns/</code>, <code>/about/</code>, <code>/legal/</code>, <code>/graph.*</code>, <code>/llms.txt</code>, <code>/.well-known/*</code>, 404) into <code>www/</code>.</td><td>Route snapshot.</td><td>v1</td></tr>
@@ -99,10 +113,10 @@
 <tr id="PRD-021"><td>PRD-021</td><td>WHEN <code>import --from old-site</code> runs, THE SYSTEM SHALL convert 153 cards, 110 Clusters, diagrams and resources deterministically and idempotently, keeping <code>status</code>/<code>release</code>, refusing <code>bookRef</code>.</td><td>Re-run no-op; 66 render, 87 dark; the maintainer approves a 10-card sample first.</td><td>v1</td></tr>
 </tbody></table></div>
 <h3 id="section-2-3">2.3 Mode 1: distributed agentic memory</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 4"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 5"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Acceptance</th><th scope="col">Scope</th></tr></thead>
 <tbody>
-<tr id="PRD-022"><td>PRD-022</td><td>WHEN <code>build</code> runs, THE SYSTEM SHALL emit the graph as JSON-LD, Turtle and N-Quads plus per-item <code>.md</code>/<code>.jsonld</code>.</td><td>Blank-node-free; sorted N-Quads in the specification's own canonical form (<em>note 2026-10-02:</em> the same quads as RDFC-1.0 output, four terms written differently; no RDFC-1.0 claim, <a class="ref" href="/specs/04-canonicalization/#AGSC-04-16">AGSC-04-16</a>).</td><td>v1 (RDF/XML: should S1)</td></tr>
+<tr id="PRD-022"><td>PRD-022</td><td>WHEN <code>build</code> runs, THE SYSTEM SHALL emit the graph as JSON-LD, Turtle and N-Quads plus per-item <code>.md</code>/<code>.jsonld</code>.</td><td>Blank-node-free; sorted N-Quads in the specification's own canonical form (<em>note:</em> the same quads as RDFC-1.0 output, four terms written differently; no RDFC-1.0 claim, <a class="ref" href="/specs/04-canonicalization/#AGSC-04-16">AGSC-04-16</a>).</td><td>v1 (RDF/XML: should S1)</td></tr>
 <tr id="PRD-023"><td>PRD-023</td><td>WHEN <code>agsc mcp</code> starts, THE SYSTEM SHALL serve a local stdio JSON-RPC server exposing exactly <code>search read links compose propose</code> over the static exports.</td><td>Five tools; results carry <code>source/trust/license</code>.</td><td>v1 (remote MCP: not at v1)</td></tr>
 <tr id="PRD-024"><td>PRD-024</td><td>THE SYSTEM SHALL publish one <code>/.well-known/knowledge-linkset</code> as a conformant RFC 9264 link set (<code>linkset</code> the sole member) served as <code>application/linkset+json</code> with the profile URI <code>https://w3id.org/agentic-system-core/profile/agentic-knowledge</code>, carrying RFC 9530 <code>digest</code> and <code>agsc-*</code> extension target attributes (bundle facts on the anchor's <code>describedby</code> link, ledger head on <code>rel#ledger</code>).</td><td>Link set resolves and validates as <code>application/linkset+json</code>; every <code>digest</code> recomputes; the profile is conveyed by the media-type parameter or by <code>Link: …; rel=&quot;profile&quot;</code>.</td><td>v1</td></tr>
 <tr id="PRD-025"><td>PRD-025</td><td>THE SYSTEM SHALL publish <code>llms.txt</code>, <code>llms-full.txt</code> and per-item Markdown for non-MCP agents.</td><td>Every item reachable from <code>llms.txt</code>.</td><td>v1</td></tr>
@@ -110,7 +124,7 @@
 <tr id="PRD-027"><td>PRD-027</td><td>WHERE <code>memory://&lt;bundle&gt;/&lt;slug&gt;</code> appears, THE SYSTEM SHALL document it as an alias of the HTTPS IRI, not resolve it.</td><td>Alias-only; no resolver.</td><td>v1 (resolver: v2)</td></tr>
 </tbody></table></div>
 <h3 id="section-2-4">2.4 Mode 2: live specs / SDLC memory</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 5"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 6"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Acceptance</th><th scope="col">Scope</th></tr></thead>
 <tbody>
 <tr id="PRD-028"><td>PRD-028</td><td>WHERE a Bundle records a project's own work, THE SYSTEM SHALL accept Concept <code>kind ∈ principle|decision|spec|task|term</code> plus Gate and Episode items, adding no type.</td><td>Kinds accepted; no new type.</td><td>v1 (typed Mode-2 links: v2)</td></tr>
@@ -119,7 +133,7 @@
 <tr id="PRD-031"><td>PRD-031</td><td>WHEN a Gate item declares <code>checks[]</code>, THE SYSTEM SHALL compile it into a required CI status check.</td><td>Gate page ↔ named required check.</td><td>v1 (hooks/CODEOWNERS: v1.x)</td></tr>
 </tbody></table></div>
 <h3 id="section-2-5">2.5 Mode 3: evolutive skills wiki</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 6"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 7"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Acceptance</th><th scope="col">Scope</th></tr></thead>
 <tbody>
 <tr id="PRD-032"><td>PRD-032</td><td>WHEN <code>build</code> runs, THE SYSTEM SHALL emit one Skill pack per Cluster plus <code>/skills/index.json</code>, each declaring its licence.</td><td>20 packs + index; <code>description</code> ≤1024.</td><td>v1</td></tr>
@@ -128,7 +142,7 @@
 <tr id="PRD-035"><td>PRD-035</td><td>THE SYSTEM SHALL emit skills as content only — no scripts, executables, symlinks, <code>allowed-tools</code> — with a sha256 lockfile.</td><td>Lint rejects executables; lockfile verifies.</td><td>v1</td></tr>
 </tbody></table></div>
 <h3 id="section-2-6">2.6 Mode 4: runnable knowledge</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 7"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 8"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Acceptance</th><th scope="col">Scope</th></tr></thead>
 <tbody>
 <tr id="PRD-036"><td>PRD-036</td><td>WHEN Concepts are composed, THE SYSTEM SHALL apply <code>requires</code> closure, <code>excludes</code> mutex, <code>uses</code>/<code>contradicts</code> warnings, <code>supersedes</code> hiding, explaining each addition and conflict.</td><td>Fixtures give documented verdicts.</td><td>v1</td></tr>
@@ -136,7 +150,7 @@
 <tr id="PRD-038"><td>PRD-038</td><td>WHILE a user is on <code>/compose/</code>, THE SYSTEM SHALL run the CLI's composition core in the browser with downloadable outputs, no server.</td><td>Node = browser (test); no Node imports in core.</td><td>v1</td></tr>
 </tbody></table></div>
 <h3 id="section-2-7">2.7 Governance &amp; provenance</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 8"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 9"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Acceptance</th><th scope="col">Scope</th></tr></thead>
 <tbody>
 <tr id="PRD-039"><td>PRD-039</td><td>WHEN <code>propose</code> runs, THE SYSTEM SHALL write a patch plus PR body locally and print the commands, never pushing.</td><td>No network write.</td><td>v1</td></tr>
@@ -150,7 +164,7 @@
 <tr id="PRD-047"><td>PRD-047</td><td>THE SYSTEM SHALL ship the hygiene set (<code>SECURITY.md</code>, <code>security.txt</code>, CoC, <code>CITATION.cff</code>, CONTRIBUTING, GOVERNANCE) and a REUSE layout.</td><td>Presence test.</td><td>v1</td></tr>
 </tbody></table></div>
 <h3 id="section-2-8">2.8 Distribution &amp; delivery</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 9"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 10"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Acceptance</th><th scope="col">Scope</th></tr></thead>
 <tbody>
 <tr id="PRD-048"><td>PRD-048</td><td>WHEN the maintainer pushes a tag, THE SYSTEM SHALL publish <code>agentic-system-core</code> (bin <code>agsc</code>) and the <code>agsc-cli</code> alias with attestations from one hand-versioned source.</td><td>Tag-triggered; CI writes the alias version.</td><td>v1 (PyPI/GHCR/Homebrew/Nix: v1.x; binaries: v2)</td></tr>
@@ -161,14 +175,14 @@
 </tbody></table></div>
 <p>---</p>
 <h3 id="2-9a-amendment-2-independent-validators-document-generators">2.9a Amendment 2 — independent validators &amp; document generators</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 10"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 11"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Acceptance</th><th scope="col">Scope</th></tr></thead>
 <tbody>
 <tr id="PRD-054"><td>PRD-054</td><td>THE SYSTEM SHALL ship <strong>independent validator scripts</strong> under <code>tools/</code> — each a standalone, engine-independent check runnable by anyone (ports, reviewers, IANA/ISE experts) analogous to the I-D toolchain (idnits/xml2rfc): <code>tools/validate-schemas</code> (meta-validate <code>schema/*.json</code> against 2020-12), <code>tools/validate-spec</code> (&quot;specnits&quot;: rule-id uniqueness AGSC-xx-nn, MUST/SHOULD grammar, trace-tag presence, error-code closure vs spec/09, cross-reference resolution), <code>tools/validate-ontology</code> (Turtle well-formedness + OWL 2 RL-safe axiom allowlist + SKOS pitfalls S19/S32/S37), <code>tools/validate-vectors</code> (vector-format schema + every <code>rule</code> resolves + JCS order), <code>tools/validate-wellknown &lt;url|file&gt; [--level N] [--peer &lt;url|file&gt;]</code> (RFC 9264 link-set shape, profile transport, every <code>digest</code>, the REQUIRED <code>agsc-*</code> target attributes, and the <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a> mutual federation check — there is no separate federation validator), <code>tools/validate-features</code> (Gherkin parse + @PRD tag ↔ PRD-id closure), <code>tools/validate-diagrams</code> (Mermaid parse + trace-id presence + staleness vs source docs) — all Node stdlib, zero deps, exit 0/1, <code>--json</code>; plus <strong>generators</strong>: <code>tools/gen-spec-html</code> (spec/ → <code>/specs/</code> pages), <code>tools/gen-ns</code> (deterministic <code>context.jsonld</code> + <code>agsc.rdf</code> + <code>/ns/</code> index from <code>ontology/agsc.ttl</code>, sorted per <a class="ref" href="/specs/05-graph/#AGSC-05-10">AGSC-05-10</a> and round-tripped against the Turtle) and, at P-RFC, kramdown-rfc → xml2rfc → idnits for the I-D. CI runs every validator on every PR.</td><td>Each tool runs standalone on a fresh clone; breaking any invariant fails the matching tool; all green in CI.</td><td><strong>v1</strong> (M13 + one per milestone that creates its target)</td></tr>
 </tbody></table></div>
 <p><em>Design bar: simplest possible usage (P0: three commands) AND simplest implementation, all five modes on one core, every artifact standardizable, and RFC/spec publication-readiness treated as a first-class design criterion (validators above are the proof).</em></p>
 <h3 id="section-2-9">2.9 Amendment 1 — the drop-in zero-config case</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 11"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 12"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Acceptance</th><th scope="col">Scope</th></tr></thead>
 <tbody>
 <tr id="PRD-053"><td>PRD-053</td><td>WHEN <code>init</code> runs in a directory containing plain Markdown files without frontmatter, THE SYSTEM SHALL <strong>adopt</strong> them: insert minimal valid frontmatter in place (<code>type: concept</code>, <code>kind: explainer</code>, <code>title</code> from the first <code>#</code> heading else the filename, <code>prov: {origin: human, operator}</code> from config or git identity), preserving every body byte verbatim and never overwriting existing frontmatter — so that a user who just drops <code>.md</code> files reaches a fully working online wiki / ontologic memory (site + graph + llms.txt + well-known + MCP-readable exports) in ≤3 commands: <code>npx agentic-system-core init</code> → <code>npx agentic-system-core ci</code> → publish (<code>git push</code> with the generated workflow, or upload <code>www/</code>).</td><td>Fixture dir of 3 bare <code>.md</code> → adopt → <code>ci</code> green offline → all Mode-0/1 surfaces emitted; re-run is a no-op; a file WITH frontmatter is untouched.</td><td><strong>v1</strong> (M1/M3)</td></tr>
@@ -176,7 +190,7 @@
 <p><em>This is the front-door scenario of the product (persona P0 &quot;drop-in user&quot;: &quot;I have notes; I want a living, linked, agent-readable wiki with zero configuration&quot;). It precedes every other flow in quickstarts and on the site home.</em></p>
 <h3 id="2-9b-amendment-3-restatements-not-rewrites">2.9b Amendment 3 — restatements, not rewrites</h3>
 <p>The rows above stand verbatim. Two of them are <strong>restated</strong> here; where a restatement and the row differ in mechanism, the restatement governs the specification and the engine.</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 12"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 13"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Restatement</th><th scope="col">Acceptance</th></tr></thead>
 <tbody>
 <tr><td>PRD-005 (restated)</td><td>WHEN <code>build</code>/<code>ci</code> completes, THE SYSTEM SHALL <strong>derive</strong> the whole hash-chained <code>ledger.jsonl</code> from the git history of the content branch and write it into the build output and the release assets — never appending to a stored file, never committing it from CI — and SHALL publish its head as the <code>agsc-ledger-head</code> target attribute of the <code>…/rel#ledger</code> link in the well-known file, re-verifiable offline via <code>verify --ledger</code>, which recomputes the chain <strong>and</strong> compares the head.</td><td>Tampered or truncated file fails; head published and attested; two builds of one history are byte-identical; no CI commit to the content branch.</td></tr>
@@ -188,20 +202,20 @@
 <li><strong>Scope.</strong> The Scope cell reads &quot;v1 (M1/M3)&quot;, but <code>init</code> is built in M7. The adoption half — pure frontmatter synthesis plus relocation over the M1 parser, ≈0.3 d — lands in <strong>M1</strong> as <code>init --adopt</code>; the scaffold half (<code>init --host cloudflare</code>) stays in <strong>M7</strong>. No requirement changes; only where the work sits.</li>
 </ul>
 <h3 id="2-9b-amendment-4-implementable-anywhere">2.9b Amendment 4 — implementable anywhere</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 13"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 14"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Acceptance</th><th scope="col">Scope</th></tr></thead>
 <tbody>
 <tr id="PRD-055"><td>PRD-055</td><td>THE SYSTEM SHALL be implementable in any language, framework or existing software (CMS, wiki, KB, note tool) from its specs alone: <code>spec/10-implementation-profiles.md</code> defines conformance Levels 0–3 (Publisher / Reader / Writer-Exporter / Full engine) with the exact rule subset and vector set per level, and <code>docs/IMPLEMENTERS-GUIDE.md</code> gives a ≤10-step path plus a platform mapping table, so that a third party can publish their linked knowledge as a node, export packages/skills/graphs, expose <code>memory://</code> aliases over their own KB, and import ours — validated by the shipped <code>tools/</code> validators without our engine.</td><td>A Level-0 node built from a plain CMS export passes <code>validate-wellknown</code> + <code>validate-vectors</code> (Level-0 subset) with zero engine code; guide followed end-to-end by a reviewer on a non-Node stack in the M14 dogfood.</td><td><strong>v1</strong> (spec/10 at S03 close; guide at M14)</td></tr>
 </tbody></table></div>
 <h3 id="2-9c-amendment-5-channel-adapters-ingest-ask">2.9c Amendment 5 — channel adapters: ingest &amp; ask</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 14"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 15"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Acceptance</th><th scope="col">Scope</th></tr></thead>
 <tbody>
 <tr id="PRD-056"><td>PRD-056</td><td>THE SYSTEM SHALL define a <code>Channel</code> port with plugin adapters so that (a) notes/messages from external systems (Google Keep, Microsoft OneNote/Sticky Notes, Telegram, WhatsApp, e-mail, other exports/bot inboxes) are <strong>ingested</strong> as Markdown items through CI (<code>refresh --ingest &lt;adapter&gt;</code>) as Proposals, per channel either <code>auto</code> (lint green → optional AI-correct within the LLM cap → merge with <code>prov.origin: ai-assisted</code>) or <code>hitl</code> (author review before publish — default); and (b) the same channels can <strong>ask</strong> the memory: a plugin responder answers from the wiki's exports only (Level-1 reader / local MCP), every answer citing item IRIs, LLM optional. Port + spec + reference stub in v1; first adapters v1.x.</td><td>Port interfaces + <a class="ref" href="/specs/01-bundle/#AGSC-01-30">AGSC-01-30</a>..33/09-14a in spec; stub adapter round-trips a fixture message → Proposal (hitl) and → merged item (auto, lint-only); ask stub returns cited answers over the fixture Bundle; no server code in v1.</td><td><strong>v1</strong> (port+spec+stub, M12) · adapters v1.x</td></tr>
 </tbody></table></div>
 <p><strong>Note to PRD-041 / PRD-042 / PRD-044 (the rows stand).</strong> Human ratification stays the rule and bot commits stay forbidden, with <strong>one</strong> configured exception: a pull request that satisfies every condition of <a class="ref" href="/specs/08-governance/#AGSC-08-26"><code>AGSC-08-26</code></a> — opened by the channel's registered forge identity <code>channels[].author</code>, changing only <code>content/**</code> items of <code>type ∈ concept|episode|lesson</code> (never a <code>procedure</code>, which becomes a <code>SKILL.md</code> pack and <code>--steer</code> content) whose <code>prov.operator</code> equals <code>channels[].owner</code> from <code>agsc.config.json</code>, carrying <code>prov.agent</code> so the N9 lints run at <code>error</code> severity, lint-green, merged by the channel owner's <strong>separate</strong> <code>CHANNEL_MERGE_TOKEN_&lt;name&gt;</code> in <code>review.yml</code>'s <code>auto-merge</code> job, the only identity on the ruleset bypass list and one the ingest job cannot reach (<a class="ref" href="/specs/08-governance/#AGSC-08-26">AGSC-08-26</a>(f), <a class="ref" href="/specs/01-bundle/#AGSC-01-30">AGSC-01-30</a>). That merge is the channel owner's <strong>standing</strong> ratification recorded in configuration (<code>publish: auto</code>), not an agent approving and not CI committing; it is revocable by editing one config key, it never touches config, workflows, schemas or Gates, and it writes a <code>Channel-Auto:</code> trailer so the derived ledger records <code>mode: auto</code>. <code>refresh</code> still opens issues, never commits; <code>propose</code> still performs no network write — the ingest job does, with the channel owner's token.</p>
 <h2 id="3-non-functional-requirements">3. Non-functional requirements</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 15"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 16"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Acceptance</th></tr></thead>
 <tbody>
 <tr id="NFR-01"><td>NFR-01</td><td>THE SYSTEM SHALL have zero runtime dependencies (<code>node:</code> builtins, Node ≥22.14).</td><td><code>npm ls --prod</code> empty.</td></tr>
@@ -249,7 +263,7 @@
 <p><strong>Note:</strong> PRD-001's thirteen verbs READ AS the <strong>sixteen</strong> of <a class="ref" href="/specs/09-conformance/#AGSC-09-07">AGSC-09-07</a> — <code>init lint build verify ci export import compose propose review refresh skills mcp run trace conform</code> — <code>run</code> and <code>trace</code> being opt-in and disabled by default (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-09-94">AGSC-09-94</a>). The &quot;13 names&quot; acceptance cell reads &quot;16 names&quot;.</p>
 <p><strong>Note:</strong> &quot;nine Links&quot; in the rows READS AS &quot;fourteen Links (nine core, which drive composition, + five Mode-2: implements, verifies, covers, blocked-by, decided-by)&quot; per <a class="ref" href="/specs/03-links/#AGSC-03-01">AGSC-03-01</a>.</p>
 <h3 id="2-9e-amendment-7-federation-contribution-diagrams-determinism-scope">2.9e Amendment 7 — federation, contribution, diagrams, determinism scope</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 16"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 17"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement (EARS)</th><th scope="col">Acceptance</th><th scope="col">Version</th></tr></thead>
 <tbody>
 <tr id="PRD-057"><td>PRD-057</td><td>THE SYSTEM SHALL specify federation as a protocol section of the discovery layer: peer declaration, mutual conformance, cross-origin readability of public artefacts, safe peer fetching (HTTPS except loopback; private/loopback/link-local ranges blocked in both address families; redirect hops validated; scheme allow-list; hop limit 3; per-hop fan-out cap 50; per-walk request cap 500; unreachable peer = defined code), untrusted marking of peer-derived prose naming its origin, cross-node citation via <code>references[].url</code> emitted as <code>rdfs:seeAlso</code> (never a Link), client-side federated query, federated contribution and federated boards; Links MUST NOT cross Bundles at 1.0.</td><td>vectors under <code>tests/vectors/boundary/</code>; <code>validate-wellknown --peer</code> both ways; a 3-hop walk stops at the caps.</td><td>v1</td></tr>
@@ -263,7 +277,7 @@
 <p><strong>Note:</strong> PRD-062's <code>Link</code> header carries the registered relation <code>describedby</code> with <code>type=&quot;application/linkset+json&quot;</code> — no relation is requested from IANA (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-25">AGSC-06-25</a>); PRD-057's cross-node citation requires a pinned IRI normalisation for <code>references[].url</code> objects; PRD-060's cross-implementation set includes a <code>search.json</code> vector with an astral-plane token sorted by UTF-16 code units.</p>
 <p><strong>Note:</strong> (a) §4's &quot;No remote MCP&quot; reads, like the two re-readings above, as <em>not served at 1.0; MAY be declared as a <code>responder</code> surface</em> (<a class="ref" href="/specs/11-boundary/#AGSC-11-21">AGSC-11-21</a>) — the declaration is a hook, its bytes are pinned by the external specification, and a static reader never depends on it. (b) PRD-057's <code>references[].url</code> denotes <code>sources[].resource</code> — the item model has one citation array (<a class="ref" href="/specs/02-item/#AGSC-02-10">AGSC-02-10</a>), and <a class="ref" href="/specs/11-boundary/#AGSC-11-12">AGSC-11-12</a> says so; the peer base is derived from the declared well-known URL, never fetched. (c) PRD-059's &quot;un-minified with stable ids&quot; is an obligation of the M3 importer and the DSL→SVG compiler, not a conformance rule of the format; <a class="ref" href="/specs/02-item/#AGSC-02-98">AGSC-02-98</a> pins the safety allow-list, and <code>lint-0024</code> proves it. (d) PRD-060's astral-plane evidence is <code>jcs-0003</code> at the JCS level; the full <code>search.json</code> case is <code>build-0003</code>. (e) PRD-062's <code>ETag</code> is the quoted digest (RFC 9110), and <code>Cache-Control: immutable</code> is reserved until a digest-named route exists (<a class="ref" href="/specs/11-boundary/#AGSC-11-05">AGSC-11-05</a>).</p>
 <h3 id="2-9f-amendment-8-the-agent-lane-and-mode-5-the-live-board">2.9f Amendment 8 — the agent lane and Mode 5, the live board</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 17"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 18"><table>
 <thead><tr><th scope="col">ID</th><th scope="col">Requirement (EARS)</th><th scope="col">Acceptance</th><th scope="col">Version</th></tr></thead>
 <tbody>
 <tr id="PRD-063"><td>PRD-063</td><td>WHERE an <code>agents[]</code> entry is enabled, THE SYSTEM SHALL let a model-driven or programmatic agent create, edit, update, review, summarize, translate, refresh, plan, claim and work on items <strong>non-deterministically</strong>, always as Proposals through the entry's channel, never as a write; with <code>publish: auto</code> on that channel the node is self-driving under every guard of <a class="ref" href="/specs/08-governance/#AGSC-08-26">AGSC-08-26</a>, the budget and the type set (never a procedure, gate, cluster, configuration, workflow or schema); every run is an Episode with <code>usage</code>; <code>lint</code>, <code>build</code>, <code>verify</code> and <code>ci</code> stay model-free.</td><td><code>bundle-0003/0004</code>, <code>prov-0001</code>; a run with the budget reached is <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E510"><code>AGSC-E510</code></a>; a Proposal outside the declared set is <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E509"><code>AGSC-E509</code></a>; the grep-asserted model-free lanes of NFR-11 still pass.</td><td>v1.0</td></tr>
@@ -417,6 +431,81 @@ error whenever the engine requires one of its ES-module libraries, and a warning
 MCP server's clean-stderr contract; 22.13.0 is the first 22.x release that prints it only on
 request. The development gates (the linter) need 22.13.0 as well. <code>package.json</code>, the CI matrix
 and a test that keeps the two equal carry the floor.</p>
+<h2 id="notes-at-1-0-0-2026-10-10">Notes at 1.0.0 (2026-10-10)</h2>
+<p>The rows, the amendments and the notes above stay as they were written. These notes say how
+some of them read at <code>1.0.0</code>; where one of them and an earlier note differ, the note here
+governs.</p>
+<p><strong>Note on the capabilities planned for 1.1.</strong> Eleven capabilities of the reference distribution
+are planned for 1.1 (<a class="ref" href="/specs/00-overview/#AGSC-00-20">AGSC-00-20</a>):</p>
+<p>1. an ingest stub and channel adapters (PRD-056);
+2. <code>init</code> writing example Concepts, type folders and a forge workflow, with the options
+<code>init --forge</code> and <code>init --host</code> (PRD-009, PRD-053);
+3. direct memory adapters for Mem0, Letta, Zep and CSV (PRD-026);
+4. installing skill packs into other agents' install trees, and installing them from a published
+site (PRD-033);
+5. distribution through GHCR, Homebrew and Nix, and a PyPI wrapper of the engine (PRD-048, §4);
+6. a git mirror and a weekly attested snapshot of a node (PRD-045);
+7. a model client for the review lane (PRD-041);
+8. <code>narrate</code>, a model-written narration of a composition, run on the reader's own key (§4 rules
+out a server-side one);
+9. memory adapters for Basic Memory and for Claude Code's memory files;
+10. running the engine's library on Deno, Bun and Cloudflare Workers;
+11. a model adapter for the agent lane (PRD-063).</p>
+<p>They are capabilities of the reference distribution, not parts of the format: no version
+requires a tool to ship them, and no conformance claim depends on them. They wait for 1.1
+because each one adds behaviour, and <code>1.0.0</code> adds no behaviour beyond a defect fix. So where a
+note above says of one of them &quot;not planned&quot;, &quot;not in the declared scope of any version&quot;, &quot;not
+planned for a version&quot; or &quot;planned for later, with no version fixed&quot;, or that no container
+image, Homebrew formula or Nix package &quot;is planned for a version&quot;, read &quot;planned for 1.1&quot;. §4's &quot;No functional PyPI wrapper&quot; and the note that
+keeps that non-goal for the engine read the same way: at 1.0 the PyPI package is the
+independent Python checker, and a wrapper of the engine is planned for 1.1.</p>
+<p><strong>Note to PRD-063 (a live run of an agent lane at 1.0).</strong> The Mode 5 note above says that the
+engine implements the agent lane, &quot;channels, refresh&quot; included. At 1.0 the reference engine
+ships no model adapter and no channel adapter: <code>refresh --agent &lt;name&gt;</code> runs only with
+<code>--dry-run</code>, which writes the Proposal the lane would open, with the Episode of the run, and
+calls no model; without <code>--dry-run</code> the verb refuses. A live run is made by an agent outside the
+engine — Claude Code, a script — as a client of the local tool server (<code>agsc mcp</code>) or of the
+page tools, under the rules of the lane it runs as (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a> allows both routes); the gating
+lanes stay model-free. The model adapter for the agent lane is planned for 1.1 (the note
+above). A model-adapter plugin kind beside the eight of <a class="ref" href="/specs/00-overview/#AGSC-00-24">AGSC-00-24</a> is a candidate for 1.1, since
+a new plugin kind is a change of the specification.</p>
+<p><strong>Note to PRD-027 and §4 (<code>memory://</code> at 1.0).</strong> The row's &quot;not resolve it&quot;, its acceptance
+&quot;Alias-only; no resolver&quot;, its version cell &quot;(resolver: v2)&quot; and §4's
+&quot;<code>memory://</code> = documented alias only&quot; read as follows at 1.0: the command line and the local
+tool server resolve <code>memory://&lt;bundle-id&gt;/&lt;slug&gt;</code> to the item when <code>&lt;bundle-id&gt;</code> is the Bundle's own <code>bundle.id</code>, and
+refuse another Bundle's id with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E309"><code>AGSC-E309</code></a> (<a class="ref" href="/specs/05-graph/#AGSC-05-04b">AGSC-05-04b</a>; the cases <code>graph-0005</code> and
+<code>cli-0015</code>). The alias is never dereferenced over the network and never emitted as an RDF
+subject (<a class="ref" href="/specs/05-graph/#AGSC-05-04">AGSC-05-04</a>), and the <code>https://</code> IRI may always be used instead (the note to PRD-027
+above).</p>
+<p><strong>Note to NFR-03 (the coverage bar at 1.0).</strong> The bar that continuous integration enforces on
+<code>src/</code> is higher than the row's 99 % of lines: lines 99.9 %, functions 99 % and branches 93 %,
+the thresholds of <code>npm run test:coverage</code>, which runs inside a check every pull request must
+pass (<code>test (ubuntu-latest, Node 24)</code>). <code>CONTRIBUTING.md</code> states the same three figures. The
+row's &quot;no requirement without a test&quot; is checked by <code>node tools/requirements-matrix --check</code>.
+Read &quot;coverage ≥99%&quot; in §5's definition of done the same way.</p>
+<p><strong>Note to §5, the definition of done at 1.0.0.</strong></p>
+<ul>
+<li>Item (1), &quot;persona walkthroughs (a)–(j)&quot;, reads as one walkthrough for each persona of §1 and
+§1.1: the feature files <code>persona-0</code> and <code>persona-a</code> to <code>persona-o</code> under <code>features/</code> (P0 to
+P15), which the acceptance runner executes, a scenario that needs a forge, a model or an
+outside service being listed as pending with its reason; with them, the six mode walks of
+<code>tests/e2e/modes/</code> and the runs of the guides and the demos (<code>tests/docs/</code>).</li>
+<li>Item (2): the coverage figure reads as the note to NFR-03 says.</li>
+<li>Item (4), the benchmark kit run on real data with its results and datasheet on Zenodo, is 1.1
+work, when <a class="ref" href="/specs/00-overview/#AGSC-00-20">AGSC-00-20</a> makes the kit normative. At <code>1.0.0</code> the measurement half runs
+(<code>bench/measure.js</code>, recorded in <code>docs/MEASUREMENTS.md</code>), and the kit's study belongs to the
+<code>tools/bench</code> program. Item 1 of &quot;Resolved at review&quot;,
+&quot;published benchmarks are a v1.0.1 gate within 30 days of launch&quot;, reads &quot;published
+benchmarks are 1.1 work&quot;; there is no <code>bench</code> verb and no 1.0.1 gate.</li>
+<li>Item (6), &quot;a DOI for each release&quot;, reads &quot;a DOI for each final release&quot;: the Zenodo record
+gets a version for <code>1.0.0</code> and for each later final release, and release candidates get none
+and are kept by their tags. The Internet-Draft is an individual Internet-Draft.</li>
+</ul>
+<p><strong>Note to §1, persona P10 (the areas at 1.0.0; 2026-10-11).</strong> The note to persona P10 above
+says that the Python checker distribution runs &quot;seven of the nineteen areas&quot;. At <code>1.0.0</code> the
+shared vector set has twenty populated areas, the <code>export</code> area having been added; the Python
+checker distribution runs the same seven of them natively and reports the other thirteen as
+not run by that package.</p>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/requirements.md">Propose an edit</a> — opens <code>site/docs/requirements.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">

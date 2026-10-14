@@ -7,9 +7,11 @@
 <meta name="description" content="arc42 and C4 architecture of AgenticSystemCore: quality goals, constraints, context, containers, bounded contexts, ports, runtime views, deployment, architecture decision records, quality lanes, risks and the STRIDE threat model.">
 <link rel="canonical" href="https://agenticsystemcore.com/docs/architecture/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/docs/architecture/">
 <meta property="og:title" content="Architecture">
@@ -42,7 +44,7 @@
 <p class="summary"><strong>Summary</strong>The architecture of the reference implementation in the arc42 and C4 forms: quality goals, constraints, the system in its context, containers, five bounded contexts and their ports, the runtime sequences, deployment, the decisions of record and the threat model.</p>
 <p>This page restates the frozen architecture document of the project (its first architecture baseline, arc42 with C4 views and ISO 42010 correspondence rules) for readers who are not going to read the engine's source. It adds nothing to it. The architecture satisfies the <a href="/docs/requirements/">requirements</a> and never overrides a rule of the <a href="/specs/">specification</a>; where this page and a rule disagree, the rule wins.</p>
 <h2 id="1-quality-goals-ranked">1. Quality goals, ranked</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
 <thead><tr><th scope="col">#</th><th scope="col">Quality goal</th><th scope="col">Meaning here</th><th scope="col">Requirements</th></tr></thead>
 <tbody>
 <tr><td>Q1</td><td>Correctness and determinism</td><td>Byte-identical rebuilds on every operating system; every requirement has a test; the ledger re-verifies offline</td><td><a class="ref" href="/docs/requirements/#NFR-03">NFR-03</a>, <a class="ref" href="/docs/requirements/#NFR-04">NFR-04</a>, <a class="ref" href="/docs/requirements/#NFR-05">NFR-05</a></td></tr>
@@ -53,7 +55,7 @@
 </tbody></table></div>
 <p>Two floors are never traded: the licence stack (<a class="ref" href="/docs/requirements/#NFR-10">NFR-10</a>) and the clean-room rule (<a class="ref" href="/docs/requirements/#NFR-12">NFR-12</a>).</p>
 <h2 id="2-stakeholders">2. Stakeholders</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 30"><table>
 <thead><tr><th scope="col">Who</th><th scope="col">Primary concern</th></tr></thead>
 <tbody>
 <tr><td>Human reader</td><td>Find a pattern with evidence; the site works without JavaScript</td></tr>
@@ -71,7 +73,7 @@
 <tr><td>Future port implementers in other languages</td><td>No hidden behaviour in the JavaScript; byte-level vectors; no build step</td></tr>
 </tbody></table></div>
 <h2 id="3-constraints">3. Constraints</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 30"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
 <thead><tr><th scope="col">#</th><th scope="col">Constraint</th><th scope="col">Consequence</th></tr></thead>
 <tbody>
 <tr><td>C1</td><td>Zero runtime dependencies: Node built-ins only, Node 22.14 or later <em>(superseded — see the amendment below)</em></td><td>Every parser and writer is hand-written</td></tr>
@@ -100,35 +102,35 @@
 <rect x="16" y="40" width="120" height="44" rx="6"/>
 <rect x="16" y="110" width="120" height="44" rx="6"/>
 <rect x="16" y="180" width="120" height="44" rx="6"/>
-<rect x="380" y="40" width="124" height="44" rx="6"/>
-<rect x="380" y="110" width="124" height="44" rx="6"/>
-<rect x="380" y="172" width="124" height="44" rx="6"/>
-<rect x="380" y="232" width="124" height="36" rx="6"/>
-<path d="M114.5 86.1 L222.5 153.9" marker-end="url(#ar-c4-context)"/>
+<rect x="380" y="30" width="124" height="36" rx="6"/>
+<rect x="380" y="86" width="124" height="44" rx="6"/>
+<rect x="380" y="150" width="124" height="44" rx="6"/>
+<rect x="380" y="214" width="124" height="44" rx="6"/>
 <path d="M139.9 147.9 L186.1 159.4" marker-end="url(#ar-c4-context)"/>
-<path d="M124.8 178.3 L212.2 135.7" marker-end="url(#ar-c4-context)"/>
+<path d="M140.0 193.7 L186.0 187.7" marker-end="url(#ar-c4-context)"/>
+<path d="M139.9 79.3 L186.1 91.8" marker-end="url(#ar-c4-context)"/>
 <path d="M261.0 138.0 L261.0 152.0" marker-end="url(#ar-c4-context)"/>
-<path d="M442.0 88.0 L442.0 106.0" marker-end="url(#ar-c4-context)"/>
-<path d="M376.1 148.7 L335.9 159.0" marker-end="url(#ar-c4-context)"/>
-<path d="M376.0 188.2 L336.0 184.6" marker-end="url(#ar-c4-context)"/>
-<path d="M415.2 229.6 L293.0 136.4" marker-end="url(#ar-c4-context)"/>
+<path d="M442.0 134.0 L442.0 146.0" marker-end="url(#ar-c4-context)"/>
+<path d="M376.0 174.2 L336.0 175.5" marker-end="url(#ar-c4-context)"/>
+<path d="M376.2 214.9 L333.5 201.2" marker-end="url(#ar-c4-context)"/>
+<path d="M387.3 67.3 L327.0 88.7" marker-end="url(#ar-c4-context)"/>
 </g>
 <g fill="currentColor" text-anchor="middle">
 <text x="261" y="64" font-size="11">AgenticSystemCore</text>
 <text x="261" y="116.0" font-size="12">engine (CLI)</text>
 <text x="261" y="182.0" font-size="12">static site (www/)</text>
-<text x="76" y="58.0" font-size="12">people: read,</text>
-<text x="76" y="74.0" font-size="12">contribute</text>
-<text x="76" y="128.0" font-size="12">agents: read,</text>
-<text x="76" y="144.0" font-size="12">propose</text>
-<text x="76" y="198.0" font-size="12">implementers:</text>
-<text x="76" y="214.0" font-size="12">spec + vectors</text>
-<text x="442" y="58.0" font-size="12">GitHub</text>
-<text x="442" y="74.0" font-size="12">(PRs, CI)</text>
-<text x="442" y="136.0" font-size="12">Cloudflare Pages</text>
-<text x="442" y="190.0" font-size="12">w3id.org</text>
-<text x="442" y="206.0" font-size="12">(namespace)</text>
-<text x="442" y="254.0" font-size="12">npm registry</text>
+<text x="76" y="58.0" font-size="12">implementers:</text>
+<text x="76" y="74.0" font-size="12">spec + vectors</text>
+<text x="76" y="128.0" font-size="12">people: read,</text>
+<text x="76" y="144.0" font-size="12">contribute</text>
+<text x="76" y="198.0" font-size="12">agents: read,</text>
+<text x="76" y="214.0" font-size="12">propose</text>
+<text x="442" y="52.0" font-size="12">npm registry</text>
+<text x="442" y="104.0" font-size="12">GitHub</text>
+<text x="442" y="120.0" font-size="12">(PRs, CI)</text>
+<text x="442" y="176.0" font-size="12">Cloudflare Pages</text>
+<text x="442" y="232.0" font-size="12">w3id.org</text>
+<text x="442" y="248.0" font-size="12">(namespace)</text>
 <text x="260" y="288" font-size="11">files and URLs only — there is no API to call</text>
 </g>
 </svg>
@@ -137,7 +139,7 @@
 <p>People read the pages and machine surfaces over HTTPS and open proposals as pull requests. Agents call the local tool server over standard input and output, fetch the discovery document, the graph, llms.txt and the skill packs over HTTPS, and use the page tools where a browser exposes them. The owner performs every git write. Standards implementers request the link set and negotiate the vocabulary through w3id. Port implementers read the specification and the vectors. GitHub holds the repositories and runs the pipeline; Cloudflare Pages serves the site; w3id.org resolves the namespace; the npm registry distributes the engine. External interfaces are files and URLs only: there is no API to call.</p>
 <h2 id="5-solution-strategy">5. Solution strategy</h2>
 <p>A functional core compiles a folder of Markdown into every surface the product has. The content directory and the configuration file are the sole system of record; the engine is a pure compiler behind ports; GitHub Actions is the only thing that ever writes; Cloudflare Pages serves the output byte for byte. Every interactive path, in the browser, over MCP, over WebMCP or on the command line, ends in a local patch that a person turns into a proposal, and nothing publishes until a person merges.</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 32"><table>
 <thead><tr><th scope="col">Context</th><th scope="col">Responsibility</th><th scope="col">Aggregates</th><th scope="col">Verbs owned</th></tr></thead>
 <tbody>
 <tr><td>Knowledge</td><td>Parse, validate, link, ontology, graph; the vectors</td><td>Bundle, item (six types), Link, Source</td><td>Serves all</td></tr>
@@ -151,33 +153,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 280" role="img" aria-label="Bounded contexts: Knowledge feeds Composition, Distribution (highlighted) and Interchange; Governance feeds Distribution; the Boundary context wraps cross-origin access, peers, declared surfaces and visibility around everything that faces outside" font-family="system-ui, sans-serif" font-size="14">
 <defs><marker id="ar-bounded-contexts" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
 <g fill="none" stroke="currentColor" stroke-width="1.5">
-<rect x="16" y="30" width="140" height="60" rx="6"/>
-<rect x="16" y="110" width="140" height="60" rx="6"/>
-<rect x="190" y="30" width="140" height="60" rx="6"/>
-<rect x="190" y="110" width="140" height="60" rx="6" class="acc" stroke-width="2.2"/>
-<rect x="190" y="190" width="140" height="50" rx="6"/>
+<rect x="16" y="60" width="140" height="60" rx="6"/>
+<rect x="16" y="170" width="140" height="60" rx="6"/>
+<rect x="190" y="20" width="140" height="50" rx="6"/>
+<rect x="190" y="90" width="140" height="60" rx="6"/>
+<rect x="190" y="170" width="140" height="60" rx="6" class="acc" stroke-width="2.2"/>
 <rect x="350" y="20" width="154" height="230" rx="8" stroke-dasharray="6 4"/>
 <rect x="362" y="40" width="130" height="40" rx="6"/>
 <rect x="362" y="90" width="130" height="40" rx="6"/>
 <rect x="362" y="140" width="130" height="40" rx="6"/>
 <rect x="362" y="190" width="130" height="40" rx="6"/>
-<path d="M160.0 60.0 L186.0 60.0" marker-end="url(#ar-bounded-contexts)"/>
-<path d="M154.9 91.7 L191.1 108.3" marker-end="url(#ar-bounded-contexts)"/>
-<path d="M160.0 140.0 L186.0 140.0" marker-end="url(#ar-bounded-contexts)"/>
-<path d="M122.7 92.7 L228.9 187.3" marker-end="url(#ar-bounded-contexts)"/>
-<path d="M334.0 137.8 L346.0 137.4" marker-end="url(#ar-bounded-contexts)"/>
+<path d="M159.9 102.7 L186.1 107.3" marker-end="url(#ar-bounded-contexts)"/>
+<path d="M136.8 122.1 L209.2 167.9" marker-end="url(#ar-bounded-contexts)"/>
+<path d="M160.0 200.0 L186.0 200.0" marker-end="url(#ar-bounded-contexts)"/>
+<path d="M159.9 70.9 L186.1 64.1" marker-end="url(#ar-bounded-contexts)"/>
+<path d="M333.7 171.3 L346.3 166.4" marker-end="url(#ar-bounded-contexts)"/>
 </g>
 <g fill="currentColor" text-anchor="middle">
-<text x="86" y="56.0" font-size="12">Knowledge</text>
-<text x="86" y="72.0" font-size="12">items, links, graph</text>
-<text x="86" y="136.0" font-size="12">Governance</text>
-<text x="86" y="152.0" font-size="12">prov, gates, ledger</text>
-<text x="260" y="56.0" font-size="12">Composition</text>
-<text x="260" y="72.0" font-size="12">closure, Harness</text>
-<text x="260" y="136.0" font-size="12">Distribution</text>
-<text x="260" y="152.0" font-size="12">routes, surfaces</text>
-<text x="260" y="211.0" font-size="12">Interchange</text>
-<text x="260" y="227.0" font-size="12">import, export</text>
+<text x="86" y="86.0" font-size="12">Knowledge</text>
+<text x="86" y="102.0" font-size="12">items, links, graph</text>
+<text x="86" y="196.0" font-size="12">Governance</text>
+<text x="86" y="212.0" font-size="12">prov, gates, ledger</text>
+<text x="260" y="41.0" font-size="12">Interchange</text>
+<text x="260" y="57.0" font-size="12">import, export</text>
+<text x="260" y="116.0" font-size="12">Composition</text>
+<text x="260" y="132.0" font-size="12">closure, Harness</text>
+<text x="260" y="196.0" font-size="12">Distribution</text>
+<text x="260" y="212.0" font-size="12">routes, surfaces</text>
 <text x="427" y="14" font-size="11">Boundary</text>
 <text x="427" y="64.0" font-size="12">cross-origin</text>
 <text x="427" y="114.0" font-size="12">peers, walk</text>
@@ -223,7 +225,7 @@
 </svg>
 <figcaption>The highlighted static site is written only by the CLI under CI; the MCP server and the browser bundle read what it publishes.</figcaption>
 </figure>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 32"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 33"><table>
 <thead><tr><th scope="col">Container</th><th scope="col">What it is</th></tr></thead>
 <tbody>
 <tr><td><code>agsc</code> CLI</td><td>Node ≥ 22.13, CommonJS, a small set of pinned and audited libraries; sixteen verbs, exit codes 0, 1 and 2, <code>--json</code> everywhere; five context directories under <code>src/</code> plus ports and Node adapters</td></tr>
@@ -234,7 +236,7 @@
 <tr><td>Bundle</td><td><code>content/**/*.md</code> plus <code>agsc.config.json</code>: the system of record; the ledger is derived into <code>www/</code>, not stored here</td></tr>
 </tbody></table></div>
 <h3 id="ports-and-adapters">Ports and adapters</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 33"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 34"><table>
 <thead><tr><th scope="col">Port</th><th scope="col">Purpose</th><th scope="col">Reference adapter</th><th scope="col">Plugin adapters, never required</th></tr></thead>
 <tbody>
 <tr><td>FileSystem</td><td>Read and write files</td><td>Node <code>fs</code></td><td>In-memory (tests), Deno, Bun, Workers</td></tr>
@@ -347,7 +349,7 @@
 </figure>
 <p><strong>Browser composition.</strong> <code>/compose/</code> loads the graph and the browser bundle, which is the same composition module set with no Node imports. The user ticks Concepts; the closure runs client-side in the normative order (<a class="ref" href="/specs/07-composition/#AGSC-07-04">AGSC-07-04</a> to <a class="ref" href="/specs/07-composition/#AGSC-07-08">AGSC-07-08</a>); the user names the Harness; its files, of the seven kinds, are generated in memory and downloaded as a store-only zip, or file by file as the documented fallback. The bytes equal those of the command-line invocation for the same selection, and a vector asserts it (<a class="ref" href="/specs/07-composition/#AGSC-07-13">AGSC-07-13</a>).</p>
 <h2 id="8-deployment">8. Deployment</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 34"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 35"><table>
 <thead><tr><th scope="col">Lane</th><th scope="col">Trigger</th><th scope="col">Permissions</th><th scope="col">Result</th></tr></thead>
 <tbody>
 <tr><td>Engine CI</td><td>Push, pull request</td><td>Read only</td><td>Tests with a fixed clock and no network, coverage, self-lint, vectors, every independent validator</td></tr>
@@ -358,6 +360,7 @@
 <p>Every action is pinned by commit hash; <code>pull_request_target</code> is never used; there is no cache step; each secret lives only in the job that needs it and expires within ninety days. Content negotiation for the namespace is a fixed table in the w3id <code>.htaccess</code> mapping <code>Accept</code> to same-origin static files, with immutable versioned copies; until the w3id pull request merges, the namespace simply does not resolve, which blocks nothing else.</p>
 <h3 id="where-a-node-can-live">Where a node can live</h3>
 <p>A node is a set of files, and so is its build; neither depends on a transport. It can be served from a web host, a laptop or a small device, a clone of its repository, IPFS behind an HTTP gateway, or a web interface in front of a store anchored in a ledger. What the rules ask of the place is fixed: an HTTPS origin that serves the discovery document and the routes with the response headers the build wrote (<a class="ref" href="/specs/06-surfaces/#AGSC-06-01">AGSC-06-01</a>, <a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-17">AGSC-06-17</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-05">AGSC-11-05</a>). How each kind of place is told is a <em>hosting profile</em>, one of the plugin kinds (<a class="ref" href="/specs/00-overview/#AGSC-00-24">AGSC-00-24</a>): the reference engine's <code>agsc-host</code> command carries seven, from Cloudflare Pages (the reference, and this site's host) to nginx and Apache, GitHub Pages behind a proxy, a local server, a clone, IPFS and a ledger anchor that records the bundle hash and the content version of each build (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-25">AGSC-04-25</a>). Each profile states what its place cannot do, and a conformance claim names its profile. No rule of version 1.x pins a transport other than HTTP.</p>
+<p><em>(Note of 2026-10-12, for 1.0.0.)</em> The lanes above are the planned shape. At 1.0.0 the site is published by the host's git integration from the committed <code>www/</code> of the main branch; the demonstration node by the maintainer's upload of a checked build; no workflow of any repository holds a secret (every repository's secrets list is empty); and the weekly job is a read-only live check of the published addresses.</p>
 <h2 id="9-crosscutting-concepts">9. Crosscutting concepts</h2>
 <ul>
 <li><strong>Determinism.</strong> Canonical JSON, sorted keys, LF, NFC, UTC seconds, <code>SOURCE_DATE_EPOCH</code>, code-point file ordering, no blank nodes; <code>verify</code> blocks merges (<a class="ref" href="/specs/04-canonicalization/">AGSC-04</a>).</li>
@@ -368,7 +371,7 @@
 <li><strong>Internationalisation.</strong> Language variants of an item — sharing its slug and address, served under a language path with <code>hreflang</code> alternates — are reserved to 1.1 (<a class="ref" href="/specs/01-bundle/#AGSC-01-13">AGSC-01-13</a>); at 1.0 a variant file beside its primary is refused (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E206"><code>AGSC-E206</code></a>).</li>
 </ul>
 <h2 id="10-decisions-of-record">10. Decisions of record</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 35"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 36"><table>
 <thead><tr><th scope="col">ADR</th><th scope="col">Decision</th></tr></thead>
 <tbody>
 <tr><td>001</td><td>Agent safety by structural defence, not by a classifier and not by sandboxing: trust-marked results, fenced prose, deterministic lints, identifier-only tools, inert skills, human merge; with the honest limit that hashes prove tampering, not safety</td></tr>
@@ -389,7 +392,7 @@
 <tr><td>016</td><td>Ports are wired verdict-neutrally in the fifth composition step</td></tr>
 </tbody></table></div>
 <h2 id="11-quality-lanes">11. Quality lanes</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 36"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 37"><table>
 <thead><tr><th scope="col">Requirement</th><th scope="col">Proved by</th></tr></thead>
 <tbody>
 <tr><td><a class="ref" href="/docs/requirements/#NFR-01">NFR-01</a> pinned, audited dependencies</td><td>The production dependency list is pinned to exact versions with a committed lockfile, <code>npm ci</code> installs and an <code>npm audit</code> gate</td></tr>
@@ -407,7 +410,7 @@
 <tr><td><a class="ref" href="/docs/requirements/#NFR-13">NFR-13</a> offline and cross-platform</td><td>A portability checklist on three operating systems</td></tr>
 </tbody></table></div>
 <h2 id="12-risks">12. Risks</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 37"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 38"><table>
 <thead><tr><th scope="col">Risk</th><th scope="col">Mitigation</th></tr></thead>
 <tbody>
 <tr><td>The hand-written Markdown renderer, which must render every imported body</td><td>Golden tests over the whole corpus; unsupported syntax is a lint error, never a rendering surprise</td></tr>
@@ -421,15 +424,15 @@
 </tbody></table></div>
 <h2 id="13-threat-model">13. Threat model</h2>
 <p>The assets are the content repository, the engine repository and its packages, the published site and exports, the CI secrets, the accounts, the domains and the w3id prefix, contributor personal data, the memories of downstream agents, and the clean-room invariants. The threats and their mitigations, in STRIDE terms:</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 38"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 39"><table>
 <thead><tr><th scope="col">Threat</th><th scope="col">Mitigation</th></tr></thead>
 <tbody>
 <tr><td>Prompt injection through merged content reaching agents</td><td>Trust-marked results, fenced prose, the injection scan at error severity for agent-authored changes, identifier-only tools, inert skills, human merge</td></tr>
 <tr><td>A malicious proposal editing schemas, the ontology, types or identifiers, or an ingest pull request posing as a channel</td><td>A ruleset requiring a pull request, one approval, a code owner and a green pipeline; a single bypass identity that the ingest job cannot reach; code owners on the schema and ontology; forks lint-only until labelled</td></tr>
 <tr><td>A look-alike package name</td><td>Trusted publishing with attestations on both packages; canonical names documented</td></tr>
-<tr><td>Theft of a CI token</td><td>Read-only defaults with per-job elevation, actions pinned by hash, never <code>pull_request_target</code>, secrets only in the deploy job</td></tr>
+<tr><td>Theft of a CI token</td><td>Read-only defaults with per-job elevation, actions pinned by hash, never <code>pull_request_target</code>, secrets only in the deploy job (the planned lane; at 1.0.0 no job holds a token — see the note at the end of §8)</td></tr>
 <tr><td>Tampering with the w3id redirects</td><td>A fixed table of same-origin targets reviewed by the w3id maintainers; immutable versioned copies; a digest on the ontology link</td></tr>
-<tr><td>A deploy from a compromised CI run</td><td>A scoped, short-lived host token; an attested weekly snapshot as the known-good redeploy; <code>verify</code> reproduces the site from any clone</td></tr>
+<tr><td>A deploy from a compromised CI run</td><td>A scoped, short-lived host token; an attested weekly snapshot as the known-good redeploy; <code>verify</code> reproduces the site from any clone (the planned lane; at 1.0.0 no job holds a token — see the note at the end of §8)</td></tr>
 <tr><td>Malicious parser input</td><td>The parser controls above and a single parse-error type</td></tr>
 <tr><td>Secrets or personal data merged into a page</td><td>The secrets and personal-data lints; push protection once public</td></tr>
 <tr><td>A skill pack carrying executables</td><td>The content-only rule on both export and install, a hash lockfile, a diff before every update</td></tr>

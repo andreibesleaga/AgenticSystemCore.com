@@ -7,6 +7,8 @@ tags:
   - procedure
 prov:
   origin: ai-assisted
+  agent: Claude Code
+  model: Claude (Anthropic)
   operator: human:andreibesleaga
 ---
 
