@@ -1173,7 +1173,7 @@ const gxStage = label => `<div class="gx-stage" role="group" aria-label="${esc(l
 </div>
 `;
 const GX_EMBED = `<figure class="gx gx-embed" data-gx="embed"${GX_3D}>
-${gxStage(`A picture of this node's graph${PEER_ORIGINS.length ? ' and of its peer node' : ''}. The explorer page lists the same nodes as buttons.`)}<figcaption>The graph of this node${PEER_ORIGINS.length ? ' and of the peer node it names' : ''}, drawn in your browser from the published <code>graph.jsonld</code> files. Hover a node for a second to read its summary. <a href="/graph/">Open the explorer</a> to search, list and inspect every node, or to explore another node.</figcaption>
+${gxStage(`A picture of this node's graph. The explorer page lists the same nodes as buttons.`)}<figcaption>The graph of this node, drawn in your browser from its published <code>graph.jsonld</code>. Hover a node for a second to read its summary. <a href="/graph/">Open the explorer</a> to search, list and inspect every node${PEER_ORIGINS.length ? ', to add the peer node it names' : ''}, or to explore another node.</figcaption>
 </figure>
 `;
 
@@ -2158,10 +2158,10 @@ const siteIndexHtml = () => {
 // field, which takes any node's address. Without a script the page says where the same data is.
 addPage('/graph/', {
   title: 'Graph explorer', summary: summaryOf('/graph/'), mainClass: 'gx-page',
-  description: 'Explore the knowledge graph of AgenticSystemCore.com and of the nodes it names as peers, in 2D or 3D, in your browser: search, list and inspect every node, read its summary, its relations and its chunks, and check the digest of the graph file.',
+  description: 'Explore the knowledge graph of AgenticSystemCore.com and, on request, of the nodes it names as peers, in 2D or 3D, in your browser: search, list and inspect every node, read its summary, its relations and its chunks, and check the digest of the graph file.',
   section: null, scripts: GX_SCRIPTS, styles: GX_STYLES,
   jsonld: { '@context': 'https://schema.org', '@type': 'WebPage', name: 'Graph explorer', url: `${BASE}graph/` },
-  body: `<p>Every node of the Agentic Knowledge Web publishes its knowledge as a graph, <a href="/graph.jsonld"><code>graph.jsonld</code></a>, named with its digest in the node's <a href="${WELLKNOWN}">discovery document</a>. This page reads that file, and the graph of each peer node the document names, and draws them together. Give it another node's address to explore that node instead.</p>
+  body: `<p>Every node of the Agentic Knowledge Web publishes its knowledge as a graph, <a href="/graph.jsonld"><code>graph.jsonld</code></a>, named with its digest in the node's <a href="${WELLKNOWN}">discovery document</a>. This page reads that file and draws it. Tick Peers to read the graph of each peer node the document names and draw them together. Give it another node's address to explore that node instead.</p>
 <noscript><p>The explorer needs JavaScript. The same graph is published as data, <a href="/graph.jsonld">graph.jsonld</a> and <a href="/graph.nq">graph.nq</a>, and as the lists of <a href="/clusters/">clusters</a>, <a href="/concepts/">concepts</a> and <a href="/procedures/">procedures</a>.</p></noscript>
 <div class="gx gx-full" data-gx="full"${GX_3D} hidden>
 <div class="gx-controls" role="group" aria-label="Explorer controls">
@@ -2172,9 +2172,9 @@ addPage('/graph/', {
 <span class="gx-seg" role="group" aria-label="Dimensions"><button type="button" id="gx-d-2" aria-pressed="true">2D</button><button type="button" id="gx-d-3" aria-pressed="false">3D</button></span>
 <button type="button" id="gx-rotate" aria-pressed="false" hidden>Rotate</button>
 <button type="button" id="gx-fit">Fit</button>
-<label class="gx-check"><input type="checkbox" id="gx-depth"> Peers of peers</label>
+<label class="gx-check"><input type="checkbox" id="gx-depth"> Peers</label>
 </div>
-<p class="gx-help" id="gx-src-help">A node's address, its discovery document or its <code>graph.jsonld</code>. The peer nodes it names are read too.</p>
+<p class="gx-help" id="gx-src-help">A node's address, its discovery document or its <code>graph.jsonld</code>. Tick Peers to read the peer nodes it names too.</p>
 <p class="gx-sr" id="gx-q-help">Filters the list of nodes and dims the other nodes in the picture. Enter selects the top match.</p>
 <div class="gx-body">
 ${gxStage('The picture of the graph. Drag to move, scroll or pinch to zoom, hover a node for its summary. The side panel lists the same nodes as buttons.')}<div class="gx-split" role="separator" tabindex="0" title="Drag, tap, or use the arrow keys to change the width of the side panel" aria-orientation="vertical" aria-label="Width of the side panel" aria-controls="gx-panel" aria-valuemin="240" aria-valuemax="768" aria-valuenow="352"></div>

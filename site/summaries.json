@@ -9,7 +9,7 @@
   "/episodes/": "The episodes index of this node, empty for now: the route exists because the specification names it for every node.",
   "/exports/": "Every machine-readable file this node publishes, what each is for, and which are pinned by a rule.",
   "/gates/": "The gates index of this node, empty for now: the route exists because the specification names it for every node.",
-  "/graph/": "The knowledge graph of this node and of the peer nodes it names, drawn in your browser from their published files: search it, list it, read each node's summary and relations, and explore any other node by its address.",
+  "/graph/": "The knowledge graph of this node and, when you ask, of the peer nodes it names, drawn in your browser from their published files: search it, list it, read each node's summary and relations, and explore any other node by its address.",
   "/legal/": "The licence of each kind of artefact, who holds the copyright, the Content Use Terms in full, how to cite and quote, the date of first publication, the machine-readable signals and the privacy notice.",
   "/lessons/": "The lessons index of this node, empty for now: the route exists because the specification names it for every node.",
   "/now/": "The state of this node as the build found it: the content version, the fingerprint of the graph, the item counts and the monthly model spend.",
