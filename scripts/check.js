@@ -14,7 +14,8 @@
 // label it does not start or end at; (5) machine files: JSON parses, NFC, one trailing LF,
 // _headers and _redirects content, sitemap targets; (6) WCAG contrast of the colour tokens in
 // both schemes; (7) the page tools; (8) the content gate, scripts/check-content.js; (9) the release
-// gate, scripts/check-release.js.
+// gate, scripts/check-release.js; (5a) the graph explorer: the vendored libraries by SHA-256, the
+// SRI hashes of its scripts, no host in its own code, the policy of its two addresses.
 'use strict';
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const ROOT = path.resolve(__dirname, '..');
@@ -41,6 +42,8 @@ const ALLOWED_SCRIPTS = new Set([
   '<script src="/compose/agsc-compose.js" defer>',
   '<script src="/compose/webmcp.js" defer>',
 ]);
+// The graph explorer's scripts on / and /graph/ carry an SRI hash; section (5a) checks each tag exactly.
+const GX_SCRIPT = /^<script src="\/assets\/(?:graph-data\.js|graph-explorer\.js|vendor\/force-graph-1\.52\.0\.min\.js)" integrity="sha384-[A-Za-z0-9+/]{64}" defer>$/;
 const ok = (c, m) => { if (!c) fails.push(m); };
 const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]).sort();
 const rel = f => path.relative(WWW, f).split(path.sep).join('/');
@@ -269,7 +272,7 @@ for (const f of files.filter(f => f.endsWith('.html'))) {
   if (!h.includes('<a class="skip" href="#main">') || !h.includes('<main id="main"')) E('skip link or main landmark missing');
   const ids = idsIn(h); const dup = ids.filter((x, i) => ids.indexOf(x) !== i);
   if (dup.length) E(`duplicate ids: ${[...new Set(dup)].slice(0, 5).join(', ')}`);
-  for (const m of h.matchAll(/<script(?![^>]*type="application\/ld\+json")[^>]*>/g)) if (!ALLOWED_SCRIPTS.has(m[0])) E(`script other than the same-origin search and page-tool scripts: ${m[0]} (AGSC-06-05, CSP)`);
+  for (const m of h.matchAll(/<script(?![^>]*type="application\/ld\+json")[^>]*>/g)) if (!ALLOWED_SCRIPTS.has(m[0]) && !GX_SCRIPT.test(m[0])) E(`script other than the same-origin search and page-tool scripts: ${m[0]} (AGSC-06-05, CSP)`);
   if (!/<p class="summary"><strong>Summary<\/strong>[^<]{20,}<\/p>/.test(h)) E('summary line missing after the heading');
   for (const m of h.matchAll(/<figure class="diagram">([\s\S]*?)<\/figure>/g)) { if (!/<svg [^>]*role="img" aria-label="[^"]{20,}"/.test(m[1])) E('diagram without an accessible name'); if (!/<figcaption>[^<]{20,}<\/figcaption>/.test(m[1])) E('diagram without a caption'); }
   // Every rule carries a trailing trace bracket in the source except the ones listed (their source has none), so a missing trace line is a rendering defect.
@@ -432,6 +435,65 @@ const sitemap = exists(path.join(WWW, 'sitemap.xml')) ? fs.readFileSync(path.joi
 const locs = [...sitemap.matchAll(/<loc>https:\/\/agenticsystemcore\.com(\/[^<]*)<\/loc>/g)].map(m => m[1]);
 ok(locs.length > 0 && locs.join('\n') === [...locs].sort().join('\n'), 'sitemap empty or not ordered by URL (AGSC-06-19)');
 for (const l of locs) ok(targetFile(l), `sitemap URL has no page: ${l}`);
+// (5a) the graph explorer (the front page's picture and /graph/). Its two drawing libraries are
+// third-party code vendored byte for byte: each file, and its licence text, must have the SHA-256
+// recorded here, in the repository and in the built output, and assets/vendor/ holds nothing else.
+// Its pages carry exactly the explorer's scripts with their SRI hashes, its own code names no host
+// it could load from, and its two addresses carry exactly the policy below while every other
+// address keeps the site-wide one.
+{
+  const crypto = require('crypto');
+  const sha256 = b => crypto.createHash('sha256').update(b).digest('hex');
+  const sri = b => `sha384-${crypto.createHash('sha384').update(b).digest('base64')}`;
+  const VENDORED = {
+    'assets/vendor/force-graph-1.52.0.min.js': 'f59db59ba92ff5a76ed93d7a4d77a703b176260e5d9cd29f4f8eb4f6c369a629', // force-graph 1.52.0, MIT, from unpkg
+    'assets/vendor/force-graph-1.52.0.LICENSE.txt': '5b6dc9ce44c7b73620b191c567339212bd00537af46fdedaf98304c34214cc9c',
+    'assets/vendor/3d-force-graph-1.80.1.min.js': '13088340aad408156064fd120c3bc3a47c93a3cc45b8f132d6284b20e2223be9', // 3d-force-graph 1.80.1, MIT, from unpkg
+    'assets/vendor/3d-force-graph-1.80.1.LICENSE.txt': '7262e566e874d1ce8cfadace01d4f635f8d704b6bdf7b4345cc028e5faeafded',
+  };
+  const held = fs.existsSync(path.join(ROOT, 'assets', 'vendor')) ? fs.readdirSync(path.join(ROOT, 'assets', 'vendor')).sort() : [];
+  ok(held.join(', ') === Object.keys(VENDORED).map(f => path.basename(f)).sort().join(', '), `assets/vendor/ must hold exactly ${Object.keys(VENDORED).map(f => path.basename(f)).join(', ')}; it holds ${held.join(', ') || 'nothing'}`);
+  for (const [f, want] of Object.entries(VENDORED)) {
+    const src = path.join(ROOT, f), out = path.join(WWW, f);
+    ok(exists(src) && sha256(fs.readFileSync(src)) === want, `${f} is not the vendored file: its SHA-256 is not ${want}`);
+    ok(exists(out) && sha256(fs.readFileSync(out)) === want, `/${f} is missing from the output or differs from the vendored file`);
+  }
+  const OWN = ['assets/graph-data.js', 'assets/graph-explorer.js', 'assets/graph-explorer.css'];
+  for (const f of OWN) ok(exists(path.join(ROOT, f)) && exists(path.join(WWW, f)) && fs.readFileSync(path.join(ROOT, f)).equals(fs.readFileSync(path.join(WWW, f))), `/${f} is missing from the output or differs from assets/${path.basename(f)}`);
+  // The explorer's own code names hosts only as vocabulary identifiers, compared as strings and never fetched.
+  const IDENTIFIER_HOSTS = new Set(['w3id.org', 'schema.org', 'www.w3.org', 'purl.org']);
+  for (const f of OWN) if (exists(path.join(ROOT, f))) for (const m of fs.readFileSync(path.join(ROOT, f), 'utf8').matchAll(/\b(?:https?:)?\/\/([a-z0-9.-]+\.[a-z]{2,})/gi)) ok(IDENTIFIER_HOSTS.has(m[1].toLowerCase()), `${f} names the host ${m[1]}: the explorer reads only the node it is given and the peers that node declares`);
+  // The scripts of the two pages: the explorer's three, each with the SRI hash of the file served.
+  const tag = f => (exists(path.join(WWW, f)) ? `<script src="/${f}" integrity="${sri(fs.readFileSync(path.join(WWW, f)))}" defer>` : null);
+  const GX_TAGS = ['assets/graph-data.js', 'assets/graph-explorer.js', 'assets/vendor/force-graph-1.52.0.min.js'].map(tag);
+  const threeSri = exists(path.join(WWW, 'assets/vendor/3d-force-graph-1.80.1.min.js')) ? sri(fs.readFileSync(path.join(WWW, 'assets/vendor/3d-force-graph-1.80.1.min.js'))) : null;
+  for (const page of files.filter(f => f.endsWith('.html'))) {
+    const h = fs.readFileSync(page, 'utf8'), r = rel(page);
+    const explorer = r === 'index.html' || r === 'graph/index.html';
+    const gx = [...h.matchAll(/<script src="\/assets\/(?:graph-|vendor\/)[^>]*>/g)].map(m => m[0]);
+    if (!explorer) { ok(gx.length === 0 && !h.includes('class="gx '), `${r}: carries the graph explorer, which only / and /graph/ may`); continue; }
+    ok(gx.join('\n') === GX_TAGS.join('\n'), `${r}: the graph explorer's scripts are not exactly ${GX_TAGS.join(' ')} (in that order, each with the SRI hash of the file served)`);
+    ok(h.includes('<link rel="stylesheet" href="/assets/graph-explorer.css">'), `${r}: does not load /assets/graph-explorer.css`);
+    ok(threeSri && h.includes(` data-gx-3d="/assets/vendor/3d-force-graph-1.80.1.min.js" data-gx-3d-integrity="${threeSri}"`), `${r}: does not hand the page script the 3D library's address and SRI hash`);
+  }
+  const home = exists(path.join(WWW, 'index.html')) ? fs.readFileSync(path.join(WWW, 'index.html'), 'utf8') : '';
+  ok(/<p class="lead">[^<]*(?:<[^/][^>]*>[^<]*<\/[a-z]+>[^<]*)*<\/p>\n<figure class="gx gx-embed" data-gx="embed"/.test(home) && home.includes('<a href="/graph/">Open the explorer</a>'), 'the front page does not carry the graph picture right below its lead paragraph, with the link "Open the explorer" to /graph/');
+  ok(locs.includes('/graph/'), 'the sitemap does not list /graph/');
+  // The Content-Security-Policy: site-wide on `/*`; replaced (detached, then set) on `/` and on
+  // `/graph/` only, where only connect-src differs.
+  const CSP_BASE = "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+  const linkset = JSON.parse(fs.readFileSync(path.join(WWW, '.well-known', 'knowledge-linkset'), 'utf8'));
+  const peerOrigins = [...new Set(((linkset.linkset || [])[0]['https://w3id.org/agentic-system-core/rel#peer'] || []).map(l => new URL(l.href).origin))].sort();
+  const want = new Map([['/*', [`Content-Security-Policy: ${CSP_BASE}`]], ['/graph/', ['! Content-Security-Policy', `Content-Security-Policy: ${CSP_BASE.replace("connect-src 'self'", "connect-src 'self' https:")}`]]]);
+  if (peerOrigins.length) want.set('/', ['! Content-Security-Policy', `Content-Security-Policy: ${CSP_BASE.replace("connect-src 'self'", `connect-src ${["'self'", ...peerOrigins].join(' ')}`)}`]);
+  for (const [route, lines] of headerBlocks) {
+    const csp = lines.filter(l => /^(?:! )?Content-Security-Policy\b/.test(l));
+    const expected = want.get(route) || [];
+    ok(csp.join('\n') === expected.join('\n'), `_headers: the Content-Security-Policy of ${route} is ${csp.length ? csp.join(' / ') : 'not set'}; it must be ${expected.length ? expected.join(' / ') : 'left to the site-wide block'}`);
+  }
+  for (const route of want.keys()) ok(headerBlocks.has(route), `_headers: no block for ${route}`);
+  ok([...headerBlocks.keys()].indexOf('/*') === 0, '_headers: the site-wide block /* must come first, so the blocks that replace its policy apply after it');
+}
 for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt', '.well-known/tdmrep.json', 'graph.jsonld', 'llms.txt', 'llms-full.txt', 'search.json', 'assets/search-site.json', 'assets/search.js', 'robots.txt', '404.html', 'ns/context.jsonld', 'ns/agsc.ttl', 'specs/agentic-knowledge/index.html', 'specs/mcp/index.html', 'legal/index.html', 'docs/index.html', 'docs/introduction/index.html', 'docs/modes/index.html', 'docs/requirements/index.html', 'docs/standards/index.html', 'docs/compliance/index.html', 'docs/status/index.html', 'search/index.html',
   // AGSC-06-01/06-02/09-16: the page-tool route family.
   'compose/index.html', 'compose/agsc-core.js', 'compose/agsc-page-tools.js', 'compose/agsc-compose.js', 'compose/webmcp.js',

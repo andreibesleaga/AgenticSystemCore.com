@@ -28,15 +28,25 @@ const WWW = process.env.SITE_A11Y_WWW ? path.resolve(process.env.SITE_A11Y_WWW) 
 const AXE = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 const headers = fs.readFileSync(path.join(WWW, '_headers'), 'utf8');
 // `_headers` as the host reads it: blocks of an address (a `*` matches any run of characters)
-// followed by indented `Name: value` lines. Every block whose address matches a request applies.
+// followed by indented `Name: value` lines. Every block whose address matches a request applies,
+// in the order of the file; a `! Name` line removes the header of that name an earlier block set
+// (the host's detach operator), which is how the graph explorer's two pages replace the site-wide
+// Content-Security-Policy instead of adding a second one.
 const BLOCKS = [];
 for (const line of headers.split('\n')) {
   if (/^\s*(#|$)/.test(line)) continue;
-  if (!/^\s/.test(line)) { BLOCKS.push({ re: new RegExp('^' + line.trim().split('*').map(x => x.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*') + '$'), headers: [] }); continue; }
+  if (!/^\s/.test(line)) { BLOCKS.push({ re: new RegExp('^' + line.trim().split('*').map(x => x.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*') + '$'), headers: [], unset: [] }); continue; }
+  const u = /^\s+! ([A-Za-z-]+)\s*$/.exec(line);
+  if (u && BLOCKS.length) { BLOCKS[BLOCKS.length - 1].unset.push(u[1].toLowerCase()); continue; }
   const m = /^\s+([A-Za-z-]+):\s*(.*)$/.exec(line);
   if (m && BLOCKS.length) BLOCKS[BLOCKS.length - 1].headers.push([m[1], m[2]]);
 }
-const headersFor = url => BLOCKS.filter(b => b.re.test(url)).flatMap(b => b.headers);
+const headersFor = url => BLOCKS.filter(b => b.re.test(url)).reduce((out, b) => [...out.filter(([n]) => !b.unset.includes(n.toLowerCase())), ...b.headers], []);
+// The graph explorer (the front page and /graph/) reads the published graphs of the peer nodes the
+// discovery document declares. Those reads, and only those, are not third-party loads; here they are
+// answered offline (refused), so the lane needs no network and the page shows its peer as not read.
+const PEER_ORIGINS = new Set((((JSON.parse(fs.readFileSync(path.join(WWW, '.well-known', 'knowledge-linkset'), 'utf8')).linkset || [])[0] || {})['https://w3id.org/agentic-system-core/rel#peer'] || []).map(l => new URL(l.href).origin));
+const EXPLORER_PAGES = new Set(['/', '/graph/']);
 const CSP = (headersFor('/').find(([n]) => n.toLowerCase() === 'content-security-policy') || [])[1];
 if (!CSP) { console.error('a11y: _headers gives no Content-Security-Policy for /'); process.exit(2); }
 const typeProblems = [];
@@ -105,7 +115,7 @@ const srv = http.createServer((req, res) => {
 srv.listen(0, async () => {
   const port = srv.address().port, base = `http://127.0.0.1:${port}`;
   const browser = await chromium.launch({ executablePath: process.env.CHROME_EXE, headless: true });
-  let violations = 0, cspViol = 0, thirdParty = 0, problems = [], scrolling = 0;
+  let violations = 0, cspViol = 0, thirdParty = 0, peerReads = 0, problems = [], scrolling = 0;
   const longest = { 768: [], 1280: [] }, split = { 390: 0, 768: 0, 1280: 0 }, splitInCode = { 390: 0, 768: 0, 1280: 0 };
   // 'light' and 'dark' follow the system scheme; 'chosen-dark' is a light system with the
   // visitor's stored switcher choice 'dark' (the manual override of the theme switcher).
@@ -119,8 +129,18 @@ srv.listen(0, async () => {
     for (const p of pages) {
       const page = await ctx.newPage();
       page.on('console', m => { if (/Content Security Policy/.test(m.text())) { cspViol++; problems.push(`${scheme} ${p}: CSP ${m.text().slice(0, 100)}`); } });
-      page.on('request', r => { if (!r.url().startsWith(base)) { thirdParty++; problems.push(`${p}: third-party ${r.url()}`); } });
+      await page.route(u => PEER_ORIGINS.has(u.origin), route => route.abort());
+      page.on('request', r => {
+        if (r.url().startsWith(base)) return;
+        if (EXPLORER_PAGES.has(p) && PEER_ORIGINS.has(new URL(r.url()).origin) && r.resourceType() === 'fetch') { peerReads++; return; }
+        thirdParty++; problems.push(`${p}: third-party ${r.url()}`);
+      });
       await page.goto(base + p, { waitUntil: 'load' });
+      // the graph explorer fills its list, legend and detail after it has read the graphs: axe checks that state
+      if (EXPLORER_PAGES.has(p)) {
+        const ready = await page.waitForFunction(() => { const s = document.querySelector('.gx-status'); return !!s && s.textContent.trim() !== '' && !/^Reading /.test(s.textContent.trim()); }, null, { timeout: 15000 }).then(() => true, () => false);
+        if (!ready) problems.push(`${scheme} ${width}px ${p}: the graph explorer did not finish reading in 15 s`);
+      }
       await page.addScriptTag({ url: base + '/__axe.js' });
       const res = await page.evaluate(() => axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'] } }));
       for (const v of res.violations) { violations++; problems.push(`${scheme} ${width}px ${p}: ${v.id} (${v.impact}) ${v.nodes.length}x — ${v.nodes[0].target[0]}`); }
@@ -181,7 +201,7 @@ srv.listen(0, async () => {
   }
   const r404 = await page.goto(base + '/no/such/page/'); console.log(`unknown path -> HTTP ${r404.status()}`);
   await browser.close(); srv.close();
-  console.log(`pages: ${pages.length} × 2 schemes (system light, system dark) at 390, 768 and 1280 px, and the chosen dark scheme at 1280 px; axe violations: ${violations}; CSP violations: ${cspViol}; third-party requests: ${thirdParty}; content types from _headers`);
+  console.log(`pages: ${pages.length} × 2 schemes (system light, system dark) at 390, 768 and 1280 px, and the chosen dark scheme at 1280 px; axe violations: ${violations}; CSP violations: ${cspViol}; third-party requests: ${thirdParty}; the graph explorer's reads of declared peer nodes (answered offline): ${peerReads}; content types from _headers`);
   console.log(`pages scrolling sideways (320, 390, 768, 1280 px): ${scrolling}`);
   for (const w of [768, 1280]) console.log(`prose at ${w} px: ${longest[w].length} pages with wrapped prose; median of each page's longest line ${median(longest[w])} characters, longest ${Math.max(0, ...longest[w])} (at most ${MAX_LINE})`);
   console.log(`words split across lines in table cells (390 / 768 / 1280 px): ${split[390]} / ${split[768]} / ${split[1280]}; breaks inside code or a link, allowed: ${splitInCode[390]} / ${splitInCode[768]} / ${splitInCode[1280]}`);
