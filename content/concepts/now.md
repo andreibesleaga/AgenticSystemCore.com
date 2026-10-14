@@ -7,6 +7,8 @@ tags: [vocabulary, specification]
 clusters: [vocabulary]
 prov:
   origin: ai-assisted
+  agent: "Claude Code"
+  model: "Claude (Anthropic)"
   operator: "human:andreibesleaga"
 sources:
   - resource: "https://agenticsystemcore.com/specs/00-overview/#AGSC-00-07"

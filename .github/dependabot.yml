@@ -1,0 +1,13 @@
+# Update pull requests for the GitHub Actions the workflows pin by commit SHA: once a month,
+# all in one pull request, so a pinned action does not stay behind its security fixes. The
+# workflows have no other dependencies (the site's scripts use the Node standard library).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      github-actions:
+        patterns:
+          - '*'

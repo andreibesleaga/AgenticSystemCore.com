@@ -7,9 +7,11 @@
 <meta name="description" content="How AgenticSystemCore works: the build pipeline, the proposal lifecycle, discovery, import and export, determinism, federation and agent safety.">
 <link rel="canonical" href="https://agenticsystemcore.com/docs/how-it-works/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/docs/how-it-works/">
 <meta property="og:title" content="How it works">
@@ -186,15 +188,15 @@
 <rect x="380" y="108" width="124" height="34" rx="6"/>
 <rect x="380" y="152" width="124" height="34" rx="6"/>
 <rect x="380" y="196" width="124" height="34" rx="6"/>
-<rect x="190" y="190" width="150" height="50" rx="6"/>
+<rect x="190" y="190" width="130" height="50" rx="6"/>
 <path d="M149.9 78.1 L186.1 85.0" marker-end="url(#ar-discovery-flow)"/>
 <path d="M149.9 128.2 L186.1 119.3" marker-end="url(#ar-discovery-flow)"/>
-<path d="M343.8 72.0 L390.5 55.3" marker-end="url(#ar-discovery-flow)"/>
-<path d="M344.0 91.5 L376.0 88.1" marker-end="url(#ar-discovery-flow)"/>
-<path d="M344.0 111.2 L376.0 115.7" marker-end="url(#ar-discovery-flow)"/>
-<path d="M343.7 130.7 L394.7 150.5" marker-end="url(#ar-discovery-flow)"/>
-<path d="M315.4 132.2 L412.0 193.8" marker-end="url(#ar-discovery-flow)"/>
-<path d="M265.0 134.0 L265.0 186.0" marker-end="url(#ar-discovery-flow)"/>
+<path d="M310.2 70.0 L360 37 L380.0 37.0" marker-end="url(#ar-discovery-flow)"/>
+<path d="M340.0 85.0 L360 81 L380.0 81.0" marker-end="url(#ar-discovery-flow)"/>
+<path d="M340.0 119.7 L360 125 L380.0 125.0" marker-end="url(#ar-discovery-flow)"/>
+<path d="M306.3 130.0 L360 169 L380.0 169.0" marker-end="url(#ar-discovery-flow)"/>
+<path d="M290.2 130.0 L360 213 L380.0 213.0" marker-end="url(#ar-discovery-flow)"/>
+<path d="M262.0 134.0 L257.5 186.0" marker-end="url(#ar-discovery-flow)"/>
 </g>
 <g fill="currentColor" text-anchor="middle">
 <text x="81" y="61.0" font-size="12">any HTML page</text>
@@ -207,8 +209,8 @@
 <text x="442" y="129.0" font-size="12">ontology (/ns/)</text>
 <text x="442" y="173.0" font-size="12">licence (/legal/)</text>
 <text x="442" y="217.0" font-size="12">specification</text>
-<text x="265" y="211.0" font-size="12">profile URI (w3id)</text>
-<text x="265" y="227.0" font-size="12">→ profile page</text>
+<text x="255" y="211.0" font-size="12">profile URI (w3id)</text>
+<text x="255" y="227.0" font-size="12">→ profile page</text>
 <text x="260" y="288" font-size="11">one document lists every machine artefact; the profile URI says how to read it</text>
 </g>
 </svg>
@@ -230,15 +232,15 @@
 <rect x="364" y="120" width="140" height="34" rx="6"/>
 <rect x="364" y="168" width="140" height="34" rx="6"/>
 <rect x="364" y="216" width="140" height="34" rx="6"/>
-<path d="M123.4 59.9 L194.5 99.0" marker-end="url(#ar-import-export)"/>
+<path d="M162.0 41.0 L180 41 L230.2 100.0" marker-end="url(#ar-import-export)"/>
 <path d="M156.1 107.0 L194.1 117.3" marker-end="url(#ar-import-export)"/>
 <path d="M166.0 136.1 L194.0 135.8" marker-end="url(#ar-import-export)"/>
 <path d="M151.0 166.9 L194.2 154.3" marker-end="url(#ar-import-export)"/>
-<path d="M325.5 99.6 L399.0 59.9" marker-end="url(#ar-import-export)"/>
+<path d="M292.0 100.0 L346 41 L364.0 41.0" marker-end="url(#ar-import-export)"/>
 <path d="M325.9 117.6 L365.8 107.0" marker-end="url(#ar-import-export)"/>
 <path d="M326.0 135.8 L360.0 136.1" marker-end="url(#ar-import-export)"/>
 <path d="M325.8 153.9 L371.0 166.9" marker-end="url(#ar-import-export)"/>
-<path d="M325.5 171.9 L400.3 214.0" marker-end="url(#ar-import-export)"/>
+<path d="M290.7 170.0 L346 233 L364.0 233.0" marker-end="url(#ar-import-export)"/>
 </g>
 <g fill="currentColor" text-anchor="middle">
 <text x="260" y="131.0" font-size="12">Bundle</text>
@@ -265,7 +267,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" role="img" aria-label="Boundary: this node declares its surfaces (highlighted: llms-txt, chunks, mcp, webmcp, a2a-card, solid, responder), its visibility and its retirement; a browser reads it cross-origin, and an agent walks peer nodes over HTTPS with a hop limit; nodes never call nodes" font-family="system-ui, sans-serif" font-size="14">
 <defs><marker id="ar-spec-11-boundary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
 <g fill="none" stroke="currentColor" stroke-width="1.5">
-<rect x="160" y="20" width="200" height="260" rx="8" stroke-dasharray="6 4"/>
+<rect x="160" y="20" width="200" height="250" rx="8" stroke-dasharray="6 4"/>
 <rect x="174" y="40" width="172" height="100" rx="6" class="acc" stroke-width="2.2"/>
 <rect x="174" y="156" width="172" height="44" rx="6"/>
 <rect x="174" y="216" width="172" height="44" rx="6"/>
@@ -274,7 +276,7 @@
 <rect x="394" y="60" width="110" height="50" rx="6"/>
 <rect x="394" y="160" width="110" height="50" rx="6"/>
 <path d="M449.0 156.0 L449.0 114.0" marker-end="url(#ar-spec-11-boundary)"/>
-<path d="M390.1 174.1 L363.9 169.2" marker-end="url(#ar-spec-11-boundary)"/>
+<path d="M390.1 172.5 L363.9 167.0" marker-end="url(#ar-spec-11-boundary)"/>
 </g>
 <g fill="currentColor" text-anchor="middle">
 <text x="260" y="14" font-size="11">this node</text>
@@ -289,7 +291,8 @@
 <text x="449" y="89.0" font-size="12">peer node</text>
 <text x="449" y="181.0" font-size="12">agent walks</text>
 <text x="449" y="197.0" font-size="12">peers</text>
-<text x="447" y="126" font-size="10">HTTPS only, hop limit 3</text>
+<text x="455" y="131" font-size="10" text-anchor="start">HTTPS only,</text>
+<text x="455" y="143" font-size="10" text-anchor="start">hop limit 3</text>
 <text x="260" y="288" font-size="11">static and client-side: nodes never call nodes</text>
 </g>
 </svg>

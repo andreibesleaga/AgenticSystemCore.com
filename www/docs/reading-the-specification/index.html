@@ -7,9 +7,11 @@
 <meta name="description" content="How to read the AgenticSystemCore specification: rule identifiers, BCP 14 key words, the bracketed trace references, reserved rules, error codes, test vectors and conformance Levels.">
 <link rel="canonical" href="https://agenticsystemcore.com/docs/reading-the-specification/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/docs/reading-the-specification/">
 <meta property="og:title" content="Reading the specification">
@@ -42,12 +44,12 @@
 <p class="summary"><strong>Summary</strong>A key to the specification's notation: what the rule identifiers mean, how the key words MUST and SHOULD are used, what the small bracketed references at the end of each rule are, why some rules are marked reserved, and how error codes, vectors and Levels fit together.</p>
 <p>The specification is exact so that two implementers in two languages produce the same bytes. That exactness makes it dense. This page explains its conventions, so that the rule text can be read for what it says.</p>
 <h2 id="sections-and-rules">Sections and rules</h2>
-<p>The specification has twelve sections, <code>AGSC-00</code> to <code>AGSC-11</code>, each a page under <a href="/specs/">/specs/</a>; a section too long for one page is published in numbered parts, each with the section's title and a part line, and a link to a rule always names the part that carries it. Every rule has a stable identifier of the form <code>AGSC-&lt;section&gt;-&lt;number&gt;</code>, for example <a class="ref" href="/specs/03-links/#AGSC-03-01">AGSC-03-01</a>, which is the first rule of the links section. Identifiers are never reused or renumbered (<a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a>). On this site every identifier is a link: click one to reach the rule, and copy the address to cite it.</p>
+<p>The specification has twelve sections, <code>AGSC-00</code> to <code>AGSC-11</code>, each a page under <a href="/specs/">/specs/</a>; a section too long for one page is published in numbered parts, each with the section's title and a part line, and a link to a rule always names the part that carries it. Every rule has a stable identifier of the form <code>AGSC-&lt;section&gt;-&lt;number&gt;</code>, for example <a class="ref" href="/specs/03-links/#AGSC-03-01">AGSC-03-01</a>, which is the first rule of the links section. Identifiers are never reused or renumbered (<a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a>). On this site every identifier is a link: click one to reach the rule, and copy the address to cite it. Section numbers are stable in the same way, so a number that no section carries (§2.6 to §2.8 and §9.5 to §9.8) is unused on purpose. A rule marked &quot;(reference distribution)&quot; binds the reference distribution of the specification — its engine, validators and test suite — and not a node or another implementation.</p>
 <h2 id="the-key-words">The key words</h2>
-<p>MUST, MUST NOT, REQUIRED, SHALL, SHOULD, SHOULD NOT and MAY are used as defined in BCP 14 (RFC 2119 and RFC 8174), and only when written in capitals. MUST is an obligation whose violation is non-conformance; SHOULD is a recommendation that may be set aside for a stated reason; MAY is a permission.</p>
+<p>MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY and OPTIONAL are used as defined in BCP 14 (RFC 2119 and RFC 8174), and only when written in capitals. MUST is an obligation whose violation is non-conformance; SHOULD is a recommendation that may be set aside for a stated reason; MAY is a permission.</p>
 <h2 id="the-small-bracketed-references">The small bracketed references</h2>
 <p>Most rules end with a bracketed note such as <code>[PRD-002]</code> or <code>[PRD-022, RFC 9264]</code>. It is the rule's traceability record: the requirement the rule serves and, where there is one, the external document it follows. It is shown small and grey on this site because it is not part of what the rule requires. Its parts are:</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
 <thead><tr><th scope="col">Form</th><th scope="col">Meaning</th><th scope="col">Where to find it</th></tr></thead>
 <tbody>
 <tr><td><code>PRD-nnn</code>, <code>NFR-nn</code></td><td>A product requirement, or a non-functional requirement, in EARS form</td><td>Published on the <a href="/docs/requirements/">requirements page</a>; the identifiers link there</td></tr>
@@ -55,7 +57,7 @@
 <tr><td><code>design</code></td><td>The rule records a design choice of this specification rather than a requirement or an external document</td><td>The rule text itself</td></tr>
 </tbody></table></div>
 <h2 id="drafted-rules">Drafted rules</h2>
-<p>When a next release candidate is being drafted in the engine repository, its identifiers are shown here with a dotted underline and no link until it is tagged and published; none are pending now.</p>
+<p>When the next version is being drafted in the engine repository, its identifiers are shown here with a dotted underline and no link until it is tagged and published; none are pending now.</p>
 <h2 id="reserved-rules">Reserved rules</h2>
 <p>A rule marked <em>(reserved: …)</em> holds no requirement: while the specification was drafted, it was found to say nothing that another rule did not already say, and its content was merged into that rule, which the note names. Its identifier is kept and never reused (<a class="ref" href="/specs/00-overview/#AGSC-00-16">AGSC-00-16</a>), so that a citation of it still resolves. Reserved rules impose nothing.</p>
 <h2 id="amendments">Amendments</h2>

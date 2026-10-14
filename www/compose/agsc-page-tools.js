@@ -4,7 +4,7 @@
 // function below is the SOURCE TEXT of the function Node runs, so the local
 // tools and the page tools cannot drift. No network beyond this origin, no key,
 // no server, no cookie, no storage.
-// spec_version: 1.0.0-rc.7
+// spec_version: 1.0.0
 (function () {
 function pageTerms() {
   return 'LicenseRef-AgenticSystemCore-Content-Use-1.0';

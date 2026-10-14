@@ -7,9 +7,11 @@
 <meta name="description" content="The AgenticSystemCore data model: the six item types, Concept kinds, the fourteen link keys and their inverses, clusters, sources, provenance and status.">
 <link rel="canonical" href="https://agenticsystemcore.com/docs/data-model/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/docs/data-model/">
 <meta property="og:title" content="Data model">
@@ -55,12 +57,12 @@
 <rect x="28" y="180" width="200" height="44" rx="6"/>
 <rect x="260" y="180" width="110" height="44" rx="6"/>
 <rect x="392" y="180" width="100" height="44" rx="6"/>
-<path d="M103.8 74.6 L196.4 108.6" marker-end="url(#ar-data-model)"/>
+<path d="M64.0 80.0 L64 124 L130.0 126.7" marker-end="url(#ar-data-model)"/>
 <path d="M179.6 82.1 L221.2 107.9" marker-end="url(#ar-data-model)"/>
 <path d="M235.8 83.6 L247.2 106.4" marker-end="url(#ar-data-model)"/>
 <path d="M289.7 83.4 L275.5 106.6" marker-end="url(#ar-data-model)"/>
 <path d="M346.1 82.0 L301.3 108.0" marker-end="url(#ar-data-model)"/>
-<path d="M424.2 74.0 L326.1 108.7" marker-end="url(#ar-data-model)"/>
+<path d="M464.0 80.0 L464 124 L390.0 126.9" marker-end="url(#ar-data-model)"/>
 <path d="M215.0 155.9 L173.0 178.1" marker-end="url(#ar-data-model)"/>
 <path d="M279.8 157.1 L295.2 176.9" marker-end="url(#ar-data-model)"/>
 <path d="M320.9 155.4 L388.3 181.3" marker-end="url(#ar-data-model)"/>
@@ -86,7 +88,7 @@
 <h2 id="one-file-shape">One file shape</h2>
 <p>An item is one Markdown file with a YAML header between <code>---</code> lines (<a class="ref" href="/specs/02-item/#AGSC-02-01">AGSC-02-01</a>). The YAML is a small, safe subset: no anchors, no aliases, no tags, no flow mappings (<a class="ref" href="/specs/02-item/#AGSC-02-02">AGSC-02-02</a>). The body is CommonMark; headings become anchors and, for the chunk export, cut points; fenced code stays code (<a class="ref" href="/specs/02-item/#AGSC-02-20">AGSC-02-20</a>). Lengths are counted in Unicode code points (<a class="ref" href="/specs/02-item/#AGSC-02-24">AGSC-02-24</a>). Unknown keys are kept and reported as warnings, never errors (<a class="ref" href="/specs/02-item/#AGSC-02-05">AGSC-02-05</a>).</p>
 <h2 id="the-six-types">The six types</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
 <thead><tr><th scope="col">Type</th><th scope="col">What it records</th><th scope="col">Notes</th></tr></thead>
 <tbody>
 <tr><td>Concept</td><td>A unit of knowledge</td><td>Qualified by <code>kind</code>: <code>pattern</code>, <code>taxonomy</code>, <code>explainer</code>, <code>principle</code>, <code>decision</code>, <code>spec</code>, <code>task</code>, <code>term</code> (<a class="ref" href="/specs/02-item/#AGSC-02-12">AGSC-02-12</a>) or <code>architecture</code> (<a class="ref" href="/specs/02-item/#AGSC-02-97">AGSC-02-97</a>)</td></tr>
@@ -99,7 +101,7 @@
 <p>There is deliberately no common <code>Item</code> class in the ontology; &quot;item&quot; is a term of the specification only (<a class="ref" href="/specs/00-overview/#AGSC-00-05">AGSC-00-05</a>). Words like card, page, deck or note are never types (<a class="ref" href="/specs/00-overview/#AGSC-00-08">AGSC-00-08</a>).</p>
 <h2 id="the-fourteen-links">The fourteen links</h2>
 <p>A link is a header key whose values are slugs of other items in the same Bundle; a link never crosses Bundles (<a class="ref" href="/specs/03-links/#AGSC-03-01">AGSC-03-01</a>, <a class="ref" href="/specs/03-links/#AGSC-03-02">AGSC-03-02</a>). Inverses are computed at build and never authored (<a class="ref" href="/specs/03-links/#AGSC-03-04">AGSC-03-04</a>).</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 30"><table>
 <thead><tr><th scope="col">You write</th><th scope="col">The build adds</th><th scope="col">What it means</th><th scope="col">Effect in composition</th></tr></thead>
 <tbody>
 <tr><td><code>related</code></td><td><code>related</code></td><td>Loosely connected</td><td>Advisory only</td></tr>

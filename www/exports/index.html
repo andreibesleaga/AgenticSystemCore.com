@@ -7,9 +7,11 @@
 <meta name="description" content="Every machine-readable file this node publishes, what each is for, and which are additive.">
 <link rel="canonical" href="https://agenticsystemcore.com/exports/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/exports/">
 <meta property="og:title" content="Machine-readable files">
@@ -52,6 +54,7 @@
 <tr><td><a href="/pages/bundle.md"><code>/pages/&lt;slug&gt;.md</code></a></td><td><code>text/markdown</code></td><td>The source file of one item, exactly as it is stored.</td></tr>
 <tr><td><a href="/pages/bundle.jsonld"><code>/pages/&lt;slug&gt;.jsonld</code></a></td><td><code>application/ld+json</code></td><td>One item as RDF, on its own.</td></tr>
 <tr><td><a href="/skills/index.json"><code>/skills/index.json</code></a></td><td><code>application/json</code></td><td>The skill packs and their digests.</td></tr>
+<tr><td><a href="/boards/index.json"><code>/boards/index.json</code></a></td><td><code>application/json</code></td><td>The live boards of this node. Each board is also a page, such as <a href="/boards/project-board/">the project board</a>, and a JSON file.</td></tr>
 <tr><td><a href="/now.md"><code>/now.md</code></a></td><td><code>text/markdown</code></td><td>The state of this node at the last build.</td></tr>
 <tr><td><a href="/ledger.jsonl"><code>/ledger.jsonl</code></a></td><td><code>application/jsonl</code></td><td>The derived ledger: one hash-chained line per commit of this site's history and one for the build, re-verifiable offline. Its head is on the ledger link of the discovery document.</td></tr>
 <tr><td><a href="/ns/context.jsonld"><code>/ns/context.jsonld</code></a></td><td><code>application/ld+json</code></td><td>The JSON-LD context the graph files use.</td></tr>

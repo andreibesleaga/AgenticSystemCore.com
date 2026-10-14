@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scenarios: Standards implementer adopts the discovery format on their own site — AgenticSystemCore</title>
+<meta name="description" content="The behaviour-driven scenarios of persona-j-standards.feature: Standards implementer adopts the discovery format on their own site.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/scenarios/persona-j-standards/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/scenarios/persona-j-standards/">
+<meta property="og:title" content="Scenarios: Standards implementer adopts the discovery format on their own site">
+<meta property="og:description" content="The behaviour-driven scenarios of persona-j-standards.feature: Standards implementer adopts the discovery format on their own site.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Scenarios: Standards implementer adopts the discovery format on their own site","description":"The behaviour-driven scenarios of persona-j-standards.feature: Standards implementer adopts the discovery format on their own site.","url":"https://agenticsystemcore.com/docs/scenarios/persona-j-standards/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/scenarios/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main" class="wide">
+<h1>Scenarios: Standards implementer adopts the discovery format on their own site</h1>
+<p class="summary"><strong>Summary</strong>The 12 scenarios of the feature file persona-j-standards.feature, in the Given/When/Then form the reference engine runs; each names the requirement it proves.</p>
+<p>One of the feature files of the <a href="/docs/scenarios/">scenarios</a>, where the coverage table names the requirements each file proves. Previous: <a href="/docs/scenarios/persona-i-maintainer/" rel="prev"><code>persona-i-maintainer.feature</code></a>. Next: <a href="/docs/scenarios/persona-k-live-board/" rel="next"><code>persona-k-live-board.feature</code></a>.</p>
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a>, <a class="ref" href="/docs/requirements/#PRD-025">PRD-025</a>, <a class="ref" href="/docs/requirements/#PRD-050">PRD-050</a>, <a class="ref" href="/docs/requirements/#PRD-054">PRD-054</a>, <a class="ref" href="/docs/requirements/#PRD-055">PRD-055</a>, <a class="ref" href="/docs/requirements/#PRD-057">PRD-057</a>, <a class="ref" href="/docs/requirements/#PRD-058">PRD-058</a> · PLAN §7 (w3id conneg) · spec/10 §10.4, spec/11 §11.3
+@persona-j @mode-1
+Feature: Standards implementer adopts the discovery format on their own site
+  As P11 (standards implementer)
+  I want one well-known discovery file with an RFC 9264 linkset and content negotiation for the vocabulary
+  So that I can adopt the pattern on my own site using only static files, no server code
+
+  @<a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a> @human @matrix-H15
+  Scenario: Implementer discovers the linkset via the well-known URI
+    When the implementer reads &quot;/.well-known/knowledge-linkset&quot; and the headers &quot;_headers&quot; serves it with
+    Then it is served as &quot;application/linkset+json&quot; with profile &quot;https://w3id.org/agentic-system-core/profile/agentic-knowledge&quot; and &quot;linkset&quot; is its sole top-level member (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-17">AGSC-06-17</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>)
+    And it is a RFC 9264 linkset with &quot;anchor&quot; equal to the site base
+    And it links &quot;describedby&quot; to &quot;/graph.jsonld&quot;
+    And it links relation &quot;https://w3id.org/agentic-system-core/rel#graph&quot; to &quot;/graph.nq&quot; and to &quot;/graph.ttl&quot;
+    And it links relation &quot;…rel#context&quot; to &quot;/ns/context.jsonld&quot;, and carries no &quot;…rel#ontology&quot; link, because a content node does not serve the vocabulary (<a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>)
+    And it links relation &quot;…rel#now&quot; to &quot;/now.md&quot; and &quot;…rel#skills&quot; to &quot;/skills/index.json&quot;
+    And it links &quot;alternate&quot; to &quot;/llms.txt&quot;, and every target on the node's own origin is a file the build emitted
+
+  @<a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a> @human @matrix-H15
+  Scenario: Implementer verifies the link-set integrity attributes
+    When the implementer reads the &quot;describedby&quot; link to &quot;/graph.jsonld&quot; inside &quot;/.well-known/knowledge-linkset&quot;
+    Then it carries &quot;agsc-spec-version&quot;, &quot;agsc-generated-at&quot;, &quot;agsc-counts&quot; and &quot;agsc-bundle-hash&quot;, every value an array
+    And the &quot;…rel#graph&quot; and &quot;…rel#ledger&quot; links each carry a &quot;digest&quot; of the form &quot;sha-256=:&lt;base64&gt;:&quot;
+    And &quot;agsc-generated-at&quot; derives from &quot;SOURCE_DATE_EPOCH&quot;, never the wall clock
+
+  @<a class="ref" href="/docs/requirements/#PRD-050">PRD-050</a> @agent @matrix-H15
+  Scenario: The w3id rule file sends the namespace, a fixed version, the profile and the relations to the site
+    When the agent reads the rules of &quot;w3id/.htaccess&quot; that w3id serves under &quot;https://w3id.org/agentic-system-core/&quot;
+    Then each of these requests is answered &quot;303 See Other&quot; with this &quot;Location&quot;:
+      | path                      | Accept              | Location                                                    |
+      | ns                        | text/turtle         | https://agenticsystemcore.com/ns/agsc.ttl                   |
+      | ns                        | application/ld+json | https://agenticsystemcore.com/ns/context.jsonld             |
+      | ns                        | text/html           | https://agenticsystemcore.com/ns/                           |
+      | ns/1.0.0                  | text/turtle         | https://agenticsystemcore.com/ns/1.0.0/agsc.ttl             |
+      | ns/1.0.0                  | application/ld+json | https://agenticsystemcore.com/ns/1.0.0/context.jsonld       |
+      | ns/1.0.0                  | text/html           | https://agenticsystemcore.com/ns/1.0.0/                     |
+      | ns/1.0.0-draft.1          | text/turtle         | https://agenticsystemcore.com/ns/1.0.0-draft.1/agsc.ttl     |
+      | profile/agentic-knowledge | */*                 | https://agenticsystemcore.com/specs/agentic-knowledge/      |
+      | rel                       | */*                 | https://agenticsystemcore.com/specs/agentic-knowledge/      |
+    And every &quot;Location&quot; the rules can produce is on &quot;https://agenticsystemcore.com/&quot;, so no rule is an open redirect
+
+  @<a class="ref" href="/docs/requirements/#PRD-050">PRD-050</a> @human @matrix-H15
+  Scenario: Implementer content-negotiates the vocabulary via w3id
+    When the implementer requests &quot;https://w3id.org/agentic-system-core/ns#Concept&quot; with &quot;Accept: text/turtle&quot;
+    Then w3id's &quot;.htaccess&quot; issues a 303 redirect to &quot;/ns/agsc.ttl&quot;
+    When the same IRI is requested with &quot;Accept: application/ld+json&quot;
+    Then w3id issues a 303 redirect to &quot;/ns/context.jsonld&quot;
+    When the same IRI is requested with no matching Accept header
+    Then the response is the &quot;/ns/&quot; HTML index
+    And every redirect target is same-origin, never an open redirect
+
+  @<a class="ref" href="/docs/requirements/#PRD-025">PRD-025</a> @human @matrix-H15
+  Scenario: Implementer falls back to llms.txt without any RDF tooling
+    When the implementer fetches &quot;/llms.txt&quot;
+    Then every published item is reachable from the listed links
+    And no authentication or API key is required
+
+  @<a class="ref" href="/docs/requirements/#PRD-054">PRD-054</a> @human @matrix-H15
+  Scenario: Implementer validates the published artifacts with the shipped tools
+    When the implementer runs &quot;the shipped validate-wellknown tool on https://agenticsystemcore.com/.well-known/knowledge-linkset&quot;
+    Then it exits 0 and prints an agsc.diagnostics.v1 envelope with verb &quot;validate-wellknown&quot;
+    And running it against a linkset carrying an unregistered short name exits 1
+
+  @<a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a> @<a class="ref" href="/docs/requirements/#PRD-055">PRD-055</a> @human @matrix-H15
+  Scenario: A node served on loopback passes the shipped checker at Level 1
+    Given a fresh copy of the acceptance Bundle
+    When the Bundle is built and served on loopback
+    Then the shipped validate-wellknown passes at Level 1 over loopback
+
+  @<a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a> @agent @matrix-H15
+  Scenario: A discovery document served as application/json with a profile Link fails Level 2
+    Given a fresh copy of the acceptance Bundle
+    And the Bundle is built and served on loopback
+    When the host serves the discovery document as &quot;application/json&quot;, with the profile carried only by a &quot;Link: rel=profile&quot; header
+    Then the shipped validate-wellknown fails at Level 2 over loopback
+    And its finding &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E201">AGSC-E201</a>&quot; says the media type &quot;application/json&quot; is not &quot;application/linkset+json&quot; (<a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a>)
+
+  @<a class="ref" href="/docs/requirements/#PRD-057">PRD-057</a> @human @matrix-H16
+  Scenario: Two publishers federate and pass the mutual check both ways
+    Given two publishers build the nodes &quot;a.example&quot; and &quot;b.example&quot; from the acceptance Bundle, each naming the other in &quot;peers[]&quot;
+    When the publisher runs the shipped validate-wellknown at Level 2 on the discovery file of &quot;a.example&quot; with &quot;--peer&quot; the discovery file of &quot;b.example&quot;
+    Then it exits 0, and so does the same check from &quot;b.example&quot; to &quot;a.example&quot; (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-12">AGSC-10-12</a>)
+    And a node &quot;c.example&quot; that names &quot;a.example&quot; as its peer, while &quot;a.example&quot; does not name it, is &quot;resolved, not mutual&quot; with &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E907">AGSC-E907</a>&quot;
+
+  @<a class="ref" href="/docs/requirements/#PRD-058">PRD-058</a> @human @matrix-H16
+  Scenario: A publisher advertises a contribute channel
+    Given a fresh copy of the acceptance Bundle
+    And the publisher adds the contribute entry &quot;urn:agsc:channel:inbox&quot; in mode &quot;channel&quot;, backed by the channel &quot;inbox&quot; that publishes &quot;hitl&quot;
+    When the Bundle is built
+    Then the discovery document carries one &quot;…rel#contribute&quot; link per &quot;contribute[]&quot; entry, each with its mode as &quot;agsc-contribute-mode&quot; (<a class="ref" href="/specs/11-boundary/#AGSC-11-14">AGSC-11-14</a>)
+    When the channel &quot;inbox&quot; is set to publish &quot;auto&quot;
+    And the publisher runs &quot;agsc lint --json&quot;
+    Then the JSON envelope carries the error &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E209">AGSC-E209</a>&quot;
+
+  @<a class="ref" href="/docs/requirements/#PRD-057">PRD-057</a> @agent @matrix-A9
+  Scenario: A cross-node citation carries rdfs:seeAlso and asc:peerOrigin
+    Given the node &quot;a.example&quot; names &quot;b.example&quot; as its peer, and its item &quot;handoff&quot; cites &quot;https://b.example/concepts/supervisor/&quot; and &quot;https://elsewhere.example/paper/&quot; in &quot;sources[]&quot;
+    When the Bundle is built
+    Then &quot;graph.nq&quot;, &quot;graph.ttl&quot; and &quot;graph.jsonld&quot; of &quot;a.example&quot; each say that &quot;handoff&quot; has &quot;rdfs:seeAlso&quot; &quot;https://b.example/concepts/supervisor/&quot; and &quot;asc:peerOrigin&quot; &quot;https://b.example/&quot; (<a class="ref" href="/specs/11-boundary/#AGSC-11-12">AGSC-11-12</a>)
+    And the source on &quot;elsewhere.example&quot;, which no peer declares, gets neither, and no Link key of &quot;handoff&quot; names a URL
+
+  @<a class="ref" href="/docs/requirements/#PRD-057">PRD-057</a> @agent @matrix-A9
+  Scenario Outline: A peer at an IPv4-compatible or IPv4-mapped address is refused as the shipped checker refuses it
+    Given the node &quot;a.example&quot; names &quot;b.example&quot; as its peer, and the Bundle is built
+    When an agent walks the federation from &quot;a.example&quot; while &quot;b.example&quot; resolves to &quot;&lt;address&gt;&quot;
+    Then the walk skips &quot;b.example&quot; with &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E905">AGSC-E905</a>&quot; and never reads it (<a class="ref" href="/specs/11-boundary/#AGSC-11-08">AGSC-11-08</a>)
+    And the shipped validate-wellknown refuses &quot;https://[&lt;address&gt;]/.well-known/knowledge-linkset&quot; with &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E905">AGSC-E905</a>&quot; and makes no network call
+
+    Examples:
+      | address        |
+      | ::127.0.0.1    |
+      | ::ffff:8.8.8.8 |</code></pre>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/agentic-system-core/edit/main/features/persona-j-standards.feature">Propose an edit</a> — opens <code>features/persona-j-standards.feature</code> in the specification repository; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>

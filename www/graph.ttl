@@ -9,7 +9,7 @@
 <https://agenticsystemcore.com/> a asc:Bundle ;
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
-    asc:specVersion "1.0.0-rc.7" .
+    asc:specVersion "1.0.0" .
 
 <https://agenticsystemcore.com/clusters/guides/> a asc:Cluster ;
     skos:definition "Procedures for publishing and reading a node, each step naming the rule or the check that proves it."@en ;
@@ -17,6 +17,7 @@
     skos:prefLabel "Guides"@en ;
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" .
 
@@ -26,6 +27,7 @@
     skos:prefLabel "Project board"@en ;
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" .
 
@@ -35,6 +37,7 @@
     skos:prefLabel "Vocabulary"@en ;
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" .
 
@@ -45,6 +48,7 @@
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     asc:kind "term" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/concepts/bundle/#source-1> , <https://agenticsystemcore.com/concepts/bundle/#source-2> , <https://agenticsystemcore.com/concepts/bundle/#source-3> , <https://agenticsystemcore.com/concepts/bundle/#source-4> .
@@ -76,6 +80,7 @@
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     asc:kind "term" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/concepts/cluster/#source-1> , <https://agenticsystemcore.com/concepts/cluster/#source-2> , <https://agenticsystemcore.com/concepts/cluster/#source-3> , <https://agenticsystemcore.com/concepts/cluster/#source-4> .
@@ -107,6 +112,7 @@
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     asc:kind "term" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/concepts/concept/#source-1> , <https://agenticsystemcore.com/concepts/concept/#source-2> , <https://agenticsystemcore.com/concepts/concept/#source-3> .
@@ -133,6 +139,7 @@
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     asc:kind "term" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/concepts/episode/#source-1> , <https://agenticsystemcore.com/concepts/episode/#source-2> .
@@ -154,6 +161,7 @@
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     asc:kind "term" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/concepts/gate/#source-1> , <https://agenticsystemcore.com/concepts/gate/#source-2> .
@@ -175,6 +183,7 @@
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     asc:kind "term" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/concepts/harness/#source-1> , <https://agenticsystemcore.com/concepts/harness/#source-2> , <https://agenticsystemcore.com/concepts/harness/#source-3> .
@@ -201,6 +210,7 @@
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     asc:kind "term" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/concepts/item/#source-1> , <https://agenticsystemcore.com/concepts/item/#source-2> , <https://agenticsystemcore.com/concepts/item/#source-3> , <https://agenticsystemcore.com/concepts/item/#source-4> .
@@ -232,6 +242,7 @@
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     asc:kind "term" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/concepts/lesson/#source-1> , <https://agenticsystemcore.com/concepts/lesson/#source-2> , <https://agenticsystemcore.com/concepts/lesson/#source-3> .
@@ -258,6 +269,7 @@
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     asc:kind "term" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/concepts/link/#source-1> , <https://agenticsystemcore.com/concepts/link/#source-2> , <https://agenticsystemcore.com/concepts/link/#source-3> .
@@ -284,6 +296,7 @@
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     asc:kind "term" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/concepts/now/#source-1> , <https://agenticsystemcore.com/concepts/now/#source-2> .
@@ -305,6 +318,7 @@
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     asc:kind "term" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/concepts/procedure/#source-1> , <https://agenticsystemcore.com/concepts/procedure/#source-2> , <https://agenticsystemcore.com/concepts/procedure/#source-3> .
@@ -325,16 +339,17 @@
     asc:grade "primary" .
 
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/> a asc:Concept ;
-    skos:definition "Apply the items recorded against the release candidate, run the whole vector set with the reference engine, and tag version 1.0.0, at which the reference engine may first claim a conformance Level."@en ;
+    skos:definition "The items recorded against the release candidates were applied, the whole vector set was run with the reference engine, and version 1.0.0 was tagged, with the reference engine's own conformance claim."@en ;
     skos:inScheme <https://agenticsystemcore.com/> ;
     skos:prefLabel "Release version 1.0.0 of the specification"@en ;
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     asc:kind "task" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/concepts/release-version-1-0-0/#source-1> , <https://agenticsystemcore.com/concepts/release-version-1-0-0/#source-2> ;
-    asc:taskState "TASK_STATE_SUBMITTED" .
+    asc:taskState "TASK_STATE_COMPLETED" .
 
 <https://agenticsystemcore.com/concepts/release-version-1-0-0/#source-1> dcterms:source "https://agenticsystemcore.com/specs/10-implementation-profiles/#AGSC-10-05" ;
     dcterms:title "AGSC-10-05" ;
@@ -353,6 +368,7 @@
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     asc:kind "term" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/concepts/source/#source-1> , <https://agenticsystemcore.com/concepts/source/#source-2> .
@@ -372,6 +388,7 @@
     skos:prefLabel "Publish a Level-0 node"@en ;
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
+    asc:model "Claude (Anthropic)" ;
     asc:operator "human:andreibesleaga" ;
     asc:origin "ai-assisted" ;
     asc:source <https://agenticsystemcore.com/procedures/publish-a-level-0-node/#source-1> , <https://agenticsystemcore.com/procedures/publish-a-level-0-node/#source-2> .

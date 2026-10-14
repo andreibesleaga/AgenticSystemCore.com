@@ -10,12 +10,60 @@
     xmlns:skos="http://www.w3.org/2004/02/skos/core#"
     xmlns:vann="http://purl.org/vocab/vann/"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+  <rdf:Description rdf:about="http://purl.org/dc/terms/creator">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/description">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/issued">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/license">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/modified">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/publisher">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/dc/terms/title">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/vocab/vann/preferredNamespacePrefix">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/vocab/vann/preferredNamespaceUri">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://purl.org/vocommons/voaf#Vocabulary">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Collection">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#ConceptScheme">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/ns/prov#Activity">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/ns/prov#Entity">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/ns/prov#Plan">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns">
     <dcterms:creator rdf:resource="https://orcid.org/0009-0001-3464-5283"/>
     <dcterms:description>Vocabulary for AgenticSystemCore Bundles: six item types plus Bundle, Source, Proposal, Review, Harness and Attachment, aligned to SKOS, PROV-O and DCTerms.</dcterms:description>
-    <dcterms:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-09-17</dcterms:issued>
+    <dcterms:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-09-29</dcterms:issued>
     <dcterms:license rdf:resource="https://creativecommons.org/publicdomain/zero/1.0/"/>
-    <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-09-29</dcterms:modified>
+    <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-10-14</dcterms:modified>
     <dcterms:publisher rdf:resource="https://orcid.org/0009-0001-3464-5283"/>
     <dcterms:title>AgenticSystemCore vocabulary</dcterms:title>
     <vann:preferredNamespacePrefix>asc</vann:preferredNamespacePrefix>
@@ -23,8 +71,8 @@
     <rdf:type rdf:resource="http://purl.org/vocommons/voaf#Vocabulary"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
     <rdfs:label>AgenticSystemCore vocabulary</rdfs:label>
-    <owl:versionIRI rdf:resource="https://w3id.org/agentic-system-core/ns/1.0.0-draft.1"/>
-    <owl:versionInfo>1.0.0-draft.1</owl:versionInfo>
+    <owl:versionIRI rdf:resource="https://w3id.org/agentic-system-core/ns/1.0.0"/>
+    <owl:versionInfo>1.0.0</owl:versionInfo>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Attachment">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
@@ -63,35 +111,35 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Gate">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:comment>A declared set of checks that a change must pass; its runs are Episodes.</rdfs:comment>
+    <rdfs:comment>A declared set of checks that a change must pass; the verdict of a run is the file dist/gate.json that the ci verb writes (AGSC-08-10), not an item.</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>Gate</rdfs:label>
     <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Plan"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Harness">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:comment>A generated bundle of files assembled from a validated composition of Concepts; never authored, never stored under content/.</rdfs:comment>
+    <rdfs:comment>A generated bundle of files assembled from a validated composition of items; never authored, never stored under content/ (AGSC-07-12).</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>Harness</rdfs:label>
     <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Plan"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Lesson">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:comment>Knowledge distilled from one or more Episodes, carrying a severity; a Concept by essence.</rdfs:comment>
+    <rdfs:comment>Knowledge drawn from experience, carrying a severity; a Concept by essence. It should name the Episode it comes from with derived-from (AGSC-02-16).</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>Lesson</rdfs:label>
     <rdfs:subClassOf rdf:resource="https://w3id.org/agentic-system-core/ns#Concept"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Procedure">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:comment>An executable-by-a-reader plan: trigger, steps and checks. Exports one-to-one to a skill file.</rdfs:comment>
+    <rdfs:comment>An executable-by-a-reader plan: trigger, steps and checks. Wrapped in the published skill pack of every Cluster it is a member of (AGSC-07-19), and rendered as its own SKILL.md in a Harness that selects it (AGSC-07-12).</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>Procedure</rdfs:label>
     <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Plan"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Proposal">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:comment>A proposed change to a Bundle. It has no file: it is a forge pull request, instantiated in exports from the derived git log.</rdfs:comment>
+    <rdfs:comment>A proposed change to a Bundle. It has no file: it is a forge pull request, and at 1.0 no triple instantiates it (AGSC-05-28).</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>Proposal</rdfs:label>
     <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Activity"/>
@@ -112,7 +160,7 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#blockedBy">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:comment>Mode-2 key 13: the subject cannot proceed until the object is resolved. No domain, range or super-property (AGSC-05-26a). Combiner semantics: none.</rdfs:comment>
+    <rdfs:comment>Mode-2 key 13: the subject cannot proceed until the object is resolved. No domain, range or super-property is declared. Combiner semantics: none.</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>blocked by</rdfs:label>
     <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#blocks"/>
@@ -135,7 +183,7 @@
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#contradicts">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#SymmetricProperty"/>
-    <rdfs:comment>Asserts that two items cannot both be true. Selecting both in a composition is a warning, never a failure. No domain or range is declared: any item type may author this key, and declaring asc:Concept would entail a Concept typing for Procedures, Episodes and Gates.</rdfs:comment>
+    <rdfs:comment>Asserts that two items cannot both be true. A pair of them in the result of a composition is a warning (AGSC-E803), never a failure (AGSC-07-07). No domain or range is declared: any item type may author this key, and declaring asc:Concept would entail a Concept typing for Procedures, Episodes and Gates.</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>contradicts</rdfs:label>
   </rdf:Description>
@@ -255,7 +303,7 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#operator">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdfs:comment>Actor accountable for an item: the human or organisation running the agent that produced it.</rdfs:comment>
+    <rdfs:comment>Person accountable for an item, written human:&lt;id&gt;: the human running the agent that produced it, or its author (AGSC-02-07).</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>operator</rdfs:label>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>

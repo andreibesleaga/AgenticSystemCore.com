@@ -8,11 +8,11 @@ The specification is exact so that two implementers in two languages produce the
 
 ## Sections and rules
 
-The specification has twelve sections, `AGSC-00` to `AGSC-11`, each a page under [/specs/](/specs/); a section too long for one page is published in numbered parts, each with the section's title and a part line, and a link to a rule always names the part that carries it. Every rule has a stable identifier of the form `AGSC-<section>-<number>`, for example AGSC-03-01, which is the first rule of the links section. Identifiers are never reused or renumbered (AGSC-00-16). On this site every identifier is a link: click one to reach the rule, and copy the address to cite it.
+The specification has twelve sections, `AGSC-00` to `AGSC-11`, each a page under [/specs/](/specs/); a section too long for one page is published in numbered parts, each with the section's title and a part line, and a link to a rule always names the part that carries it. Every rule has a stable identifier of the form `AGSC-<section>-<number>`, for example AGSC-03-01, which is the first rule of the links section. Identifiers are never reused or renumbered (AGSC-00-16). On this site every identifier is a link: click one to reach the rule, and copy the address to cite it. Section numbers are stable in the same way, so a number that no section carries (§2.6 to §2.8 and §9.5 to §9.8) is unused on purpose. A rule marked "(reference distribution)" binds the reference distribution of the specification — its engine, validators and test suite — and not a node or another implementation.
 
 ## The key words
 
-MUST, MUST NOT, REQUIRED, SHALL, SHOULD, SHOULD NOT and MAY are used as defined in BCP 14 (RFC 2119 and RFC 8174), and only when written in capitals. MUST is an obligation whose violation is non-conformance; SHOULD is a recommendation that may be set aside for a stated reason; MAY is a permission.
+MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY and OPTIONAL are used as defined in BCP 14 (RFC 2119 and RFC 8174), and only when written in capitals. MUST is an obligation whose violation is non-conformance; SHOULD is a recommendation that may be set aside for a stated reason; MAY is a permission.
 
 ## The small bracketed references
 
@@ -27,7 +27,7 @@ Most rules end with a bracketed note such as `[PRD-002]` or `[PRD-022, RFC 9264]
 
 ## Drafted rules
 
-When a next release candidate is being drafted in the engine repository, its identifiers are shown here with a dotted underline and no link until it is tagged and published; none are pending now.
+When the next version is being drafted in the engine repository, its identifiers are shown here with a dotted underline and no link until it is tagged and published; none are pending now.
 
 ## Reserved rules
 

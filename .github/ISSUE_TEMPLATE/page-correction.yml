@@ -1,0 +1,32 @@
+# GitHub issue form: a correction to a page of the site.
+# Format: https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms
+name: Correct a page
+description: Something on a page of agenticsystemcore.com is wrong, unclear or broken.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A security problem does not belong here: report it privately, as SECURITY.md says.
+        A small correction can also go straight to a pull request, through the page's "Propose an edit" link.
+  - type: input
+    id: page
+    attributes:
+      label: The page
+      description: The exact address of the page or file.
+      placeholder: https://agenticsystemcore.com/docs/
+    validations:
+      required: true
+  - type: textarea
+    id: wrong
+    attributes:
+      label: What is wrong
+      description: Quote the sentence, or describe what does not work and in which browser.
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: The correction
+      description: What it would say or do instead, and the source that shows it, if there is one.
+    validations:
+      required: true

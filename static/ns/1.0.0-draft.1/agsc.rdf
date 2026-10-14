@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+    xmlns:asc="https://w3id.org/agentic-system-core/ns#"
+    xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:prov="http://www.w3.org/ns/prov#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:schema="https://schema.org/"
+    xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+    xmlns:vann="http://purl.org/vocab/vann/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns">
+    <dcterms:creator rdf:resource="https://orcid.org/0009-0001-3464-5283"/>
+    <dcterms:description>Vocabulary for AgenticSystemCore Bundles: six item types plus Bundle, Source, Proposal, Review, Harness and Attachment, aligned to SKOS, PROV-O and DCTerms.</dcterms:description>
+    <dcterms:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-09-17</dcterms:issued>
+    <dcterms:license rdf:resource="https://creativecommons.org/publicdomain/zero/1.0/"/>
+    <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-09-29</dcterms:modified>
+    <dcterms:publisher rdf:resource="https://orcid.org/0009-0001-3464-5283"/>
+    <dcterms:title>AgenticSystemCore vocabulary</dcterms:title>
+    <vann:preferredNamespacePrefix>asc</vann:preferredNamespacePrefix>
+    <vann:preferredNamespaceUri rdf:resource="https://w3id.org/agentic-system-core/ns#"/>
+    <rdf:type rdf:resource="http://purl.org/vocommons/voaf#Vocabulary"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+    <rdfs:label>AgenticSystemCore vocabulary</rdfs:label>
+    <owl:versionIRI rdf:resource="https://w3id.org/agentic-system-core/ns/1.0.0-draft.1"/>
+    <owl:versionInfo>1.0.0-draft.1</owl:versionInfo>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Attachment">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:comment>A media file carried by an item under content/attachments/&lt;slug&gt;/ (AGSC-02-98); IRI &lt;item-IRI&gt;#attachment-&lt;n&gt; (AGSC-05-29). Pattern images are SVG only.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>Attachment</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Entity"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Bundle">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:comment>One directory tree of items published together; the concept scheme every Concept is in.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>Bundle</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#ConceptScheme"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Cluster">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:comment>A navigational grouping of items. Membership is skos:member, authored on the item. Cluster nesting is also skos:member — never skos:broader, which would put a Collection in a semantic relation.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>Cluster</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Collection"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Concept">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:comment>A unit of knowledge in a Bundle: a pattern, taxonomy, explainer, principle, decision, spec, task, term or architecture, distinguished by asc:kind.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>Concept</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Episode">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:comment>A recorded occurrence — a session, run or incident — with a start, an actor and an outcome.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>Episode</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Activity"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Gate">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:comment>A declared set of checks that a change must pass; its runs are Episodes.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>Gate</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Plan"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Harness">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:comment>A generated bundle of files assembled from a validated composition of Concepts; never authored, never stored under content/.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>Harness</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Plan"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Lesson">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:comment>Knowledge distilled from one or more Episodes, carrying a severity; a Concept by essence.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>Lesson</rdfs:label>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/agentic-system-core/ns#Concept"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Procedure">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:comment>An executable-by-a-reader plan: trigger, steps and checks. Exports one-to-one to a skill file.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>Procedure</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Plan"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Proposal">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:comment>A proposed change to a Bundle. It has no file: it is a forge pull request, instantiated in exports from the derived git log.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>Proposal</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Activity"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Review">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:comment>The human assessment of a Proposal. It has no file: it is instantiated from a verified[] entry at the IRI &lt;item-IRI&gt;#review-&lt;n&gt;, its actor and instant carried by asc:verifiedBy and asc:verifiedAt (AGSC-05-15).</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>Review</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Activity"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Source">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:comment>An external work cited by an item. It has no file: it is instantiated from a sources[] entry.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>Source</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Entity"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#blockedBy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Mode-2 key 13: the subject cannot proceed until the object is resolved. No domain, range or super-property (AGSC-05-26a). Combiner semantics: none.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>blocked by</rdfs:label>
+    <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#blocks"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#blocks">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Computed inverse of asc:blockedBy; never authored.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>blocks</rdfs:label>
+    <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#blockedBy"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#consumes">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>A port type name this item consumes (AGSC-02-96, AGSC-05-30).</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Concept"/>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>consumes</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#contradicts">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#SymmetricProperty"/>
+    <rdfs:comment>Asserts that two items cannot both be true. Selecting both in a composition is a warning, never a failure. No domain or range is declared: any item type may author this key, and declaring asc:Concept would entail a Concept typing for Procedures, Episodes and Gates.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>contradicts</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#coveredBy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Computed inverse of asc:covers; never authored.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>covered by</rdfs:label>
+    <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#covers"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#covers">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Mode-2 key 12: the subject covers the object (a test, a check or a document covering a requirement). Combiner semantics: none.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>covers</rdfs:label>
+    <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#coveredBy"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#decidedBy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Mode-2 key 14: the subject was settled by the object, a decision item. Combiner semantics: none.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>decided by</rdfs:label>
+    <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#decides"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#decides">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Computed inverse of asc:decidedBy; never authored.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>decides</rdfs:label>
+    <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#decidedBy"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#excludes">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#SymmetricProperty"/>
+    <rdfs:comment>Asserts mutual exclusion. Evaluated after the requires closure; a surviving pair invalidates a composition. No domain or range is declared, for the reason given on asc:contradicts.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>excludes</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#generatedAt">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Instant at which an item was generated, with an explicit UTC offset.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>generated at</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#generatedBy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Actor string that generated an item: human:&lt;id&gt;, process:&lt;id&gt; or &lt;producer&gt;/&lt;version&gt;.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>generated by</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#grade">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Evidence grade of a Source: primary, secondary or tertiary.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Source"/>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>grade</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#hasAttachment">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Links an item to one of its attachments (AGSC-05-29). No domain: items share no superclass (AGSC-05-13).</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>has attachment</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/agentic-system-core/ns#Attachment"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#implementedBy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Computed inverse of asc:implements; never authored.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>implemented by</rdfs:label>
+    <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#implements"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#implements">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Mode-2 key 10: the subject realises the object (code or a procedure realising a spec). Combiner semantics: none.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>implements</rdfs:label>
+    <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#implementedBy"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#isVerifiedBy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Computed inverse of asc:verifies; never authored. Distinct from the datatype property asc:verifiedBy (AGSC-05-15).</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>is verified by</rdfs:label>
+    <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#verifies"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#kind">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Qualifier on a Concept: pattern, taxonomy, explainer, principle, decision, spec, task, term or architecture.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Concept"/>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>kind</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#level">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Gate level: L1 (schema and links) or L2 (adds provenance, determinism and review).</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Gate"/>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>level</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#mentions">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Untyped edge produced by an inline Markdown link between items. Not a Link key; it may not appear in frontmatter.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>mentions</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#model">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Model identifier recorded when an item's origin is ai-assisted or ai-generated.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>model</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#operator">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Actor accountable for an item: the human or organisation running the agent that produced it.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>operator</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#origin">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>How an item came to exist: human, ai-assisted, ai-generated or imported.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>origin</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#outcome">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Result of an Episode: success, partial or failure.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Episode"/>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>outcome</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#peerOrigin">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>The Bundle IRI of the declared peer node under whose base a cited resource lives (AGSC-11-12). Emitted beside rdfs:seeAlso; takes part in no composition step. No range is declared: the object is a foreign node's Bundle IRI about which this node asserts no class (AGSC-05-23).</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>peer origin</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#produces">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>A port type name this item produces (AGSC-02-96, AGSC-05-30); matched by exact equality in composition Step 5 (AGSC-07-23).</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Concept"/>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>produces</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#retiredAt">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>The instant at which an item entered status retired (AGSC-11-22): modified, else date, by the midnight convention of AGSC-05-14, as xsd:dateTime.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>retired at</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#review">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Connects an item to each asc:Review instantiated from its verified[] entries (AGSC-05-15), so a Review is reachable from its item without string-parsing a fragment IRI. No domain is declared, for the reason given on asc:contradicts (AGSC-05-13: no asc:Item superclass).</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>review</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/agentic-system-core/ns#Review"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#severity">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Weight of a Lesson: info, warn or block.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Lesson"/>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>severity</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#sha256">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Lowercase-hex SHA-256 of the attachment bytes at build (AGSC-05-29).</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Attachment"/>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>SHA-256</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#source">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Connects an item to each asc:Source instantiated from its sources[] entries (AGSC-05-14), so a Source is reachable from its item without string-parsing a fragment IRI. No domain is declared, for the reason given on asc:contradicts (AGSC-05-13: no asc:Item superclass).</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>source</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/agentic-system-core/ns#Source"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#specVersion">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Version of the AgenticSystemCore specification a Bundle declares.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Bundle"/>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>spec version</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#staleAfter">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Absolute instant after which an item is stale. Staleness is a comparison, never a decay function.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>stale after</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#status">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Publication state of an item: draft, stable, deprecated or retired (AGSC-11-22).</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>status</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#taskState">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>One of the nine Agent2Agent 1.0 task states, verbatim (AGSC-02-99, AGSC-10-13).</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Concept"/>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>task state</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#usedBy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Computed inverse of asc:uses; never authored. No domain or range is declared, for the reason given on asc:contradicts.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>used by</rdfs:label>
+    <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#uses"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#uses">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Soft dependency: the subject draws on the object. A composition warns when a used item is absent. No domain, range or super-property is declared: skos:related is a sub-property of skos:semanticRelation, whose domain and range are skos:Concept (S19/S20), so a super-property axiom would re-introduce the unintended Concept typing and the S37 contradiction for Clusters (AGSC-05-26a).</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>uses</rdfs:label>
+    <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#usedBy"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#verifiedAt">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Instant at which a human recorded a Review, with an explicit UTC offset.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Review"/>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>verified at</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#verifiedBy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Actor string of the human who recorded a Review.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Review"/>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>verified by</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#verifiedOn">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Instant at which a Source was last checked to resolve; an authored YYYY-MM-DD date is rendered as that day's midnight UTC instant. xsd:date is not in the OWL 2 datatype map, so xsd:dateTime keeps the ontology inside OWL 2 RL (AGSC-05-14, AGSC-05-22).</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/agentic-system-core/ns#Source"/>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>verified on</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#verifies">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Mode-2 key 11: the subject checks that the object holds. Its computed inverse is asc:isVerifiedBy (the datatype property asc:verifiedBy carries a Review actor and is unrelated). Combiner semantics: none.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>verifies</rdfs:label>
+    <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#isVerifiedBy"/>
+  </rdf:Description>
+</rdf:RDF>

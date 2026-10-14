@@ -22,6 +22,11 @@
 /.well-known/security.txt
   Content-Type: text/plain; charset=utf-8
 
+/changelog.xml
+  Content-Type: application/rss+xml; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
 /graph.jsonld
   Content-Type: application/ld+json; charset=utf-8
   Access-Control-Allow-Origin: *

@@ -14,8 +14,9 @@ specification's chapter on items (`spec/02-item.md` in the engine repository).
 | `clusters/` | the groupings: the vocabulary, the guides and the project board |
 | `procedures/` | step-by-step guides, published as skill packs |
 
-A README is kept only at this level: a `README.md` inside a type folder would be read as
-an item. Every item names its provenance (`prov`), two to five tags from the list in
+A README is kept only at this level, and this one describes the three type folders: a
+`README.md` inside a type folder is not an item, but the engine reports each one it skips
+as a warning on every `lint`, `build` and `ci`. Every item names its provenance (`prov`), two to five tags from the list in
 `agsc.config.json`, and, for a concept, its `kind`. To change an item, edit its file and
 run `node scripts/build.js && node scripts/check.js`; the page's "Propose an edit" link
 opens the same file on the forge.

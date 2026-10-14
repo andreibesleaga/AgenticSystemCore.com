@@ -9,13 +9,13 @@ box o2 380 64 124 34 "llms.txt"
 box o3 380 108 124 34 "ontology (/ns/)"
 box o4 380 152 124 34 "licence (/legal/)"
 box o5 380 196 124 34 "specification"
-box prof 190 190 150 50 "profile URI (w3id)|→ profile page"
+box prof 190 190 130 50 "profile URI (w3id)|→ profile page"
 arrow page wk
 arrow hdr wk
-arrow wk o1
-arrow wk o2
-arrow wk o3
-arrow wk o4
-arrow wk o5
+arrow wk o1 via=360,37
+arrow wk o2 via=360,81
+arrow wk o3 via=360,125
+arrow wk o4 via=360,169
+arrow wk o5 via=360,213
 arrow wk prof
 note "one document lists every machine artefact; the profile URI says how to read it"

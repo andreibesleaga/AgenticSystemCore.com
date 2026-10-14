@@ -4,13 +4,13 @@ caption "The highlighted static site is the only thing readers and agents touch;
 region sys 176 70 170 150 "AgenticSystemCore"
 box eng 190 90 142 44 "engine (CLI)"
 box site 190 156 142 44 "static site (www/)" acc
-box reader 16 40 120 44 "people: read,|contribute"
-box agent 16 110 120 44 "agents: read,|propose"
-box impl 16 180 120 44 "implementers:|spec + vectors"
-box gh 380 40 124 44 "GitHub|(PRs, CI)"
-box cf 380 110 124 44 "Cloudflare Pages"
-box w3 380 172 124 44 "w3id.org|(namespace)"
-box npm 380 232 124 36 "npm registry"
+box impl 16 40 120 44 "implementers:|spec + vectors"
+box reader 16 110 120 44 "people: read,|contribute"
+box agent 16 180 120 44 "agents: read,|propose"
+box npm 380 30 124 36 "npm registry"
+box gh 380 86 124 44 "GitHub|(PRs, CI)"
+box cf 380 150 124 44 "Cloudflare Pages"
+box w3 380 214 124 44 "w3id.org|(namespace)"
 arrow reader site
 arrow agent site
 arrow impl eng

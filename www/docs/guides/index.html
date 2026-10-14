@@ -4,17 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Guides — AgenticSystemCore</title>
-<meta name="description" content="Step-by-step guides to the six modes of AgenticSystemCore, each with the exact commands on your own files and the lines they print, kept true by a test.">
+<meta name="description" content="Step-by-step guides to the six modes of AgenticSystemCore and to publishing a node, each with the exact commands on your own files and the lines they print, kept true by a test.">
 <link rel="canonical" href="https://agenticsystemcore.com/docs/guides/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/docs/guides/">
 <meta property="og:title" content="Guides">
-<meta property="og:description" content="Step-by-step guides to the six modes of AgenticSystemCore, each with the exact commands on your own files and the lines they print, kept true by a test.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Guides","description":"Step-by-step guides to the six modes of AgenticSystemCore, each with the exact commands on your own files and the lines they print, kept true by a test.","url":"https://agenticsystemcore.com/docs/guides/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<meta property="og:description" content="Step-by-step guides to the six modes of AgenticSystemCore and to publishing a node, each with the exact commands on your own files and the lines they print, kept true by a test.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Guides","description":"Step-by-step guides to the six modes of AgenticSystemCore and to publishing a node, each with the exact commands on your own files and the lines they print, kept true by a test.","url":"https://agenticsystemcore.com/docs/guides/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
 <script src="/compose/webmcp.js" defer></script>
@@ -39,12 +41,12 @@
 </header>
 <main id="main">
 <h1>Guides</h1>
-<p class="summary"><strong>Summary</strong>Six short guides, one per mode: who each is for, what you get, the exact commands on files you write yourself, and the lines they print. Every command is run by a test in the engine repository.</p>
+<p class="summary"><strong>Summary</strong>Seven short guides, one per mode and one for publishing: who each is for, what you get, the exact commands on files you write yourself, and the lines they print. Every command that runs offline is run by a test in the engine repository.</p>
 <p><strong>Who this is for:</strong> anyone who wants to use the engine on their own files. <strong>Read
 after:</strong> <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/START-HERE.md">START-HERE.md</a>; the modes are described in
 <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/plain/modes.md">plain/modes.md</a>, and <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/DEMOS.md">DEMOS.md</a> runs every mode on
 ready-made folders.</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
 <thead><tr><th scope="col">Guide</th><th scope="col">Who it is for</th><th scope="col">What you get</th></tr></thead>
 <tbody>
 <tr><td><a href="/docs/guides/mode-0/">Mode 0 — a folder of notes becomes a checked site</a></td><td>a person with Markdown notes</td><td>a static site with search, a graph and files for assistants; changes as proposals</td></tr>
@@ -53,7 +55,10 @@ ready-made folders.</p>
 <tr><td><a href="/docs/guides/mode-3/">Mode 3 — procedures as installable skills</a></td><td>a team with repeatable procedures</td><td>one skill pack per cluster with a lockfile; install, publish, bring skills in</td></tr>
 <tr><td><a href="/docs/guides/mode-4/">Mode 4 — a selection becomes a starting harness</a></td><td>an architect</td><td>a checked selection written as seven kinds of file and an archive; the opt-in <code>run</code> verb</td></tr>
 <tr><td><a href="/docs/guides/mode-5/">Mode 5 — the live board</a></td><td>people and agents sharing tasks</td><td>a board with who holds what; agent lanes with owners, budgets and limits; claims as proposals</td></tr>
+<tr><td><a href="/docs/guides/publish/">Publish — put a node online and check it live</a></td><td>anyone with a node that builds</td><td>the node at an <code>https:</code> address of your own, with the host's settings written for you, checked live by both checkers</td></tr>
 </tbody></table></div>
+<p>When a command says no, look its code up on the reference page
+<a href="/docs/guides/troubleshooting/">Troubleshooting — the codes the guides and demos print</a>.</p>
 <h2 id="before-any-guide">Before any guide</h2>
 <p>Node.js 22.13 or later, <code>git</code> with your name and e-mail set, and a POSIX shell (<code>bash</code>;
 on Windows, Git Bash). Install the package once, in a working folder:</p>
@@ -65,9 +70,12 @@ export ENGINE=&quot;$PWD/node_modules/agentic-system-core&quot;  # the package: 
 except where a step says so.</p>
 <h2 id="how-these-pages-stay-true">How these pages stay true</h2>
 <p>In each guide, a block marked <code>bash demo</code> is run and the <code>text expect</code> block after it
-lists lines it printed, each exactly; a plain <code>bash</code> block is shown, not run.
+lists lines it printed, each exactly; a plain <code>bash</code> block is shown, not run (the upload
+and the live check of the publishing guide need the network, so they are shown).
 <code>tests/docs/guides.test.js</code> runs every guide from top to bottom in a scratch folder, with
-no build instant set (the guides commit instead, as a reader does). To check the guides
+no build instant set (the guides commit instead, as a reader does), and checks that the
+troubleshooting page has a row for every code a guide prints and every code the guides
+and the demos quote. To check the guides
 against the package exactly as it will be published, pack it from a clone of the engine
 repository, install the packed file elsewhere, and point the test at it:</p>
 <pre tabindex="0" data-lang="bash"><code>mkdir -p /tmp/agsc-pack /tmp/agsc-installed

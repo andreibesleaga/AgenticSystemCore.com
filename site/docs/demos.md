@@ -1,7 +1,7 @@
 ---
 title: "Demos"
 summary: "Every mode and every persona as a small demo you can run in under five minutes from an empty folder: the exact commands, the lines they print, and the one thing each proves. Every command is run by a test in the engine repository, so this page cannot drift from the engine."
-description: "Runnable demos of AgenticSystemCore: the six modes and the thirteen personas, each with the exact commands, the printed lines and what it proves, kept true by a test."
+description: "Runnable demos of AgenticSystemCore: the six modes and the personas of the scenarios, each with the exact commands, the printed lines and what it proves, kept true by a test."
 ---
 
 Reading about six modes is one thing; seeing each one do something is another. The engine repository carries one page of demos, [docs/DEMOS.md](https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/DEMOS.md), and a test, `tests/docs/demos.test.js`, that runs every command on that page in a scratch folder and compares what was printed with what the page says. This page is the short form: what each demo does, the commands, and the lines to look for. The full page has every step and every expected line.
@@ -30,7 +30,7 @@ agsc init                                          # adopts the notes, writes th
 mkdir -p .well-known && cp ../security.txt .well-known/security.txt
 cp ../boiling-point.md content/concepts/boiling-point.md
 printf 'Salt it like [pasta water](%s).\n' salting.md >> content/concepts/brewing.md
-agsc lint                                          # error: AGSC-E310 … resolves to nothing … brewing.md:4
+agsc lint                                          # error: AGSC-E310 … resolves to nothing … brewing.md:15
 agsc build                                         # error: AGSC-E901 … emits no route for it; nothing under www/
 grep -v salting content/concepts/brewing.md > brewing.tmp && mv brewing.tmp content/concepts/brewing.md
 agsc build                                         # build: pass — www/ holds the site, graph.jsonld, llms.txt, search.json, the discovery document

@@ -30,12 +30,17 @@ Needs Node 22.13 or later and the engine repository at `../agentic-system-core` 
 `SITE_ENGINE=<path>`), with its `npm ci` done. `SOURCE_DATE_EPOCH` fixes the build
 instant; without it the instant comes from the last commit.
 
+Run both commands with the same `SITE_ENGINE` and `SOURCE_DATE_EPOCH`: the gate rebuilds
+the site and compares the result with `www/`, so a variable set on one line only makes the
+comparison fail.
+
 Optional browser lanes, with `playwright-core` and `axe-core` installed **outside** this
 repository (see each file's header):
 
 ```bash
-NODE_PATH=<dir>/node_modules CHROME_EXE=<chromium> node scripts/a11y.js   # both colour schemes, desktop and phone width, 0 violations expected
+NODE_PATH=<dir>/node_modules CHROME_EXE=<chromium> node scripts/a11y.js   # both colour schemes at 390, 768 and 1280 px, 0 violations expected
 node scripts/page-tools-check.js                                        # the seven page tools, no browser needed
+node scripts/live-check.mjs                                             # read-only check of both live nodes (weekly in .github/workflows/live.yml)
 ```
 
 ## Where things are
@@ -45,8 +50,8 @@ node scripts/page-tools-check.js                                        # the se
 | [content/](content/README.md) | the Bundle's items: vocabulary Concepts, Clusters, a procedure, the project board |
 | [site/](site/README.md) | the authored pages that are not items: the guide, about, privacy, the profile page, diagrams, summaries |
 | [scripts/](scripts/README.md) | the generator, the gate and the optional lanes |
-| `assets/` | the stylesheet (the engine's default theme, byte for byte), the search script, the icon |
-| [docs/](docs/BUILD.md) | how the site is built, with a diagram |
+| [assets/](assets/README.md) | the stylesheet (the engine's default theme, byte for byte), the search script, the icon, as SVG and as the 180-pixel PNG touch icon |
+| [docs/](docs/README.md) | how the site is built, with a diagram |
 | `www/` | the built site, committed; Cloudflare Pages serves it as is |
 
 ## Two switches
@@ -61,7 +66,15 @@ node scripts/page-tools-check.js                                        # the se
 
 Edit `content/` or `site/`, never the built output. Every page carries a "Propose an edit"
 link to its source file here; a change arrives as a pull request, the gate runs, and a
-person merges it. Security reports: the engine repository's `SECURITY.md`.
+person merges it. [CONTRIBUTING.md](CONTRIBUTING.md) says how, and the
+[code of conduct](CODE_OF_CONDUCT.md) applies. Security reports go to this repository's
+private vulnerability reporting, as [SECURITY.md](SECURITY.md) says, never to a public issue.
+
+By contributing you sign off under the contributor agreement of the format,
+`CONTRIBUTOR-AGREEMENT` in the engine repository (token `CA-v1`): you keep the copyright
+in your text and grant the maintainer a non-exclusive licence to publish it here and in
+other collections and editions the maintainer makes from this node's items; you may
+choose, contribution by contribution, to assign it instead. Your name stays on the item.
 
 ## How this is made
 

@@ -1,20 +1,25 @@
 #!/usr/bin/env node
-// Site v0 gate. Run before every commit: `node scripts/check.js`. Exit 0 pass, 1 fail.
+// Site v0 gate: `node scripts/check.js`, before the output is committed and again on the commit
+// that holds it. Exit 0 pass, 1 fail.
 // No network. Checks: (0) every page has a summary line, every diagram a name and a caption, every rule its trace line, no e-mail address; (1) determinism — two builds are byte-identical and equal the committed
-// www/; (2) the llms layout against vectors disc-0013/disc-0014 of the specification;
+// www/, both run at the commit the output's content version names when only www/ changed since; (2) the llms layout against vectors disc-0013/disc-0014 of the specification;
 // (3) the discovery document with the engine's tools/validate-wellknown at Level 0;
+// (3b) every frozen copy of the vocabulary under /ns/<version>/ by SHA-256, beside the copy of the
+// current version;
 // (4) every HTML page: structure, accessibility basics, unique ids, internal links and
 // fragments, no third-party loads, CSP-compatible markup, the 100 KB budget; (4a) every active
 // rule of spec/ anchored exactly once under /specs/, and every link to a rule id — in a page, in
 // the graph, in a machine view — landing on the page that carries it, since a section over the
-// page budget is published in parts; (5) machine files: JSON parses, NFC, one trailing LF,
+// page budget is published in parts; (4b) every diagram: no arrow runs through a box or over a
+// label it does not start or end at; (5) machine files: JSON parses, NFC, one trailing LF,
 // _headers and _redirects content, sitemap targets; (6) WCAG contrast of the colour tokens in
-// both schemes.
+// both schemes; (7) the page tools; (8) the content gate, scripts/check-content.js; (9) the release
+// gate, scripts/check-release.js.
 'use strict';
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const ROOT = path.resolve(__dirname, '..');
 const ENGINE = path.resolve(ROOT, process.env.SITE_ENGINE || '../agentic-system-core');
-const SPEC_TAG = process.env.SITE_SPEC_TAG || '1.0.0-rc.7';
+const SPEC_TAG = process.env.SITE_SPEC_TAG || '1.0.0';
 // The same parameter scripts/build.js reads: the vectors come from the release tag, and from the
 // engine's working tree while the candidate has not been tagged yet.
 const tagExists = cp.spawnSync('git', ['-C', ENGINE, 'rev-parse', '-q', '--verify', `${SPEC_TAG}^{commit}`], { stdio: 'ignore' }).status === 0;
@@ -44,13 +49,23 @@ const rel = f => path.relative(WWW, f).split(path.sep).join('/');
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'agsc-site-'));
 // Removed on every way out — a failed build throws before the end of this file.
 process.on('exit', () => fs.rmSync(tmp, { recursive: true, force: true }));
-const build = out => cp.execFileSync(process.execPath, [path.join(__dirname, 'build.js'), '--out', out], { stdio: ['ignore', 'pipe', 'inherit'], env: process.env });
+// WHERE THE TWO BUILDS RUN. The output records its content version (AGSC-04-25), which names the
+// commit the build ran on; the output itself is committed one commit later, so a build at HEAD
+// would name that later commit and never equal the committed bytes. When the output names another
+// commit and this tree differs from it only inside the output folder, both builds run in a scratch
+// checkout of that commit (scripts/built-commit.js); otherwise they run here, as before.
+const BUILT = require('./built-commit.js').resolve({ root: ROOT, out: WWW });
+const BUILD_ROOT = BUILT.use ? require('./built-commit.js').checkoutAt(ROOT, BUILT.commit, path.join(tmp, 'built-commit')) : ROOT;
+const build = out => cp.execFileSync(process.execPath, [path.join(BUILD_ROOT, 'scripts', 'build.js'), '--out', out], { stdio: ['ignore', 'pipe', 'inherit'], env: { ...process.env, SITE_ENGINE: ENGINE } });
 build(path.join(tmp, 'a')); build(path.join(tmp, 'b'));
 const same = (x, y) => { try { cp.execFileSync('diff', ['-r', x, y], { stdio: 'pipe' }); return true; } catch (e) { return e.stdout.toString().split('\n').slice(0, 5).join('\n'); } };
 const d1 = same(path.join(tmp, 'a'), path.join(tmp, 'b'));
 ok(d1 === true, `build is not reproducible (AGSC-04-02):\n${d1}`);
 const d2 = fs.existsSync(WWW) ? same(path.join(tmp, 'a'), WWW) : 'www/ missing';
-ok(d2 === true, `committed output directory differs from a fresh build — run node scripts/build.js:\n${d2}`);
+const stale = BUILT.commit && BUILT.differs.length
+  ? `the committed output names content version ${BUILT.recorded}, built at ${BUILT.commit.slice(0, 12)}, and this tree differs from that commit outside the output folder in ${BUILT.differs.length} path(s), first ${BUILT.differs[0]}: rebuild, then commit the output on its own.\n`
+  : '';
+ok(d2 === true, `committed output directory differs from a fresh build — run node scripts/build.js:\n${stale}${d2}`);
 
 // (2) llms vectors
 const llms = require('./llms.js');
@@ -102,12 +117,25 @@ else {
 // `tools/gen-ns` derives /ns/context.jsonld, /ns/agsc.ttl and /ns/agsc.rdf from ontology/agsc.ttl
 // and, with --check, compares them with the bytes a site publishes. Zero errors AND zero warnings
 // is the bar: a warning here means this site carries a second derivation of a file the engine
-// already derives, which is exactly the drift removed.
+// already derives, which is exactly the drift removed. The generator and its inputs come from the
+// same specification source the build used: at the tag in tag mode (an archive of the tag's
+// `tools/gen-ns`, `ontology/`, `spec/` and `package.json`, with the engine's installed libraries),
+// from the working tree otherwise, so that a vocabulary changed in the working tree does not fail a
+// build that publishes the tagged one.
 {
-  const gen = path.join(ENGINE, 'tools', 'gen-ns');
+  let root = ENGINE;
+  if (SPEC_SOURCE === 'tag') {
+    root = path.join(tmp, 'gen-ns-root');
+    fs.mkdirSync(root);
+    const archive = cp.spawnSync('git', ['-C', ENGINE, 'archive', '--format=tar', SPEC_TAG, 'tools/gen-ns', 'ontology', 'spec', 'package.json'], { maxBuffer: 256 * 1024 * 1024 });
+    if (archive.status === 0) cp.execFileSync('tar', ['-x', '-C', root], { input: archive.stdout });
+    else fails.push(`cannot archive the vocabulary generator at tag ${SPEC_TAG}: ${String(archive.stderr)}`);
+  }
+  const gen = path.join(root, 'tools', 'gen-ns');
   if (!fs.existsSync(gen)) fails.push(`generator not found: ${gen}`);
   else {
-    const r = cp.spawnSync(process.execPath, [gen, '--check', path.join(WWW, 'ns'), '--json', ENGINE], { encoding: 'utf8' });
+    const childEnv = { ...process.env, NODE_PATH: [path.join(ENGINE, 'node_modules'), process.env.NODE_PATH].filter(Boolean).join(path.delimiter) };
+    const r = cp.spawnSync(process.execPath, [gen, '--check', path.join(WWW, 'ns'), '--json', root], { encoding: 'utf8', env: childEnv });
     let env = null; try { env = JSON.parse(r.stdout); } catch { /* reported below */ }
     ok(r.status === 0 && env && env.status === 'pass' && env.counts.error === 0 && env.counts.warn === 0,
       `gen-ns --check on /ns/ is not clean: ${r.stdout}${r.stderr}`);
@@ -154,6 +182,51 @@ const targetFile = urlPath => {
   if (p.endsWith('/')) return exists(path.join(f, 'index.html')) ? path.join(f, 'index.html') : null;
   return exists(f) ? f : null;
 };
+// (3b) the versioned copies of the vocabulary (AGSC-05-25, AGSC-00-16). A published versioned
+// copy never changes, and it stays served when a later version is published beside it. Each
+// frozen copy is a static input of this site, static/ns/<version>/ (static/README.md), holding
+// exactly the four files below, each with the SHA-256 recorded here: the bytes as published. The
+// build serves those bytes under /ns/<version>/ with a page of its own, and serves the copy of the
+// current version, the one /ns/agsc.ttl names in owl:versionInfo, beside them.
+const FROZEN_NS = {
+  '1.0.0-draft.1': {
+    'agsc.nt': 'e9e04762e90d609207b4a85bacd8c5dc3b257b93f2eee26b0dfcf7b8a68ab2f4',
+    'agsc.rdf': 'b79f375dfc15915ce8f10236895233bc444640628ba89871ddf6d0e285e433fd',
+    'agsc.ttl': '45c958a3f1adc7e51de1bfd5c83b1a19c4e3a7431611ffcbe45c54c2e3eab87a',
+    'context.jsonld': '8f25f2d250db309a2462c62a24e776bfb450252efce631b17832f52658438030',
+  },
+};
+const VOCABULARY_FILES = ['agsc.nt', 'agsc.rdf', 'agsc.ttl', 'context.jsonld'];
+let currentVocabulary = null;
+{
+  const sha = b => require('crypto').createHash('sha256').update(b).digest('hex');
+  const staticNs = path.join(ROOT, 'static', 'ns');
+  for (const v of fs.existsSync(staticNs) ? fs.readdirSync(staticNs).sort() : []) {
+    ok(Object.hasOwn(FROZEN_NS, v), `static/ns/${v}/ is a frozen vocabulary copy whose SHA-256 values scripts/check.js does not record`);
+  }
+  for (const [v, want] of Object.entries(FROZEN_NS)) {
+    const dir = path.join(staticNs, v);
+    const held = fs.existsSync(dir) ? fs.readdirSync(dir).sort() : [];
+    ok(held.join(', ') === VOCABULARY_FILES.join(', '), `static/ns/${v}/ must hold exactly ${VOCABULARY_FILES.join(', ')}; it holds ${held.join(', ') || 'nothing'} (AGSC-05-25)`);
+    for (const f of VOCABULARY_FILES) {
+      const src = path.join(dir, f), out = path.join(WWW, 'ns', v, f);
+      if (exists(src)) ok(sha(fs.readFileSync(src)) === want[f], `static/ns/${v}/${f} is not the copy as published: its SHA-256 is not ${want[f]}; a published versioned copy never changes (AGSC-05-25, AGSC-00-16)`);
+      ok(exists(out) && sha(fs.readFileSync(out)) === want[f], `/ns/${v}/${f} is missing or is not the frozen copy (AGSC-05-25, AGSC-00-16)`);
+    }
+    ok(exists(path.join(WWW, 'ns', v, 'index.html')), `missing route: /ns/${v}/ (AGSC-05-25)`);
+  }
+  const top = path.join(WWW, 'ns', 'agsc.ttl');
+  const m = exists(top) ? /owl:versionInfo\s+"([^"]+)"/.exec(fs.readFileSync(top, 'utf8')) : null;
+  ok(m !== null, '/ns/agsc.ttl is missing or declares no owl:versionInfo (AGSC-05-25)');
+  if (m) {
+    currentVocabulary = m[1];
+    for (const f of VOCABULARY_FILES) {
+      const copy = path.join(WWW, 'ns', currentVocabulary, f);
+      ok(exists(copy) && fs.readFileSync(copy).equals(fs.readFileSync(path.join(WWW, 'ns', f))), `/ns/${currentVocabulary}/${f} is missing or differs from /ns/${f}: the copy of the current version is the same bytes (AGSC-05-25, AGSC-06-32)`);
+    }
+    ok(exists(path.join(WWW, 'ns', currentVocabulary, 'index.html')), `missing route: /ns/${currentVocabulary}/ (AGSC-05-25)`);
+  }
+}
 // (4a) the page each rule lives on. A section over the page budget is published in parts
 // (AGSC-06-21; scripts/build.js, "the layout of the specification pages"), so the page a rule
 // lives on is a fact of the build, not of the section's name. Every active rule of spec/ has
@@ -220,9 +293,75 @@ for (const f of files.filter(f => f.endsWith('.html'))) {
   }
 }
 
+// (4b) diagram geometry: no arrow runs through a box, or over a label, that it does not start or
+// end at. The compiler (scripts/diagram.js) clips an arrow to the borders of its two boxes, so an
+// arrow that touches a box's inside, or a label's extent, anywhere else draws over another box or
+// its text. Read from the inline SVG each page carries: boxes are the `rx="6"` rectangles and the
+// circles (a region, `rx="8"`, is a dashed boundary that arrows cross on purpose), arrows are the
+// paths with an arrowhead, labels are the text lines outside every box, their width estimated
+// with the compiler's own glyph table. A box or label is shrunk by a small margin first, so an
+// arrow that ends on a border, or passes along one, is not a crossing.
+const diagramCrossings = svg => {
+  const attr = (tag, n) => { const m = new RegExp(`\\s${n}="([^"]*)"`).exec(tag); return m === null ? NaN : Number(m[1]); };
+  const unesc = s => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+  const boxes = [...svg.matchAll(/<rect\b[^>]*>/g)].filter(m => /\srx="6"/.test(m[0]))
+    .map(m => ({ x: attr(m[0], 'x'), y: attr(m[0], 'y'), w: attr(m[0], 'width'), h: attr(m[0], 'height'), lines: [] }))
+    .concat([...svg.matchAll(/<circle\b[^>]*>/g)].map(m => { const r = attr(m[0], 'r'); return { x: attr(m[0], 'cx') - r, y: attr(m[0], 'cy') - r, w: 2 * r, h: 2 * r, lines: [] }; }));
+  const labels = [];
+  for (const m of svg.matchAll(/<text x="([^"]+)" y="([^"]+)" font-size="([^"]+)"(?: text-anchor="(start|end)")?>([^<]*)<\/text>/g)) {
+    const x = Number(m[1]), y = Number(m[2]), size = Number(m[3]), text = unesc(m[5]);
+    const inside = boxes.find(b => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h);
+    if (inside) { inside.lines.push(text); continue; }
+    const w = textW(text, size), x0 = m[4] === 'start' ? x : m[4] === 'end' ? x - w : x - w / 2;
+    labels.push({ x: x0, y: y - size * 0.75, w, h: size * 0.95, what: `the label "${text}"` });
+  }
+  const shapes = boxes.map(b => ({ ...b, what: `the box "${b.lines.join(' ')}"` })).concat(labels);
+  // Liang–Barsky: does the segment a–b enter the inside of rectangle s shrunk by `margin` (a
+  // negative margin grows it: a label's width is an estimate, so it gets 2 px of room)?
+  const enters = (a, b, s, margin) => {
+    const dx = b.x - a.x, dy = b.y - a.y; let t0 = 0, t1 = 1;
+    for (const [p, q] of [[-dx, a.x - (s.x + margin)], [dx, s.x + s.w - margin - a.x], [-dy, a.y - (s.y + margin)], [dy, s.y + s.h - margin - a.y]]) {
+      if (p === 0) { if (q <= 0) return false; continue; }
+      const r = q / p;
+      if (p < 0) { if (r > t1) return false; if (r > t0) t0 = r; } else { if (r < t0) return false; if (r < t1) t1 = r; }
+    }
+    return t1 - t0 > 1e-9;
+  };
+  const found = []; let arrows = 0;
+  for (const m of svg.matchAll(/<path d="([^"]+)" marker-end="[^"]*"[^>]*>/g)) {
+    arrows++;
+    const pts = [...m[1].matchAll(/[ML](-?[\d.]+) (-?[\d.]+)/g)].map(p => ({ x: Number(p[1]), y: Number(p[2]) }));
+    const crossed = new Set();
+    for (let i = 1; i < pts.length; i++) for (const s of shapes) if (enters(pts[i - 1], pts[i], s, s.lines ? 1 : -2)) crossed.add(s.what);
+    for (const what of crossed) found.push(`the arrow ${m[1]} runs through ${what}`);
+  }
+  return { found, arrows };
+};
+const { compile: compileDiagram, textW } = require('./diagram.js');
+// The check must see a crossing when there is one: a known-bad and a known-good figure first.
+{
+  const head = 'label "a figure that tests the geometry check"\ncaption "a figure that tests the geometry check"\n';
+  const bad = diagramCrossings(compileDiagram('geometry-bad', `${head}box a 16 100 60 40 "a" acc\nbox b 100 100 60 40 "b"\nbox c 184 100 60 40 "c"\narrow a c\nbox d 16 20 60 40 "d"\nbox e 184 20 60 40 "e"\ntext 130 44 "over"\narrow d e\n`).svg);
+  ok(bad.found.length === 2 && bad.found.some(f => f.includes('the box "b"')) && bad.found.some(f => f.includes('the label "over"')), `the diagram geometry check does not see an arrow through a box and over a label: ${JSON.stringify(bad.found)}`);
+  const good = diagramCrossings(compileDiagram('geometry-good', `${head}box a 16 100 60 40 "a" acc\nbox b 100 100 60 40 "b"\nbox c 184 100 60 40 "c"\narrow a c via=46,60;214,60\ntext 130 52 "over"\narrow b a\n`).svg);
+  ok(good.found.length === 0 && good.arrows === 2, `the diagram geometry check reports a crossing where there is none: ${JSON.stringify(good.found)}`);
+}
+let diagramArrows = 0;
+for (const f of files.filter(f => f.endsWith('.html'))) {
+  for (const m of fs.readFileSync(f, 'utf8').matchAll(/<figure class="diagram"[^>]*>([\s\S]*?)<\/figure>/g)) {
+    const id = (/<marker id="ar-([^"]+)"/.exec(m[1]) || [])[1];
+    const { found, arrows } = diagramCrossings(m[1]);
+    diagramArrows += arrows;
+    for (const x of found) fails.push(`${rel(f)}: diagram ${id} (site/diagrams/${id}.diagram): ${x}; re-route it with via= or move the boxes`);
+  }
+}
+ok(diagramArrows > 0, 'no diagram arrow found on any page: the diagram geometry check read nothing');
+
 // (5) machine files
 for (const f of files) {
   const r = rel(f), b = fs.readFileSync(f);
+  // The one binary file: the touch icon, copied from assets/ as it is (scripts/check-content.js checks its size).
+  if (r === 'apple-touch-icon.png') { ok(b.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex')), `${r}: not a PNG`); continue; }
   if (/\.(png|jpe?g|gif|webp|ico|woff2?)$/.test(r)) { fails.push(`${r}: binary asset not expected in site v0`); continue; }
   const s = b.toString('utf8');
   if (!Buffer.from(s, 'utf8').equals(b)) { fails.push(`${r}: not UTF-8`); continue; }
@@ -303,6 +442,20 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
   // the agent skill and its guide page
   'agent-skill/agentic-system-core/SKILL.md', 'docs/agent-skill/index.html'])
   ok(exists(path.join(WWW, need)), `missing route: /${need}`);
+// The scenarios (AGSC-06-21): /docs/scenarios/ carries the coverage table and one link per feature
+// file of the engine, and each feature file is a page of its own, /docs/scenarios/<file stem>/, so
+// that no page grows past the budget as scenarios are added.
+{
+  const index = path.join(WWW, 'docs/scenarios/index.html');
+  const indexHtml = exists(index) ? fs.readFileSync(index, 'utf8') : '';
+  for (const f of engineList('features').filter(x => x.endsWith('.feature'))) {
+    const stem = f.slice(0, -'.feature'.length), page = path.join(WWW, 'docs/scenarios', stem, 'index.html');
+    ok(exists(page), `missing route: /docs/scenarios/${stem}/ (the page of features/${f})`);
+    ok(indexHtml.includes(`href="/docs/scenarios/${stem}/"`), `/docs/scenarios/ does not link to /docs/scenarios/${stem}/`);
+    if (exists(page)) ok((fs.readFileSync(page, 'utf8').match(/<pre tabindex="0" class="feature" data-lang="gherkin">/g) || []).length === 1, `/docs/scenarios/${stem}/ must carry exactly one feature file`);
+  }
+  ok(!indexHtml.includes('class="feature"'), '/docs/scenarios/ must link to the feature files, not carry them');
+}
 // (7) the page tools: their inputs, their declaration, and the tools themselves RUN.
 {
   const index = exists(searchJson) ? JSON.parse(fs.readFileSync(searchJson, 'utf8')) : { docs: [] };
@@ -346,5 +499,11 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
     }
 }
 
+// (8) the content gate: sentences and routes that must stay true for the version this site publishes.
+for (const f of require('./check-content.js').check(WWW)) fails.push(`content: ${f}`);
+// (9) the release gate, scripts/check-release.js: no page calls a final version a release candidate,
+// the status page's checkable rows agree with the engine, and the releases feed /changelog.xml.
+for (const f of require('./check-release.js').check(WWW, { engine: ENGINE, specTag: SPEC_TAG, specSource: SPEC_SOURCE })) fails.push(`release: ${f}`);
+
 if (fails.length) { process.stderr.write(fails.map(f => `FAIL ${f}`).join('\n') + `\ncheck: ${fails.length} failure(s)\n`); process.exit(1); }
-process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} reserved on ${specPageCount} specification pages with every rule link on its page, headers, contrast, public hygiene\n`);
+process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/ (spec from ${SPEC_SOURCE === 'tag' ? `tag ${SPEC_TAG}` : 'the working tree'}), content, vocabulary copies ${[...Object.keys(FROZEN_NS), currentVocabulary].filter((v, i, a) => a.indexOf(v) === i).map(v => `/ns/${v}/`).join(' and ')}${Object.keys(FROZEN_NS).length ? ` (${Object.keys(FROZEN_NS).join(', ')} frozen by SHA-256)` : ''}, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, diagram geometry (${diagramArrows} arrows clear of every other box and label), ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} reserved on ${specPageCount} specification pages with every rule link on its page, headers, contrast, content, release wording and the releases feed, public hygiene\n`);

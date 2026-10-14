@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scenarios: Port implementer proves a second implementation conforms — AgenticSystemCore</title>
+<meta name="description" content="The behaviour-driven scenarios of persona-l-port-implementer.feature: Port implementer proves a second implementation conforms.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/scenarios/persona-l-port-implementer/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/scenarios/persona-l-port-implementer/">
+<meta property="og:title" content="Scenarios: Port implementer proves a second implementation conforms">
+<meta property="og:description" content="The behaviour-driven scenarios of persona-l-port-implementer.feature: Port implementer proves a second implementation conforms.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Scenarios: Port implementer proves a second implementation conforms","description":"The behaviour-driven scenarios of persona-l-port-implementer.feature: Port implementer proves a second implementation conforms.","url":"https://agenticsystemcore.com/docs/scenarios/persona-l-port-implementer/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/scenarios/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main" class="wide">
+<h1>Scenarios: Port implementer proves a second implementation conforms</h1>
+<p class="summary"><strong>Summary</strong>The 3 scenarios of the feature file persona-l-port-implementer.feature, in the Given/When/Then form the reference engine runs; each names the requirement it proves.</p>
+<p>One of the feature files of the <a href="/docs/scenarios/">scenarios</a>, where the coverage table names the requirements each file proves. Previous: <a href="/docs/scenarios/persona-k-live-board/" rel="prev"><code>persona-k-live-board.feature</code></a>. Next: <a href="/docs/scenarios/persona-m-security-reviewer/" rel="next"><code>persona-m-security-reviewer.feature</code></a>.</p>
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-010">PRD-010</a>, <a class="ref" href="/docs/requirements/#PRD-054">PRD-054</a>, <a class="ref" href="/docs/requirements/#PRD-055">PRD-055</a>, <a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a> · spec/09 conformance, spec/10 Levels
+@persona-l @mode-1
+Feature: Port implementer proves a second implementation conforms
+  As P10 (port implementer)
+  I want the shipped checker and the shared vector set to judge my implementation, not the engine's code
+  So that I can prove a port conforms from the specification's files alone
+
+  @<a class="ref" href="/docs/requirements/#PRD-054">PRD-054</a> @<a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a> @human @matrix-H14
+  Scenario: A Level-0 node written without the engine passes the shipped checker
+    Given a publisher writes, without the engine, two Markdown items, &quot;graph.jsonld&quot;, &quot;llms.txt&quot; and &quot;/.well-known/knowledge-linkset&quot; with no digest and no &quot;agsc-*&quot; attribute
+    When the port implementer runs the shipped &quot;validate-wellknown&quot; tool on that discovery file at Level 0
+    Then it exits 0 and reports &quot;pass&quot; (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-02">AGSC-10-02</a>)
+    And the same file with a relation name that is neither registered nor an extension of the format exits 1 (<a class="ref" href="/specs/06-surfaces/#AGSC-06-10">AGSC-06-10</a>)
+
+  @<a class="ref" href="/docs/requirements/#PRD-010">PRD-010</a> @<a class="ref" href="/docs/requirements/#NFR-02">NFR-02</a> @human @matrix-H14
+  Scenario: The Python package's runner agrees with the engine on the shared vectors
+    Given the Python checker package is checked out beside the engine
+    When the port implementer runs the engine's &quot;conform&quot; and the Python package's &quot;run-vectors&quot; over the same &quot;tests/vectors/&quot;
+    Then every vector the Python package runs has the same result as in the engine's conformance report
+    And every vector it does not run is reported as not run with a reason, never counted as a pass
+
+  @<a class="ref" href="/docs/requirements/#PRD-055">PRD-055</a> @agent @matrix-H14
+  Scenario: The reference engine's Level-3 report
+    Given a fresh copy of the acceptance Bundle
+    When the agent runs &quot;agsc conform --level 3 --to report.json&quot;
+    Then the command exits 0
+    And &quot;report.json&quot; names the implementation &quot;agentic-system-core&quot; and the class &quot;full-engine&quot;, which is Level 3 (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-01">AGSC-10-01</a>, <a class="ref" href="/specs/09-conformance/#AGSC-09-03">AGSC-09-03</a>)
+    And every required case of the Level-3 set is reported &quot;pass&quot; by its id, and &quot;summary.fail&quot; is 0
+    And every withdrawn case is reported apart as &quot;skip&quot;, never counted as a pass, and &quot;summary.pass&quot; counts only the cases that ran and passed (<a class="ref" href="/specs/09-conformance/#AGSC-09-02">AGSC-09-02</a>, <a class="ref" href="/specs/09-conformance/#AGSC-09-05">AGSC-09-05</a>)</code></pre>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/agentic-system-core/edit/main/features/persona-l-port-implementer.feature">Propose an edit</a> — opens <code>features/persona-l-port-implementer.feature</code> in the specification repository; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>

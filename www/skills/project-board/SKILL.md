@@ -10,9 +10,9 @@ license: LicenseRef-AgenticSystemCore-Content-Use-1.0
 bundle: https://agenticsystemcore.com/
 license: LicenseRef-AgenticSystemCore-Content-Use-1.0
 terms: LicenseRef-AgenticSystemCore-Content-Use-1.0
-spec_version: 1.0.0-rc.7
-bundle_version: v1.0.0+16.g5b24a4555deb
-generated_at: 2026-10-08T07:30:56Z
+spec_version: 1.0.0
+bundle_version: vsite-2026-10-14
+generated_at: 2026-10-14T09:45:37Z
 assistance: content may be AI-assisted; each item states its origin in prov.origin and each accepted contribution carries an Assisted-by: trailer
 -->
 
@@ -31,11 +31,11 @@ assistance: content may be AI-assisted; each item states its origin in prov.orig
 
 ```text agsc-content
 
-The specification is published as a release candidate. Version 1.0.0 is the first release at which the reference engine may claim a conformance Level: the claim needs a green run of that Level's whole vector set at a released version (AGSC-10-05).
+Version 1.0.0 of the specification was released and tagged, and with it the reference engine published its own conformance claim: a claim needs a green run of that Level's whole vector set at a released version, which a release candidate is not (AGSC-10-05).
 
 ## What done means
 
-- Every item recorded against the release candidate is either applied, with a dated amendment note on each changed rule, or moved to a later version with a reason.
+- Every item recorded against the release candidates is either applied, with a dated amendment note on each changed rule, or moved to a later version with a reason.
 - A vector found wrong is withdrawn and replaced by a new one, never edited (AGSC-00-16).
 - The reference engine passes every required vector of the Level-3 set, and the report is published with the claim.
 - The specification's tag and the engine's tag are pushed on one commit by the maintainer.

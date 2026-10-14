@@ -7,9 +7,11 @@
 <meta name="description" content="Guide to Mode 5 of AgenticSystemCore: the live board with agent lanes, claims as proposals and their limits, with every command and the lines it prints.">
 <link rel="canonical" href="https://agenticsystemcore.com/docs/guides/mode-5/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/docs/guides/mode-5/">
 <meta property="og:title" content="Mode 5 guide: the live board">
@@ -48,7 +50,9 @@ tasks are open, who holds which, and whether the board is done; <strong>agent la
 in the configuration, each with its owner, its budget and its limit of tasks held at once;
 claims made as proposals (the tool server returns a patch and writes nothing) that take
 effect only when a person commits them; refusals for a task already held and for a lane
-over its limit. No model adapter ships with the engine: an agent's own run is shown as a
+over its limit. No model adapter ships with the engine: a live run is made by an agent
+outside the engine — Claude Code, a script — as a client of <code>agsc mcp</code> or the page tools,
+under the lane's declared limits (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a>), and the lane's own run is shown here as a
 dry run.</p>
 <p><strong>Read after:</strong> <a href="/docs/guides/mode-2/">Mode 2</a>. <strong>Next:</strong> the <a href="/docs/guides/">guides index</a>.</p>
 <p>---</p>
@@ -131,7 +135,7 @@ cat &gt; lanes.json &lt;&lt;'JSON'
 JSON
 node -e 'const fs = require(&quot;node:fs&quot;), c = JSON.parse(fs.readFileSync(&quot;agsc.config.json&quot;, &quot;utf8&quot;)); Object.assign(c, JSON.parse(fs.readFileSync(&quot;lanes.json&quot;, &quot;utf8&quot;))); fs.writeFileSync(&quot;agsc.config.json&quot;, JSON.stringify(c, null, 2) + &quot;\n&quot;);'
 rm lanes.json</code></pre>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 28"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
 <thead><tr><th scope="col">Block</th><th scope="col">What it says</th></tr></thead>
 <tbody>
 <tr><td><code>agents[]</code></td><td>one lane: its <code>name</code>; <code>kind</code> (<code>llm</code> or <code>process</code>); the <code>model</code> and <code>budget_usd_month</code> (both required for <code>llm</code>); the forge login it opens pull requests as (<code>author</code>); the person who answers for it (<code>operator</code>); its <code>channel</code>; the <code>tasks</code> it may do (<code>claim</code>, <code>work</code>, <code>plan</code>, <code>refresh</code>, <code>create</code>, <code>edit</code>, …); the item <code>types</code> it may touch (never a procedure, a gate or a cluster); <code>max_claims</code>, the number of tasks it may hold at once; <code>enabled</code></td></tr>
@@ -186,11 +190,18 @@ refresh exit 1</code></pre>
 through <code>remember</code> comes back as a proposal on the board it names; the lane's run, dry,
 writes the proposal it would open (with the Episode of the run) and prints the commands a
 person may run; a lane that is not declared is refused.</p>
+<p>The lane's run stops before it writes anything when the month's spend has reached the
+lane's <code>budget_usd_month</code> or the node's <code>budget.usd_month</code> (the warning <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E510"><code>AGSC-E510</code></a>,
+which the NOW page and the output of <code>agsc build</code> repeat), when no board it may touch
+holds a task it can claim (it says &quot;nothing can be claimed&quot;), and when it has no date
+for its Episode, with no commit and no <code>SOURCE_DATE_EPOCH</code> (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E204"><code>AGSC-E204</code></a>, as <code>build</code>).</p>
 <h2 id="what-needs-something-you-may-not-have">What needs something you may not have</h2>
 <ul>
 <li><strong>A model.</strong> The engine ships no model adapter, so <code>refresh --agent &lt;lane&gt;</code> without
-<code>--dry-run</code> refuses; the budget, the lane's limits and the Episode are real, the model
-call is not made.</li>
+<code>--dry-run</code> refuses; the budget and the stop it causes, the lane's limits and the
+Episode are real, the model call is not made. A live run is made by an agent outside
+the engine, with its own model, as a client of <code>agsc mcp</code> or the page tools, as the
+claims in this guide are made (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a>).</li>
 <li><strong>A forge.</strong> Pull requests, required checks and <code>publish: auto</code> merges happen on
 GitHub, GitLab or similar; <code>agsc ci</code> writes the files the forge needs (<a href="/docs/guides/mode-2/">Mode 2</a>).</li>
 </ul>

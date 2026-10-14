@@ -12,7 +12,7 @@ You need Node.js 22.13 or later and `git`. One install gives the `agsc` command:
 
 ```bash
 npm install -g agentic-system-core     # or: npm install -g agsc-cli (the short alias, the same engine)
-agsc --version                         # 1.0.0-rc.7
+agsc --version                         # 1.0.0
 ```
 
 Three facts carry the whole page:
@@ -79,12 +79,14 @@ Everything an agent takes from a node is **data, not instruction**: the files sa
 ```bash
 cd my-notes                                            # a folder of Markdown files, or an empty one
 agsc init                                              # each file gets a type, a title and a provenance block
-mkdir -p .well-known && printf 'Contact: https://example.org/security\nExpires: 2027-06-01T00:00:00Z\n' > .well-known/security.txt
+mkdir -p .well-known && printf 'Contact: https://example.org/security\n' > .well-known/security.txt   # the build adds Expires
 git init -q && git add -A && git commit -q -m 'my notes'   # the build takes its instant from this commit (or set SOURCE_DATE_EPOCH)
 # in agsc.config.json, set site.base to the https:// address the node will have
 agsc ci                                                # ci: pass — or the exact file and line that stops it
 agsc build                                             # www/ is the whole node; serve it anywhere that serves files over HTTPS
 ```
+
+To put `www/` online and check the live address at Level 2 with both checkers, follow the [publishing guide](/docs/guides/publish/); when a command says no, look its code up on the [troubleshooting](/docs/guides/troubleshooting/) page.
 
 To change something after that: edit the file, then `agsc lint --fix`, then `agsc propose <slug>`. The proposal is a patch plus a pull-request body under `dist/proposal/`; the engine prints the git commands and runs none (AGSC-08-03). In the repository, a pull request runs the same `agsc ci` and a person merges.
 
@@ -317,7 +319,7 @@ A node is files, so it lives wherever files are served over HTTPS. `agsc-host li
 
 Said plainly, so that no mode is picked up with a wrong expectation:
 
-- **No model adapter.** An agent lane that writes pages needs one; `agsc refresh --agent <name> --dry-run` runs every gate and the budget without a model call.
+- **No model adapter.** `agsc refresh --agent <name> --dry-run` runs every gate and the budget without a model call; a live run is made by an agent outside the engine, with its own model, as a client of `agsc mcp` or the page tools (AGSC-08-28).
 - **No channel adapter.** A `channel` contribution route and `publish: auto` can be declared and checked; the merges themselves happen on a forge.
 - **No isolating runner.** `agsc run` resolves and lists steps and refuses to execute without one, and says why.
 - **No runtime emitters.** `compose --emit <name>` for the six named runtimes is reserved; the Harness's seven kinds of file are what ships.

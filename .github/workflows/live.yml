@@ -1,0 +1,59 @@
+# The live check of both public nodes, once a week and on request.
+#
+#   What runs  `node scripts/live-check.mjs --require-checkers` (read-only: GET requests and
+#              the released checkers; it writes nothing but its report): the served pages
+#              against the committed `www/` (no rewritten e-mail text, no script from
+#              `/cdn-cgi/`), the promised response headers (Link, ETag, Content-Type, the
+#              page policy, HSTS), no Network Error Logging or speculation rules header unless
+#              the node's statements name it, `security.txt` expiring more than 60 days ahead,
+#              a sustainability report at most two months old, the w3id redirects, the npm and
+#              PyPI versions, and both released checkers at Level 2 on both nodes with the
+#              mutual check. `scripts/live-check.test.mjs` proves each rule on recorded responses.
+#   Checkers   the latest npm package `agentic-system-core` and the version PyPI names as
+#              its latest, each installed outside the repository in a folder of the runner.
+#   Required   no. What it reads can change without a commit here (the edge network, the
+#              registries, w3id), so it reports and never blocks a pull request.
+#   Schedule   Mondays 06:17 UTC. GitHub turns a schedule off after 60 days without activity
+#              in the repository; a manual run ("Run workflow") turns it back on.
+#   Secrets    none. Permissions: read this repository, nothing else.
+#
+# Every action is pinned to a commit SHA with the version beside it, the SHAs test.yml pins.
+
+name: live
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    name: live check (both nodes, read-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: this repository, for the committed output and the check
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: AgenticSystemCore.com
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22.13.0'
+          package-manager-cache: false
+      - name: the released checkers, outside the repository
+        shell: bash
+        run: |
+          npm i --prefix "$RUNNER_TEMP/npm" --no-save --no-audit --no-fund agentic-system-core@latest
+          version="$(python3 -c 'import json, urllib.request; print(json.load(urllib.request.urlopen("https://pypi.org/pypi/agentic-system-core/json", timeout=60))["info"]["version"])')"
+          python3 -m venv "$RUNNER_TEMP/py"
+          "$RUNNER_TEMP/py/bin/pip" install --disable-pip-version-check --no-cache-dir "agentic-system-core==$version"
+      - name: the live check
+        working-directory: AgenticSystemCore.com
+        env:
+          SITE_LIVE_NODE_CHECKER: ${{ runner.temp }}/npm/node_modules/agentic-system-core/tools/validate-wellknown
+          SITE_LIVE_PYTHON: ${{ runner.temp }}/py/bin/python
+        run: node scripts/live-check.mjs --require-checkers
