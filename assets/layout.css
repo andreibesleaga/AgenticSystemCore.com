@@ -33,6 +33,7 @@
 
 header.site nav, main, main.wide, footer.site p { max-width: 60rem; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
 main > :not(figure, pre, table, .table-wrap, .modes) { max-width: none; }
+figure.diagram figcaption { max-width: none; }
 
 
 /* THE HEADER ROW. In the theme the list of links is one flex item as wide as all its links, so on a
