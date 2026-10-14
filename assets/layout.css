@@ -61,15 +61,13 @@ header.site ul { flex: 1 1 18rem; }
   .toc li { margin: 0; }
   .toc a { display: inline-flex; align-items: center; min-height: 44px; }
   /* A link alone in a table cell ("Mode 0", a commit, a draft's name) is a control, not a word in
-     a sentence: 12 px of padding above and below its 20 px line make it 44 px tall without moving
-     the text (vertical padding on an inline box does not change the line), and the cell gets the
-     same 12 px of padding so the enlarged link stays inside its own row and never overlaps the
-     link of the row above or below; and the cell is never narrower than the 44 px link plus its side
-     padding, so at 320 px a column of file names does not shrink to 40 px (the table then scrolls
-     inside its own wrapper, as WCAG 1.4.10 allows). Only cells whose single child element is a link
-     change. */
-  td:has(> a:only-child), th:has(> a:only-child) { padding-top: 12px; padding-bottom: 12px; min-width: calc(44px + 1.1rem); }
-  td > a:only-child, th > a:only-child { padding-top: 12px; padding-bottom: 12px; }
+     a sentence: it becomes an inline-flex box at least 44 px wide and tall, so the clickable area
+     itself (not only its cell) meets the size; the row grows to fit it, and the cell is never
+     narrower than the link plus its side padding, so at 320 px a column of file names does not
+     shrink below the link (the table then scrolls inside its own wrapper, as WCAG 1.4.10 allows).
+     Only cells whose single child element is a link change. */
+  td:has(> a:only-child), th:has(> a:only-child) { min-width: calc(44px + 1.1rem); }
+  td > a:only-child, th > a:only-child { display: inline-flex; align-items: center; min-width: 44px; min-height: 44px; }
 }
 
 /* CARD LINKS. In the front page's two card grids (.modes) each card's title is a link of one 20 px
