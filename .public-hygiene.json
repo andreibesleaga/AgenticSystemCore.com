@@ -3,7 +3,16 @@
   "built": [
     "www"
   ],
-  "skip": [],
+  "skip": [
+    {
+      "path": "assets/vendor/*.min.js",
+      "reason": "third-party MIT code (force-graph 1.52.0, 3d-force-graph 1.80.1) vendored byte for byte at a pinned version; scripts/check.js asserts the SHA-256 of each file, so no change can pass unseen, and its strings are the libraries' own"
+    },
+    {
+      "path": "www/assets/vendor/*.min.js",
+      "reason": "the same vendored files as published; scripts/check.js asserts that their SHA-256 equals the pinned one"
+    }
+  ],
   "allow": [
     {
       "check": "wording",

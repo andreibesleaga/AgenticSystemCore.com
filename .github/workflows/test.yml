@@ -101,7 +101,7 @@ jobs:
         run: npm ci
       - name: the tests of the gate's own helpers (no network)
         working-directory: AgenticSystemCore.com
-        run: node --test scripts/built-commit.test.js scripts/live-check.test.mjs scripts/release-feed.test.js
+        run: node --test scripts/built-commit.test.js scripts/live-check.test.mjs scripts/release-feed.test.js scripts/graph-explorer.test.js
       - name: the committed output, on a pull request that changes it
         if: ${{ github.event_name == 'pull_request' }}
         working-directory: AgenticSystemCore.com

@@ -74,9 +74,13 @@ for (const [route, expected] of Object.entries(EXPECTED)) {
   ok(served === expected, `${route} is not the engine's emitted bytes — this repository must hold no second implementation`);
   digests[route] = { bytes: Buffer.byteLength(served || ''), sha256: sha256(served || '') };
 }
-// A script anywhere else would be a second implementation by another name.
+// A script anywhere else would be a second implementation by another name. The graph explorer's
+// scripts (its own two and the two vendored drawing libraries, pinned by scripts/check.js) are not
+// page tools: they must register nothing and never touch `document.modelContext`.
+const EXPLORER_SCRIPTS = ['/assets/graph-data.js', '/assets/graph-explorer.js', '/assets/vendor/force-graph-1.52.0.min.js', '/assets/vendor/3d-force-graph-1.80.1.min.js'];
+for (const route of EXPLORER_SCRIPTS) if (files.has(route)) ok(!/modelContext|registerTool|provideContext/.test(files.get(route)), `${route}: the graph explorer touches the WebMCP surface; the page tools are the engine's four /compose/ files only`);
 for (const route of [...files.keys()]) {
-  if (route.endsWith('.js') && !route.startsWith('/compose/') && route !== '/assets/search.js' && route !== '/assets/theme.js') {
+  if (route.endsWith('.js') && !route.startsWith('/compose/') && route !== '/assets/search.js' && route !== '/assets/theme.js' && !EXPLORER_SCRIPTS.includes(route)) {
     fails.push(`${route}: an unexpected script — the page tools are the engine's four /compose/ files only`);
   }
 }

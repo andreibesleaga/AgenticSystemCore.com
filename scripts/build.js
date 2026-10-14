@@ -1041,14 +1041,17 @@ const SPEC_DIAGRAM = { '00-overview': 'spec-00-conformance', '01-bundle': 'spec-
 // ------------------------------------------------------------------ HTML layout
 const NAV = [['/docs/', 'Guide'], ['/specs/', 'Specification'], ['/concepts/', 'Vocabulary'], ['/ns/', 'Ontology'], ['/specs/agentic-knowledge/', 'Discovery'], ['/docs/standards/', 'Standards'], ['/about/', 'About'], ['/search/', 'Search']];
 const summaryOf = url => { const s = SUMMARIES[url]; if (!s) die(`no summary for ${url} (site/summaries.json)`); return s; };
-function page({ url, title, heading, summary, description, body, jsonld, section, wide, script, scripts }) {
+function page({ url, title, heading, summary, description, body, jsonld, section, wide, script, scripts, styles, mainClass }) {
   const canonical = ORIGIN + url;
   if (!summary || cp_len(summary) < 20) die(`${url}: summary missing`);
   const ld = jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld).replace(/</g, '\\u003c')}</script>\n` : '';
   // Same-origin classic scripts, deferred so the parse is never interrupted (AGSC-06-17's
-  // `script-src 'self'` admits no inline script and no other host).
+  // `script-src 'self'` admits no inline script and no other host). A script given as
+  // { src, integrity } carries its SRI hash (the graph explorer's files).
   const js = [...(script ? [script] : []), ...(scripts || [])]
-    .map(s => `<script src="${esc(s)}" defer></script>\n`).join('');
+    .map(s => (typeof s === 'string' ? `<script src="${esc(s)}" defer></script>\n` : `<script src="${esc(s.src)}" integrity="${esc(s.integrity)}" defer></script>\n`)).join('');
+  const css = (styles || []).map(s => `<link rel="stylesheet" href="${esc(s)}">\n`).join('');
+  const mainClasses = [wide ? 'wide' : '', mainClass || ''].filter(Boolean).join(' ');
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -1060,7 +1063,7 @@ function page({ url, title, heading, summary, description, body, jsonld, section
 <link rel="describedby" href="${WELLKNOWN}" type="application/linkset+json">
 <link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
-<script src="/assets/theme.js"></script>
+${css}<script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="${url === '/' ? 'website' : 'article'}">
@@ -1079,7 +1082,7 @@ ${NAV.map(([h, t]) => `<li><a href="${h}"${section === h ? ' aria-current="page"
 ${engineTheme.SWITCHER}
 </nav>
 </header>
-<main id="main"${wide ? ' class="wide"' : ''}>
+<main id="main"${mainClasses ? ` class="${mainClasses}"` : ''}>
 <h1>${heading || esc(title)}</h1>
 <p class="summary"><strong>Summary</strong>${esc(summary)}</p>
 ${body}</main>
@@ -1141,6 +1144,38 @@ const pageTexts = new Map(); // url -> { title, html } for the site search index
 
 function addPage(url, opts) { const html = page({ url, ...opts }); put(url.replace(/^\//, '') + 'index.html', html); routes.push(url); pageTexts.set(url, { title: opts.title, summary: opts.summary, html }); }
 
+// ------------------------------------------------------------------ the graph explorer
+// The front page's picture and the page /graph/: this node's published graph.jsonld, and the
+// graphs of the peers its discovery document names, drawn in the browser. The drawing libraries
+// are third-party code, MIT-licensed, vendored under assets/vendor/ byte for byte at a pinned
+// version (scripts/check.js asserts the SHA-256 of each) and served from this site: force-graph
+// (2D canvas) loads with the page, 3d-force-graph (WebGL) only when the visitor asks for 3D. Every
+// <script> of the explorer carries its SRI hash; the 3D library's hash is handed to the page
+// script, which sets it on the element it adds. The explorer's own code is assets/graph-data.js
+// (the pure functions, tested by scripts/graph-explorer.test.js) and assets/graph-explorer.js.
+const sri = b => `sha384-${crypto.createHash('sha384').update(b).digest('base64')}`;
+const GX_VENDOR = [
+  { name: 'force-graph', version: '1.52.0', file: 'assets/vendor/force-graph-1.52.0.min.js', licence: 'assets/vendor/force-graph-1.52.0.LICENSE.txt' },
+  { name: '3d-force-graph', version: '1.80.1', file: 'assets/vendor/3d-force-graph-1.80.1.min.js', licence: 'assets/vendor/3d-force-graph-1.80.1.LICENSE.txt' },
+].map(v => { const bytes = fs.readFileSync(path.join(ROOT, v.file)); return { ...v, bytes, sri: sri(bytes), url: `/${v.file}`, licenceUrl: `/${v.licence}` }; });
+const GX_OWN = ['assets/graph-data.js', 'assets/graph-explorer.js', 'assets/graph-explorer.css'].map(f => { const text = read(f); checkText(f, text); return { file: f, text, url: `/${f}`, sri: sri(Buffer.from(text, 'utf8')) }; });
+const GX_SCRIPTS = [{ src: GX_OWN[0].url, integrity: GX_OWN[0].sri }, { src: GX_OWN[1].url, integrity: GX_OWN[1].sri }, { src: GX_VENDOR[0].url, integrity: GX_VENDOR[0].sri }];
+const GX_STYLES = [GX_OWN[2].url];
+const GX_3D = ` data-gx-3d="${esc(GX_VENDOR[1].url)}" data-gx-3d-integrity="${esc(GX_VENDOR[1].sri)}"`;
+// The origins the front page may read from: this node's own, and each declared peer's (its CSP, below).
+const PEER_ORIGINS = [...new Set(PEERS.map(p => new URL(p).origin))].sort(byCode);
+const gxStage = label => `<div class="gx-stage" role="group" aria-label="${esc(label)}" hidden>
+<div class="gx-view" aria-hidden="true"></div>
+<p class="gx-status" role="status">Reading the graph…</p>
+<div class="gx-legend" role="group" aria-label="Legend: the kinds of node and the nodes read; press one to hide or show it"></div>
+<div class="gx-tip" id="gx-tip" role="tooltip" hidden></div>
+</div>
+`;
+const GX_EMBED = `<figure class="gx gx-embed" data-gx="embed"${GX_3D}>
+${gxStage(`A picture of this node's graph${PEER_ORIGINS.length ? ' and of its peer node' : ''}. The explorer page lists the same nodes as buttons.`)}<figcaption>The graph of this node${PEER_ORIGINS.length ? ' and of the peer node it names' : ''}, drawn in your browser from the published <code>graph.jsonld</code> files. Hover a node for a second to read its summary. <a href="/graph/">Open the explorer</a> to search, list and inspect every node, or to explore another node.</figcaption>
+</figure>
+`;
+
 // home
 const MODE_CARDS = [
   ['Auto-wiki', 'Markdown in, a checked and linked website out; no model needed.', '/docs/modes/#mode-0-the-automatic-self-correcting-wiki'],
@@ -1188,10 +1223,11 @@ const MEASURES = [
 ];
 addPage('/', {
   title: config.site.title, summary: summaryOf('/'), description: index.fm.description, section: null,
+  scripts: GX_SCRIPTS, styles: GX_STYLES,
   jsonld: { '@context': 'https://schema.org', '@type': 'WebSite', name: config.site.title, url: BASE, description: index.fm.description, author: { '@type': 'Person', name: config.site.author, sameAs: ['https://orcid.org/0009-0001-3464-5283'] } },
   body: `<p class="tagline">${esc(config.site.tagline)}</p>
 <p class="lead">AgenticSystemCore turns one folder of Markdown into a website, a knowledge graph and a local tool server for AI assistants at once — every link typed, every published artefact carrying a digest a reader can check, every change merged by a person or by a rule that person recorded — so people, search engines and AI agents read the same checked knowledge, with no server, database or language model needed to build, check or publish it.</p>
-<ul>
+${GX_EMBED}<ul>
 <li><a href="/docs/demos/">Try it in five minutes</a>: install the package and run each mode from an empty folder.</li>
 <li><a href="/docs/guides/">Use it on your own files</a>: seven short guides, one per mode and one for publishing, every command with the lines it prints.</li>
 <li><a href="/docs/modes/">The six ways to use it</a>: one folder of files, six modes.</li>
@@ -1949,6 +1985,7 @@ addPage('/legal/', {
 <tr><td>The schemas, the ontology, the JSON-LD context, the identifiers and the discovery document</td><td><a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a></td></tr>
 <tr><td>The specification text</td><td><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>, as published with the reference implementation</td></tr>
 <tr><td>The reference engine, its command line and checkers, and the conformance vectors</td><td><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a></td></tr>
+${GX_VENDOR.map(v => `<tr><td>${esc(v.name)} ${esc(v.version)}, by Vasco Asturiano: a drawing library the graph explorer loads, served from this site unchanged</td><td>MIT License (<a href="${esc(v.licenceUrl)}">its licence text</a>)</td></tr>`).join('\n')}
 </tbody></table></div>
 <h2 id="copyright">Copyright and authorship</h2>
 <p>&#169; ${esc(FOOTER_YEAR)} ${esc(config.site.author)}. The author wrote the specification, the reference engine, the vocabulary, the schemas, the guide and the items of this node, except where an item&#39;s provenance names another author, and holds the copyright in all of it except the parts dedicated to the public domain under CC0 1.0. The licences above grant the permissions they state and nothing more; every other right is kept by the author, including the right to publish the same material elsewhere, in any form. The right to be named as the author, and to object to a change that harms the work&#39;s integrity, stays with the author wherever the law gives it.</p>
@@ -2115,6 +2152,49 @@ const siteIndexHtml = () => {
     return rs.length ? `<h2 id="index-${name.toLowerCase().replace(/[^a-z]+/g, '-')}">${esc(name)}</h2>\n<ul>\n${rs.sort(byCode).map(r => `<li><a href="${esc(r)}">${esc(pageTexts.get(r).title)}</a>: ${esc(pageTexts.get(r).summary)}</li>`).join('\n')}\n</ul>\n` : '';
   }).join('');
 };
+// The graph explorer page: the same picture as the front page, with the controls, the resizable
+// side panel (the selected node, the nodes read, the tree, every node as a button) and the Node
+// field, which takes any node's address. Without a script the page says where the same data is.
+addPage('/graph/', {
+  title: 'Graph explorer', summary: summaryOf('/graph/'), mainClass: 'gx-page',
+  description: 'Explore the knowledge graph of AgenticSystemCore.com and of the nodes it names as peers, in 2D or 3D, in your browser: search, list and inspect every node, read its summary, its relations and its chunks, and check the digest of the graph file.',
+  section: null, scripts: GX_SCRIPTS, styles: GX_STYLES,
+  jsonld: { '@context': 'https://schema.org', '@type': 'WebPage', name: 'Graph explorer', url: `${BASE}graph/` },
+  body: `<p>Every node of the Agentic Knowledge Web publishes its knowledge as a graph, <a href="/graph.jsonld"><code>graph.jsonld</code></a>, named with its digest in the node's <a href="${WELLKNOWN}">discovery document</a>. This page reads that file, and the graph of each peer node the document names, and draws them together. Give it another node's address to explore that node instead.</p>
+<noscript><p>The explorer needs JavaScript. The same graph is published as data, <a href="/graph.jsonld">graph.jsonld</a> and <a href="/graph.nq">graph.nq</a>, and as the lists of <a href="/clusters/">clusters</a>, <a href="/concepts/">concepts</a> and <a href="/procedures/">procedures</a>.</p></noscript>
+<div class="gx gx-full" data-gx="full"${GX_3D} hidden>
+<div class="gx-controls" role="group" aria-label="Explorer controls">
+<label class="gx-field gx-src">Node<input type="url" id="gx-src" name="src" spellcheck="false" autocomplete="url" aria-describedby="gx-src-help"></label>
+<button type="button" id="gx-load">Load</button>
+<label class="gx-field">Search<input type="search" id="gx-q" name="q" autocomplete="off" spellcheck="false" aria-describedby="gx-q-help"></label>
+<span class="gx-seg" role="group" aria-label="View"><button type="button" id="gx-m-graph" aria-pressed="true">Graph</button><button type="button" id="gx-m-tree" aria-pressed="false">Tree</button></span>
+<span class="gx-seg" role="group" aria-label="Dimensions"><button type="button" id="gx-d-2" aria-pressed="true">2D</button><button type="button" id="gx-d-3" aria-pressed="false">3D</button></span>
+<button type="button" id="gx-rotate" aria-pressed="false" hidden>Rotate</button>
+<button type="button" id="gx-fit">Fit</button>
+<label class="gx-check"><input type="checkbox" id="gx-depth"> Peers of peers</label>
+</div>
+<p class="gx-help" id="gx-src-help">A node's address, its discovery document or its <code>graph.jsonld</code>. The peer nodes it names are read too.</p>
+<p class="gx-sr" id="gx-q-help">Filters the list of nodes and dims the other nodes in the picture. Enter selects the top match.</p>
+<div class="gx-body">
+${gxStage('The picture of the graph. Drag to move, scroll or pinch to zoom, hover a node for its summary. The side panel lists the same nodes as buttons.')}<div class="gx-split" role="separator" tabindex="0" aria-orientation="vertical" aria-label="Width of the side panel" aria-controls="gx-panel" aria-valuemin="240" aria-valuemax="768" aria-valuenow="352"></div>
+<section class="gx-panel" id="gx-panel" aria-label="Side panel: the selected node, the nodes read and every node">
+<div class="gx-live gx-sr" aria-live="polite"></div>
+<div class="gx-detail"><h2>No node selected</h2><p class="gx-muted">Pick a node in the list below, or click one in the picture.</p></div>
+<h2>Nodes read</h2>
+<ul class="gx-sources-list"></ul>
+<div class="gx-treebox" hidden><h2>Tree</h2><div class="gx-tree"></div></div>
+<h2>Every node <span class="gx-badge gx-count"></span></h2>
+<ul class="gx-list"></ul>
+</section>
+</div>
+</div>
+<h2 id="how-it-works">How it works</h2>
+<p>The page reads the node's discovery document, takes the address of its graph and the digest declared for it, reads the graph and checks the digest of the bytes it received. It then follows each <code>…/rel#peer</code> link of the document and does the same for that node, and draws a link between the two nodes, and wherever an item of one names an item of the other. It follows at most 16 peers of each node and reads at most 10 MB of each file, and says in the status line what it left out.</p>
+<p>The page only reads published files: the discovery documents, the graphs and, for a selected item, the chunk export. It sends nothing else and keeps nothing except the width you give the side panel, in your browser's local storage.</p>
+<p>With a keyboard: Tab reaches each node in the side panel, Enter selects it and centres the picture on it, and Escape clears the selection or closes a summary. The bar between the picture and the panel resizes the panel with the arrow keys, Home and End.</p>
+`,
+});
+
 addPage('/search/', {
   title: 'Search', summary: summaryOf('/search/'), description: 'Search every page and every rule of AgenticSystemCore.com; the index is built with the site and nothing leaves the browser.', section: '/search/', script: '/assets/search.js',
   jsonld: { '@context': 'https://schema.org', '@type': 'WebPage', name: 'Search', url: `${BASE}search/` },
@@ -2241,10 +2321,20 @@ try { put('changelog.xml', releaseFeed.rss({ origin: ORIGIN, engineRepo: FORGE.e
 PUBLIC_ARTEFACT.push('/changelog.xml');
 const HEADER_BLOCKS = new Map(); // address -> header lines, in the order they are written
 const addHeaders = (route, ...lines) => { if (!HEADER_BLOCKS.has(route)) HEADER_BLOCKS.set(route, []); HEADER_BLOCKS.get(route).push(...lines); };
+const CSP = "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
 addHeaders('/*', 'X-Content-Type-Options: nosniff', 'X-Frame-Options: DENY', 'Referrer-Policy: strict-origin-when-cross-origin',
-  "Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+  `Content-Security-Policy: ${CSP}`,
   'Permissions-Policy: interest-cohort=()');
 addHeaders('/', `Link: <${WELLKNOWN}>; rel="describedby"; type="application/linkset+json"`);
+// The graph explorer's two pages read other nodes' published files, so on those two addresses, and
+// only there, `connect-src` is wider; every other directive, and every other address, keeps the
+// policy above. `! Content-Security-Policy` removes the policy the `/*` block set (the host applies
+// the blocks in order), so the browser enforces one policy here, not the intersection of two. The
+// front page reads this node and the peers it declares; /graph/ reads any node a visitor names,
+// over https. What is read is JSON, parsed and shown as text, never run or inserted as markup.
+const cspConnect = sources => CSP.replace("connect-src 'self'", `connect-src ${sources}`);
+if (PEER_ORIGINS.length) addHeaders('/', '! Content-Security-Policy', `Content-Security-Policy: ${cspConnect(["'self'", ...PEER_ORIGINS].join(' '))}`);
+addHeaders('/graph/', '! Content-Security-Policy', `Content-Security-Policy: ${cspConnect("'self' https:")}`);
 addHeaders('/.well-known/knowledge-linkset', `Content-Type: application/linkset+json; profile="${PROFILE}"`, `Link: <${PROFILE}>; rel="profile"`, 'Cache-Control: no-cache');
 for (const [route, type, ...rest] of [
   ['/.well-known/tdmrep.json', 'application/json; charset=utf-8'],
@@ -2319,6 +2409,10 @@ put('_redirects', `# Generated by scripts/build.js — do not hand-edit (AGSC-06
 
 // assets
 for (const f of ['assets/site.css', 'assets/search.js', 'favicon.svg']) { const s = read(`assets/${path.basename(f)}`); checkText(f, s); put(f, s); }
+// The graph explorer: its own three files, and the two vendored libraries with their licence texts,
+// copied byte for byte (the SHA-256 of each library is asserted by scripts/check.js).
+for (const f of GX_OWN) put(f.file, f.text);
+for (const v of GX_VENDOR) { put(v.file, v.bytes); put(v.licence, fs.readFileSync(path.join(ROOT, v.licence))); }
 // The touch icon phones ask for at /apple-touch-icon.png, named by every page head: the icon of
 // assets/favicon.svg drawn edge to edge (the phone rounds the corners itself) at 180 × 180 px,
 // rendered once with a headless Chromium screenshot and stripped of its date chunks. Its bytes are

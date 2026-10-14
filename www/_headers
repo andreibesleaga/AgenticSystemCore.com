@@ -8,6 +8,12 @@
 
 /
   Link: </.well-known/knowledge-linkset>; rel="describedby"; type="application/linkset+json"
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self' https://patterns.agenticsystemcore.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+/graph/
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self' https:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
 
 /.well-known/knowledge-linkset
   Content-Type: application/linkset+json; profile="https://w3id.org/agentic-system-core/profile/agentic-knowledge"
