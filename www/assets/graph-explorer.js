@@ -41,13 +41,17 @@
     }
     root.hidden = false;
     stage.hidden = false;
+    // data-state on the explorer's root: "loading" while it reads, "ready" once the picture is drawn
+    // and fitted and the panel filled, "error" when nothing could be drawn. Tests wait for it.
+    const setState = v => root.setAttribute('data-state', v);
+    setState('loading');
     const P = new URLSearchParams(location.search);
     const LANG = (document.documentElement.lang || 'en').toLowerCase().split('-')[0];
     const mq = q => (window.matchMedia ? window.matchMedia(q) : { matches: false, addEventListener() {} });
     const motionQuery = mq('(prefers-reduced-motion: reduce)');
     const reduced = () => motionQuery.matches || P.get('motion') === 'reduce';
     const KNOWN_TYPES = new Set(['Bundle', 'Cluster', 'Concept', 'Procedure', 'Episode', 'Lesson', 'Gate', 'Task', 'Source']);
-    const st = { net: null, model: null, hiddenTypes: new Set(), hiddenSrc: new Set(), mode: P.get('mode') === 'tree' && FULL ? 'tree' : 'graph', dim: 2, graph: null, selected: null, hover: null, q: '', userMoved: false, known: new Set(), chunks: new Map(), loading: 0, depth: FULL && P.get('depth') === '2' ? 2 : 1 };
+    const st = { net: null, model: null, hiddenTypes: new Set(), hiddenSrc: new Set(), mode: P.get('mode') === 'tree' && FULL ? 'tree' : 'graph', dim: 2, graph: null, selected: null, hover: null, q: '', userMoved: false, known: new Set(), chunks: new Map(), loading: 0, loaded: 0, depth: FULL && P.get('depth') === '2' ? 2 : 1 };
 
     // ---------------------------------------------------------------- small DOM helpers (text only)
     function h(tag, attrs, ...kids) {
@@ -125,8 +129,13 @@
     view.addEventListener('contextmenu', e => { if (tip.longPressed) e.preventDefault(); });
     // touch: a press held for more than half a second shows the tooltip; a tap selects
     let press = null;
+    // The visitor has taken the picture in hand (a mouse press, a two-finger touch, a zooming wheel;
+    // on /graph/ any touch, which pans there): no automatic fit after this. On the front page one
+    // finger scrolls the page, so a touch alone does not count.
+    const touches = new Set();
     view.addEventListener('pointerdown', e => {
-      st.userMoved = true; // the visitor has taken the picture in hand: no automatic fit after this
+      if (e.pointerType === 'touch') touches.add(e.pointerId);
+      if (e.pointerType !== 'touch' || FULL || touches.size > 1) st.userMoved = true;
       if (e.pointerType !== 'touch') return;
       const r = view.getBoundingClientRect();
       press = { x: e.clientX - r.left, y: e.clientY - r.top, timer: setTimeout(() => {
@@ -135,6 +144,8 @@
       }, 500) };
     });
     const endPress = () => { if (press) { clearTimeout(press.timer); press = null; } setTimeout(() => { tip.longPressed = false; }, 50); };
+    for (const t of ['pointerup', 'pointercancel']) view.addEventListener(t, e => touches.delete(e.pointerId));
+    view.addEventListener('wheel', e => { if (FULL || e.ctrlKey || e.metaKey) st.userMoved = true; }, { passive: true });
     view.addEventListener('pointermove', e => { if (!press) return; const r = view.getBoundingClientRect(); if (Math.hypot(e.clientX - r.left - press.x, e.clientY - r.top - press.y) > 10) endPress(); });
     view.addEventListener('pointerup', endPress);
     view.addEventListener('pointercancel', endPress);
@@ -358,18 +369,88 @@
         .nodeVisibility(visible).linkVisibility(linkVisible)
         .dagMode(st.mode === 'tree' ? 'radialout' : null).onDagError(() => {});
       if (st.mode === 'tree') g.dagLevelDistance(st.dim === 2 ? 70 : 60);
-      if (reduced()) g.warmupTicks(300).cooldownTicks(0); else g.cooldownTime(4000);
+      // The layout runs ahead before the first paint (fewer ticks for a large graph, so a big node
+      // never blocks the tab), so the first fit already sees the graph near its final shape.
+      const n = st.model.nodes.length, ahead = n <= 1000 ? 120 : n <= 3000 ? 30 : 10;
+      if (reduced()) g.warmupTicks(Math.min(300, Math.max(ahead, Math.round(30000 / Math.max(1, n))))).cooldownTicks(0); else g.warmupTicks(ahead).cooldownTime(4000);
+      // The front page's picture sits in a scrolling page: the wheel scrolls the page unless Ctrl or
+      // Cmd is held (a trackpad pinch sends that too), and one finger scrolls the page while two pan
+      // and zoom. On /graph/ the picture is the page's subject, and the wheel and one finger move it.
+      if (!FULL && st.dim === 2) {
+        g.enableZoomInteraction(e => !!(e && (e.ctrlKey || e.metaKey)));
+        g.enablePanInteraction(e => !(e && e.type === 'touchstart' && e.touches && e.touches.length < 2));
+      }
       g.graphData(graphData());
       if (st.mode !== 'tree' && st.net.nodes.length > 1) g.d3Force('gxOrigin', originForce());
       if (st.dim === 2) { g.d3Force('charge').strength(st.mode === 'tree' ? -60 : -120); g.d3Force('link').distance(st.mode === 'tree' ? 30 : 40); }
-      // Fit the picture when the layout comes to rest, and once more a moment after the first paint
-      // (with reduced motion the layout is at rest before the camera is ready); never after the
-      // visitor has moved the picture or selected a node.
-      const fit = () => { if (st.graph === g && !st.userMoved) g.zoomToFit(reduced() ? 0 : 400, 30); };
-      g.onEngineStop(fit);
-      setTimeout(fit, reduced() ? 400 : 2500);
+      // The picture fits itself into view: at once on the first frame of the layout, again (animated,
+      // unless reduced motion is asked for) when the layout comes to rest, and on a resize; never
+      // after the visitor has moved the picture or selected a node. The first fit marks the explorer
+      // ready, but only while the picture shows the last load that completed: once a newer load has
+      // started (st.loading moves past st.loaded) this graph's callbacks and timer no longer touch
+      // the state, so a replacement request is never marked ready before its data arrives, and an
+      // error it reports is never overwritten.
+      const fit = ms => { if (st.graph === g && st.loaded === st.loading && (st.userMoved || fitView(ms))) markReady(); };
+      let first = true;
+      g.onEngineTick(() => { if (first && st.graph === g) { first = false; fit(0); } });
+      g.onEngineStop(() => fit(400));
+      setTimeout(() => { if (root.getAttribute('data-state') !== 'ready') fit(0); }, reduced() ? 400 : 1500);
       return g;
     }
+    /** Fits the visible nodes into the part of the picture no overlay covers: on a wide screen the
+     *  status line lies over the top of the picture and the legend over its bottom, so the graph is
+     *  centred in the band between them. Returns false while the layout has no position yet. */
+    function fitView(ms) {
+      const g = st.graph; if (!g || !st.model) return false;
+      const t = reduced() ? 0 : ms;
+      if (st.dim === 3) { g.zoomToFit(t, 30, visible); return true; }
+      const W = view.clientWidth, H = view.clientHeight;
+      if (W < 2 || H < 2) return false;
+      // Each visible node with a position: its centre, its radius (graph units, as drawn) and the
+      // width of the name drawn to its right (screen px, 11 px type), which make2D draws for every
+      // Bundle, the node in focus, every node but a Source once the scale reaches 0.9, and every
+      // node, Sources too, once it reaches 1.6 (the same condition as the renderer's).
+      const ctx = labelCtx(), focus = st.hover || st.selected, pts = [];
+      for (const n of st.model.nodes) {
+        if (!visible(n) || !Number.isFinite(n.x) || !Number.isFinite(n.y)) continue;
+        const r = 4 * Math.sqrt(1 + Math.sqrt(n.deg || 0)) + 3, m = nodeOf(n.id) || n;
+        const text = m.label.length > 40 ? `${m.label.slice(0, 39)}…` : m.label;
+        const lw = ctx ? Math.ceil(ctx.measureText(text).width) + 4 : text.length * 6.5;
+        pts.push({ x: n.x, y: n.y, r, always: m.type === 'Bundle' || focus === n.id, some: m.type !== 'Source', lw });
+      }
+      if (!pts.length) return false;
+      const vr = view.getBoundingClientRect();
+      const over = el => (el && !el.hidden && getComputedStyle(el).position === 'absolute' ? el.getBoundingClientRect() : null);
+      const s = over(statusEl), l = over(legendEl);
+      const top = s ? Math.min(H / 3, Math.max(0, s.bottom - vr.top)) : 0;
+      const bottom = l ? Math.min(H / 3, Math.max(0, vr.bottom - l.top)) : 0;
+      const pad = Math.max(12, Math.min(32, W * 0.04));
+      const aw = Math.max(20, W - 2 * pad), ah = Math.max(20, H - top - bottom - 2 * pad);
+      // The horizontal extent at scale k, in screen px: the nodes scale, their names do not.
+      const extent = k => {
+        let a = Infinity, b = -Infinity;
+        for (const p of pts) {
+          const named = p.always || k >= 1.6 || (k >= 0.9 && p.some);
+          a = Math.min(a, (p.x - p.r) * k); b = Math.max(b, (p.x + p.r) * k + (named ? p.lw : 0));
+        }
+        return [a, b];
+      };
+      let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+      for (const p of pts) { x0 = Math.min(x0, p.x - p.r); x1 = Math.max(x1, p.x + p.r); y0 = Math.min(y0, p.y - p.r); y1 = Math.max(y1, p.y + p.r); }
+      let k = Math.min(4, ah / Math.max(1, y1 - y0), aw / Math.max(1, x1 - x0));
+      for (let i = 0; i < 8; i++) { const [a, b] = extent(k); if (b - a <= aw + 0.5) break; k *= Math.max(0.5, Math.min(0.99, aw / (b - a))); }
+      k = Math.max(0.01, k);
+      const [a, b] = extent(k);
+      const cx = (a + b) / 2 / k, cy = (y0 + y1) / 2 - (top + pad + ah / 2 - H / 2) / k;
+      g.centerAt(cx, cy, t); g.zoom(k, t);
+      return true;
+    }
+    let labelCanvas = null;
+    function labelCtx() {
+      try { if (!labelCanvas) { labelCanvas = document.createElement('canvas').getContext('2d'); labelCanvas.font = '11px system-ui, sans-serif'; } } catch (e) { labelCanvas = null; }
+      return labelCanvas;
+    }
+    function markReady() { if (root.getAttribute('data-state') !== 'ready') setState('ready'); }
     function make2D() {
       const g = new window.ForceGraph(view);
       common(g).linkLineDash(l => (l.cross ? [4, 2] : null)).nodeCanvasObjectMode(() => 'replace').nodeCanvasObject((n, ctx, scale) => {
@@ -405,7 +486,7 @@
       renderTree();
       setStatus();
     }
-    new ResizeObserver(() => { if (st.graph) { const s = size(); st.graph.width(s.w).height(s.h); } }).observe(view);
+    new ResizeObserver(() => { if (st.graph) { const s = size(); st.graph.width(s.w).height(s.h); if (!st.userMoved) fitView(0); } }).observe(view);
     const onTheme = () => { if (st.graph) restyle(); if (FULL && st.model) { renderLegend(); } };
     new MutationObserver(onTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     mq('(prefers-color-scheme: dark)').addEventListener('change', onTheme);
@@ -459,7 +540,7 @@
       $('#gx-d-2').addEventListener('click', () => setDim(2));
       $('#gx-d-3').addEventListener('click', () => setDim(3));
       $('#gx-rotate').addEventListener('click', () => rotate(!rotating));
-      $('#gx-fit').addEventListener('click', () => { if (st.graph) st.graph.zoomToFit(reduced() ? 0 : 400, 30); });
+      $('#gx-fit').addEventListener('click', () => { st.userMoved = false; fitView(400); });
       const q = $('#gx-q');
       q.addEventListener('input', () => { st.q = q.value.trim(); renderList(); restyle(); });
       q.addEventListener('keydown', e => { if (e.key === 'Enter') { const b = listEl.querySelector('button.gx-nb'); if (b) { select(b.getAttribute('data-id'), true); b.focus(); } } });
@@ -474,22 +555,41 @@
     // ---------------------------------------------------------------- resizable side panel (full page)
     if (FULL) {
       const body = $('.gx-body'), split = $('.gx-split'), KEY = 'agsc-graph-panel', MIN = 240;
-      const max = () => Math.max(MIN, Math.round(window.innerWidth * 0.6));
-      let width = 352;
-      try { const v = Number(localStorage.getItem(KEY)); if (v >= MIN) width = v; } catch (e) { /* no storage: the default width */ }
+      // At most 60 % of the explorer's own width (it sits in the page's 60rem container, not the window).
+      const max = () => Math.max(MIN, Math.round((body.clientWidth || window.innerWidth) * 0.6));
+      // The default width: 352 px, or 40 % of the explorer on a tablet, so the picture keeps the
+      // larger part; a width the visitor chose is remembered and kept.
+      const byDefault = () => Math.max(MIN, Math.min(352, Math.round((body.clientWidth || window.innerWidth) * 0.4)));
+      let width = byDefault(), chosen = false;
+      try { const v = Number(localStorage.getItem(KEY)); if (v >= MIN) { width = v; chosen = true; } } catch (e) { /* no storage: the default width */ }
       const apply = w => {
         width = Math.round(Math.min(max(), Math.max(MIN, w)));
         body.style.setProperty('--gx-panel-w', `${width}px`);
         split.setAttribute('aria-valuemin', String(MIN)); split.setAttribute('aria-valuemax', String(max()));
         split.setAttribute('aria-valuenow', String(width)); split.setAttribute('aria-valuetext', `side panel ${width} pixels wide`);
       };
-      const save = () => { try { localStorage.setItem(KEY, String(width)); } catch (e) { /* not kept: fine */ } };
+      const save = () => { chosen = true; try { localStorage.setItem(KEY, String(width)); } catch (e) { /* not kept: fine */ } };
       apply(width);
+      // A tap (or a click) that does not drag steps the width: narrowest, default, widest, then
+      // narrowest again. It is the single-pointer alternative to dragging (WCAG 2.5.7).
+      const step = () => {
+        const stops = [MIN, byDefault(), max()].filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => a - b);
+        apply(stops.find(v => v > width + 1) ?? stops[0]);
+      };
       split.addEventListener('pointerdown', e => {
         if (e.button !== 0) return;
         e.preventDefault(); split.setPointerCapture(e.pointerId); split.classList.add('gx-dragging');
-        const move = ev => apply(body.getBoundingClientRect().right - ev.clientX - split.offsetWidth / 2);
-        const up = () => { split.releasePointerCapture(e.pointerId); split.classList.remove('gx-dragging'); split.removeEventListener('pointermove', move); split.removeEventListener('pointerup', up); split.removeEventListener('pointercancel', up); save(); };
+        const x0 = e.clientX;
+        let moved = false;
+        const move = ev => {
+          if (!moved && Math.abs(ev.clientX - x0) < 5) return;
+          moved = true; apply(body.getBoundingClientRect().right - ev.clientX - split.offsetWidth / 2);
+        };
+        const up = ev => {
+          split.releasePointerCapture(e.pointerId); split.classList.remove('gx-dragging'); split.removeEventListener('pointermove', move); split.removeEventListener('pointerup', up); split.removeEventListener('pointercancel', up);
+          if (!moved && ev.type === 'pointerup') step();
+          save();
+        };
         split.addEventListener('pointermove', move); split.addEventListener('pointerup', up); split.addEventListener('pointercancel', up);
       });
       split.addEventListener('keydown', e => {
@@ -498,7 +598,13 @@
         if (next === undefined) return;
         e.preventDefault(); apply(next); save();
       });
-      window.addEventListener('resize', () => apply(width));
+      window.addEventListener('resize', () => apply(chosen ? width : byDefault()));
+      // The explorer fills the window below its controls: graph-explorer.css sizes it from the height
+      // of the controls and the help line above it, which wrap differently at each width.
+      const controls = $('.gx-controls'), help = $('.gx-help');
+      const chrome = () => { const h = controls.offsetHeight + (help ? help.offsetHeight : 0); root.style.setProperty('--gx-chrome', `${Math.ceil(h)}px`); };
+      chrome();
+      new ResizeObserver(chrome).observe(controls);
     }
 
     // ---------------------------------------------------------------- load
@@ -512,11 +618,12 @@
       const ticket = ++st.loading;
       const target = (address || '').trim() || `${location.origin}/`;
       hideTip();
+      setState('loading');
       statusEl.textContent = `Reading ${target} and the peers it names…`;
       let net;
       try {
         net = await G.loadNetwork(target, { fetch: (u, o) => window.fetch(u, o), sha256: window.crypto && crypto.subtle ? sha256 : null, depth: st.depth, base: location.href, lang: LANG });
-      } catch (e) { if (ticket === st.loading) statusEl.textContent = `Could not read ${target}: ${e.message}. Give a node's address, its discovery document or its graph.jsonld.`; return; }
+      } catch (e) { if (ticket === st.loading) { statusEl.textContent = `Could not read ${target}: ${e.message}. Give a node's address, its discovery document or its graph.jsonld.`; setState('error'); } return; }
       if (ticket !== st.loading) return;
       if (!(window.crypto && crypto.subtle)) for (const n of net.nodes) if (n.declaredDigest) n.digest = 'not checked';
       st.net = net; st.model = net.model; st.selected = null; st.hover = null; st.hiddenSrc.clear(); st.chunks.clear();
@@ -527,8 +634,9 @@
         if (st.depth === 2) u.searchParams.set('depth', '2'); else u.searchParams.delete('depth');
         history.replaceState(null, '', u.pathname + u.search + u.hash);
       }
-      if (!st.model.nodes.length) { statusEl.textContent = `Nothing to draw: ${net.nodes[0].error || 'the graph has no nodes'}.`; if (st.graph) { st.graph.graphData({ nodes: [], links: [] }); } renderSources(); return; }
+      if (!st.model.nodes.length) { statusEl.textContent = `Nothing to draw: ${net.nodes[0].error || 'the graph has no nodes'}.`; if (st.graph) { st.graph.graphData({ nodes: [], links: [] }); } renderSources(); setState('error'); return; }
       renderLegend(); renderList(); renderSources(); renderDetail(null);
+      st.loaded = ticket;
       mount();
       say(`Read ${st.model.nodes.length} nodes and ${st.model.links.length} links from ${net.nodes.filter(n => n.parsed).length} node${net.nodes.filter(n => n.parsed).length === 1 ? '' : 's'}`);
       const pre = P.get('node');

@@ -9,6 +9,7 @@
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
 <link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
 <link rel="stylesheet" href="/assets/graph-explorer.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -18,8 +19,8 @@
 <meta property="og:title" content="Graph explorer">
 <meta property="og:description" content="Explore the knowledge graph of AgenticSystemCore.com and of the nodes it names as peers, in 2D or 3D, in your browser: search, list and inspect every node, read its summary, its relations and its chunks, and check the digest of the graph file.">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Graph explorer","url":"https://agenticsystemcore.com/graph/"}</script>
-<script src="/assets/graph-data.js" integrity="sha384-daOBEAprEoLq74vvPeNtcv+FbYENIo2Ioe5CQpnYUouGKaM9yn8aclmjSkKfY+7h" defer></script>
-<script src="/assets/graph-explorer.js" integrity="sha384-RPZxXf2iPNh0RPP5duo6qjRJBA6O/eD1Jarxa7ifP5rngQFIkVyY6Lcm0WESQ6Mp" defer></script>
+<script src="/assets/graph-data.js" integrity="sha384-9ogXbZmq/ThJtsXZQoUwDx6VLyGdJKm7bf+/IAa/KYjsZ2BrEPiaaHzqrP1WLGDe" defer></script>
+<script src="/assets/graph-explorer.js" integrity="sha384-GKUIMb3zqm9bLooz4iVChQiVjLNQQm5otZhHPDoAewy50uRI2P/oazcveqwFzipo" defer></script>
 <script src="/assets/vendor/force-graph-1.52.0.min.js" integrity="sha384-isW4dF8tfo3t+I2iiIdnz1MFV+hW1Vn3YyY2PmAgPbRQaW7Biahepz8fTRR+nLxm" defer></script>
 </head>
 <body>
@@ -65,7 +66,7 @@
 <div class="gx-legend" role="group" aria-label="Legend: the kinds of node and the nodes read; press one to hide or show it"></div>
 <div class="gx-tip" id="gx-tip" role="tooltip" hidden></div>
 </div>
-<div class="gx-split" role="separator" tabindex="0" aria-orientation="vertical" aria-label="Width of the side panel" aria-controls="gx-panel" aria-valuemin="240" aria-valuemax="768" aria-valuenow="352"></div>
+<div class="gx-split" role="separator" tabindex="0" title="Drag, tap, or use the arrow keys to change the width of the side panel" aria-orientation="vertical" aria-label="Width of the side panel" aria-controls="gx-panel" aria-valuemin="240" aria-valuemax="768" aria-valuenow="352"></div>
 <section class="gx-panel" id="gx-panel" aria-label="Side panel: the selected node, the nodes read and every node">
 <div class="gx-live gx-sr" aria-live="polite"></div>
 <div class="gx-detail"><h2>No node selected</h2><p class="gx-muted">Pick a node in the list below, or click one in the picture.</p></div>
@@ -78,9 +79,9 @@
 </div>
 </div>
 <h2 id="how-it-works">How it works</h2>
-<p>The page reads the node's discovery document, takes the address of its graph and the digest declared for it, reads the graph and checks the digest of the bytes it received. It then follows each <code>…/rel#peer</code> link of the document and does the same for that node, and draws a link between the two nodes, and wherever an item of one names an item of the other. It follows at most 16 peers of each node and reads at most 10 MB of each file, and says in the status line what it left out.</p>
+<p>The page reads the node's discovery document, takes the address of its graph and the digest declared for it, reads the graph and checks the digest of the bytes it received. It then follows each <code>…/rel#peer</code> link of the document and does the same for that node, and draws a link between the two nodes, and wherever an item of one names an item of the other. It follows at most 16 peers of each node, reads at most 10 MB of each file and draws at most 5,000 nodes and 10,000 links, and says in the status line what it left out.</p>
 <p>The page only reads published files: the discovery documents, the graphs and, for a selected item, the chunk export. It sends nothing else and keeps nothing except the width you give the side panel, in your browser's local storage.</p>
-<p>With a keyboard: Tab reaches each node in the side panel, Enter selects it and centres the picture on it, and Escape clears the selection or closes a summary. The bar between the picture and the panel resizes the panel with the arrow keys, Home and End.</p>
+<p>With a keyboard: Tab reaches each node in the side panel, Enter selects it and centres the picture on it, and Escape clears the selection or closes a summary. The bar between the picture and the panel resizes the panel: drag it, tap or click it to step through three widths, or use the arrow keys, Home and End.</p>
 </main>
 <footer class="site">
 <p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>

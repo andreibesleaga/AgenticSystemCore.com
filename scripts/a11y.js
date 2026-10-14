@@ -5,6 +5,10 @@
 // practices); CSP violations, third-party requests, first-Tab skip link, the 404 page and the
 // search script. Besides axe it measures what decides how a page reads:
 //   - no page scrolls sideways at 320, 390, 768 or 1280 px (WCAG 1.4.10);
+//   - one container (assets/layout.css): the logo, the page title, the summary, the first
+//     paragraph, the first wide block and the footer's text start at the same x on every page
+//     that loads it, at 390, 768 and 1280 px;
+//   - on / and /graph/, axe runs once the graph explorer has marked itself data-state="ready";
 //   - prose lines: at 768 and 1280 px no line of running text in the main column is longer
 //     than 80 characters (WCAG 1.4.8; the stylesheet aims at about 70). Code blocks, tables,
 //     diagrams and the card grid are not prose and are not measured; a diagram caption is;
@@ -100,6 +104,20 @@ function splitWords() {
   }
   return found;
 }
+/** The left edge, in CSS px, of the logo, the h1, the summary, the first paragraph, the first wide
+ *  block (picture, table, diagram, code, card grid) and the footer's text (its content box: the
+ *  paragraph has padding). Null on a page that does not load assets/layout.css (the board pages,
+ *  which are the engine's bytes, or another node's pages under SITE_A11Y_WWW). */
+function leftEdges() {
+  if (!document.querySelector('link[rel="stylesheet"][href="/assets/layout.css"]')) return null;
+  const x = el => Math.round(el.getBoundingClientRect().left + parseFloat(getComputedStyle(el).paddingLeft || '0') * (el.matches('footer.site p') ? 1 : 0));
+  const out = [];
+  for (const [name, sel] of [['logo', 'header.site .brand'], ['h1', 'main > h1'], ['summary', 'main > .summary'], ['paragraph', 'main > p'], ['wide', 'main > figure, main > pre, main > .table-wrap, main > table, main > .modes, main > .gx'], ['footer', 'footer.site p']]) {
+    const el = document.querySelector(sel);
+    if (el && el.getBoundingClientRect().width) out.push([name, x(el)]);
+  }
+  return out;
+}
 const sideways = () => document.documentElement.scrollWidth > document.documentElement.clientWidth;
 const median = xs => { const v = [...xs].sort((a, b) => a - b); return v.length ? (v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2) : 0; };
 const srv = http.createServer((req, res) => {
@@ -115,7 +133,7 @@ const srv = http.createServer((req, res) => {
 srv.listen(0, async () => {
   const port = srv.address().port, base = `http://127.0.0.1:${port}`;
   const browser = await chromium.launch({ executablePath: process.env.CHROME_EXE, headless: true });
-  let violations = 0, cspViol = 0, thirdParty = 0, peerReads = 0, problems = [], scrolling = 0;
+  let violations = 0, cspViol = 0, thirdParty = 0, peerReads = 0, problems = [], scrolling = 0, explorerReady = 0, aligned = 0;
   const longest = { 768: [], 1280: [] }, split = { 390: 0, 768: 0, 1280: 0 }, splitInCode = { 390: 0, 768: 0, 1280: 0 };
   // 'light' and 'dark' follow the system scheme; 'chosen-dark' is a light system with the
   // visitor's stored switcher choice 'dark' (the manual override of the theme switcher).
@@ -136,10 +154,14 @@ srv.listen(0, async () => {
         thirdParty++; problems.push(`${p}: third-party ${r.url()}`);
       });
       await page.goto(base + p, { waitUntil: 'load' });
-      // the graph explorer fills its list, legend and detail after it has read the graphs: axe checks that state
+      // The graph explorer fills its list, legend and detail after it has read the graphs, then draws
+      // and fits the picture and marks its root data-state="ready" ("error" when nothing could be
+      // drawn): axe checks that state, never the page as it was at `load`.
       if (EXPLORER_PAGES.has(p)) {
-        const ready = await page.waitForFunction(() => { const s = document.querySelector('.gx-status'); return !!s && s.textContent.trim() !== '' && !/^Reading /.test(s.textContent.trim()); }, null, { timeout: 15000 }).then(() => true, () => false);
-        if (!ready) problems.push(`${scheme} ${width}px ${p}: the graph explorer did not finish reading in 15 s`);
+        const ready = await page.waitForFunction(() => { const r = document.querySelector('.gx[data-gx]'); return !!r && ['ready', 'error'].includes(r.getAttribute('data-state')); }, null, { timeout: 15000 }).then(() => true, () => false);
+        if (!ready) problems.push(`${scheme} ${width}px ${p}: the graph explorer did not mark itself ready in 15 s`);
+        else if (await page.evaluate(() => document.querySelector('.gx[data-gx]').getAttribute('data-state')) !== 'ready' || !(await page.evaluate(() => document.querySelectorAll('.gx-legend button').length))) problems.push(`${scheme} ${width}px ${p}: the graph explorer drew nothing (data-state ${await page.evaluate(() => document.querySelector('.gx[data-gx]').getAttribute('data-state'))})`);
+        else explorerReady++;
       }
       await page.addScriptTag({ url: base + '/__axe.js' });
       const res = await page.evaluate(() => axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'] } }));
@@ -147,6 +169,12 @@ srv.listen(0, async () => {
       if (scheme === 'chosen-dark' && await page.evaluate(() => document.documentElement.getAttribute('data-theme')) !== 'dark') problems.push(`${p}: the stored theme choice is not applied`);
       if (await page.evaluate(sideways)) { scrolling++; problems.push(`${scheme} ${p}: horizontal scroll at ${width}px`); }
       if (scheme === 'light') {
+        // One container (assets/layout.css): the logo, the page title, the main column's first block
+        // and the footer's text start at the same x, at every width.
+        const edges = await page.evaluate(leftEdges);
+        if (!edges) { /* not this site's layout: not measured */ }
+        else if (Math.max(...edges.map(e => e[1])) - Math.min(...edges.map(e => e[1])) > 1) problems.push(`${width}px ${p}: left edges differ: ${edges.map(e => `${e[0]} ${e[1]}`).join(', ')}`);
+        else aligned++;
         const words = await page.evaluate(splitWords);
         split[width] += words.plain.length; splitInCode[width] += words.codeOrLink;
         if (words.plain.length) problems.push(`${width}px ${p}: ${words.plain.length} word(s) split across lines in a table cell (${words.plain.slice(0, 5).join(', ')})`);
@@ -203,6 +231,7 @@ srv.listen(0, async () => {
   await browser.close(); srv.close();
   console.log(`pages: ${pages.length} × 2 schemes (system light, system dark) at 390, 768 and 1280 px, and the chosen dark scheme at 1280 px; axe violations: ${violations}; CSP violations: ${cspViol}; third-party requests: ${thirdParty}; the graph explorer's reads of declared peer nodes (answered offline): ${peerReads}; content types from _headers`);
   console.log(`pages scrolling sideways (320, 390, 768, 1280 px): ${scrolling}`);
+  console.log(`one container: ${aligned} page views with the logo, the title, the summary, the first paragraph, the first wide block and the footer at one left edge (390, 768, 1280 px); graph explorer ready before axe: ${explorerReady} page views`);
   for (const w of [768, 1280]) console.log(`prose at ${w} px: ${longest[w].length} pages with wrapped prose; median of each page's longest line ${median(longest[w])} characters, longest ${Math.max(0, ...longest[w])} (at most ${MAX_LINE})`);
   console.log(`words split across lines in table cells (390 / 768 / 1280 px): ${split[390]} / ${split[768]} / ${split[1280]}; breaks inside code or a link, allowed: ${splitInCode[390]} / ${splitInCode[768]} / ${splitInCode[1280]}`);
   problems.push(...typeProblems);

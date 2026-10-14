@@ -228,3 +228,26 @@ test('a Source or a Bundle with no summary field gets a short description from w
   assert.equal(G.fallbackSummary({ type: 'Concept', raw: {} }, 'en'), '', 'only a Source or a Bundle has a fallback');
   assert.ok(G.fallbackSummary({ type: 'Source', raw: { title: 'w '.repeat(400) } }, 'en').length <= 300);
 });
+
+test('a graph too large to draw is cut to the first nodes and links, and the cut is reported', async () => {
+  assert.equal(G.MAX_NODES, 5000);
+  assert.equal(G.MAX_LINKS, 10000);
+  // within both limits: the model itself, nothing cut
+  const small = G.merge([G.parseGraph(graphA, 0, 'en')], []);
+  assert.equal(G.capModel(small).model, small);
+  assert.deepEqual(G.capModel(small).cut, []);
+  // a node whose graph holds 40 concepts, each linked to the next three, drawn with at most 10 nodes and 12 links
+  const big = { '@graph': [{ '@id': `${C}/`, '@type': 'Bundle' }].concat(Array.from({ length: 40 }, (_, i) => ({ '@id': `${C}/c/${String(i).padStart(2, '0')}/`, '@type': 'Concept', prefLabel: en(`c${String(i).padStart(2, '0')}`), inScheme: `${C}/`, related: [1, 2, 3].map(k => `${C}/c/${String((i + k) % 40).padStart(2, '0')}/`) }))) };
+  const gb = JSON.stringify(big);
+  const net = await G.loadNetwork(`${C}/graph.jsonld`, { fetch: fakeFetch({ [`${C}/graph.jsonld`]: gb }), sha256, maxNodes: 10, maxLinks: 12 });
+  assert.equal(net.model.nodes.length, 10);
+  assert.equal(net.model.nodes[0].type, 'Bundle', 'the first nodes of the merged order are kept: the Bundle first');
+  assert.ok(net.model.links.length <= 12);
+  const kept = new Set(net.model.nodes.map(n => n.id));
+  assert.ok(net.model.links.every(l => kept.has(l.source) && kept.has(l.target)), 'no link to a node left out');
+  for (const n of net.model.nodes) assert.equal(n.deg, net.model.links.filter(l => l.source === n.id || l.target === n.id).length, 'degrees recomputed');
+  assert.equal(net.model.adj.size, 10);
+  assert.ok(net.cuts.includes('picture: 41 nodes, the first 10 drawn'), net.cuts.join(' | '));
+  assert.ok(net.cuts.some(c => /^picture: \d+ links between them, the first 12 drawn$/.test(c)), net.cuts.join(' | '));
+  assert.equal(net.nodes[0].parsed.nodes.length, 41, 'the node itself is read whole; only the picture is cut');
+});
