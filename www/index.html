@@ -9,6 +9,7 @@
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
 <link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
 <link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/graph-explorer.css">
 <script src="/assets/theme.js"></script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -17,6 +18,9 @@
 <meta property="og:title" content="AgenticSystemCore">
 <meta property="og:description" content="An open specification for knowledge that people and software agents can both read, verify and build on, published here as a node of itself.">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"AgenticSystemCore","url":"https://agenticsystemcore.com/","description":"An open specification for knowledge that people and software agents can both read, verify and build on, published here as a node of itself.","author":{"@type":"Person","name":"Andrei N. Besleaga","sameAs":["https://orcid.org/0009-0001-3464-5283"]}}</script>
+<script src="/assets/graph-data.js" integrity="sha384-daOBEAprEoLq74vvPeNtcv+FbYENIo2Ioe5CQpnYUouGKaM9yn8aclmjSkKfY+7h" defer></script>
+<script src="/assets/graph-explorer.js" integrity="sha384-RPZxXf2iPNh0RPP5duo6qjRJBA6O/eD1Jarxa7ifP5rngQFIkVyY6Lcm0WESQ6Mp" defer></script>
+<script src="/assets/vendor/force-graph-1.52.0.min.js" integrity="sha384-isW4dF8tfo3t+I2iiIdnz1MFV+hW1Vn3YyY2PmAgPbRQaW7Biahepz8fTRR+nLxm" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -41,6 +45,15 @@
 <p class="summary"><strong>Summary</strong>An open format and a set of rules that turn a folder of Markdown into a wiki, a graph, an agent memory, a skills library, starting architectures and a shared live board for agents and people, published here as a node of itself.</p>
 <p class="tagline">Auto-wiki, distributed agentic memory, live specifications, evolving skills, starting architectures and a self-driving live board — one open format for people and agents. Reference Node Level-0 of the Agentic Knowledge Web.</p>
 <p class="lead">AgenticSystemCore turns one folder of Markdown into a website, a knowledge graph and a local tool server for AI assistants at once — every link typed, every published artefact carrying a digest a reader can check, every change merged by a person or by a rule that person recorded — so people, search engines and AI agents read the same checked knowledge, with no server, database or language model needed to build, check or publish it.</p>
+<figure class="gx gx-embed" data-gx="embed" data-gx-3d="/assets/vendor/3d-force-graph-1.80.1.min.js" data-gx-3d-integrity="sha384-i98VDQKdpyVrtyuFn0fjUWJBLBmxnqHqOANcvYe9HLJUgT2wPixa4ZkLd7Dh3VEk">
+<div class="gx-stage" role="group" aria-label="A picture of this node's graph and of its peer node. The explorer page lists the same nodes as buttons." hidden>
+<div class="gx-view" aria-hidden="true"></div>
+<p class="gx-status" role="status">Reading the graph…</p>
+<div class="gx-legend" role="group" aria-label="Legend: the kinds of node and the nodes read; press one to hide or show it"></div>
+<div class="gx-tip" id="gx-tip" role="tooltip" hidden></div>
+</div>
+<figcaption>The graph of this node and of the peer node it names, drawn in your browser from the published <code>graph.jsonld</code> files. Hover a node for a second to read its summary. <a href="/graph/">Open the explorer</a> to search, list and inspect every node, or to explore another node.</figcaption>
+</figure>
 <ul>
 <li><a href="/docs/demos/">Try it in five minutes</a>: install the package and run each mode from an empty folder.</li>
 <li><a href="/docs/guides/">Use it on your own files</a>: seven short guides, one per mode and one for publishing, every command with the lines it prints.</li>

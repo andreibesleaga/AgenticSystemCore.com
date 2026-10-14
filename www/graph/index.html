@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Graph explorer — AgenticSystemCore</title>
+<meta name="description" content="Explore the knowledge graph of AgenticSystemCore.com and of the nodes it names as peers, in 2D or 3D, in your browser: search, list and inspect every node, read its summary, its relations and its chunks, and check the digest of the graph file.">
+<link rel="canonical" href="https://agenticsystemcore.com/graph/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/graph-explorer.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/graph/">
+<meta property="og:title" content="Graph explorer">
+<meta property="og:description" content="Explore the knowledge graph of AgenticSystemCore.com and of the nodes it names as peers, in 2D or 3D, in your browser: search, list and inspect every node, read its summary, its relations and its chunks, and check the digest of the graph file.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Graph explorer","url":"https://agenticsystemcore.com/graph/"}</script>
+<script src="/assets/graph-data.js" integrity="sha384-daOBEAprEoLq74vvPeNtcv+FbYENIo2Ioe5CQpnYUouGKaM9yn8aclmjSkKfY+7h" defer></script>
+<script src="/assets/graph-explorer.js" integrity="sha384-RPZxXf2iPNh0RPP5duo6qjRJBA6O/eD1Jarxa7ifP5rngQFIkVyY6Lcm0WESQ6Mp" defer></script>
+<script src="/assets/vendor/force-graph-1.52.0.min.js" integrity="sha384-isW4dF8tfo3t+I2iiIdnz1MFV+hW1Vn3YyY2PmAgPbRQaW7Biahepz8fTRR+nLxm" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main" class="gx-page">
+<h1>Graph explorer</h1>
+<p class="summary"><strong>Summary</strong>The knowledge graph of this node and of the peer nodes it names, drawn in your browser from their published files: search it, list it, read each node's summary and relations, and explore any other node by its address.</p>
+<p>Every node of the Agentic Knowledge Web publishes its knowledge as a graph, <a href="/graph.jsonld"><code>graph.jsonld</code></a>, named with its digest in the node's <a href="/.well-known/knowledge-linkset">discovery document</a>. This page reads that file, and the graph of each peer node the document names, and draws them together. Give it another node's address to explore that node instead.</p>
+<noscript><p>The explorer needs JavaScript. The same graph is published as data, <a href="/graph.jsonld">graph.jsonld</a> and <a href="/graph.nq">graph.nq</a>, and as the lists of <a href="/clusters/">clusters</a>, <a href="/concepts/">concepts</a> and <a href="/procedures/">procedures</a>.</p></noscript>
+<div class="gx gx-full" data-gx="full" data-gx-3d="/assets/vendor/3d-force-graph-1.80.1.min.js" data-gx-3d-integrity="sha384-i98VDQKdpyVrtyuFn0fjUWJBLBmxnqHqOANcvYe9HLJUgT2wPixa4ZkLd7Dh3VEk" hidden>
+<div class="gx-controls" role="group" aria-label="Explorer controls">
+<label class="gx-field gx-src">Node<input type="url" id="gx-src" name="src" spellcheck="false" autocomplete="url" aria-describedby="gx-src-help"></label>
+<button type="button" id="gx-load">Load</button>
+<label class="gx-field">Search<input type="search" id="gx-q" name="q" autocomplete="off" spellcheck="false" aria-describedby="gx-q-help"></label>
+<span class="gx-seg" role="group" aria-label="View"><button type="button" id="gx-m-graph" aria-pressed="true">Graph</button><button type="button" id="gx-m-tree" aria-pressed="false">Tree</button></span>
+<span class="gx-seg" role="group" aria-label="Dimensions"><button type="button" id="gx-d-2" aria-pressed="true">2D</button><button type="button" id="gx-d-3" aria-pressed="false">3D</button></span>
+<button type="button" id="gx-rotate" aria-pressed="false" hidden>Rotate</button>
+<button type="button" id="gx-fit">Fit</button>
+<label class="gx-check"><input type="checkbox" id="gx-depth"> Peers of peers</label>
+</div>
+<p class="gx-help" id="gx-src-help">A node's address, its discovery document or its <code>graph.jsonld</code>. The peer nodes it names are read too.</p>
+<p class="gx-sr" id="gx-q-help">Filters the list of nodes and dims the other nodes in the picture. Enter selects the top match.</p>
+<div class="gx-body">
+<div class="gx-stage" role="group" aria-label="The picture of the graph. Drag to move, scroll or pinch to zoom, hover a node for its summary. The side panel lists the same nodes as buttons." hidden>
+<div class="gx-view" aria-hidden="true"></div>
+<p class="gx-status" role="status">Reading the graph…</p>
+<div class="gx-legend" role="group" aria-label="Legend: the kinds of node and the nodes read; press one to hide or show it"></div>
+<div class="gx-tip" id="gx-tip" role="tooltip" hidden></div>
+</div>
+<div class="gx-split" role="separator" tabindex="0" aria-orientation="vertical" aria-label="Width of the side panel" aria-controls="gx-panel" aria-valuemin="240" aria-valuemax="768" aria-valuenow="352"></div>
+<section class="gx-panel" id="gx-panel" aria-label="Side panel: the selected node, the nodes read and every node">
+<div class="gx-live gx-sr" aria-live="polite"></div>
+<div class="gx-detail"><h2>No node selected</h2><p class="gx-muted">Pick a node in the list below, or click one in the picture.</p></div>
+<h2>Nodes read</h2>
+<ul class="gx-sources-list"></ul>
+<div class="gx-treebox" hidden><h2>Tree</h2><div class="gx-tree"></div></div>
+<h2>Every node <span class="gx-badge gx-count"></span></h2>
+<ul class="gx-list"></ul>
+</section>
+</div>
+</div>
+<h2 id="how-it-works">How it works</h2>
+<p>The page reads the node's discovery document, takes the address of its graph and the digest declared for it, reads the graph and checks the digest of the bytes it received. It then follows each <code>…/rel#peer</code> link of the document and does the same for that node, and draws a link between the two nodes, and wherever an item of one names an item of the other. It follows at most 16 peers of each node and reads at most 10 MB of each file, and says in the status line what it left out.</p>
+<p>The page only reads published files: the discovery documents, the graphs and, for a selected item, the chunk export. It sends nothing else and keeps nothing except the width you give the side panel, in your browser's local storage.</p>
+<p>With a keyboard: Tab reaches each node in the side panel, Enter selects it and centres the picture on it, and Escape clears the selection or closes a summary. The bar between the picture and the panel resizes the panel with the arrow keys, Home and End.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Second node (live demo)</a></p>
+</footer>
+</body>
+</html>
