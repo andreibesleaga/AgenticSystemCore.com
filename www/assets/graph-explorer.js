@@ -51,7 +51,7 @@
     const motionQuery = mq('(prefers-reduced-motion: reduce)');
     const reduced = () => motionQuery.matches || P.get('motion') === 'reduce';
     const KNOWN_TYPES = new Set(['Bundle', 'Cluster', 'Concept', 'Procedure', 'Episode', 'Lesson', 'Gate', 'Task', 'Source']);
-    const st = { net: null, model: null, hiddenTypes: new Set(), hiddenSrc: new Set(), mode: P.get('mode') === 'tree' && FULL ? 'tree' : 'graph', dim: 2, graph: null, selected: null, hover: null, q: '', userMoved: false, known: new Set(), chunks: new Map(), loading: 0, depth: FULL && P.get('depth') === '2' ? 2 : 1 };
+    const st = { net: null, model: null, hiddenTypes: new Set(), hiddenSrc: new Set(), mode: P.get('mode') === 'tree' && FULL ? 'tree' : 'graph', dim: 2, graph: null, selected: null, hover: null, q: '', userMoved: false, known: new Set(), chunks: new Map(), loading: 0, loaded: 0, depth: FULL && P.get('depth') === '2' ? 2 : 1 };
 
     // ---------------------------------------------------------------- small DOM helpers (text only)
     function h(tag, attrs, ...kids) {
@@ -386,8 +386,11 @@
       // The picture fits itself into view: at once on the first frame of the layout, again (animated,
       // unless reduced motion is asked for) when the layout comes to rest, and on a resize; never
       // after the visitor has moved the picture or selected a node. The first fit marks the explorer
-      // ready.
-      const fit = ms => { if (st.graph === g && (st.userMoved || fitView(ms))) markReady(); };
+      // ready, but only while the picture shows the last load that completed: once a newer load has
+      // started (st.loading moves past st.loaded) this graph's callbacks and timer no longer touch
+      // the state, so a replacement request is never marked ready before its data arrives, and an
+      // error it reports is never overwritten.
+      const fit = ms => { if (st.graph === g && st.loaded === st.loading && (st.userMoved || fitView(ms))) markReady(); };
       let first = true;
       g.onEngineTick(() => { if (first && st.graph === g) { first = false; fit(0); } });
       g.onEngineStop(() => fit(400));
@@ -405,7 +408,8 @@
       if (W < 2 || H < 2) return false;
       // Each visible node with a position: its centre, its radius (graph units, as drawn) and the
       // width of the name drawn to its right (screen px, 11 px type), which make2D draws for every
-      // Bundle, the node in focus, and every node but a Source once the scale reaches 0.9.
+      // Bundle, the node in focus, every node but a Source once the scale reaches 0.9, and every
+      // node, Sources too, once it reaches 1.6 (the same condition as the renderer's).
       const ctx = labelCtx(), focus = st.hover || st.selected, pts = [];
       for (const n of st.model.nodes) {
         if (!visible(n) || !Number.isFinite(n.x) || !Number.isFinite(n.y)) continue;
@@ -426,7 +430,7 @@
       const extent = k => {
         let a = Infinity, b = -Infinity;
         for (const p of pts) {
-          const named = p.always || (k >= 0.9 && p.some);
+          const named = p.always || k >= 1.6 || (k >= 0.9 && p.some);
           a = Math.min(a, (p.x - p.r) * k); b = Math.max(b, (p.x + p.r) * k + (named ? p.lw : 0));
         }
         return [a, b];
@@ -632,6 +636,7 @@
       }
       if (!st.model.nodes.length) { statusEl.textContent = `Nothing to draw: ${net.nodes[0].error || 'the graph has no nodes'}.`; if (st.graph) { st.graph.graphData({ nodes: [], links: [] }); } renderSources(); setState('error'); return; }
       renderLegend(); renderList(); renderSources(); renderDetail(null);
+      st.loaded = ticket;
       mount();
       say(`Read ${st.model.nodes.length} nodes and ${st.model.links.length} links from ${net.nodes.filter(n => n.parsed).length} node${net.nodes.filter(n => n.parsed).length === 1 ? '' : 's'}`);
       const pre = P.get('node');
