@@ -27,6 +27,11 @@
   // node, and the bytes of each file. What is cut is reported, never silently dropped.
   const MAX_PEERS = 16;
   const MAX_BYTES = 10 * 1024 * 1024;
+  // Limits on what is drawn: a graph larger than this would hold the visitor's tab for seconds in
+  // the force layout. The first nodes of the merged order (the opened node's first) are drawn, and
+  // the status line says how many were left out.
+  const MAX_NODES = 5000;
+  const MAX_LINKS = 10000;
 
   const asArray = v => (v == null ? [] : Array.isArray(v) ? v : [v]);
   const iriOf = v => (typeof v === 'string' ? v : v && typeof v === 'object' && typeof v['@id'] === 'string' ? v['@id'] : null);
@@ -176,6 +181,24 @@
     return { nodes, links, byId, adj, roots };
   }
 
+  /** `model` cut to at most `maxNodes` nodes (the first ones in its order) and `maxLinks` links
+   *  between them, its degrees and adjacency recomputed. Returns { model, cut } where `cut` lists
+   *  what was left out, or the model itself and an empty list when it is within both limits. */
+  function capModel(model, maxNodes, maxLinks) {
+    const mn = maxNodes || MAX_NODES, ml = maxLinks || MAX_LINKS;
+    if (model.nodes.length <= mn && model.links.length <= ml) return { model, cut: [] };
+    const cut = [];
+    const nodes = model.nodes.slice(0, mn).map(n => Object.assign({}, n, { deg: 0 }));
+    if (model.nodes.length > mn) cut.push(`${model.nodes.length} nodes, the first ${mn} drawn`);
+    const byId = new Map(nodes.map(n => [n.id, n]));
+    let links = model.links.filter(l => byId.has(l.source) && byId.has(l.target));
+    if (links.length > ml) { cut.push(`${links.length} links between them, the first ${ml} drawn`); links = links.slice(0, ml); }
+    const adj = new Map(nodes.map(n => [n.id, []]));
+    for (const l of links) { adj.get(l.source).push({ id: l.target, rel: l.rel, dir: 'out' }); adj.get(l.target).push({ id: l.source, rel: l.rel, dir: 'in' }); byId.get(l.source).deg++; byId.get(l.target).deg++; }
+    const roots = new Map([...model.roots].filter(([, id]) => byId.has(id)));
+    return { model: { nodes, links, byId, adj, roots }, cut };
+  }
+
   /** The tree: each Bundle root, its clusters, their members, the members' sources; an item in no
    *  cluster hangs from its Bundle; a peer's Bundle hangs from the Bundle that declared it. */
   function treeLinks(model) {
@@ -263,7 +286,7 @@
    *  Every node is { url, origin, anchor, linkset, graph, chunks, license, digest, version, counts, depth, error, doc, parsed }.
    *  A failure is recorded on its node and never stops the others. */
   async function loadNetwork(address, opts) {
-    const o = Object.assign({ depth: 1, timeoutMs: TIMEOUT_MS, lang: 'en', maxPeers: MAX_PEERS, maxBytes: MAX_BYTES }, opts || {});
+    const o = Object.assign({ depth: 1, timeoutMs: TIMEOUT_MS, lang: 'en', maxPeers: MAX_PEERS, maxBytes: MAX_BYTES, maxNodes: MAX_NODES, maxLinks: MAX_LINKS }, opts || {});
     const start = resolveAddress(address, o.base);
     if (!start) throw new Error('not an http(s) address');
     const sizeText = m => (m % (1024 * 1024) === 0 ? `${m / 1024 / 1024} MB` : `${m} bytes`);
@@ -360,10 +383,10 @@
       frontier = await Promise.all(next);
     }
     const parts = nodes.filter(n => n.parsed).map(n => n.parsed);
-    const model = merge(parts, pairs.filter(([a, b]) => nodes[a].parsed && nodes[b].parsed));
-    const cuts = nodes.flatMap(n => n.cut.map(c => `${new URL(n.origin).host}: ${c}`));
-    return { nodes, model, start, cuts };
+    const capped = capModel(merge(parts, pairs.filter(([a, b]) => nodes[a].parsed && nodes[b].parsed)), o.maxNodes, o.maxLinks);
+    const cuts = nodes.flatMap(n => n.cut.map(c => `${new URL(n.origin).host}: ${c}`)).concat(capped.cut.map(c => `picture: ${c}`));
+    return { nodes, model: capped.model, start, cuts };
   }
 
-  return { REL, WELLKNOWN, SUMMARY_KEYS, TREE_RELS, ORDER, SUMMARY_MAX, TIMEOUT_MS, MAX_PEERS, MAX_BYTES, asArray, iriOf, textOf, typeOf, labelOf, httpUrl, safeHref, originOf, resolveAddress, linksOf, anchorOf, peersOf, graphLinkOf, chunksLinkOf, licenseOf, rebase, parseGraph, merge, treeLinks, truncate, summaryText, fallbackSummary, pageHref, parseChunks, digestStatus, loadNetwork };
+  return { REL, WELLKNOWN, SUMMARY_KEYS, TREE_RELS, ORDER, SUMMARY_MAX, TIMEOUT_MS, MAX_PEERS, MAX_BYTES, MAX_NODES, MAX_LINKS, asArray, iriOf, textOf, typeOf, labelOf, httpUrl, safeHref, originOf, resolveAddress, linksOf, anchorOf, peersOf, graphLinkOf, chunksLinkOf, licenseOf, rebase, parseGraph, merge, capModel, treeLinks, truncate, summaryText, fallbackSummary, pageHref, parseChunks, digestStatus, loadNetwork };
 });

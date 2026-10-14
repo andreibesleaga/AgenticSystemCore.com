@@ -270,6 +270,11 @@ for (const f of files.filter(f => f.endsWith('.html'))) {
   if (r !== '404.html' && !/<link rel="canonical" href="https:\/\/agenticsystemcore\.com\/[^"]*">/.test(h)) E('canonical missing');
   if (!h.includes('<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">')) E('describedby link missing (AGSC-06-25)');
   if (!h.includes('<a class="skip" href="#main">') || !h.includes('<main id="main"')) E('skip link or main landmark missing');
+  // The site's own layout (assets/layout.css: one container for the header, the page and the
+  // footer) is loaded on every page this generator writes, right after the engine theme it
+  // overrides. The board pages (boards/…) are the engine's bytes, adopted unchanged: they keep the
+  // engine theme alone until the engine's page shell aligns its own columns.
+  if (!r.startsWith('boards/') && !h.includes('<link rel="stylesheet" href="/assets/site.css">\n<link rel="stylesheet" href="/assets/layout.css">\n')) E('does not load /assets/layout.css right after /assets/site.css');
   const ids = idsIn(h); const dup = ids.filter((x, i) => ids.indexOf(x) !== i);
   if (dup.length) E(`duplicate ids: ${[...new Set(dup)].slice(0, 5).join(', ')}`);
   for (const m of h.matchAll(/<script(?![^>]*type="application\/ld\+json")[^>]*>/g)) if (!ALLOWED_SCRIPTS.has(m[0]) && !GX_SCRIPT.test(m[0])) E(`script other than the same-origin search and page-tool scripts: ${m[0]} (AGSC-06-05, CSP)`);
@@ -494,6 +499,8 @@ for (const l of locs) ok(targetFile(l), `sitemap URL has no page: ${l}`);
   for (const route of want.keys()) ok(headerBlocks.has(route), `_headers: no block for ${route}`);
   ok([...headerBlocks.keys()].indexOf('/*') === 0, '_headers: the site-wide block /* must come first, so the blocks that replace its policy apply after it');
 }
+// The site's own stylesheet over the engine theme: published as it is in the repository.
+ok(exists(path.join(ROOT, 'assets', 'layout.css')) && exists(path.join(WWW, 'assets', 'layout.css')) && fs.readFileSync(path.join(ROOT, 'assets', 'layout.css')).equals(fs.readFileSync(path.join(WWW, 'assets', 'layout.css'))), '/assets/layout.css is missing from the output or differs from assets/layout.css');
 for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt', '.well-known/tdmrep.json', 'graph.jsonld', 'llms.txt', 'llms-full.txt', 'search.json', 'assets/search-site.json', 'assets/search.js', 'robots.txt', '404.html', 'ns/context.jsonld', 'ns/agsc.ttl', 'specs/agentic-knowledge/index.html', 'specs/mcp/index.html', 'legal/index.html', 'docs/index.html', 'docs/introduction/index.html', 'docs/modes/index.html', 'docs/requirements/index.html', 'docs/standards/index.html', 'docs/compliance/index.html', 'docs/status/index.html', 'search/index.html',
   // AGSC-06-01/06-02/09-16: the page-tool route family.
   'compose/index.html', 'compose/agsc-core.js', 'compose/agsc-page-tools.js', 'compose/agsc-compose.js', 'compose/webmcp.js',

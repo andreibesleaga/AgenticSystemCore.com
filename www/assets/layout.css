@@ -1,0 +1,84 @@
+/* AgenticSystemCore.com: the site's own layout, loaded on every page right after /assets/site.css.
+   site.css is the engine's default theme, byte for byte (scripts/build.js stops if it differs), so
+   this site changes its layout here and nowhere else. Same colour tokens, no new colours.
+
+   THE ONE CONTAINER. The engine theme centres three boxes of three widths: the header's <nav> at
+   60rem, <main> at 46rem (main.wide at 62rem) and the footer's paragraphs at 60rem. Each has a
+   1rem side padding, so the logo, the page title and the footer start at three different left
+   edges on a laptop. Here the three get the same box: at most 60rem wide, centred, 1rem of padding
+   each side, so at every width the logo, the h1, the first paragraph, every wide element and the
+   footer text start at the same x. `box-sizing: border-box` (site.css) keeps the padding inside the
+   60rem.
+
+   THE CASCADE, rule by rule (this file comes after site.css, so a selector of equal specificity
+   here wins):
+   - `main` (0,0,1) and `main.wide` (0,1,1) of site.css: max-width 46rem / 62rem. Overridden by
+     `main` and `main.wide` below, same specificity, later.
+   - `main.gx-page` of graph-explorer.css (90rem): removed there; the graph page uses this box too.
+   - `main > :not(figure, pre, table, .table-wrap, .modes) { max-width: 34rem }` of site.css
+     (specificity 0,1,1 for `.table-wrap`/`.modes` in :not): KEPT. It is the owner's reading measure
+     (about 70 characters a line, never more than 80; WCAG 1.4.8). Prose and its boxes (the summary,
+     the status box, the plain-language box, the contents list, blockquotes, dl) stay 34rem wide and
+     start at the container's left edge, because <main> no longer centres a narrower column.
+   - The wide elements that rule exempts (figure, pre, table, .table-wrap, .modes) take the whole
+     container. The graph explorer of /graph/ (a <div>) is exempted in graph-explorer.css.
+   - `figure.diagram svg { max-width: 46rem; min-width: 42rem }` of site.css: KEPT. A diagram is
+     drawn at most 46rem wide from the container's left edge (its labels would grow past their
+     design size if it were stretched), and on a phone it scrolls inside its own figure.
+   - `@media print { main, main.wide { max-width: none } }` of site.css: restated at the end of this
+     file, since the rules here come later and would otherwise win in print too.
+   Below 48rem (768 px) the container is the screen less the same 1rem padding each side. The 34rem
+   measure stays: on a phone it is wider than the screen, so prose takes the full width there; on a
+   small tablet (600-767 px) it keeps lines under about 70 characters, as on a laptop. */
+
+header.site nav, main, main.wide, footer.site p { max-width: 60rem; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+
+
+/* THE HEADER ROW. In the theme the list of links is one flex item as wide as all its links, so on a
+   tablet (about 600-900 px) it drops below the logo and the theme switcher drops to a third row of
+   its own. Here the list may shrink to 18rem and wraps its links inside, so the logo, the first
+   links and the switcher share the first row, in the same order as the markup (the reading and
+   focus order do not change). On a laptop all of it fits one row, as before; on a phone the list
+   still takes its own row. */
+header.site ul { flex: 1 1 18rem; }
+
+/* TOUCH TARGETS. The theme makes the header links and the theme switcher at least 24 px tall (WCAG
+   2.5.8). On a touch screen, and at every width below 64rem (phones and tablets), each control of
+   the header, each rule chip and each line of a contents list is at least 44 px tall (WCAG 2.5.5).
+   A link inside a sentence keeps the size of the text around it (the exception both criteria make). */
+@media (max-width: 63.99rem), (pointer: coarse) {
+  header.site nav { row-gap: 0; padding-top: 0.25rem; padding-bottom: 0.25rem; }
+  header.site ul { row-gap: 0; }
+  header.site a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; padding: 0; }
+  .theme select { min-height: 44px; min-width: 44px; padding: 0.25rem 0.4rem; }
+  .skip { min-height: 44px; }
+  a.rule { padding-top: 10px; padding-bottom: 10px; }
+  .toc li { margin: 0; }
+  .toc a { display: inline-flex; align-items: center; min-height: 44px; }
+  /* A link alone in a table cell ("Mode 0", a commit, a draft's name) is a control, not a word in
+     a sentence: 12 px of padding above and below its 20 px line make it 44 px tall without moving
+     the text (vertical padding on an inline box does not change the line), and the cell gets the
+     same 12 px of padding so the enlarged link stays inside its own row and never overlaps the
+     link of the row above or below; and the cell is never narrower than the 44 px link plus its side
+     padding, so at 320 px a column of file names does not shrink to 40 px (the table then scrolls
+     inside its own wrapper, as WCAG 1.4.10 allows). Only cells whose single child element is a link
+     change. */
+  td:has(> a:only-child), th:has(> a:only-child) { padding-top: 12px; padding-bottom: 12px; min-width: calc(44px + 1.1rem); }
+  td > a:only-child, th > a:only-child { padding-top: 12px; padding-bottom: 12px; }
+}
+
+/* CARD LINKS. In the front page's two card grids (.modes) each card's title is a link of one 20 px
+   line. The whole card is its target instead: the link's ::after covers the card (the card is the
+   positioned box), so a tap anywhere on a card follows its link, at every width. A card holds exactly
+   one link, so no other target is covered. The link itself keeps the theme's focus ring and
+   underline on focus; the card shows the hover state of the whole target. */
+.modes li { position: relative; }
+.modes li strong a::after { content: ""; position: absolute; inset: 0; border-radius: 4px; }
+.modes li:hover { border-color: var(--link); }
+
+/* Large screens: the container stays at 60rem, centred; only the page background and the header's
+   and footer's rules run edge to edge. */
+
+@media print {
+  header.site nav, main, main.wide, footer.site p { max-width: none; }
+}

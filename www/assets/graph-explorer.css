@@ -20,8 +20,9 @@
   --gx-o1: #e879f9; --gx-o2: #a3e635; --gx-o3: #fdba74; --gx-dim: #2c3038;
 }
 
-/* The page: the explorer takes the whole width; the text above it keeps the site's measure. */
-main.gx-page { max-width: 90rem; }
+/* The page: /graph/ uses the site's one container (assets/layout.css: 60rem, the same left edge as
+   the logo and the title). The text keeps the site's 34rem measure; the explorer (a <div>, which
+   site.css would cap at 34rem with the prose) takes the container's whole width. */
 main > .gx.gx-full { max-width: none; }
 .gx[hidden], .gx [hidden] { display: none !important; }
 .gx-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
@@ -45,8 +46,11 @@ main > .gx.gx-full { max-width: none; }
 .gx-check input { width: 1.1rem; height: 1.1rem; margin: 0; }
 .gx-help { font-size: 0.85rem; color: var(--muted); max-width: 34rem; margin: 0 0 0.75rem; }
 
-/* Picture, splitter, panel */
-.gx-body { display: grid; grid-template-columns: minmax(0, 1fr) 12px var(--gx-panel-w, 22rem); height: calc(100vh - 14rem); min-height: 30rem; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+/* Picture, splitter, panel. The explorer fills the window below its controls: once the controls
+   are scrolled to the top, the picture and the panel take the rest of the window's height
+   (--gx-chrome is the height of the controls and the help line, set by graph-explorer.js), and
+   never less than 480 px. */
+.gx-body { display: grid; grid-template-columns: minmax(0, 1fr) 12px var(--gx-panel-w, 22rem); height: calc(100vh - var(--gx-chrome, 7rem) - 1.5rem); height: calc(100dvh - var(--gx-chrome, 7rem) - 1.5rem); min-height: 480px; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
 .gx-stage { position: relative; overflow: hidden; min-width: 0; min-height: 0; background: var(--bg); }
 .gx-view { position: absolute; inset: 0; }
 .gx-view canvas { display: block; user-select: none; outline: none; -webkit-tap-highlight-color: transparent; touch-action: none; }
@@ -102,9 +106,13 @@ main > .gx.gx-full { max-width: none; }
 .gx-tip-meta { color: var(--muted); font-size: 0.78rem; }
 .gx-tip-go a { display: inline-block; min-height: 24px; padding: 0.1rem 0; font-weight: 600; }
 
-/* The front-page picture: about 60 % of the window's height, its caption below. */
+/* The front-page picture: the container's whole width, about 60 % of the window's height (never
+   under 360 px, never over 640 px), its caption below. */
 .gx-embed { margin: 1.25rem 0 1.5rem; }
-.gx-embed .gx-stage { height: 60vh; min-height: 18rem; border: 1px solid var(--rule); border-radius: 4px; }
+.gx-embed .gx-stage { height: clamp(360px, 60vh, 640px); border: 1px solid var(--rule); border-radius: 4px; }
+/* On the front page one finger scrolls the page (two pan and zoom the picture), so the canvas lets
+   the browser scroll vertically; on /graph/ the canvas takes every gesture. */
+.gx-embed .gx-view canvas { touch-action: pan-y; }
 .gx-embed figcaption { font-size: 0.92rem; color: var(--muted); max-width: 34rem; margin-top: 0.35rem; }
 
 /* Narrow screens: the picture takes the full width at about 60 % of the window's height, with the
@@ -113,7 +121,8 @@ main > .gx.gx-full { max-width: none; }
 @media (max-width: 760px) {
   .gx-body { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; }
   .gx-stage, .gx-embed .gx-stage { display: flex; flex-direction: column; height: auto; min-height: 0; }
-  .gx-view { position: relative; inset: auto; height: 60vh; min-height: 16rem; flex: none; }
+  .gx-view { position: relative; inset: auto; height: clamp(18rem, 60vh, 40rem); flex: none; }
+  .gx-embed .gx-view { height: clamp(360px, 60vh, 640px); }
   .gx-status, .gx-legend { position: static; max-width: none; border-width: 0; border-radius: 0; }
   .gx-status { order: -1; border-bottom: 1px solid var(--rule); }
   .gx-legend { border-top: 1px solid var(--rule); }
@@ -122,8 +131,22 @@ main > .gx.gx-full { max-width: none; }
   .gx button, .gx input[type="url"], .gx input[type="search"], .gx .gx-nb, .gx .gx-legend button, .gx .gx-linkish { min-height: 44px; }
   .gx-check { min-height: 44px; }
 }
-@media (pointer: coarse) {
+/* The splitter beside the side panel (shown from 761 px up), on a touch screen and on a tablet-width
+   window: 24 px wide instead of 12 px, and its target 48 px wide (a transparent ::before reaching
+   12 px over the picture's edge and 12 px over the panel's left padding, which holds no content),
+   so a finger can take it (WCAG 2.5.5). A tap on it steps the panel's width (graph-explorer.js), the
+   single-pointer alternative to dragging (WCAG 2.5.7). */
+@media (pointer: coarse) and (min-width: 760.5px), (min-width: 760.5px) and (max-width: 63.99rem) {
+  .gx-body { grid-template-columns: minmax(0, 1fr) 24px var(--gx-panel-w, 22rem); }
+  .gx-split::before { content: ""; position: absolute; top: 0; bottom: 0; left: -12px; right: -12px; z-index: 2; }
+}
+/* Touch screens, and every width below 64rem (phones and tablets): 44 px targets (WCAG 2.5.5). */
+@media (pointer: coarse), (max-width: 63.99rem) {
   .gx button, .gx input[type="url"], .gx input[type="search"], .gx .gx-nb, .gx .gx-legend button, .gx .gx-linkish, .gx-check { min-height: 44px; }
+  .gx button { min-width: 44px; }
+  /* The 2D / 3D buttons share a border (margin-left: -1px), so each is drawn 1 px wider to keep 44 px
+     of its own. */
+  .gx .gx-seg button { min-width: 45px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .gx * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
