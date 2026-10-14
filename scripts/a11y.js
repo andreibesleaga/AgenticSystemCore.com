@@ -10,7 +10,8 @@
 //     that loads it, at 390, 768 and 1280 px;
 //   - on / and /graph/, axe runs once the graph explorer has marked itself data-state="ready";
 //   - prose lines: at 768 and 1280 px no line of running text in the main column is longer
-//     than 80 characters (WCAG 1.4.8; the stylesheet aims at about 70). Code blocks, tables,
+//     than 130 characters (prose takes the whole 60rem container, the site's choice since 15 Oct 2026;
+//     WCAG 1.4.8's 80 is a AAA criterion). Code blocks, tables,
 //     diagrams and the card grid are not prose and are not measured; a diagram caption is;
 //   - whole words in tables: no word of three or more letters is split across two lines inside
 //     a table cell, at any of the three widths. A word inside code or a link may break anywhere
@@ -59,7 +60,7 @@ const pages = walk(WWW).filter(f => f.endsWith('index.html')).map(f => '/' + pat
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.txt': 'text/plain' };
 // The reading measures (they run inside the page; layout does not depend on the colour scheme,
 // so they run once per width, in the light scheme).
-const MAX_LINE = 80; // characters in one rendered line of prose (WCAG 1.4.8)
+const MAX_LINE = 130; // characters in one rendered line of prose: the full 60rem container (since 15 Oct 2026); WCAG 1.4.8 (80, AAA) is not a bar here
 const SIZES = { 390: { width: 390, height: 844 }, 768: { width: 768, height: 1024 }, 1280: { width: 1280, height: 900 } };
 /** The longest rendered line of prose in the main column, in characters, and whether any block wraps. */
 function proseLines() {
