@@ -23,7 +23,7 @@
 /* The page: /graph/ uses the site's one container (assets/layout.css: 60rem, the same left edge as
    the logo and the title). The text and the explorer (a <div>, which site.css would cap at 34rem
    with the prose; layout.css lifts that cap for everything) take the container's whole width. */
-main > .gx.gx-full { max-width: none; }
+main > .gx.gx-full { max-width: 51.5rem; }
 .gx[hidden], .gx [hidden] { display: none !important; }
 .gx-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .gx-muted { color: var(--muted); }
