@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Graph explorer — AgenticSystemCore</title>
-<meta name="description" content="Explore the knowledge graph of AgenticSystemCore.com and of the nodes it names as peers, in 2D or 3D, in your browser: search, list and inspect every node, read its summary, its relations and its chunks, and check the digest of the graph file.">
+<meta name="description" content="Explore the knowledge graph of AgenticSystemCore.com and, on request, of the nodes it names as peers, in 2D or 3D, in your browser: search, list and inspect every node, read its summary, its relations and its chunks, and check the digest of the graph file.">
 <link rel="canonical" href="https://agenticsystemcore.com/graph/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
 <link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
@@ -17,10 +17,10 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/graph/">
 <meta property="og:title" content="Graph explorer">
-<meta property="og:description" content="Explore the knowledge graph of AgenticSystemCore.com and of the nodes it names as peers, in 2D or 3D, in your browser: search, list and inspect every node, read its summary, its relations and its chunks, and check the digest of the graph file.">
+<meta property="og:description" content="Explore the knowledge graph of AgenticSystemCore.com and, on request, of the nodes it names as peers, in 2D or 3D, in your browser: search, list and inspect every node, read its summary, its relations and its chunks, and check the digest of the graph file.">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Graph explorer","url":"https://agenticsystemcore.com/graph/"}</script>
 <script src="/assets/graph-data.js" integrity="sha384-9ogXbZmq/ThJtsXZQoUwDx6VLyGdJKm7bf+/IAa/KYjsZ2BrEPiaaHzqrP1WLGDe" defer></script>
-<script src="/assets/graph-explorer.js" integrity="sha384-GKUIMb3zqm9bLooz4iVChQiVjLNQQm5otZhHPDoAewy50uRI2P/oazcveqwFzipo" defer></script>
+<script src="/assets/graph-explorer.js" integrity="sha384-LC6GzJCemvwayiXsOUxdaBi/Te5OfU7wlXl0kM64yjqzga0Qz1z35WsF2wLa07md" defer></script>
 <script src="/assets/vendor/force-graph-1.52.0.min.js" integrity="sha384-isW4dF8tfo3t+I2iiIdnz1MFV+hW1Vn3YyY2PmAgPbRQaW7Biahepz8fTRR+nLxm" defer></script>
 </head>
 <body>
@@ -43,8 +43,8 @@
 </header>
 <main id="main" class="gx-page">
 <h1>Graph explorer</h1>
-<p class="summary"><strong>Summary</strong>The knowledge graph of this node and of the peer nodes it names, drawn in your browser from their published files: search it, list it, read each node's summary and relations, and explore any other node by its address.</p>
-<p>Every node of the Agentic Knowledge Web publishes its knowledge as a graph, <a href="/graph.jsonld"><code>graph.jsonld</code></a>, named with its digest in the node's <a href="/.well-known/knowledge-linkset">discovery document</a>. This page reads that file, and the graph of each peer node the document names, and draws them together. Give it another node's address to explore that node instead.</p>
+<p class="summary"><strong>Summary</strong>The knowledge graph of this node and, when you ask, of the peer nodes it names, drawn in your browser from their published files: search it, list it, read each node's summary and relations, and explore any other node by its address.</p>
+<p>Every node of the Agentic Knowledge Web publishes its knowledge as a graph, <a href="/graph.jsonld"><code>graph.jsonld</code></a>, named with its digest in the node's <a href="/.well-known/knowledge-linkset">discovery document</a>. This page reads that file and draws it. Tick Peers to read the graph of each peer node the document names and draw them together. Give it another node's address to explore that node instead.</p>
 <noscript><p>The explorer needs JavaScript. The same graph is published as data, <a href="/graph.jsonld">graph.jsonld</a> and <a href="/graph.nq">graph.nq</a>, and as the lists of <a href="/clusters/">clusters</a>, <a href="/concepts/">concepts</a> and <a href="/procedures/">procedures</a>.</p></noscript>
 <div class="gx gx-full" data-gx="full" data-gx-3d="/assets/vendor/3d-force-graph-1.80.1.min.js" data-gx-3d-integrity="sha384-i98VDQKdpyVrtyuFn0fjUWJBLBmxnqHqOANcvYe9HLJUgT2wPixa4ZkLd7Dh3VEk" hidden>
 <div class="gx-controls" role="group" aria-label="Explorer controls">
@@ -55,9 +55,9 @@
 <span class="gx-seg" role="group" aria-label="Dimensions"><button type="button" id="gx-d-2" aria-pressed="true">2D</button><button type="button" id="gx-d-3" aria-pressed="false">3D</button></span>
 <button type="button" id="gx-rotate" aria-pressed="false" hidden>Rotate</button>
 <button type="button" id="gx-fit">Fit</button>
-<label class="gx-check"><input type="checkbox" id="gx-depth"> Peers of peers</label>
+<label class="gx-check"><input type="checkbox" id="gx-depth"> Peers</label>
 </div>
-<p class="gx-help" id="gx-src-help">A node's address, its discovery document or its <code>graph.jsonld</code>. The peer nodes it names are read too.</p>
+<p class="gx-help" id="gx-src-help">A node's address, its discovery document or its <code>graph.jsonld</code>. Tick Peers to read the peer nodes it names too.</p>
 <p class="gx-sr" id="gx-q-help">Filters the list of nodes and dims the other nodes in the picture. Enter selects the top match.</p>
 <div class="gx-body">
 <div class="gx-stage" role="group" aria-label="The picture of the graph. Drag to move, scroll or pinch to zoom, hover a node for its summary. The side panel lists the same nodes as buttons." hidden>

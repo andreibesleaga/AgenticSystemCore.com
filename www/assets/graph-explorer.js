@@ -51,7 +51,7 @@
     const motionQuery = mq('(prefers-reduced-motion: reduce)');
     const reduced = () => motionQuery.matches || P.get('motion') === 'reduce';
     const KNOWN_TYPES = new Set(['Bundle', 'Cluster', 'Concept', 'Procedure', 'Episode', 'Lesson', 'Gate', 'Task', 'Source']);
-    const st = { net: null, model: null, hiddenTypes: new Set(), hiddenSrc: new Set(), mode: P.get('mode') === 'tree' && FULL ? 'tree' : 'graph', dim: 2, graph: null, selected: null, hover: null, q: '', userMoved: false, known: new Set(), chunks: new Map(), loading: 0, loaded: 0, depth: FULL && P.get('depth') === '2' ? 2 : 1 };
+    const st = { net: null, model: null, hiddenTypes: new Set(), hiddenSrc: new Set(), mode: P.get('mode') === 'tree' && FULL ? 'tree' : 'graph', dim: 2, graph: null, selected: null, hover: null, q: '', userMoved: false, known: new Set(), chunks: new Map(), loading: 0, loaded: 0, depth: FULL ? (P.get('depth') === '2' ? 2 : P.get('depth') === '1' ? 1 : 0) : 0 };
 
     // ---------------------------------------------------------------- small DOM helpers (text only)
     function h(tag, attrs, ...kids) {
@@ -547,8 +547,10 @@
       $('#gx-load').addEventListener('click', () => load(srcInput.value, true));
       srcInput.addEventListener('keydown', e => { if (e.key === 'Enter') load(srcInput.value, true); });
       const depth = $('#gx-depth');
-      depth.checked = st.depth === 2;
-      depth.addEventListener('change', () => { st.depth = depth.checked ? 2 : 1; load(srcInput.value, true); });
+      // The picture starts with the node alone; Peers reads the peer nodes it names (one hop; the
+      // address ?depth=2 reads their peers too).
+      depth.checked = st.depth >= 1;
+      depth.addEventListener('change', () => { st.depth = depth.checked ? 1 : 0; load(srcInput.value, true); });
       setPressed();
     }
 
@@ -631,7 +633,7 @@
       if (FULL && user) {
         const u = new URL(location.href);
         if (G.originOf(net.start.linkset) === location.origin && !net.start.graph) u.searchParams.delete('src'); else u.searchParams.set('src', target);
-        if (st.depth === 2) u.searchParams.set('depth', '2'); else u.searchParams.delete('depth');
+        if (st.depth >= 1) u.searchParams.set('depth', String(st.depth)); else u.searchParams.delete('depth');
         history.replaceState(null, '', u.pathname + u.search + u.hash);
       }
       if (!st.model.nodes.length) { statusEl.textContent = `Nothing to draw: ${net.nodes[0].error || 'the graph has no nodes'}.`; if (st.graph) { st.graph.graphData({ nodes: [], links: [] }); } renderSources(); setState('error'); return; }

@@ -16,22 +16,24 @@
      `main` and `main.wide` below, same specificity, later.
    - `main.gx-page` of graph-explorer.css (90rem): removed there; the graph page uses this box too.
    - `main > :not(figure, pre, table, .table-wrap, .modes) { max-width: 34rem }` of site.css
-     (specificity 0,1,1 for `.table-wrap`/`.modes` in :not): KEPT. It is the owner's reading measure
-     (about 70 characters a line, never more than 80; WCAG 1.4.8). Prose and its boxes (the summary,
-     the status box, the plain-language box, the contents list, blockquotes, dl) stay 34rem wide and
-     start at the container's left edge, because <main> no longer centres a narrower column.
-   - The wide elements that rule exempts (figure, pre, table, .table-wrap, .modes) take the whole
-     container. The graph explorer of /graph/ (a <div>) is exempted in graph-explorer.css.
+     (specificity 0,1,1 for `.table-wrap`/`.modes` in :not): OVERRIDDEN below with the same
+     selector, so prose and its boxes (the summary, the status box, the plain-language box, the
+     contents list, blockquotes, dl) take the whole container, like the tables, the diagrams, the
+     card grids and the graph: one width for everything, the site's choice since 15 Oct 2026
+     (a 34rem reading measure beside 60rem-wide blocks looked like two columns). Lines run to
+     about 120 characters on a laptop; WCAG 1.4.8 (80 characters) is a AAA criterion, not required,
+     and scripts/a11y.js measures the longest line against 130.
+   - The graph explorer of /graph/ (a <div>) is exempted in graph-explorer.css as well.
    - `figure.diagram svg { max-width: 46rem; min-width: 42rem }` of site.css: KEPT. A diagram is
      drawn at most 46rem wide from the container's left edge (its labels would grow past their
      design size if it were stretched), and on a phone it scrolls inside its own figure.
    - `@media print { main, main.wide { max-width: none } }` of site.css: restated at the end of this
      file, since the rules here come later and would otherwise win in print too.
-   Below 48rem (768 px) the container is the screen less the same 1rem padding each side. The 34rem
-   measure stays: on a phone it is wider than the screen, so prose takes the full width there; on a
-   small tablet (600-767 px) it keeps lines under about 70 characters, as on a laptop. */
+   Below 48rem (768 px) the container is the screen less the same 1rem padding each side. */
 
 header.site nav, main, main.wide, footer.site p { max-width: 60rem; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+main > :not(figure, pre, table, .table-wrap, .modes) { max-width: none; }
+figure.diagram figcaption { max-width: none; }
 
 
 /* THE HEADER ROW. In the theme the list of links is one flex item as wide as all its links, so on a
