@@ -81,6 +81,13 @@ header.site ul { flex: 1 1 18rem; }
 .modes li strong a::after { content: ""; position: absolute; inset: 0; border-radius: 4px; }
 .modes li:hover { border-color: var(--link); }
 
+/* THE FOOTER. Its paragraphs are the container itself (no wrapper to narrow), so each takes the
+   content width, 53.5rem with its 1rem padding each side (51.5rem inside), and is pushed right by
+   the room a centred 60rem container would leave: the footer's text starts under the logo and ends
+   under the menu's last link, like everything else. Below 60rem the room is zero, and below 53.5rem
+   the paragraph is simply the screen's width, like the content. */
+footer.site p { max-width: 53.5rem; margin-left: max(0px, calc((100% - 60rem) / 2)); margin-right: 0; }
+
 /* Large screens: the container stays at 60rem, centred; only the page background and the header's
    and footer's rules run edge to edge. */
 
