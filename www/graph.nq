@@ -22,7 +22,7 @@
 <https://agenticsystemcore.com/clusters/project-board/> <https://w3id.org/agentic-system-core/ns#operator> "human:andreibesleaga"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/project-board/> <https://w3id.org/agentic-system-core/ns#origin> "ai-assisted"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/vocabulary/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Cluster> <https://agenticsystemcore.com/> .
-<https://agenticsystemcore.com/clusters/vocabulary/> <http://www.w3.org/2004/02/skos/core#definition> "The terms of the specification's ubiquitous language: the six item types and the words that complete them."@en <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/clusters/vocabulary/> <http://www.w3.org/2004/02/skos/core#definition> "The terms of the specification's ubiquitous language, the six item types and the words that complete them."@en <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/vocabulary/> <http://www.w3.org/2004/02/skos/core#member> <https://agenticsystemcore.com/concepts/bundle/> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/vocabulary/> <http://www.w3.org/2004/02/skos/core#member> <https://agenticsystemcore.com/concepts/cluster/> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/vocabulary/> <http://www.w3.org/2004/02/skos/core#member> <https://agenticsystemcore.com/concepts/concept/> <https://agenticsystemcore.com/> .

@@ -51,7 +51,7 @@
     const motionQuery = mq('(prefers-reduced-motion: reduce)');
     const reduced = () => motionQuery.matches || P.get('motion') === 'reduce';
     const KNOWN_TYPES = new Set(['Bundle', 'Cluster', 'Concept', 'Procedure', 'Episode', 'Lesson', 'Gate', 'Task', 'Source']);
-    const st = { net: null, model: null, hiddenTypes: new Set(), hiddenSrc: new Set(), mode: P.get('mode') === 'tree' && FULL ? 'tree' : 'graph', dim: 2, graph: null, selected: null, hover: null, q: '', userMoved: false, known: new Set(), chunks: new Map(), loading: 0, loaded: 0, depth: FULL ? (P.get('depth') === '2' ? 2 : P.get('depth') === '1' ? 1 : 0) : 0 };
+    const st = { net: null, model: null, hiddenTypes: new Set(), hiddenSrc: new Set(), mode: P.get('mode') === 'tree' && FULL ? 'tree' : 'graph', dim: 2, graph: null, selected: null, hover: null, q: '', userMoved: false, known: new Set(), chunks: new Map(), loading: 0, pending: 0, shown: null, preselect: null, wantDim: 2, depth: FULL ? (P.get('depth') === '2' ? 2 : P.get('depth') === '1' ? 1 : 0) : 0 };
 
     // ---------------------------------------------------------------- small DOM helpers (text only)
     function h(tag, attrs, ...kids) {
@@ -75,10 +75,16 @@
     const endId = e => (typeof e === 'object' && e ? e.id : e);
     const linkVisible = l => { const s = nodeOf(endId(l.source)), t = nodeOf(endId(l.target)); return !!(s && t && visible(s) && visible(t)); };
     const live = FULL ? $('.gx-live') : null;
+    // A node's drawn radius in graph units: larger for a node with more links.
+    const radiusOf = n => 4 * Math.sqrt(1 + Math.sqrt(n.deg || 0));
+    // The least radius, in screen pixels, at which a pointer finds a node: a drawn node can be under
+    // 3 px across on a phone, which a finger cannot hit.
+    const coarsePointer = mq('(pointer: coarse)');
+    const minTargetPx = () => (coarsePointer.matches ? 14 : 6);
     const say = text => { if (live) live.textContent = text; };
 
     // ---------------------------------------------------------------- tooltip (hover 1 s, focus, long-press)
-    const tip = { node: null, showTimer: 0, hideTimer: 0, pointer: null, suppressClickUntil: 0, byFocus: false };
+    const tip = { node: null, showTimer: 0, hideTimer: 0, pointer: null, suppressClickUntil: 0, byFocus: false, over: false };
     // The summary the page shows; for a Source or a Bundle, which carry none, what the graph and the link set say of it.
     const summaryOf = (n, max) => G.summaryText(n.raw, LANG, max) || G.fallbackSummary(n, LANG, st.net && st.net.nodes[n.src]);
     function tipContent(n) {
@@ -119,13 +125,67 @@
       const p = at || screenOf(n);
       placeTip(p.x + view.offsetLeft, p.y + view.offsetTop);
     }
-    function hideTip() { clearTimeout(tip.showTimer); clearTimeout(tip.hideTimer); tip.node = null; tip.byFocus = false; tipEl.hidden = true; for (const b of root.querySelectorAll('[aria-describedby="gx-tip"]')) b.removeAttribute('aria-describedby'); }
-    const graceHide = () => { clearTimeout(tip.hideTimer); tip.hideTimer = setTimeout(hideTip, 400); };
-    tipEl.addEventListener('pointerenter', () => clearTimeout(tip.hideTimer));
-    tipEl.addEventListener('pointerleave', graceHide);
+    // Two ways to close the tooltip:
+    //   closeTip() closes the open tooltip and leaves a pending one alone, so the grace period of
+    //   the node the pointer has left never cancels the tooltip of the node it has moved on to;
+    //   hideTip() also cancels the pending one (Escape, a click elsewhere, a new picture).
+    function closeTip() {
+      clearTimeout(tip.hideTimer);
+      tip.node = null;
+      tip.over = false;
+      tip.byFocus = false;
+      tipEl.hidden = true;
+      for (const b of root.querySelectorAll('[aria-describedby="gx-tip"]')) b.removeAttribute('aria-describedby');
+    }
+    function hideTip() {
+      clearTimeout(tip.showTimer);
+      closeTip();
+      // On the front page a click selects a node only to show its tooltip: closing it ends the highlight.
+      if (!FULL && st.selected) select(null);
+    }
+    // Closes the tooltip after 400 ms, the time the pointer needs to travel from the node onto
+    // the tooltip; the tooltip stays open while the pointer is on it, so its link can be followed.
+    function graceHide() {
+      clearTimeout(tip.hideTimer);
+      if (tip.over) return;
+      tip.hideTimer = setTimeout(() => { if (!tip.over) closeTip(); }, 400);
+    }
+    tipEl.addEventListener('pointerenter', () => {
+      tip.over = true;
+      clearTimeout(tip.hideTimer);
+    });
+    tipEl.addEventListener('pointerleave', () => {
+      tip.over = false;
+      const backOnItsNode = st.hover && st.hover === tip.node;
+      if (!backOnItsNode) graceHide();
+    });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !tipEl.hidden) hideTip(); });
-    document.addEventListener('pointerdown', e => { if (!tipEl.hidden && !tipEl.contains(e.target)) { if (!(e.pointerType === 'touch' && view.contains(e.target))) hideTip(); } }, true);
-    view.addEventListener('pointermove', e => { const r = view.getBoundingClientRect(); tip.pointer = { x: e.clientX - r.left, y: e.clientY - r.top }; });
+    // A press anywhere but on the tooltip closes it; a touch on the picture is left to the
+    // long-press and tap handlers below.
+    document.addEventListener('pointerdown', e => {
+      if (tipEl.hidden || tipEl.contains(e.target)) return;
+      const touchOnPicture = e.pointerType === 'touch' && view.contains(e.target);
+      if (!touchOnPicture) hideTip();
+    }, true);
+    view.addEventListener('pointermove', e => {
+      if (!e.isTrusted) return;
+      tip.inView = true;
+      const r = view.getBoundingClientRect();
+      tip.pointer = { x: e.clientX - r.left, y: e.clientY - r.top };
+      tip.lastPointer = e.pointerType;
+    });
+    // The drawing libraries learn where the pointer is only from moves over the picture, so a
+    // pointer that leaves it (for the legend, the status line, the tooltip or the page) would leave
+    // the last node hovered, highlighted and its tooltip pending. One move far outside the picture,
+    // sent to the canvas, tells them the pointer has gone.
+    view.addEventListener('pointerleave', e => {
+      if (!e.isTrusted) return;
+      tip.inView = false;
+      if (e.pointerType === 'touch') return;
+      const canvas = view.querySelector('canvas');
+      const away = new PointerEvent('pointermove', { bubbles: true, clientX: -1e5, clientY: -1e5, pointerType: e.pointerType || 'mouse' });
+      if (canvas) canvas.dispatchEvent(away);
+    });
     view.addEventListener('contextmenu', e => { if (tip.longPressed) e.preventDefault(); });
     // touch: a press held for more than half a second shows the tooltip; a tap selects
     let press = null;
@@ -134,30 +194,60 @@
     // finger scrolls the page, so a touch alone does not count.
     const touches = new Set();
     view.addEventListener('pointerdown', e => {
+      const r0 = view.getBoundingClientRect();
+      tip.pointer = { x: e.clientX - r0.left, y: e.clientY - r0.top }; // a tap fires no pointermove
+      tip.inView = true;
+      tip.lastPointer = e.pointerType;
       if (e.pointerType === 'touch') touches.add(e.pointerId);
       if (e.pointerType !== 'touch' || FULL || touches.size > 1) st.userMoved = true;
       if (e.pointerType !== 'touch') return;
+      // A second finger starts a pinch, not a long press: the first press is dropped.
+      if (press) { clearTimeout(press.timer); press = null; }
+      if (touches.size > 1) return;
       const r = view.getBoundingClientRect();
-      press = { x: e.clientX - r.left, y: e.clientY - r.top, timer: setTimeout(() => {
-        const n = nodeAt(press.x, press.y);
-        if (n) { tip.longPressed = true; tip.suppressClickUntil = Date.now() + 800; showTip(n, { x: press.x, y: press.y }); }
+      const at = { x: e.clientX - r.left, y: e.clientY - r.top };
+      press = { ...at, timer: setTimeout(() => {
+        const n = nodeAt(at.x, at.y);
+        if (n) { tip.longPressed = true; tip.suppressClickUntil = Date.now() + 800; showTip(n, at); }
       }, 500) };
     });
     const endPress = () => { if (press) { clearTimeout(press.timer); press = null; } setTimeout(() => { tip.longPressed = false; }, 50); };
-    for (const t of ['pointerup', 'pointercancel']) view.addEventListener(t, e => touches.delete(e.pointerId));
-    view.addEventListener('wheel', e => { if (FULL || e.ctrlKey || e.metaKey) st.userMoved = true; }, { passive: true });
+    for (const t of ['pointerup', 'pointercancel']) view.addEventListener(t, e => {
+      touches.delete(e.pointerId);
+      if (e.pointerType === 'touch' && st.hover) { st.hover = null; restyle(); }
+    });
+    if (!FULL) view.addEventListener('wheel', ctrlWheelZoom, { passive: false, capture: true });
+    // Capture phase: d3-zoom stops the wheel event on the canvas, so a bubbling listener never runs.
+    view.addEventListener('wheel', e => { if (FULL || e.ctrlKey || e.metaKey) st.userMoved = true; }, { passive: true, capture: true });
     view.addEventListener('pointermove', e => { if (!press) return; const r = view.getBoundingClientRect(); if (Math.hypot(e.clientX - r.left - press.x, e.clientY - r.top - press.y) > 10) endPress(); });
     view.addEventListener('pointerup', endPress);
     view.addEventListener('pointercancel', endPress);
+    // The front page's Ctrl/Cmd + wheel: a mouse notch zooms by about 1.25x, a trackpad pinch (small
+    // steps) smoothly, always about the point under the pointer. d3-zoom would multiply a Ctrl-wheel
+    // by 10, which made each mouse notch zoom 4x.
+    function ctrlWheelZoom(e) {
+      if (!(e.ctrlKey || e.metaKey) || !st.graph || st.dim !== 2) return;
+      e.preventDefault(); e.stopPropagation();
+      const px = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY; // lines to pixels
+      const perPx = Math.abs(px) >= 50 ? 0.003 : 0.02; // a mouse notch is about 100 px
+      const k0 = st.graph.zoom(), k1 = Math.min(40, Math.max(0.05, k0 * 2 ** Math.max(-1, Math.min(1, -px * perPx))));
+      const r = view.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      const p = st.graph.screen2GraphCoords(x, y);
+      st.graph.zoom(k1, 0);
+      st.graph.centerAt(p.x - (x - r.width / 2) / k1, p.y - (y - r.height / 2) / k1, 0);
+      st.userMoved = true;
+    }
+    // The visible node nearest to a point of the picture (view coordinates), within reach of a
+    // finger or a pointer; the same rule in 2D and 3D, from each node's position on screen.
     function nodeAt(x, y) {
       if (!st.graph) return null;
-      if (st.dim === 3) return st.hover ? nodeOf(st.hover) : null;
-      const p = st.graph.screen2GraphCoords(x, y), k = st.graph.zoom() || 1;
+      const k = st.dim === 2 ? st.graph.zoom() || 1 : 1;
       let best = null, bestD = Infinity;
       for (const n of st.model.nodes) {
         if (!visible(n) || n.x === undefined) continue;
-        const d = Math.hypot(n.x - p.x, n.y - p.y), r = 4 * Math.sqrt(1 + Math.sqrt(n.deg || 0)) + 10 / k;
-        if (d <= r && d < bestD) { best = n; bestD = d; }
+        const p = screenOf(n), d = Math.hypot(p.x - x, p.y - y);
+        const reach = Math.max(st.dim === 2 ? radiusOf(n) * k : 0, minTargetPx()) + 4;
+        if (d <= reach && d < bestD) { best = n; bestD = d; }
       }
       return best;
     }
@@ -172,12 +262,20 @@
       if (read.length > 1) for (const [, i] of read) kids.push(h('button', { type: 'button', 'data-src': i, 'aria-pressed': String(!st.hiddenSrc.has(i)), title: i ? 'Nodes of a peer node: a ring in 2D, their colour in 3D' : 'Nodes of the node you opened' }, h('span', { class: `gx-dot gx-origin${i ? ` gx-ring gx-o-${((i - 1) % 3) + 1}` : ''}`, 'aria-hidden': 'true' }), hostOf(i)));
       legendEl.replaceChildren(...kids);
     }
+    const toggle = (set, v) => { if (set.has(v)) set.delete(v); else set.add(v); return !set.has(v); };
+    // A legend button hides or shows one type or one origin. The button is updated in place, so
+    // keyboard focus stays on it; a selection, hover or tooltip on a node now hidden is dropped.
     legendEl.addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
-      if (b.hasAttribute('data-type')) { const t = b.getAttribute('data-type'); if (st.hiddenTypes.has(t)) st.hiddenTypes.delete(t); else st.hiddenTypes.add(t); }
-      else if (b.hasAttribute('data-src')) { const i = Number(b.getAttribute('data-src')); if (st.hiddenSrc.has(i)) st.hiddenSrc.delete(i); else st.hiddenSrc.add(i); }
-      renderLegend(); if (FULL) renderList();
+      const shown = b.hasAttribute('data-type') ? toggle(st.hiddenTypes, b.getAttribute('data-type')) : toggle(st.hiddenSrc, Number(b.getAttribute('data-src')));
+      b.setAttribute('aria-pressed', String(shown));
+      const hidden = id => !!id && !visible(nodeOf(id) || { id });
+      if (hidden(tip.node)) hideTip();
+      if (hidden(st.hover)) st.hover = null;
+      if (hidden(st.selected)) select(null);
+      if (FULL) renderList();
       if (st.graph) st.graph.nodeVisibility(visible).linkVisibility(linkVisible);
+      restyle();
     });
 
     // ---------------------------------------------------------------- the side panel (full page)
@@ -188,6 +286,9 @@
       return h('button', { type: 'button', class: 'gx-nb', 'data-id': n.id, 'aria-pressed': String(st.selected === n.id) },
         dot(n.type, n.src), h('span', { class: 'gx-nb-label' }, n.label), h('span', { class: 'gx-rel' }, `${n.type}${note ? ` · ${note}` : ''}${n.src ? ` · ${hostOf(n.src)}` : ''}`));
     }
+    // A node chosen in the picture: its details are at the top of the side panel, so the panel
+    // (only the panel, never the page) scrolls back to the top.
+    function showDetails() { panel.scrollTop = 0; }
     function matches(n) { const q = st.q.toLowerCase(); return !q || `${n.label} ${n.type} ${n.id}`.toLowerCase().includes(q); }
     function renderList() {
       if (!FULL) return;
@@ -286,7 +387,13 @@
     }
     if (FULL) {
       panel.addEventListener('click', e => {
-        const b = e.target.closest('button.gx-nb'); if (b) { select(b.getAttribute('data-id'), true); return; }
+        const b = e.target.closest('button.gx-nb');
+        if (b) {
+          const fromDetail = detailEl.contains(b); // this button is about to be replaced
+          select(b.getAttribute('data-id'), true);
+          if (fromDetail) { const h2 = detailEl.querySelector('h2'); if (h2) { h2.tabIndex = -1; h2.focus(); } }
+          return;
+        }
         const o = e.target.closest('button[data-open]'); if (o) { srcInput.value = o.getAttribute('data-open'); load(o.getAttribute('data-open'), true); }
       });
       panel.addEventListener('keydown', e => { if (e.key === 'Escape' && tipEl.hidden) select(null); });
@@ -350,20 +457,24 @@
       g.width(s.w).height(s.h).nodeId('id').nodeLabel(() => '').linkLabel(() => '')
         .nodeVal(n => 1 + Math.sqrt(n.deg || 0)).linkDirectionalArrowLength(st.dim === 2 ? 4 : 3).linkDirectionalArrowRelPos(1)
         .onNodeClick(n => {
-          if (Date.now() < tip.suppressClickUntil) return;
+          if (tip.longPressed || Date.now() < tip.suppressClickUntil) return; // the long press showed the tooltip
           select(n.id, false);
-          if (FULL) { const b = listEl.querySelector(`button.gx-nb[data-id="${CSS.escape(n.id)}"]`); if (b) b.scrollIntoView({ block: 'nearest' }); }
-          else showTip(nodeOf(n.id), tip.pointer);
+          if (FULL) showDetails();
+          else showTip(nodeOf(n.id), tip.lastPointer === 'touch' ? null : tip.pointer);
         })
-        .onNodeHover(n => {
+        .onNodeHover(found => {
+          const n = tip.inView ? found : null; // no pointer over the picture: nothing is hovered
+          if ((n ? n.id : null) === st.hover) return;
           st.hover = n ? n.id : null;
           view.classList.toggle('gx-pointing', !!n);
           restyle();
           clearTimeout(tip.showTimer);
+          if (n && tip.lastPointer === 'touch') return; // on touch a long press opens the tooltip
           if (n) {
+            // A second's rest opens the tooltip; while one is open, the next node's opens sooner.
             if (tip.node === n.id) clearTimeout(tip.hideTimer);
-            else tip.showTimer = setTimeout(() => { if (st.hover === n.id) showTip(nodeOf(n.id), tip.pointer); }, 1000);
-          } else if (!tipEl.hidden) graceHide();
+            else tip.showTimer = setTimeout(() => { if (st.hover === n.id) showTip(nodeOf(n.id), tip.pointer); }, tipEl.hidden ? 1000 : 300);
+          } else if (!tipEl.hidden && !tip.byFocus) graceHide();
         })
         .onBackgroundClick(() => { hideTip(); select(null); })
         .nodeVisibility(visible).linkVisibility(linkVisible)
@@ -373,13 +484,6 @@
       // never blocks the tab), so the first fit already sees the graph near its final shape.
       const n = st.model.nodes.length, ahead = n <= 1000 ? 120 : n <= 3000 ? 30 : 10;
       if (reduced()) g.warmupTicks(Math.min(300, Math.max(ahead, Math.round(30000 / Math.max(1, n))))).cooldownTicks(0); else g.warmupTicks(ahead).cooldownTime(4000);
-      // The front page's picture sits in a scrolling page: the wheel scrolls the page unless Ctrl or
-      // Cmd is held (a trackpad pinch sends that too), and one finger scrolls the page while two pan
-      // and zoom. On /graph/ the picture is the page's subject, and the wheel and one finger move it.
-      if (!FULL && st.dim === 2) {
-        g.enableZoomInteraction(e => !!(e && (e.ctrlKey || e.metaKey)));
-        g.enablePanInteraction(e => !(e && e.type === 'touchstart' && e.touches && e.touches.length < 2));
-      }
       g.graphData(graphData());
       if (st.mode !== 'tree' && st.net.nodes.length > 1) g.d3Force('gxOrigin', originForce());
       if (st.dim === 2) { g.d3Force('charge').strength(st.mode === 'tree' ? -60 : -120); g.d3Force('link').distance(st.mode === 'tree' ? 30 : 40); }
@@ -387,12 +491,19 @@
       // unless reduced motion is asked for) when the layout comes to rest, and on a resize; never
       // after the visitor has moved the picture or selected a node. The first fit marks the explorer
       // ready, but only while the picture shows the last load that completed: once a newer load has
-      // started (st.loading moves past st.loaded) this graph's callbacks and timer no longer touch
+      // started (st.pending is set until it ends) this graph's callbacks and timer no longer touch
       // the state, so a replacement request is never marked ready before its data arrives, and an
       // error it reports is never overwritten.
-      const fit = ms => { if (st.graph === g && st.loaded === st.loading && (st.userMoved || fitView(ms))) markReady(); };
-      let first = true;
-      g.onEngineTick(() => { if (first && st.graph === g) { first = false; fit(0); } });
+      const fit = ms => { if (st.graph === g && !st.pending && (st.userMoved || fitView(ms))) markReady(); };
+      // In 3D the first ticks still hold the positions from before the layout ran, so the picture
+      // is fitted again every 300 ms while the layout spreads out, until it rests or the visitor moves it.
+      let first = true, lastFit = 0;
+      g.onEngineTick(() => {
+        if (st.graph !== g) return;
+        const now = performance.now();
+        if (first) { first = false; lastFit = now; fit(0); return; }
+        if (st.dim === 3 && !st.userMoved && !st.pending && now - lastFit > 300) { lastFit = now; fitView(0); }
+      });
       g.onEngineStop(() => fit(400));
       setTimeout(() => { if (root.getAttribute('data-state') !== 'ready') fit(0); }, reduced() ? 400 : 1500);
       return g;
@@ -413,7 +524,7 @@
       const ctx = labelCtx(), focus = st.hover || st.selected, pts = [];
       for (const n of st.model.nodes) {
         if (!visible(n) || !Number.isFinite(n.x) || !Number.isFinite(n.y)) continue;
-        const r = 4 * Math.sqrt(1 + Math.sqrt(n.deg || 0)) + 3, m = nodeOf(n.id) || n;
+        const r = radiusOf(n) + 3, m = nodeOf(n.id) || n;
         const text = m.label.length > 40 ? `${m.label.slice(0, 39)}…` : m.label;
         const lw = ctx ? Math.ceil(ctx.measureText(text).width) + 4 : text.length * 6.5;
         pts.push({ x: n.x, y: n.y, r, always: m.type === 'Bundle' || focus === n.id, some: m.type !== 'Source', lw });
@@ -450,35 +561,89 @@
       try { if (!labelCanvas) { labelCanvas = document.createElement('canvas').getContext('2d'); labelCanvas.font = '11px system-ui, sans-serif'; } } catch (e) { labelCanvas = null; }
       return labelCanvas;
     }
-    function markReady() { if (root.getAttribute('data-state') !== 'ready') setState('ready'); }
+    // Marks the explorer ready, then applies a selection the address asked for (?node=): it waits
+    // for the final picture, so a 3D view that loads later still centres it.
+    function markReady() {
+      if (root.getAttribute('data-state') !== 'ready') setState('ready');
+      const id = st.preselect;
+      if (id && st.wantDim === st.dim) { st.preselect = null; setTimeout(() => select(id, true), reduced() ? 50 : 1500); }
+    }
+    // 2D drawing. Each node: a ring in its origin's colour when it comes from a peer node, the dot
+    // in its type's colour, and its name to the right when it is in focus, a Bundle, or the picture
+    // is zoomed in far enough (0.9 for every node but a Source, 1.6 for every node).
+    function drawNode(n, ctx, scale) {
+      const r = radiusOf(n), m = nodeOf(n.id) || n;
+      if (m.src) {
+        ctx.beginPath(); ctx.arc(n.x, n.y, r + 2.4, 0, 2 * Math.PI);
+        ctx.lineWidth = 1.8; ctx.strokeStyle = originColor(m.src); ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, 2 * Math.PI);
+      ctx.fillStyle = st.colorOf ? st.colorOf(n) : typeColor(m.type); ctx.fill();
+      const focus = st.hover || st.selected;
+      const named = focus === n.id || m.type === 'Bundle' || scale >= 1.6 || (scale >= 0.9 && m.type !== 'Source');
+      if (!named) return;
+      ctx.font = `${Math.max(11 / scale, 2.2)}px system-ui, sans-serif`;
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = tok('--fg');
+      ctx.fillText(m.label.length > 40 ? `${m.label.slice(0, 39)}…` : m.label, n.x + r + 3, n.y);
+    }
+    // The area where the pointer finds a node (painted on the library's hidden hit canvas): the
+    // drawn dot, and never less than minTargetPx() on screen.
+    function paintPointerArea(n, color, ctx, scale) {
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(n.x, n.y, Math.max(radiusOf(n), minTargetPx() / scale), 0, 2 * Math.PI); ctx.fill();
+    }
     function make2D() {
       const g = new window.ForceGraph(view);
-      common(g).linkLineDash(l => (l.cross ? [4, 2] : null)).nodeCanvasObjectMode(() => 'replace').nodeCanvasObject((n, ctx, scale) => {
-        const r = 4 * Math.sqrt(1 + Math.sqrt(n.deg || 0)), m = nodeOf(n.id) || n;
-        if (m.src) { ctx.beginPath(); ctx.arc(n.x, n.y, r + 2.4, 0, 2 * Math.PI); ctx.lineWidth = 1.8; ctx.strokeStyle = originColor(m.src); ctx.stroke(); }
-        ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, 2 * Math.PI); ctx.fillStyle = st.colorOf ? st.colorOf(n) : typeColor(m.type); ctx.fill();
-        const focus = st.hover || st.selected;
-        const named = focus === n.id || (m.type === 'Bundle') || (scale >= 1.6) || (scale >= 0.9 && m.type !== 'Source');
-        if (!named) return;
-        const f = Math.max(11 / scale, 2.2);
-        ctx.font = `${f}px system-ui, sans-serif`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = tok('--fg');
-        ctx.fillText(m.label.length > 40 ? `${m.label.slice(0, 39)}…` : m.label, n.x + r + 3, n.y);
-      });
+      common(g)
+        .linkLineDash(l => (l.cross ? [4, 2] : null))
+        .nodeCanvasObjectMode(() => 'replace').nodeCanvasObject(drawNode)
+        .nodePointerAreaPaint(paintPointerArea);
+      if (!FULL) embedGestures(g);
       return g;
     }
-    function webgl() { try { const c = document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl'))); } catch (e) { return false; } }
+    // The front page's picture sits in a scrolling page: one finger scrolls the page (two pan and
+    // zoom), the wheel scrolls the page unless Ctrl or Cmd is held, and on a touch screen a node is
+    // not dragged, so a swipe that starts on one still scrolls. The library sets touch-action: none
+    // on its canvas when it is made; it is set back here.
+    function embedGestures(g) {
+      g.enableZoomInteraction(e => !!(e && (e.ctrlKey || e.metaKey)));
+      g.enablePanInteraction(e => !(e && e.type === 'touchstart' && e.touches && e.touches.length < 2));
+      if (coarsePointer.matches) g.enableNodeDrag(false);
+      const canvas = view.querySelector('canvas');
+      if (canvas) canvas.style.touchAction = 'pan-y';
+    }
+    // Whether this browser can draw WebGL: probed once, and the probe's context released at once
+    // (a browser keeps only a few contexts alive).
+    let hasWebgl = null;
+    function webgl() {
+      if (hasWebgl !== null) return hasWebgl;
+      try {
+        const c = document.createElement('canvas'), gl = window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl'));
+        hasWebgl = !!gl;
+        const lose = gl && gl.getExtension('WEBGL_lose_context');
+        if (lose) lose.loseContext();
+      } catch (e) { hasWebgl = false; }
+      return hasWebgl;
+    }
     function make3D() {
       const g = new window.ForceGraph3D(view, { controlType: 'orbit' });
       common(g).showNavInfo(false).nodeOpacity(0.95).linkOpacity(0.4).backgroundColor(tok('--bg'));
       return g;
     }
     function mount() {
-      if (st.graph) { try { st.graph._destructor(); } catch (e) { /* already gone */ } st.graph = null; view.replaceChildren(); }
+      if (st.graph) {
+        try {
+          if (st.webglGraph === st.graph) st.graph.renderer().forceContextLoss(); // free the old 3D picture's WebGL context
+          st.graph._destructor();
+        } catch (e) { /* already gone */ }
+        st.graph = null; view.replaceChildren();
+      }
       hideTip();
       st.userMoved = false;
+      tip.inView = false;
       if (st.dim === 3) {
-        try { if (!webgl()) throw new Error('no WebGL'); st.graph = make3D(); }
-        catch (e) { view.replaceChildren(); st.dim = 2; setPressed(); notice('WebGL is not available in this browser, so the picture stays in 2D.'); }
+        try { if (!webgl()) throw new Error('no WebGL'); st.graph = st.webglGraph = make3D(); }
+        catch (e) { view.replaceChildren(); st.dim = 2; st.wantDim = 2; setPressed(); notice('WebGL is not available in this browser, so the picture stays in 2D.'); }
       }
       if (!st.graph) st.graph = make2D();
       restyle();
@@ -487,7 +652,7 @@
       setStatus();
     }
     new ResizeObserver(() => { if (st.graph) { const s = size(); st.graph.width(s.w).height(s.h); if (!st.userMoved) fitView(0); } }).observe(view);
-    const onTheme = () => { if (st.graph) restyle(); if (FULL && st.model) { renderLegend(); } };
+    const onTheme = () => { if (st.graph) restyle(); };
     new MutationObserver(onTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     mq('(prefers-color-scheme: dark)').addEventListener('change', onTheme);
 
@@ -497,7 +662,8 @@
     function setStatus() {
       if (!st.net) return;
       const parts = st.net.nodes.map((n, i) => (n.parsed ? `${hostOf(i)}: ${n.parsed.nodes.length} nodes` : `${hostOf(i)}: not read (${n.error || 'no graph'})`));
-      statusEl.textContent = `${parts.join(' · ')} · ${st.model.links.length} links · ${st.dim === 3 ? '3D' : '2D'}${st.mode === 'tree' ? ' tree' : ''}${st.net.cuts && st.net.cuts.length ? ` · cut: ${st.net.cuts.join('; ')}` : ''}${noticeText ? ` · ${noticeText}` : ''}`;
+      const drawn = st.mode === 'tree' ? G.treeLinks(st.model).length : st.model.links.length;
+      statusEl.textContent = `${parts.join(' · ')} · ${drawn} links · ${st.dim === 3 ? '3D' : '2D'}${st.mode === 'tree' ? ' tree' : ''}${st.net.cuts && st.net.cuts.length ? ` · cut: ${st.net.cuts.join('; ')}` : ''}${noticeText ? ` · ${noticeText}` : ''}`;
     }
 
     // ---------------------------------------------------------------- controls (full page)
@@ -516,19 +682,32 @@
       if (st.dim === 3 && st.graph && st.graph.controls) { const c = st.graph.controls(); if (c && 'autoRotate' in c) { c.autoRotate = rotating; c.autoRotateSpeed = 0.6; } }
       if (FULL) $('#gx-rotate').setAttribute('aria-pressed', String(rotating));
     }
-    function setDim(d) {
-      if (d === 3 && typeof window.ForceGraph3D !== 'function') {
-        if (!webgl()) { notice('WebGL is not available in this browser, so the picture stays in 2D.'); return; }
-        const src = root.getAttribute('data-gx-3d'), sri = root.getAttribute('data-gx-3d-integrity');
-        if (!src || !sri) return;
-        notice('loading the 3D library (3d-force-graph 1.80.1, from this site)');
+    // The 3D library is downloaded on first use, once (lib3d holds that download); the dimension
+    // asked for last wins, so 2D chosen while it downloads is kept.
+    let lib3d = null;
+    function load3dLibrary() {
+      if (lib3d) return lib3d;
+      const src = root.getAttribute('data-gx-3d'), sri = root.getAttribute('data-gx-3d-integrity');
+      if (!src || !sri) return Promise.reject(new Error('no 3D library on this page'));
+      notice('loading the 3D library (3d-force-graph 1.80.1, from this site)');
+      lib3d = new Promise((resolve, reject) => {
         const s = document.createElement('script');
         s.src = src; s.integrity = sri; s.crossOrigin = 'anonymous';
         quiet.on();
-        s.onload = () => { quiet.off(); notice(''); setDim(3); };
-        s.onerror = () => { quiet.off(); notice('the 3D library could not be loaded, so the picture stays in 2D'); };
+        s.onload = () => { quiet.off(); notice(''); resolve(); };
+        s.onerror = () => { quiet.off(); lib3d = null; notice('the 3D library could not be loaded, so the picture stays in 2D'); reject(new Error('3D library not loaded')); };
         document.body.appendChild(s);
-        return;
+      });
+      return lib3d;
+    }
+    async function setDim(d) {
+      st.wantDim = d;
+      if (d === 2 && noticeText) notice('');
+      if (d === 3 && typeof window.ForceGraph3D !== 'function') {
+        const stay2d = text => { if (text) notice(text); st.wantDim = st.dim; if (!st.pending) markReady(); };
+        if (!webgl()) { stay2d('WebGL is not available in this browser, so the picture stays in 2D.'); return; }
+        try { await load3dLibrary(); } catch (e) { stay2d(''); return; }
+        if (st.wantDim !== 3) return; // the visitor chose 2D meanwhile
       }
       st.dim = d; setPressed(); if (st.model) mount();
       say(d === 3 ? '3D view' : '2D view');
@@ -550,7 +729,7 @@
       // The picture starts with the node alone; Peers reads the peer nodes it names (one hop; the
       // address ?depth=2 reads their peers too).
       depth.checked = st.depth >= 1;
-      depth.addEventListener('change', () => { st.depth = depth.checked ? 1 : 0; load(srcInput.value, true); });
+      depth.addEventListener('change', () => { st.depth = depth.checked ? 1 : 0; load(st.shown || srcInput.value, true); });
       setPressed();
     }
 
@@ -616,33 +795,48 @@
       let s = ''; for (const b of d) s += String.fromCharCode(b);
       return btoa(s);
     }
+    // Reads a node (and, with Peers ticked, the peers it names) and draws it. A newer load replaces
+    // one still in flight (the ticket). A load that fails, or finds nothing to draw, leaves the
+    // picture and the panel as they were and says why in the status line.
     async function load(address, user) {
       const ticket = ++st.loading;
       const target = (address || '').trim() || `${location.origin}/`;
+      st.pending = ticket;
       hideTip();
       setState('loading');
-      statusEl.textContent = `Reading ${target} and the peers it names…`;
-      let net;
+      statusEl.textContent = `Reading ${target}${st.depth ? ' and the peers it names' : ''}…`;
+      let net = null, problem = null;
       try {
         net = await G.loadNetwork(target, { fetch: (u, o) => window.fetch(u, o), sha256: window.crypto && crypto.subtle ? sha256 : null, depth: st.depth, base: location.href, lang: LANG });
-      } catch (e) { if (ticket === st.loading) { statusEl.textContent = `Could not read ${target}: ${e.message}. Give a node's address, its discovery document or its graph.jsonld.`; setState('error'); } return; }
-      if (ticket !== st.loading) return;
-      if (!(window.crypto && crypto.subtle)) for (const n of net.nodes) if (n.declaredDigest) n.digest = 'not checked';
-      st.net = net; st.model = net.model; st.selected = null; st.hover = null; st.hiddenSrc.clear(); st.chunks.clear();
-      st.known = new Set(net.nodes.flatMap(n => [n.anchor, n.url].filter(Boolean).map(G.originOf)));
-      if (FULL && user) {
-        const u = new URL(location.href);
-        if (G.originOf(net.start.linkset) === location.origin && !net.start.graph) u.searchParams.delete('src'); else u.searchParams.set('src', target);
-        if (st.depth >= 1) u.searchParams.set('depth', String(st.depth)); else u.searchParams.delete('depth');
-        history.replaceState(null, '', u.pathname + u.search + u.hash);
+      } catch (e) {
+        problem = `Could not read ${target}: ${e.message}. Give a node's address, its discovery document or its graph.jsonld.`;
       }
-      if (!st.model.nodes.length) { statusEl.textContent = `Nothing to draw: ${net.nodes[0].error || 'the graph has no nodes'}.`; if (st.graph) { st.graph.graphData({ nodes: [], links: [] }); } renderSources(); setState('error'); return; }
+      if (ticket !== st.loading) return; // a newer load has started
+      st.pending = 0;
+      if (!problem && !net.model.nodes.length) problem = `Nothing to draw from ${target}: ${net.nodes[0].error || 'the graph has no nodes'}.`;
+      if (problem) { statusEl.textContent = problem; setState('error'); return; }
+      show(net, target, user);
+    }
+    function show(net, target, user) {
+      if (!(window.crypto && crypto.subtle)) for (const n of net.nodes) if (n.declaredDigest) n.digest = 'not checked';
+      st.net = net; st.model = net.model; st.shown = target;
+      st.selected = null; st.hover = null; st.hiddenSrc.clear(); st.chunks.clear();
+      st.known = new Set(net.nodes.flatMap(n => [n.anchor, n.url].filter(Boolean).map(G.originOf)));
+      if (FULL && user) rememberInAddress(net, target);
       renderLegend(); renderList(); renderSources(); renderDetail(null);
-      st.loaded = ticket;
       mount();
-      say(`Read ${st.model.nodes.length} nodes and ${st.model.links.length} links from ${net.nodes.filter(n => n.parsed).length} node${net.nodes.filter(n => n.parsed).length === 1 ? '' : 's'}`);
+      const read = net.nodes.filter(n => n.parsed).length;
+      say(`Read ${st.model.nodes.length} nodes and ${st.model.links.length} links from ${read} node${read === 1 ? '' : 's'}`);
       const pre = P.get('node');
-      if (pre && nodeOf(pre) && !user) setTimeout(() => select(pre, true), reduced() ? 50 : 1500);
+      if (pre && nodeOf(pre) && !user) st.preselect = pre; // applied by markReady()
+    }
+    // The page's address records what is shown (src, depth), so a reload or a shared link shows it again.
+    function rememberInAddress(net, target) {
+      const u = new URL(location.href);
+      const ownNode = G.originOf(net.start.linkset) === location.origin && !net.start.graph;
+      if (ownNode) u.searchParams.delete('src'); else u.searchParams.set('src', target);
+      if (st.depth >= 1) u.searchParams.set('depth', String(st.depth)); else u.searchParams.delete('depth');
+      history.replaceState(null, '', u.pathname + u.search + u.hash);
     }
 
     const first = FULL ? (P.get('src') || `${location.origin}/`) : `${location.origin}/`;
