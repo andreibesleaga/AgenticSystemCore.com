@@ -51,7 +51,7 @@
     const motionQuery = mq('(prefers-reduced-motion: reduce)');
     const reduced = () => motionQuery.matches || P.get('motion') === 'reduce';
     const KNOWN_TYPES = new Set(['Bundle', 'Cluster', 'Concept', 'Procedure', 'Episode', 'Lesson', 'Gate', 'Task', 'Source']);
-    const st = { net: null, model: null, hiddenTypes: new Set(), hiddenSrc: new Set(), mode: P.get('mode') === 'tree' && FULL ? 'tree' : 'graph', dim: 2, graph: null, selected: null, hover: null, q: '', userMoved: false, known: new Set(), chunks: new Map(), loading: 0, pending: 0, shown: null, preselect: null, wantDim: 2, depth: FULL ? (P.get('depth') === '2' ? 2 : P.get('depth') === '1' ? 1 : 0) : 0 };
+    const st = { net: null, model: null, hiddenTypes: new Set(), hiddenSrc: new Set(), mode: P.get('mode') === 'tree' && FULL ? 'tree' : 'graph', dim: 2, graph: null, selected: null, hover: null, q: '', userMoved: false, known: new Set(), chunks: new Map(), loading: 0, pending: 0, failed: false, shown: null, preselect: null, wantDim: 2, depth: FULL ? (P.get('depth') === '2' ? 2 : P.get('depth') === '1' ? 1 : 0) : 0 };
 
     // ---------------------------------------------------------------- small DOM helpers (text only)
     function h(tag, attrs, ...kids) {
@@ -136,12 +136,12 @@
       tip.byFocus = false;
       tipEl.hidden = true;
       for (const b of root.querySelectorAll('[aria-describedby="gx-tip"]')) b.removeAttribute('aria-describedby');
+      // On the front page a click selects a node only to show its tooltip: closing it ends the highlight.
+      if (!FULL && st.selected) select(null);
     }
     function hideTip() {
       clearTimeout(tip.showTimer);
       closeTip();
-      // On the front page a click selects a node only to show its tooltip: closing it ends the highlight.
-      if (!FULL && st.selected) select(null);
     }
     // Closes the tooltip after 400 ms, the time the pointer needs to travel from the node onto
     // the tooltip; the tooltip stays open while the pointer is on it, so its link can be followed.
@@ -564,6 +564,7 @@
     // Marks the explorer ready, then applies a selection the address asked for (?node=): it waits
     // for the final picture, so a 3D view that loads later still centres it.
     function markReady() {
+      if (st.failed || st.pending || !st.model) return; // the status line reports the failure
       if (root.getAttribute('data-state') !== 'ready') setState('ready');
       const id = st.preselect;
       if (id && st.wantDim === st.dim) { st.preselect = null; setTimeout(() => select(id, true), reduced() ? 50 : 1500); }
@@ -641,6 +642,7 @@
       hideTip();
       st.userMoved = false;
       tip.inView = false;
+      st.failed = false; // a new picture of what is shown: an earlier failed request no longer applies
       if (st.dim === 3) {
         try { if (!webgl()) throw new Error('no WebGL'); st.graph = st.webglGraph = make3D(); }
         catch (e) { view.replaceChildren(); st.dim = 2; st.wantDim = 2; setPressed(); notice('WebGL is not available in this browser, so the picture stays in 2D.'); }
@@ -704,7 +706,7 @@
       st.wantDim = d;
       if (d === 2 && noticeText) notice('');
       if (d === 3 && typeof window.ForceGraph3D !== 'function') {
-        const stay2d = text => { if (text) notice(text); st.wantDim = st.dim; if (!st.pending) markReady(); };
+        const stay2d = text => { if (text) notice(text); st.wantDim = st.dim; markReady(); };
         if (!webgl()) { stay2d('WebGL is not available in this browser, so the picture stays in 2D.'); return; }
         try { await load3dLibrary(); } catch (e) { stay2d(''); return; }
         if (st.wantDim !== 3) return; // the visitor chose 2D meanwhile
@@ -814,7 +816,7 @@
       if (ticket !== st.loading) return; // a newer load has started
       st.pending = 0;
       if (!problem && !net.model.nodes.length) problem = `Nothing to draw from ${target}: ${net.nodes[0].error || 'the graph has no nodes'}.`;
-      if (problem) { statusEl.textContent = problem; setState('error'); return; }
+      if (problem) { st.failed = true; statusEl.textContent = problem; setState('error'); return; }
       show(net, target, user);
     }
     function show(net, target, user) {
