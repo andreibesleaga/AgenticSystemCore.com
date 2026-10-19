@@ -1,10 +1,10 @@
 ---
 title: "Demos"
-summary: "Every mode and every persona as a small demo you can run in under five minutes from an empty folder: the exact commands, the lines they print, and the one thing each proves. Every command is run by a test in the engine repository, so this page cannot drift from the engine."
-description: "Runnable demos of AgenticSystemCore: the six modes and the personas of the scenarios, each with the exact commands, the printed lines and what it proves, kept true by a test."
+summary: "Every mode as a small demo you can run in under five minutes from an empty folder, with the personas each one serves: the exact commands, the lines they print, and the one thing each proves. This page is the short form of the engine's docs/DEMOS.md, whose every command a test in the engine repository runs."
+description: "Runnable demos of AgenticSystemCore: the six modes and the personas of the scenarios, each with the exact commands, the printed lines and what it proves; the full form in the engine repository is kept true by a test."
 ---
 
-Reading about six modes is one thing; seeing each one do something is another. The engine repository carries one page of demos, [docs/DEMOS.md](https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/DEMOS.md), and a test, `tests/docs/demos.test.js`, that runs every command on that page in a scratch folder and compares what was printed with what the page says. This page is the short form: what each demo does, the commands, and the lines to look for. The full page has every step and every expected line.
+Reading about six modes is one thing; seeing each one do something is another. The engine repository carries one page of demos, [docs/DEMOS.md](https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/DEMOS.md), and a test, `tests/docs/demos.test.js`, that runs every command on that page in a scratch folder and compares what was printed with what the page says. This page is the short form: what each demo does, the commands, and the lines to look for. The full page has every step and every expected line, and it is the tested copy: where the two differ, DEMOS.md is right.
 
 ## Before you start
 
@@ -31,7 +31,7 @@ mkdir -p .well-known && cp ../security.txt .well-known/security.txt
 cp ../boiling-point.md content/concepts/boiling-point.md
 printf 'Salt it like [pasta water](%s).\n' salting.md >> content/concepts/brewing.md
 agsc lint                                          # error: AGSC-E310 … resolves to nothing … brewing.md:15
-agsc build                                         # error: AGSC-E901 … emits no route for it; nothing under www/
+agsc build                                         # error: AGSC-E310 body reference "salting.md" resolves to nothing … brewing.md:15; nothing under www/
 grep -v salting content/concepts/brewing.md > brewing.tmp && mv brewing.tmp content/concepts/brewing.md
 agsc build                                         # build: pass — www/ holds the site, graph.jsonld, llms.txt, search.json, the discovery document
 grep -A2 '## Stale items' www/now.md               # - boiling-point
@@ -99,7 +99,7 @@ Personas: the standards implementer, the port implementer, the agent using a nod
 
 ## Mode 2 — live specifications
 
-**What it proves.** A project's decisions, specifications, tasks and gates are ordinary items; a gate compiles into forge files whose one required check is a check a CI job really reports; the steering files an assistant reads are the same bytes for every assistant; a person reading the pages sees a task's state, a gate's checks and a decision's typed links.
+**What it proves.** A project's decisions, specifications, tasks and gates are ordinary items; a gate compiles into forge files whose one required check is a check a CI job really reports; the steering files an assistant reads are the same bytes for every assistant; a person reading the pages sees a task's state, a gate's checks and the typed links each item declares. A page lists only the links its own item declares; at 1.0.0 it does not list the links other items make to it.
 
 ```bash
 cp -r "$ENGINE/examples/demos/mode-2-project" . && cd mode-2-project
@@ -173,4 +173,4 @@ Personas: the self-driving team, the agent proposer.
 
 ## How the page stays true
 
-The engine's test reads the full demos page, runs every marked command block in order in a fresh scratch folder with the fixed build instant and an empty git identity, and asserts that every line the page says to expect was printed, exactly. When the engine changes what it prints, that test fails and the page is corrected — never the other way round. The [scenarios](/docs/scenarios/) are the same behaviour written as Given/When/Then; the [six modes](/docs/modes/) explain what each mode is for.
+The engine's test reads the full demos page, runs every marked command block in order in a fresh scratch folder with the fixed build instant and an empty git identity, and asserts that every line the page says to expect was printed, exactly. When the engine changes what it prints, that test fails and the page is corrected — never the other way round. The test runs DEMOS.md, not this short form, so the comments on this page are checked only by hand against it. The security reviewer starts from the Mode 0 demo (`ci` before the security contact exists, then `verify --ledger`); the researcher and the restricted publisher have no demo here, and DEMOS.md names where each one starts. The [scenarios](/docs/scenarios/) are the same behaviour written as Given/When/Then; the [six modes](/docs/modes/) explain what each mode is for.

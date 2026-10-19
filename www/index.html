@@ -86,7 +86,7 @@
 <li><strong>Agent discovery</strong> (<a href="https://datatracker.ietf.org/doc/draft-jimenez-dawn-discovery-landscape/">IETF survey</a>) finds who can act; this finds what is known. <a href="https://www.rfc-editor.org/info/rfc9727">RFC 9727 (api-catalog)</a> is the design precedent.</li>
 <li><strong><a href="https://wikiba.se/">Wikibase and Wikidata</a></strong>: a typed graph in a served wiki with live writes; here, static files under version control.</li>
 </ul>
-<p>Details in <a href="https://doi.org/10.5281/zenodo.23052710">the paper</a>; source on <a href="https://github.com/andreibesleaga/agentic-system-core">GitHub</a>.</p>
+<p>Details in <a href="https://doi.org/10.5281/zenodo.23365416">the paper</a>; source on <a href="https://github.com/andreibesleaga/agentic-system-core">GitHub</a>.</p>
 <h2 id="what-you-can-do">Six ways to use it</h2>
 <ul class="modes">
 <li><strong><a href="/docs/modes/#mode-0-the-automatic-self-correcting-wiki">Auto-wiki</a></strong>Markdown in, a checked and linked website out; no model needed.</li>
@@ -160,16 +160,16 @@
 <figcaption>The highlighted discovery document is where an agent starts; people start at the pages. Both come from the same files.</figcaption>
 </figure>
 <h2 id="measured">Measured, reproducible</h2>
-<p>Measured against specification 1.0.0 with the reference engine; each command reproduces its line. None of these is a comparison with another system.</p>
+<p>Measured against specification 1.0.0 with the reference engine; each command reproduces its line, run in a clone of the engine repository at the release tag, with <code>&lt;dir&gt;</code> a folder outside the clone. In the token and accessibility lines, <code>&lt;scratch&gt;/node_modules</code> holds the packages those layers load from outside the clone (gpt-tokenizer; playwright-core and axe-core), <code>&lt;chrome&gt;</code> is a Chrome or Chromium executable, <code>--nodes</code> takes each node&#39;s name and built site, and <code>--exports</code> each node&#39;s llm-context export. None of these is a comparison with another system.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Measured, reproducible"><table>
 <thead><tr><th scope="col">What</th><th scope="col">Result</th><th scope="col">Reproduce with</th></tr></thead>
 <tbody>
 <tr><th scope="row">Conformance</th><td>243 vectors pass, 0 fail, of 250 (7 withdrawn); 327 of 332 active rules have a machine check</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer conformance --scratch &lt;dir&gt;</code></td></tr>
-<tr><th scope="row">Determinism</th><td>49 files compared across two builds, and across time zones and locales: 0 differ</td><td><code>node bench/measure.js --layer determinism</code></td></tr>
+<tr><th scope="row">Determinism</th><td>49 files compared across two builds, and across time zones and locales: 0 differ</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer determinism --scratch &lt;dir&gt;</code></td></tr>
 <tr><th scope="row">Security floor</th><td>108/108 seeded faults handled, 14/14 clean controls left alone. This proves neither safety nor the absence of new kinds of injection (AGSC-08-19)</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer security --scratch &lt;dir&gt;</code></td></tr>
-<tr><th scope="row">Accessibility</th><td>0 automated violations on the 100 pages this site had when it was measured, in the light and dark schemes; automated checks find only part of what matters, so this is a floor, not a claim</td><td><code>NODE_PATH=&lt;scratch&gt;/node_modules CHROME_EXE=&lt;chrome&gt; node bench/measure.js --layer a11y --nodes &lt;name&gt;=&lt;www&gt;,…</code></td></tr>
-<tr><th scope="row">Build scale</th><td>5,000 items built in 34.6 s, 10,000 in 86.6 s (median of three runs, one machine); 0 pages over the 100 KB budget</td><td><code>node bench/measure.js --layer perf   # sizes 100 500 1000 5000 10000, 3 runs each, median</code></td></tr>
-<tr><th scope="row">Tokens per chunk</th><td>median 100 tokens per chunk of this site's chunk export (cl100k_base)</td><td><code>NODE_PATH=&lt;scratch&gt;/node_modules node bench/measure.js --layer tokens --nodes &lt;name&gt;=&lt;www&gt;,… --exports &lt;name&gt;=&lt;dir&gt;,…</code></td></tr>
+<tr><th scope="row">Accessibility</th><td>0 automated violations on the 100 pages this site had when it was measured, in the light and dark schemes; automated checks find only part of what matters, so this is a floor, not a claim</td><td><code>SOURCE_DATE_EPOCH=1767225600 NODE_PATH=&lt;scratch&gt;/node_modules CHROME_EXE=&lt;chrome&gt; node bench/measure.js --layer a11y --scratch &lt;dir&gt; --nodes &lt;name&gt;=&lt;www&gt;,…</code></td></tr>
+<tr><th scope="row">Build scale</th><td>5,000 items built in 34.6 s, 10,000 in 86.6 s (median of three runs, one machine); 0 pages over the 100 KB budget</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer perf --scratch &lt;dir&gt;   # sizes 100 500 1000 5000 10000, 3 runs each, median</code></td></tr>
+<tr><th scope="row">Tokens per chunk</th><td>median 100 tokens per chunk of this site's chunk export (cl100k_base)</td><td><code>SOURCE_DATE_EPOCH=1767225600 NODE_PATH=&lt;scratch&gt;/node_modules node bench/measure.js --layer tokens --scratch &lt;dir&gt; --nodes &lt;name&gt;=&lt;www&gt;,… --exports &lt;name&gt;=&lt;dir&gt;,…</code></td></tr>
 </tbody></table></div>
 <h2 id="get-started">Get started</h2>
 <p>Install the command line (Node.js 22.13 or later, <code>git</code>), then, in a folder of Markdown notes:</p>

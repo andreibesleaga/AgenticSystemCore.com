@@ -136,6 +136,26 @@
 <li><code>call propose with a task_state to claim or move a task</code></li>
 <li><code>a person reviews and merges the proposal</code></li>
 </ol>
+<h3 id="quickstart-p13">P13 &#8212; Security reviewer or auditor</h3>
+<ol>
+<li><code>agsc ci   (without .well-known/security.txt it stops with AGSC-E901)</code></li>
+<li><code>agsc verify --ledger   (the ledger re-derives from the history)</code></li>
+<li><code>fetch /.well-known/security.txt and check the headers each file is served with</code></li>
+<li><code>in a clone of the engine: SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer security --scratch &lt;dir&gt;</code></li>
+</ol>
+<h3 id="quickstart-p14">P14 &#8212; Researcher</h3>
+<ol>
+<li><code>in a clone of the engine at its release tag:</code></li>
+<li><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer determinism --scratch &lt;dir&gt;</code></li>
+<li><code>run it again: the same files, the same bytes</code></li>
+<li><code>cite the node, its content version, the specification version, the engine you measured (its software DOI) and the preprint DOI (/docs/standards/#how-to-cite)</code></li>
+</ol>
+<h3 id="quickstart-p15">P15 &#8212; Restricted publisher</h3>
+<ol>
+<li><code>set &quot;visibility&quot;: &quot;restricted&quot; and an &quot;access&quot; URL in agsc.config.json</code></li>
+<li><code>agsc build</code></li>
+<li><code>validate-wellknown &lt;file&gt; --level 0   (the public view: the discovery document, /llms.txt, /graph.jsonld)</code></li>
+</ol>
 <h2 id="status">Status</h2>
 <p>The specification is at version <code>1.0.0</code>. It is an independent specification: it is not a standard of the IETF, the W3C or any other body, and no standards body has reviewed or adopted it. Every machine-readable file on this site is written by the reference engine, from this repository's own content: the graph in its three forms, the search index, the chunk export, the skill packs, the item source views, the NOW state, the derived ledger and the discovery document. The pages you are reading are written by this repository's own generator, which keeps this site's own page layout. The <a href="/docs/status/">status page</a> lists what is live and what is not. The <a href="/changelog/">changelog</a> lists every content version of this node.</p>
 <h2 id="limits">Limits</h2>

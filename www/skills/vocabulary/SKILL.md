@@ -11,7 +11,7 @@ bundle: https://agenticsystemcore.com/
 license: LicenseRef-AgenticSystemCore-Content-Use-1.0
 terms: LicenseRef-AgenticSystemCore-Content-Use-1.0
 spec_version: 1.0.0
-bundle_version: v1.0.0+27.g41e05b412f08
+bundle_version: v1.0.0+26.g444161393b2f
 generated_at: 2026-10-14T09:45:37Z
 assistance: content may be AI-assisted; each item states its origin in prov.origin and each accepted contribution carries an Assisted-by: trailer
 -->
@@ -91,7 +91,7 @@ In the graph a Gate is an `asc:Gate`, a subclass of `prov:Plan`; its runs are Ep
 
 ```text agsc-content
 
-A **Harness** is generated output. A composition takes an ordered selection of item slugs and the resolved graph and produces a verdict plus a Harness: files of seven kinds, written outside `content/`, that describe a system built from the selected items: a JSON-LD record of the selection and its closure, a context file for agents, a Structurizr model, a Mermaid diagram, an arc42 skeleton, one decision record per selected item and one skill file per selected Procedure.
+A **Harness** is generated output. A composition takes an ordered selection of item slugs and the resolved graph and produces a verdict plus a Harness: files of seven kinds, written outside `content/`, that describe a system built from the selected items: a record of the selection and its closure in canonical JSON (`harness.jsonld`, not an RDF JSON-LD document), a context file for agents, a Structurizr model, a Mermaid diagram, an arc42 skeleton, one decision record per selected item and one skill file per selected Procedure.
 
 In agentic systems the word *harness* names the frame an agent runs inside: the scaffolding that embeds the agents and dictates the rules they follow. The specification uses the word in that sense, with one precision: a Harness here is that frame written down as files, not the running process. A runtime such as GABBE, kaiban-distributed, CrewAI or LangGraph can start from these files or render them into its own form; such a rendering is never part of the Harness itself, and none ships with the reference engine at 1.0. In the ontology a Harness is a plan (`asc:Harness`, a kind of `prov:Plan`).
 

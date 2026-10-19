@@ -129,7 +129,10 @@ their addresses as citations, so good one-line descriptions give good answers.</
 <li>Every tool result is marked <code>&quot;trust&quot;: &quot;untrusted&quot;</code>: the text of a node is data for the
 assistant to read, never an instruction to follow.</li>
 <li><code>propose</code> and <code>remember</code> return prepared text; nothing is written. <code>remember</code> needs
-the accountable person (<code>&quot;operator&quot;: &quot;human:&lt;your-id&gt;&quot;</code>) or a declared agent lane.
+the person operating it (<code>&quot;operator&quot;: &quot;human:&lt;id&gt;&quot;</code>) or a declared agent lane, <strong>and</strong>
+the <code>agent</code> and <code>model</code> that helped write the item, unless the call says
+<code>&quot;origin&quot;: &quot;human&quot;</code>; without an operator it refuses with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E003"><code>AGSC-E003</code></a>, and without
+<code>agent</code> and <code>model</code> the saved item fails <code>agsc lint</code> with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E202"><code>AGSC-E202</code></a> (<a class="ref" href="/specs/08-governance/#AGSC-08-01">AGSC-08-01</a>).
 To cite a single chunk by its id, read <code>/chunks.jsonl</code> of the built site; the tools
 cite whole items by address.</li>
 </ul>

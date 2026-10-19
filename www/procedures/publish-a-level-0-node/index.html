@@ -54,7 +54,7 @@
 <p>You have content in a CMS, a wiki or a static-site generator and want people and agents to discover and read it as a node, without adopting an engine. Level 0 asks for static files only.</p>
 <h2 id="steps"><span id="chunk-5054b2c80f6cb7de"></span>Steps</h2>
 <p>1. Choose the site base, an absolute <code>https:</code> URL. Every item IRI is the base, the type folder and the slug, with a trailing slash.
-2. Export each piece of knowledge as <code>content/&lt;type-plural&gt;/&lt;slug&gt;.md</code> with frontmatter carrying at least <code>type</code>, <code>title</code> and <code>prov</code>. An item without <code>prov</code> inherits the operator of the Bundle at Level 0, with a warning.
+2. Export each piece of knowledge as <code>content/&lt;type-plural&gt;/&lt;slug&gt;.md</code> with frontmatter carrying at least <code>type</code>, <code>title</code> and <code>prov</code>. <code>prov</code> is required at every Level; an item without it is <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E501"><code>AGSC-E501</code></a> (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-02">AGSC-10-02</a>, case <code>fm-0004</code>).
 3. Write <code>content/index.md</code> with <code>spec_version</code>, <code>okf_version</code>, <code>title</code>, <code>description</code> and <code>base</code>.
 4. Publish <code>/graph.jsonld</code>, the JSON-LD view of the items.
 5. Publish <code>/llms.txt</code> in the byte layout of <a class="ref" href="/specs/06-surfaces/#AGSC-06-13a">AGSC-06-13a</a>: the title as an H1, the provenance comment, the description, then one section per cluster.

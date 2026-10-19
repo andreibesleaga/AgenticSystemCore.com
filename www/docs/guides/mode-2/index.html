@@ -69,11 +69,15 @@ Write <code>human:&lt;your-id&gt;</code> wherever the files say <code>human:you<
 <thead><tr><th scope="col">File</th><th scope="col"><code>type</code> / <code>kind</code></th><th scope="col">What makes it that thing</th></tr></thead>
 <tbody>
 <tr><td><code>content/clusters/&lt;board&gt;.md</code></td><td><code>type: cluster</code></td><td>a group of items; the tasks in it form a board</td></tr>
-<tr><td><code>content/concepts/&lt;name&gt;.md</code></td><td><code>kind: decision</code></td><td>a <code>## Decision</code> section</td></tr>
-<tr><td><code>content/concepts/&lt;name&gt;.md</code></td><td><code>kind: spec</code></td><td>a <code>## Specification</code> section; <code>implements:</code> the decision</td></tr>
+<tr><td><code>content/concepts/&lt;name&gt;.md</code></td><td><code>kind: decision</code></td><td>by convention, a <code>## Decision</code> section</td></tr>
+<tr><td><code>content/concepts/&lt;name&gt;.md</code></td><td><code>kind: spec</code></td><td>by convention, a <code>## Specification</code> section; <code>implements:</code> the decision</td></tr>
 <tr><td><code>content/concepts/&lt;name&gt;.md</code></td><td><code>kind: task</code></td><td><code>task_state:</code> — <code>TASK_STATE_</code> followed by <code>SUBMITTED</code> (new), <code>WORKING</code>, <code>INPUT_REQUIRED</code>, <code>AUTH_REQUIRED</code>, <code>COMPLETED</code>, <code>FAILED</code>, <code>CANCELED</code> or <code>REJECTED</code>; <code>clusters:</code> names its board; <code>blocked-by:</code> other tasks</td></tr>
-<tr><td><code>content/gates/&lt;name&gt;.md</code></td><td><code>type: gate</code></td><td><code>level:</code> <code>L1</code> (schema and links) or <code>L2</code> (adds provenance, determinism, review); <code>checks:</code>; <code>enforce:</code> (<code>status-check</code>, <code>ruleset</code>, <code>hook</code>, <code>codeowner</code>)</td></tr>
+<tr><td><code>content/gates/&lt;name&gt;.md</code></td><td><code>type: gate</code></td><td><code>level:</code> <code>L1</code> (schema and links) or <code>L2</code> (adds provenance, determinism, review); <code>checks:</code>, when given, exactly the set the level implies (<a class="ref" href="/specs/02-item/#AGSC-02-18">AGSC-02-18</a>); <code>enforce:</code> (<code>status-check</code>, <code>ruleset</code>, <code>hook</code>, <code>codeowner</code>)</td></tr>
 </tbody></table></div>
+<p>Nothing checks the <code>## Decision</code> and <code>## Specification</code> sections; they are the
+convention readers and the pages expect. At 1.0.0 <code>lint</code> does not yet report a gate
+whose <code>checks:</code> differ from its level, so keep the two in step by hand, or leave
+<code>checks:</code> out.</p>
 <p>The board and the decision:</p>
 <pre tabindex="0" data-lang="bash"><code>mkdir -p my-project/content/clusters my-project/content/concepts my-project/content/gates &amp;&amp; cd my-project
 cat &gt; content/clusters/login.md &lt;&lt;'ITEM'
@@ -183,6 +187,8 @@ level: L2
 checks:
   - schema
   - links
+  - provenance
+  - determinism
   - review
 enforce:
   - status-check
@@ -215,13 +221,18 @@ how to set the real one. A wrong value is an error with its file and line, for e
 cat dist/forge/status-checks.json
 node -e 'console.log(JSON.stringify(require(&quot;./dist/forge/ruleset.json&quot;).rules.required_status_checks))'</code></pre>
 <pre tabindex="0" data-lang="text"><code>ci: pass (0 error, 1 warn)
-[&quot;links&quot;,&quot;review&quot;,&quot;schema&quot;]
+[&quot;determinism&quot;,&quot;links&quot;,&quot;provenance&quot;,&quot;review&quot;,&quot;schema&quot;]
 [&quot;agsc ci&quot;]</code></pre>
 <p><code>dist/forge/status-checks.json</code> lists the gate's checks; <code>dist/forge/ruleset.json</code>
 requires one status, <code>agsc ci</code>, because that is the one job a forge runs and its verdict
 (<code>dist/gate.json</code>) covers every check. On GitHub, the action in the root
-<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/README.md#connecting-agents-and-repositories">README</a> runs that job; you apply the
-ruleset in the repository's settings.</p>
+<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/README.md#connecting-agents-and-repositories">README</a> runs that job.
+<code>dist/forge/ruleset.json</code> is a description of the rule, not the shape GitHub's ruleset
+import takes: transcribe it by hand, as a branch ruleset in the repository's settings
+that requires the status check <code>agsc ci</code>. <code>agsc ci</code> does not enforce the check
+<code>review</code>; it means turning on the forge's own required review, on GitHub the rule
+&quot;Require a pull request before merging&quot; with at least one required approval, in the
+same ruleset.</p>
 <h2 id="3-one-steering-file-for-every-assistant">3. One steering file for every assistant</h2>
 <pre tabindex="0" data-lang="bash"><code>agsc export --steer --target agents,claude,cursor
 head -1 dist/export/steer/AGENTS.md</code></pre>
@@ -229,7 +240,9 @@ head -1 dist/export/steer/AGENTS.md</code></pre>
 # my-project — steering for coding agents</code></pre>
 <p>Copy <code>dist/export/steer/AGENTS.md</code>, <code>CLAUDE.md</code> and <code>.cursor/rules/agsc.mdc</code> into the
 repository the assistants work in. The file states the current state of the project and
-quotes the items as data, not as instructions; run the command again after a change.</p>
+quotes the items as data, not as instructions; run the command again after a change.
+At 1.0.0 the Cursor rule carries no front matter (it is planned for 1.1, <a class="ref" href="/specs/01-bundle/#AGSC-01-28">AGSC-01-28</a>),
+so Cursor may not apply it to every chat on its own; mention the rule where you need it.</p>
 <h2 id="4-the-board">4. The board</h2>
 <pre tabindex="0" data-lang="bash"><code>agsc build
 node -e 'const b = require(&quot;./www/boards/login.json&quot;); console.log(&quot;done:&quot;, b.done); for (const t of b.tasks) console.log(t.slug, t.state, &quot;blocked by:&quot;, t.blocked_by.join(&quot;, &quot;) || &quot;-&quot;);'</code></pre>
@@ -238,7 +251,8 @@ done: false
 task-login-form TASK_STATE_SUBMITTED blocked by: -
 task-login-tests TASK_STATE_SUBMITTED blocked by: task-login-form</code></pre>
 <p>The same board is a page at <code>/boards/login/</code>; each task, the decision and the gate have
-their own pages with their state, level, checks and links. To move a task, change its
+their own pages with their state, level, checks and the links each one declares; at
+1.0.0 a page does not list the links other items make to it. To move a task, change its
 <code>task_state:</code> and commit; with agents claiming tasks, the board becomes a live board:
 <a href="/docs/guides/mode-5/">Mode 5</a>. A board from GitHub, GitLab, Jira, Trello, Linear and other tools
 comes in with <code>agsc import --from board --format &lt;name&gt; &lt;folder&gt;</code>
