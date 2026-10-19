@@ -4,7 +4,7 @@ title: "Procedure"
 description: "A plan a reader can execute: a trigger, steps and checks. Procedures are published in skill packs, one pack per cluster."
 kind: term
 tags: [vocabulary, specification]
-clusters: [vocabulary]
+clusters: [vocabulary, guides]
 prov:
   origin: ai-assisted
   agent: "Claude Code"
