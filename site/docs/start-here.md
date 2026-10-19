@@ -41,7 +41,7 @@ AgenticSystemCore has several doors. Find yourself below and follow that path; e
 
 ## If your content is gated
 
-1. The [boundary section](/specs/11-boundary/) of the specification, AGSC-11-20: a node can say in public that it exists while its content stays behind access control. The discovery document stays public, the facts about the content that a public node shows are left out, and the checker accepts their absence.
+1. The [boundary section](/specs/11-boundary/) of the specification, AGSC-11-20: a node can say in public that it exists while its content stays behind access control. The discovery document stays public, the facts about the content that a public node shows are left out, and the checker accepts their absence. At 1.0.0 the reference engine still writes the content version, which carries the commit count and a commit hash, into `/llms.txt` (the line `bundle_version:`) and into the NOW page (`content version …`) of a restricted node, and `/llms.txt` is part of the unauthenticated view; leaving it out on a restricted node is planned for 1.1.
 2. `"visibility": "restricted"` in `agsc.config.json`; the restricted publisher's scenarios are in the source repository's `features/persona-o-restricted.feature`.
 
 ## If you decide whether to depend on it

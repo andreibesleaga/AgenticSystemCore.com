@@ -159,13 +159,13 @@ Personas: the agent reader, the agent proposer, the agent using a node as memory
 # content/concepts/decide-on-storage.md: type: concept, kind: decision, with the link keys decided-by: and covers:
 # content/concepts/spec-login.md:        type: concept, kind: spec, with implements: and verifies:
 # content/concepts/task-login-tests.md:  type: concept, kind: task, task_state: TASK_STATE_SUBMITTED, with blocked-by:
-# content/gates/release.md:              type: gate; level: L2; checks: schema, links, review; enforce: status-check, ruleset
+# content/gates/release.md:              type: gate; level: L2; checks: schema, links, provenance, determinism, review; enforce: status-check, ruleset
 agsc ci                                   # dist/gate.json; dist/forge/ruleset.json; dist/forge/status-checks.json
 agsc export --steer --target agents,claude,cursor   # dist/export/steer/: the same bytes at each tool's path
 agsc build                                # task pages show the state; a cluster of tasks is a board under /boards/
 ```
 
-A gate's checks compile into the forge's required status checks, so CI enforces what the gate names (AGSC-08-09). The steering files are built only from the node's current state and its concepts, procedures, gates and lessons, so the same node always gives the same bytes; they are context for an agent, never enforcement.
+A gate's checks compile into the forge's required status checks (AGSC-08-09); `agsc ci` runs the machine checks, and `review` means turning on the forge's own required review, which you set in the repository's ruleset by hand. The steering files are built only from the node's current state and its concepts, procedures, gates and lessons, so the same node always gives the same bytes; they are context for an agent, never enforcement.
 
 | Scenario | Who | Do | Result |
 |---|---|---|---|

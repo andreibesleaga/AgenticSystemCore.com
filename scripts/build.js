@@ -28,9 +28,13 @@ const OUT = path.resolve(ROOT, (() => { const i = process.argv.indexOf('--out');
 const STATUS = {
   wellknown: 'not-requested',   // not-requested | requested | registered
   profile: 'registered',         // not-filed | filed | registered
-  draft: 'draft-besleaga-agentic-knowledge-wellknown-00',                  // e.g. 'draft-besleaga-agentic-knowledge-wellknown-00' once posted
+  draft: 'draft-besleaga-agentic-knowledge-wellknown-01',                  // the current revision on the datatracker, e.g. 'draft-besleaga-agentic-knowledge-wellknown-01'
+  draftPosted: '2026-10-14', draftExpires: '2027-04-17', // the current revision's dates, as the datatracker shows them
   w3id: true,                   // true once the w3id.org namespace redirects are live
-  preprint: { doi: '10.5281/zenodo.23052710', title: 'AgenticSystemCore: Distributed Knowledge Bundles and Runnable Systems, for People and Agents', date: '2026-09-30' },               // e.g. { doi: '10.5281/zenodo.NNNNNNN', title: '…', date: 'YYYY-MM-DD' } once published
+  // the preprint of the version this site publishes; `concept` is the DOI that names every version of it
+  preprint: { doi: '10.5281/zenodo.23365416', concept: '10.5281/zenodo.23052709', title: 'AgenticSystemCore: Distributed Knowledge Bundles and Runnable Systems, for People and Agents', date: '2026-10-14', version: '1.0.0' },               // e.g. { doi: '10.5281/zenodo.NNNNNNN', title: '…', date: 'YYYY-MM-DD' } once published
+  // the reference engine's source archive of the same version, deposited as software
+  software: { doi: '10.5281/zenodo.23469027', version: '1.0.0' },
 };
 
 // ------------------------------------------------------------------ basics
@@ -1151,9 +1155,10 @@ const editLink = (repo, file) => `<p class="edit"><a rel="noopener" href="${esc(
 const regText = {
   wellknown: { 'not-requested': STATUS.draft ? 'Not registered. Its registration in the Well-Known URIs registry (RFC 8615) is asked for in the Internet-Draft, which is posted; no request has been sent to the registry.' : 'Not yet requested. The suffix <code>knowledge-linkset</code> will be requested for the Well-Known URIs registry (RFC 8615) through an Internet-Draft; it is not registered.', requested: 'Requested for the Well-Known URIs registry (RFC 8615); not yet registered.', registered: 'Registered in the Well-Known URIs registry (RFC 8615).' }[STATUS.wellknown],
   profile: { 'not-filed': 'Not yet filed in the Profile URIs registry (RFC 7284).', filed: 'Filed in the Profile URIs registry (RFC 7284); not yet registered.', registered: 'Registered in the Profile URIs registry (RFC 7284).' }[STATUS.profile],
-  draft: STATUS.draft ? `<a href="https://datatracker.ietf.org/doc/${esc(STATUS.draft.replace(/-\d{2}$/, ''))}/"><code>${esc(STATUS.draft)}</code></a>` : 'Not yet posted.',
+  draft: STATUS.draft ? `<a href="https://datatracker.ietf.org/doc/${esc(STATUS.draft.replace(/-\d{2}$/, ''))}/"><code>${esc(STATUS.draft)}</code></a>, an individual Internet-Draft${STATUS.draftPosted ? `, posted on ${esc(STATUS.draftPosted)}` : ''}${STATUS.draftExpires ? `; it expires on ${esc(STATUS.draftExpires)} unless it is revised` : ''}.` : 'Not yet posted.',
   w3id: STATUS.w3id ? 'The namespace <code>https://w3id.org/agentic-system-core/</code> resolves to this site. Its permanent addresses redirect (HTTP 303) to the pages and files they name: the vocabulary at <code>/ns</code> and its versioned copies, by content negotiation to the vocabulary file in the format asked for; the two specification pages at <code>/specs/mcp/</code> and <code>/specs/agentic-knowledge/</code>; and the profile URI at <code>/profile/agentic-knowledge</code>.' : 'The namespace <code>https://w3id.org/agentic-system-core/</code> does not resolve yet; the pull request to w3id.org is open and not yet merged.',
-  preprint: STATUS.preprint ? `Published: <a href="https://doi.org/${esc(STATUS.preprint.doi)}">${esc(STATUS.preprint.title)}</a> (${esc(STATUS.preprint.date)}), DOI <code>${esc(STATUS.preprint.doi)}</code>.` : 'In preparation; not yet published.',
+  preprint: STATUS.preprint ? `Published: <a href="https://doi.org/${esc(STATUS.preprint.doi)}">${esc(STATUS.preprint.title)}</a>${STATUS.preprint.version ? `, version ${esc(STATUS.preprint.version)}` : ''} (${esc(STATUS.preprint.date)}), DOI <code>${esc(STATUS.preprint.doi)}</code>.${STATUS.preprint.concept ? ` The DOI <a href="https://doi.org/${esc(STATUS.preprint.concept)}"><code>${esc(STATUS.preprint.concept)}</code></a> names every version of the preprint.` : ''}` : 'In preparation; not yet published.',
+  software: STATUS.software ? `The reference engine ${esc(STATUS.software.version)} is archived as software on Zenodo, DOI <a href="https://doi.org/${esc(STATUS.software.doi)}"><code>${esc(STATUS.software.doi)}</code></a>.` : '',
 };
 
 // ------------------------------------------------------------------ the page tools (AGSC-09-16)
@@ -1247,6 +1252,14 @@ const ML = MEASURED.layers;
 const num = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 const perfRow = items => ML.perf.rows.find(r => r.items === items) || die(`docs/measurements.json: no perf row for ${items} items`);
 const siteA11y = ML.a11y.nodes['main-site'] || die('docs/measurements.json: no a11y row for main-site');
+// The `command` each layer of docs/measurements.json records leaves out what every run of
+// bench/measure.js needs at 1.0.0: SOURCE_DATE_EPOCH (the script reads no clock and exits 2
+// without it) and `--scratch <dir>` (required for every layer). The page prints the full line.
+const MEASURE_EPOCH = 'SOURCE_DATE_EPOCH=1767225600';
+const runnable = c => {
+  const withEpoch = /\bSOURCE_DATE_EPOCH=/.test(c) ? c : `${MEASURE_EPOCH} ${c}`;
+  return /--scratch\b/.test(withEpoch) ? withEpoch : withEpoch.replace(/(--layer [a-z0-9]+)/, '$1 --scratch <dir>');
+};
 const MEASURES = [
   ['Conformance', `${num(ML.conformance.vector_run.pass)} vectors pass, ${ML.conformance.vector_run.fail} fail, of ${num(ML.conformance.vector_run.total)} (${ML.conformance.vector_run.withdrawn} withdrawn); ${num(ML.conformance.rule_coverage.any_check)} of ${num(ML.conformance.rule_coverage.active)} active rules have a machine check`, ML.conformance.command],
   ['Determinism', `${ML.determinism.double_build.compared} files compared across two builds, and across time zones and locales: ${ML.determinism.double_build.different.length + ML.determinism.tz_locale.different.length} differ`, ML.determinism.command],
@@ -1327,11 +1340,11 @@ ${MODE_CARDS.map(([t, d, h]) => `<li><strong><a href="${h}">${esc(t)}</a></stron
 <h2 id="brain">A distributed brain, with no server</h2>
 <p>Each node is a folder of files published as a static site. Nodes find and read each other through registered web mechanisms, every file they point at carries its digest, and they share one vocabulary. A node names its peers; a reader walks from one to the next. No node calls another, and no server sits in between.${PATTERNS_NODE ? ' This node&#39;s peer is a second node, <a href="https://patterns.agenticsystemcore.com/">patterns.agenticsystemcore.com</a>: a demonstration node run by the same reference engine, whose sample content is a small set of well-known agent-system patterns described from public sources.' : ''}</p>
 ${figure('system-overview')}<h2 id="measured">Measured, reproducible</h2>
-<p>Measured against specification ${esc(MEASURED.spec_version)} with the reference engine; each command reproduces its line. None of these is a comparison with another system.</p>
+<p>Measured against specification ${esc(MEASURED.spec_version)} with the reference engine; each command reproduces its line, run in a clone of the engine repository at the release tag, with <code>&lt;dir&gt;</code> a folder outside the clone. In the token and accessibility lines, <code>&lt;scratch&gt;/node_modules</code> holds the packages those layers load from outside the clone (gpt-tokenizer; playwright-core and axe-core), <code>&lt;chrome&gt;</code> is a Chrome or Chromium executable, <code>--nodes</code> takes each node&#39;s name and built site, and <code>--exports</code> each node&#39;s llm-context export. None of these is a comparison with another system.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Measured, reproducible"><table>
 <thead><tr><th scope="col">What</th><th scope="col">Result</th><th scope="col">Reproduce with</th></tr></thead>
 <tbody>
-${MEASURES.map(([w, r, c]) => `<tr><th scope="row">${esc(w)}</th><td>${esc(r)}</td><td><code>${esc(c)}</code></td></tr>`).join('\n')}
+${MEASURES.map(([w, r, c]) => `<tr><th scope="row">${esc(w)}</th><td>${esc(r)}</td><td><code>${esc(runnable(c))}</code></td></tr>`).join('\n')}
 </tbody></table></div>
 <h2 id="get-started">Get started</h2>
 <p>Install the command line (Node.js 22.13 or later, <code>git</code>), then, in a folder of Markdown notes:</p>
@@ -1818,7 +1831,7 @@ const statusRows = [
   ['Profile URI', { 'not-filed': 'Not filed', filed: 'Filed', registered: 'Registered' }[STATUS.profile], regText.profile],
   ['Internet-Draft', STATUS.draft ? 'Posted' : 'Not yet posted', regText.draft + (STATUS.draft ? '' : ' It will describe the discovery layer only, request the registration of the well-known suffix <code>knowledge-linkset</code>, and record the fields of the profile URI, which is registered separately in the Profile URIs registry.')],
   ['Preprint', STATUS.preprint ? 'Published' : 'In preparation', regText.preprint],
-  ['Reference engine <code>agsc</code>', 'Published', 'The engine is written, and it builds this site: every machine-readable file here is emitted by <code>agsc build</code> over this repository&#39;s own content. Its packages are in the next row.'],
+  ['Reference engine <code>agsc</code>', 'Published', 'The engine is written, and it builds this site: every machine-readable file here is emitted by <code>agsc build</code> over this repository&#39;s own content. Its packages are in the next row.' + (regText.software ? ' ' + regText.software : '')],
   ['Packages on npm and PyPI', 'Published', 'The engine as <a href="https://www.npmjs.com/package/agentic-system-core"><code>agentic-system-core</code></a> on npm, with the short alias <a href="https://www.npmjs.com/package/agsc-cli"><code>agsc-cli</code></a>; the Python checker and reader as <a href="https://pypi.org/project/agentic-system-core/"><code>agentic-system-core</code></a> on PyPI. Each version of the specification is published as the package version of the same number, from its release tag, after this site; a registry&#39;s page shows the latest version published.'],
   ['Local MCP tool server', 'Published', `<code>agsc mcp</code> serves a Bundle to an assistant on the same machine over stdio, speaking MCP revision <code>${esc(engineSurfaces.MCP_PROTOCOL_VERSION)}</code>: ${WORD[TOOL_NAMES.length]} tools (${TOOL_NAMES.map(n => `<code>${esc(n)}</code>`).join(', ')}), the items, <code>graph.jsonld</code> and <code>llms.txt</code> as read-only resources, and one prompt (${REF('AGSC-09-14b')}). Listed in the MCP Registry as <code>${esc(SERVER_JSON.name)}</code>.`],
   ['WebMCP page tools', 'Experimental', `The same ${WORD[TOOL_NAMES.length]} tools, offered to an assistant running in the visitor&#39;s browser on every item and guide page and on <a href="/compose/">/compose/</a>, declared in the discovery document as the <code>webmcp</code> surface with the access class <code>consent</code> (${REF('AGSC-11-16')}). WebMCP is a draft report of a W3C Community Group, and a browser runs the tools only where it supports that draft: see <a href="/about/#tools-for-browser-assistants">tools for browser assistants</a>.`],
@@ -1854,11 +1867,11 @@ const registrationsTable = `<div class="table-wrap" tabindex="0" role="region" a
 `;
 const publicationsHtml = `<ul>
 <li><strong>Preprint.</strong> ${regText.preprint}${STATUS.preprint ? '' : ' It will establish the specification, its vectors and its discovery layer as of the tagged release, with a persistent identifier.'}</li>
-<li><strong>Internet-Draft.</strong> ${regText.draft}</li>
+${regText.software ? `<li><strong>Software.</strong> ${regText.software}</li>\n` : ''}<li><strong>Internet-Draft.</strong> ${regText.draft}</li>
 <li><strong>Papers.</strong> Papers based on this work have been submitted for review; none is published yet. This page names a paper once it is published.</li>
 </ul>
 <h3 id="how-to-cite">How to cite</h3>
-<p>${STATUS.preprint ? `Cite the preprint by its DOI, <code>${esc(STATUS.preprint.doi)}</code>, and the specification by version.` : 'Until the preprint is published, cite the specification by version and tag:'}</p>
+<p>${STATUS.preprint ? `Cite the preprint by its DOI, <code>${esc(STATUS.preprint.doi)}</code>${STATUS.preprint.version ? ` (version ${esc(STATUS.preprint.version)})` : ''}, and the specification by version.${STATUS.preprint.concept ? ` To cite the preprint without naming a version, use <code>${esc(STATUS.preprint.concept)}</code>.` : ''}${STATUS.software ? ` To cite the reference engine itself, use its software DOI, <code>${esc(STATUS.software.doi)}</code>.` : ''}` : 'Until the preprint is published, cite the specification by version and tag:'}</p>
 <pre tabindex="0"><code>${esc(config.site.author)}. AgenticSystemCore specification ${esc(SPEC_VERSION)}, ${esc(SPEC_DATE)}. ${esc(BASE)}specs/</code></pre>
 `;
 // AGSC-06-21: /docs/scenarios/ carries the coverage table and one link per feature file; each feature
@@ -1950,6 +1963,11 @@ const QUICKSTART = [
   // P12 is a persona of the requirements (Mode 5) that the quickstart rule does not list yet; its
   // path is this site's content, beyond what AGSC-06-24 asks.
   ['P12', 'Self-driving team on a live board', ['author task items in a cluster', 'agsc build   (the board renders as a page and a JSON file)', 'agsc mcp', 'call propose with a task_state to claim or move a task', 'a person reviews and merges the proposal']],
+  // P13–P15 are the three personas of the requirements' Amendment 12; like P12, their paths are
+  // this site's content, beyond what AGSC-06-24 asks.
+  ['P13', 'Security reviewer or auditor', ['agsc ci   (without .well-known/security.txt it stops with AGSC-E901)', 'agsc verify --ledger   (the ledger re-derives from the history)', 'fetch /.well-known/security.txt and check the headers each file is served with', 'in a clone of the engine: SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer security --scratch <dir>']],
+  ['P14', 'Researcher', ['in a clone of the engine at its release tag:', 'SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer determinism --scratch <dir>', 'run it again: the same files, the same bytes', 'cite the node, its content version, the specification version, the engine you measured (its software DOI) and the preprint DOI (/docs/standards/#how-to-cite)']],
+  ['P15', 'Restricted publisher', ['set "visibility": "restricted" and an "access" URL in agsc.config.json', 'agsc build', 'validate-wellknown <file> --level 0   (the public view: the discovery document, /llms.txt, /graph.jsonld)']],
 ];
 const quickstartHtml = () => {
   for (const [id, , steps] of QUICKSTART) {
@@ -2029,7 +2047,7 @@ ${GX_VENDOR.map(v => `<tr><td>${esc(v.name)} ${esc(v.version)}, by Vasco Asturia
 <h2 id="citing">Citing and quoting</h2>
 <p>Cite this work as <a href="/docs/standards/#how-to-cite">the standards page</a> shows: the specification by its version, and the paper by its DOI once it is published. Clause 3 of the Content Use Terms lets anyone quote the prose, with attribution to this node&#39;s address and the item&#39;s address, in any work that adds their own contribution; the licences of the specification, the engine and the vocabulary allow more. Nothing on this page limits a quotation, or any other use, that the law of your country allows without permission.</p>
 <h2 id="prior-art">First publication and prior art</h2>
-<p>${FIRST_PUBLIC && FIRST_PUBLIC.name !== SPEC_VERSION ? `This work was first made public with the specification&#39;s first public ${PRERELEASE(FIRST_PUBLIC.name) ? 'release candidate' : 'release'}, tagged on ${esc(FIRST_PUBLIC.date)}, together with its reference engine, its vocabulary, its schemas and its conformance vectors. Specification <code>${esc(SPEC_VERSION)}</code>, tagged on ${esc(SPEC_DATE)}, is the version this site publishes.` : `Specification <code>${esc(SPEC_VERSION)}</code>, tagged on ${esc(SPEC_DATE)}, is the version in which this work was first made public, together with its reference engine, its vocabulary, its schemas and its conformance vectors.`} ${STATUS.preprint ? `The permanent record is the Zenodo deposit <a href="https://doi.org/${esc(STATUS.preprint.doi)}">${esc(STATUS.preprint.doi)}</a> of ${esc(STATUS.preprint.date)}: the paper, and a sealed archive of the tagged sources whose SHA-256 digests are listed in the deposit&#39;s <code>SHA256SUMS</code> file, with an OpenTimestamps proof of that list.` : 'The permanent record &#8212; a deposit with a persistent identifier holding the paper and a sealed archive of the tagged sources, with their SHA-256 digests and an OpenTimestamps proof of them &#8212; is named here once it is published.'}</p>
+<p>${FIRST_PUBLIC && FIRST_PUBLIC.name !== SPEC_VERSION ? `This work was first made public with the specification&#39;s first public ${PRERELEASE(FIRST_PUBLIC.name) ? 'release candidate' : 'release'}, tagged on ${esc(FIRST_PUBLIC.date)}, together with its reference engine, its vocabulary, its schemas and its conformance vectors. Specification <code>${esc(SPEC_VERSION)}</code>, tagged on ${esc(SPEC_DATE)}, is the version this site publishes.` : `Specification <code>${esc(SPEC_VERSION)}</code>, tagged on ${esc(SPEC_DATE)}, is the version in which this work was first made public, together with its reference engine, its vocabulary, its schemas and its conformance vectors.`} ${STATUS.preprint ? `The permanent record is the Zenodo deposit <a href="https://doi.org/${esc(STATUS.preprint.doi)}">${esc(STATUS.preprint.doi)}</a> of ${esc(STATUS.preprint.date)}: the paper, and a sealed archive of the tagged sources whose SHA-256 digests are listed in the deposit&#39;s <code>SHA256SUMS</code> file, with an OpenTimestamps proof of that list.${STATUS.preprint.concept ? ` Every version of the deposit, the earliest included, is listed under the DOI <a href="https://doi.org/${esc(STATUS.preprint.concept)}">${esc(STATUS.preprint.concept)}</a>.` : ''}${regText.software ? ` ${regText.software}` : ''}` : 'The permanent record &#8212; a deposit with a persistent identifier holding the paper and a sealed archive of the tagged sources, with their SHA-256 digests and an OpenTimestamps proof of them &#8212; is named here once it is published.'}</p>
 <p>Everything these artefacts describe &#8212; the format, the rules, the discovery mechanism, the vocabulary and the designs of the engine &#8212; is published so that it is on the public record from that date, and it is free to implement under the licences on this page. Publication does not stop anyone from applying for a patent; it places what is published here in the state of the art against which the novelty of a later application is judged.</p>
 <h2 id="signals">Machine-readable signals</h2>
 <p>The same policy is stated three ways (${REF('AGSC-06-18')}): the per-crawler groups of <a href="/robots.txt"><code>/robots.txt</code></a>, the TDM reservation in <a href="/.well-known/tdmrep.json"><code>/.well-known/tdmrep.json</code></a>, and the <code>schema:license</code> and <code>schema:usageInfo</code> members of <a href="/graph.jsonld"><code>/graph.jsonld</code></a> together with the provenance header of <a href="/llms.txt"><code>/llms.txt</code></a>. The reservation of text and data mining does not limit what the law of your country allows researchers to do without permission.</p>
