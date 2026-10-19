@@ -87,7 +87,13 @@
    *  Returns the discovery document to read and, when the address names one, the graph file itself. */
   function resolveAddress(input, base) {
     let s = typeof input === 'string' ? input.trim() : '';
-    if (s && !/^[a-z][a-z0-9+.-]*:/i.test(s) && !s.startsWith('/') && /^[^\s/]+\.[^\s/]+/.test(s)) s = `https://${s}`;
+    const hasScheme = /^[a-z][a-z0-9+.-]*:/i.test(s);
+    const isPath = /^(?:\/|\.\.?\/)/.test(s); // "/graph.jsonld", "./x", "../x": read against the page
+    const isHost = /^[^\s/]+\.[^\s/]+/.test(s); // "example.org" or "example.org/path"
+    if (s && !hasScheme && !isPath) {
+      if (!isHost) return null; // "foo", "not a url": not an address
+      s = `https://${s}`;
+    }
     const href = httpUrl(s, base);
     if (!href) return null;
     const u = new URL(href);

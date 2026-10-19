@@ -19,4 +19,4 @@ chunks[21]{id,item,kind,section,ordinal,title,digest}:
   63c33d7dec459a42,release-version-1-0-0,concept,what-done-means,0,Release version 1.0.0 of the specification,ec89db3895a7299f
   b2b16463fbb1d812,release-version-1-0-0,concept,who-does-it,0,Release version 1.0.0 of the specification,0270e6ebab72394d
   92804114176fdfa0,source,concept,"",0,Source,b1b9d63f18ae6fc8
-  0fff08f88b4faacc,vocabulary,cluster,"",0,Vocabulary,2b173e75961d4926
+  0fff08f88b4faacc,vocabulary,cluster,"",0,Vocabulary,956323940c68ccfc

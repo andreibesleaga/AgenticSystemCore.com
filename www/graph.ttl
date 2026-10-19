@@ -32,7 +32,7 @@
     asc:origin "ai-assisted" .
 
 <https://agenticsystemcore.com/clusters/vocabulary/> a asc:Cluster ;
-    skos:definition "The terms of the specification's ubiquitous language: the six item types and the words that complete them."@en ;
+    skos:definition "The terms of the specification's ubiquitous language, the six item types and the words that complete them."@en ;
     skos:member <https://agenticsystemcore.com/concepts/bundle/> , <https://agenticsystemcore.com/concepts/cluster/> , <https://agenticsystemcore.com/concepts/concept/> , <https://agenticsystemcore.com/concepts/episode/> , <https://agenticsystemcore.com/concepts/gate/> , <https://agenticsystemcore.com/concepts/harness/> , <https://agenticsystemcore.com/concepts/item/> , <https://agenticsystemcore.com/concepts/lesson/> , <https://agenticsystemcore.com/concepts/link/> , <https://agenticsystemcore.com/concepts/now/> , <https://agenticsystemcore.com/concepts/procedure/> , <https://agenticsystemcore.com/concepts/source/> ;
     skos:prefLabel "Vocabulary"@en ;
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;

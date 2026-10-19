@@ -1,7 +1,7 @@
 ---
 type: cluster
 title: Vocabulary
-description: "The terms of the specification's ubiquitous language: the six item types and the words that complete them."
+description: The terms of the specification's ubiquitous language, the six item types and the words that complete them.
 tags:
   - vocabulary
   - specification

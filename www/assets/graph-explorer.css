@@ -144,6 +144,7 @@ main > .gx.gx-full { max-width: 51.5rem; }
 @media (pointer: coarse), (max-width: 63.99rem) {
   .gx button, .gx input[type="url"], .gx input[type="search"], .gx .gx-nb, .gx .gx-legend button, .gx .gx-linkish, .gx-check { min-height: 44px; }
   .gx button { min-width: 44px; }
+  .gx .gx-tip-go a { display: inline-flex; align-items: center; min-height: 44px; }
   /* The 2D / 3D buttons share a border (margin-left: -1px), so each is drawn 1 px wider to keep 44 px
      of its own. */
   .gx .gx-seg button { min-width: 45px; }
