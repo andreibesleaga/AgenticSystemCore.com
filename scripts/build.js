@@ -905,6 +905,22 @@ const ENGINE_BUILD = require('./engine.js').build({
   engine: ENGINE, config, epoch: EPOCH, privacy: read('site/privacy.md'), securityTxt: SECURITY_TXT,
 });
 if (ENGINE_BUILD.version !== SPEC_VERSION) die(`the engine at ${ENGINE} is ${ENGINE_BUILD.version}, this build publishes ${SPEC_VERSION}`);
+// AGSC-06-28 / AGSC-06-30: the in-page anchor of each chunk of the engine's own /chunks.jsonl that
+// begins with a heading — an empty <span> opening that heading — placed on the item pages by the
+// engine's own two functions, so these pages carry the anchors the engine's pages carry, from the
+// same chunk boundaries. Every other chunk is cited at the top of its page. A heading chunk whose
+// heading this page does not render stops the build; scripts/check.js reads the anchors back.
+const engineHtml = engineModule('src/distribution/html.js');
+const CHUNK_ANCHORS = engineHtml.chunkAnchors(require('./chunk-anchors.js').records(
+  String(ENGINE_BUILD.files.get('/chunks.jsonl') || die('the engine emitted no /chunks.jsonl (AGSC-06-26)')),
+  r => String(ENGINE_BUILD.files.get(r) || die(`the engine emitted no ${r}, which /chunks.jsonl names (AGSC-06-31)`))));
+const withChunkAnchors = (it, html) => {
+  const anchors = CHUNK_ANCHORS.get(it.slug) || [];
+  const out = engineHtml.withChunkAnchors(html, anchors);
+  const lost = anchors.filter(a => !out.includes(`<span id="${a.anchor}"></span>`));
+  if (lost.length) die(`${it.rel}: no <h2> or <h3> with the id ${lost.map(a => a.section).join(', ')} for its chunk anchor (AGSC-06-28)`);
+  return out;
+};
 // The routes taken from the engine, byte for byte. Each is a machine artefact: a rule fixes its
 // bytes and no part of it is this site's design.
 const ADOPTED = [
@@ -1684,7 +1700,7 @@ const itemPage = it => addPage(it.url, {
   jsonld: it.type === 'concept'
     ? { '@context': 'https://schema.org', '@type': 'DefinedTerm', name: it.fm.title, description: it.fm.description, url: it.iri, inDefinedTermSet: `${BASE}concepts/` }
     : { '@context': 'https://schema.org', '@type': 'TechArticle', headline: it.fm.title, description: it.fm.description, url: it.iri, author: { '@type': 'Person', name: config.site.author } },
-  body: `${itemMeta(it)}${it.fm.when ? `<p><strong>When:</strong> ${esc(it.fm.when)}</p>\n` : ''}${md(it.body, { ruleLinks: true, shift: 0 })}${it.type === 'cluster' ? `<h2 id="members">Members</h2>\n<ul>\n${members(it).map(m => `<li><a href="${m.url}">${esc(m.fm.title)}</a>: ${esc(m.fm.description || '')}</li>`).join('\n')}\n</ul>\n` : ''}${sourcesList(it)}${editLink('site', it.rel)}`,
+  body: `${itemMeta(it)}${it.fm.when ? `<p><strong>When:</strong> ${esc(it.fm.when)}</p>\n` : ''}${withChunkAnchors(it, md(it.body, { ruleLinks: true, shift: 0 }))}${it.type === 'cluster' ? `<h2 id="members">Members</h2>\n<ul>\n${members(it).map(m => `<li><a href="${m.url}">${esc(m.fm.title)}</a>: ${esc(m.fm.description || '')}</li>`).join('\n')}\n</ul>\n` : ''}${sourcesList(it)}${editLink('site', it.rel)}`,
 });
 items.forEach(itemPage);
 const listPage = (url, title, description, list, section) => addPage(url, {

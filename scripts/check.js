@@ -15,7 +15,8 @@
 // _headers and _redirects content, sitemap targets; (6) WCAG contrast of the colour tokens in
 // both schemes; (7) the page tools; (8) the content gate, scripts/check-content.js; (9) the release
 // gate, scripts/check-release.js; (5a) the graph explorer: the vendored libraries by SHA-256, the
-// SRI hashes of its scripts, no host in its own code, the policy of its two addresses.
+// SRI hashes of its scripts, no host in its own code, the policy of its two addresses; (4c) every
+// chunk of /chunks.jsonl on its item page, and the anchor of each heading chunk on its heading.
 'use strict';
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const ROOT = path.resolve(__dirname, '..');
@@ -365,6 +366,27 @@ for (const f of files.filter(f => f.endsWith('.html'))) {
 }
 ok(diagramArrows > 0, 'no diagram arrow found on any page: the diagram geometry check read nothing');
 
+// (4c) the chunk anchors (AGSC-06-28, AGSC-06-30): every chunk of /chunks.jsonl has its item page
+// on this node, and every chunk that begins with a heading has its `#chunk-<16 hex>` anchor, an
+// empty <span> opening that heading, exactly once on its page (scripts/chunk-anchors.js).
+let chunkTotal = 0, chunkAnchorCount = 0;
+{
+  const chunkAnchors = require('./chunk-anchors.js');
+  const SITE_BASE = String((JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).site || {}).base || '').replace(/\/?$/, '/');
+  const readRoute = r => fs.readFileSync(path.join(WWW, r.replace(/^\//, '')), 'utf8');
+  let recs = [];
+  try { recs = chunkAnchors.records(readRoute('/chunks.jsonl'), readRoute); } catch (e) { fails.push(`chunks: /chunks.jsonl cannot be read: ${e.message}`); }
+  const pageOf = iri => {
+    if (typeof iri !== 'string' || !iri.startsWith(SITE_BASE)) return null;
+    const f = path.join(WWW, iri.slice(SITE_BASE.length), 'index.html');
+    return fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : null;
+  };
+  const r = chunkAnchors.check(recs, pageOf);
+  for (const f of r.failures) fails.push(`chunks: ${f}`);
+  ok(recs.length > 0, 'chunks: /chunks.jsonl carries no chunk');
+  chunkTotal = recs.length; chunkAnchorCount = r.anchors;
+}
+
 // (5) machine files
 for (const f of files) {
   const r = rel(f), b = fs.readFileSync(f);
@@ -575,4 +597,4 @@ for (const f of require('./check-content.js').check(WWW)) fails.push(`content: $
 for (const f of require('./check-release.js').check(WWW, { engine: ENGINE, specTag: SPEC_TAG, specSource: SPEC_SOURCE })) fails.push(`release: ${f}`);
 
 if (fails.length) { process.stderr.write(fails.map(f => `FAIL ${f}`).join('\n') + `\ncheck: ${fails.length} failure(s)\n`); process.exit(1); }
-process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/ (spec from ${SPEC_SOURCE === 'tag' ? `tag ${SPEC_TAG}` : 'the working tree'}), content, vocabulary copies ${[...Object.keys(FROZEN_NS), currentVocabulary].filter((v, i, a) => a.indexOf(v) === i).map(v => `/ns/${v}/`).join(' and ')}${Object.keys(FROZEN_NS).length ? ` (${Object.keys(FROZEN_NS).join(', ')} frozen by SHA-256)` : ''}, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, diagram geometry (${diagramArrows} arrows clear of every other box and label), ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} reserved on ${specPageCount} specification pages with every rule link on its page, headers, contrast, content, release wording and the releases feed, public hygiene\n`);
+process.stdout.write(`check: pass — ${files.length} files, ${files.filter(f => f.endsWith('.html')).length} pages, reproducible, llms vectors, gen-ns --check on /ns/ (spec from ${SPEC_SOURCE === 'tag' ? `tag ${SPEC_TAG}` : 'the working tree'}), content, vocabulary copies ${[...Object.keys(FROZEN_NS), currentVocabulary].filter((v, i, a) => a.indexOf(v) === i).map(v => `/ns/${v}/`).join(' and ')}${Object.keys(FROZEN_NS).length ? ` (${Object.keys(FROZEN_NS).join(', ')} frozen by SHA-256)` : ''}, validate-wellknown levels 0 and 2 with every declared digest verified, links and fragments, ${chunkAnchorCount} chunk anchors on their headings (${chunkTotal} chunks, each on its item page), diagram geometry (${diagramArrows} arrows clear of every other box and label), ${activeAnchors} active rule anchors (${activeRules.size} in spec/) and ${retiredAnchors} reserved on ${specPageCount} specification pages with every rule link on its page, headers, contrast, content, release wording and the releases feed, public hygiene\n`);
