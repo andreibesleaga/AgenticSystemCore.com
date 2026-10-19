@@ -11,7 +11,7 @@ bundle: https://agenticsystemcore.com/
 license: LicenseRef-AgenticSystemCore-Content-Use-1.0
 terms: LicenseRef-AgenticSystemCore-Content-Use-1.0
 spec_version: 1.0.0
-bundle_version: v1.0.0+28.g0cc1ee9df5cc
+bundle_version: v1.0.0+29.gba8e1fe07737
 generated_at: 2026-10-14T09:45:37Z
 assistance: content may be AI-assisted; each item states its origin in prov.origin and each accepted contribution carries an Assisted-by: trailer
 -->
@@ -22,7 +22,19 @@ assistance: content may be AI-assisted; each item states its origin in prov.orig
 > under LicenseRef-AgenticSystemCore-Content-Use-1.0 (AGSC-07-16).
 
 - cluster: https://agenticsystemcore.com/clusters/guides/
-- members: 1
+- members: 2
+
+## Procedure
+
+- item: https://agenticsystemcore.com/concepts/procedure/
+- type: concept
+
+```text agsc-content
+
+A **Procedure** is a plan a reader can execute. It may carry `when`, a one-line trigger saying when it applies, and `inputs[]`; its body uses the headings `When`, `Steps` and `Checks`. Procedures are published in skill packs, one pack per cluster holding the cluster's published items, and the pack takes its description from the cluster; a skill imported from elsewhere arrives as a Procedure whose `when` is that skill's description.
+
+In the graph a Procedure is an `asc:Procedure`, a subclass of `prov:Plan`.
+```
 
 ## Publish a Level-0 node
 

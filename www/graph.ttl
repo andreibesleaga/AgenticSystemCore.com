@@ -13,7 +13,7 @@
 
 <https://agenticsystemcore.com/clusters/guides/> a asc:Cluster ;
     skos:definition "Procedures for publishing and reading a node, each step naming the rule or the check that proves it."@en ;
-    skos:member <https://agenticsystemcore.com/procedures/publish-a-level-0-node/> ;
+    skos:member <https://agenticsystemcore.com/concepts/procedure/> , <https://agenticsystemcore.com/procedures/publish-a-level-0-node/> ;
     skos:prefLabel "Guides"@en ;
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
