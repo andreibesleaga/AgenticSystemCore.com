@@ -65,6 +65,9 @@ test('the address field: a site root, a discovery document or a graph file, http
   assert.deepEqual(G.resolveAddress('b.example.net'), { origin: B, linkset: `${B}/.well-known/knowledge-linkset`, graph: null });
   assert.deepEqual(G.resolveAddress('/graph.jsonld', `${A}/graph/`), { origin: A, linkset: `${A}/.well-known/knowledge-linkset`, graph: `${A}/graph.jsonld` });
   for (const bad of ['javascript:alert(1)', 'data:text/html,x', 'file:///etc/passwd', 'ftp://x.example/', '', '   ', null]) assert.equal(G.resolveAddress(bad), null, String(bad));
+  // Text that is neither an address, a host name nor a path is refused, not read as a page of this site.
+  for (const bad of ['foo', 'not a url', 'graph']) assert.equal(G.resolveAddress(bad, `${A}/graph/`), null, bad);
+  assert.equal(G.resolveAddress('./graph.jsonld', `${A}/graph/`).graph, `${A}/graph/graph.jsonld`);
 });
 
 test('peer resolution from a link set: rel#peer links, the graph link and its digest, the chunks surface', () => {
