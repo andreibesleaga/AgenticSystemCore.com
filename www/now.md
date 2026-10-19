@@ -1,6 +1,6 @@
 # Now
 
-content version v1.0.0+26.g444161393b2f, built at 2026-10-14T09:45:37Z, fingerprint 626dfa1c10abfb54f8e06e327091277add7070d5761177411611ce42f158ae1c, specification 1.0.0
+content version v1.0.0+27.g02e6f2c5b55d, built at 2026-10-14T09:45:37Z, fingerprint 626dfa1c10abfb54f8e06e327091277add7070d5761177411611ce42f158ae1c, specification 1.0.0
 
 ## Counts
 
