@@ -78,6 +78,10 @@ build: pass (0 error, 2 warn)</code></pre>
 <p><code>site.base</code> must be the address you will publish at, ending in <code>/</code>: every page and every
 link of the discovery document is written for that address, and a checker that fetches
 the document from another address refuses it (see <a href="#when-it-says-no">When it says no</a>).</p>
+<p>Run <code>agsc ci</code> before every publish, not <code>agsc build</code> alone. At 1.0.0 <code>build</code> passes a
+typed link whose target does not exist and leaves that link out of the graph, while
+<code>lint</code> and <code>ci</code> refuse it with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E301"><code>AGSC-E301</code></a>; <code>build</code> refuses only a broken link in the
+text of a note (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E310"><code>AGSC-E310</code></a>).</p>
 <h2 id="2-check-the-build-as-a-reader-will">2. Check the build as a reader will</h2>
 <p>Before anything leaves your machine, run the shipped checker on the discovery document
 in <code>www/</code>. Given a file, it finds every file the document lists on disk and compares each
@@ -94,7 +98,12 @@ each one claims and its limits:</p>
 <pre tabindex="0" data-lang="text"><code>cloudflare-pages — Cloudflare Pages, the reference
 static-host — Any web server: nginx or Apache httpd
 github-pages — GitHub Pages, with a proxy in front for the headers
-local — The node's own machine or device (agsc-host serve)</code></pre>
+local — The node's own machine or device (agsc-host serve)
+git-clone — A clone of the node's repository
+ipfs — IPFS through an HTTP gateway
+ledger-anchor — A ledger-anchored record of each build</code></pre>
+<p>Under each profile, its <code>claim:</code> and <code>limit:</code> lines are left out here. The list ends with
+<code>solid</code>, a declaration only at 1.0.0, with no host settings to write.</p>
 <p>Read the limits of the one you choose before you upload. For example, GitHub Pages lets
 no site set a response header, so a node there needs a proxy in front that sets them, or
 no Level can be claimed for the address.</p>

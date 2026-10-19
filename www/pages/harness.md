@@ -25,7 +25,7 @@ sources:
     grade: primary
 ---
 
-A **Harness** is generated output. A composition takes an ordered selection of item slugs and the resolved graph and produces a verdict plus a Harness: files of seven kinds, written outside `content/`, that describe a system built from the selected items: a JSON-LD record of the selection and its closure, a context file for agents, a Structurizr model, a Mermaid diagram, an arc42 skeleton, one decision record per selected item and one skill file per selected Procedure.
+A **Harness** is generated output. A composition takes an ordered selection of item slugs and the resolved graph and produces a verdict plus a Harness: files of seven kinds, written outside `content/`, that describe a system built from the selected items: a record of the selection and its closure in canonical JSON (`harness.jsonld`, not an RDF JSON-LD document), a context file for agents, a Structurizr model, a Mermaid diagram, an arc42 skeleton, one decision record per selected item and one skill file per selected Procedure.
 
 In agentic systems the word *harness* names the frame an agent runs inside: the scaffolding that embeds the agents and dictates the rules they follow. The specification uses the word in that sense, with one precision: a Harness here is that frame written down as files, not the running process. A runtime such as GABBE, kaiban-distributed, CrewAI or LangGraph can start from these files or render them into its own form; such a rendering is never part of the Harness itself, and none ships with the reference engine at 1.0. In the ontology a Harness is a plan (`asc:Harness`, a kind of `prov:Plan`).
 

@@ -29,7 +29,7 @@ You have content in a CMS, a wiki or a static-site generator and want people and
 ## Steps
 
 1. Choose the site base, an absolute `https:` URL. Every item IRI is the base, the type folder and the slug, with a trailing slash.
-2. Export each piece of knowledge as `content/<type-plural>/<slug>.md` with frontmatter carrying at least `type`, `title` and `prov`. An item without `prov` inherits the operator of the Bundle at Level 0, with a warning.
+2. Export each piece of knowledge as `content/<type-plural>/<slug>.md` with frontmatter carrying at least `type`, `title` and `prov`. `prov` is required at every Level; an item without it is `AGSC-E501` (AGSC-10-02, case `fm-0004`).
 3. Write `content/index.md` with `spec_version`, `okf_version`, `title`, `description` and `base`.
 4. Publish `/graph.jsonld`, the JSON-LD view of the items.
 5. Publish `/llms.txt` in the byte layout of AGSC-06-13a: the title as an H1, the provenance comment, the description, then one section per cluster.

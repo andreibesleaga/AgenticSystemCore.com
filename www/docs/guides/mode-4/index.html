@@ -50,8 +50,9 @@ anyone curious about the opt-in <code>run</code> verb.</p>
 the selection requires, refuses items that exclude each other, warns about
 contradictions) and writes a <strong>Harness</strong>: seven kinds of file — agent instructions
 (<code>AGENTS.md</code>), a C4 model (<code>workspace.dsl</code>), a Mermaid diagram, an arc42 skeleton, one
-decision record per selected item, one skill file per selected procedure, and a JSON-LD
-record of it all — plus a zip archive. It is a starting point, not a running system: no
+decision record per selected item, one skill file per selected procedure, and a record
+of it all, <code>harness.jsonld</code>, in canonical JSON (JCS; despite its name, not an RDF JSON-LD
+document) — plus a zip archive. It is a starting point, not a running system: no
 rendering for a particular runtime ships, and <code>agsc run</code> lists a procedure's steps but
 executes nothing without an isolating runner.</p>
 <p><strong>Read after:</strong> <a href="/docs/guides/mode-3/">Mode 3</a>. <strong>Next:</strong> <a href="/docs/guides/mode-5/">Mode 5</a>.</p>
@@ -140,7 +141,7 @@ agsc lint</code></pre>
 <pre tabindex="0" data-lang="text"><code>lint: pass (0 error, 1 warn)</code></pre>
 <h2 id="2-compose">2. Compose</h2>
 <pre tabindex="0" data-lang="bash"><code>agsc compose retry-with-backoff smoke-test --zip
-find dist/harness -type f | sed 's|^dist/harness/[^/]*/||' | sort</code></pre>
+find dist/harness -mindepth 2 -type f | sed 's|^dist/harness/[^/]*/||' | sort</code></pre>
 <pre tabindex="0" data-lang="text"><code>verdict: {&quot;added&quot;:[{&quot;path&quot;:[[&quot;retry-with-backoff&quot;,&quot;requires&quot;,&quot;idempotency-key&quot;]],&quot;slug&quot;:&quot;idempotency-key&quot;}],&quot;conflicts&quot;:[],&quot;hidden&quot;:[],&quot;selection&quot;:[&quot;idempotency-key&quot;,&quot;retry-with-backoff&quot;,&quot;smoke-test&quot;],&quot;valid&quot;:true,&quot;warnings&quot;:[]}
 compose: pass (0 error, 0 warn)
 AGENTS.md
@@ -193,7 +194,10 @@ sed -n '/## Monthly spend/,/^- cap/p' www/now.md</code></pre>
 (here the time of the last commit stands in for &quot;just now&quot;, because the NOW page counts
 a run's spend in the month it started), a <code>title</code>, and what it used. Unlike the other
 verbs, <code>trace</code> writes straight into <code>content/episodes/</code>; read the file before you commit
-it.</p>
+it. <code>trace</code> works only with <code>run.enabled</code> set, as in step 3. The Episode it writes has no
+<code>## What happened</code>, <code>## Outcome</code> and <code>## Next</code> sections yet, so <code>agsc lint</code> warns three times
+with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E406"><code>AGSC-E406</code></a>, once for each section, until you add them, and once with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E305"><code>AGSC-E305</code></a>
+until a cluster or another item links to it.</p>
 <h2 id="what-next">What next</h2>
 <ul>
 <li>Agents that claim and finish tasks on a shared board: <a href="/docs/guides/mode-5/">Mode 5</a>.</li>

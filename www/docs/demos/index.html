@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Demos — AgenticSystemCore</title>
-<meta name="description" content="Runnable demos of AgenticSystemCore: the six modes and the personas of the scenarios, each with the exact commands, the printed lines and what it proves, kept true by a test.">
+<meta name="description" content="Runnable demos of AgenticSystemCore: the six modes and the personas of the scenarios, each with the exact commands, the printed lines and what it proves; the full form in the engine repository is kept true by a test.">
 <link rel="canonical" href="https://agenticsystemcore.com/docs/demos/">
 <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
 <link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
@@ -16,8 +16,8 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://agenticsystemcore.com/docs/demos/">
 <meta property="og:title" content="Demos">
-<meta property="og:description" content="Runnable demos of AgenticSystemCore: the six modes and the personas of the scenarios, each with the exact commands, the printed lines and what it proves, kept true by a test.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Demos","description":"Runnable demos of AgenticSystemCore: the six modes and the personas of the scenarios, each with the exact commands, the printed lines and what it proves, kept true by a test.","url":"https://agenticsystemcore.com/docs/demos/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<meta property="og:description" content="Runnable demos of AgenticSystemCore: the six modes and the personas of the scenarios, each with the exact commands, the printed lines and what it proves; the full form in the engine repository is kept true by a test.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Demos","description":"Runnable demos of AgenticSystemCore: the six modes and the personas of the scenarios, each with the exact commands, the printed lines and what it proves; the full form in the engine repository is kept true by a test.","url":"https://agenticsystemcore.com/docs/demos/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
 <script src="/compose/webmcp.js" defer></script>
@@ -42,8 +42,8 @@
 </header>
 <main id="main">
 <h1>Demos</h1>
-<p class="summary"><strong>Summary</strong>Every mode and every persona as a small demo you can run in under five minutes from an empty folder: the exact commands, the lines they print, and the one thing each proves. Every command is run by a test in the engine repository, so this page cannot drift from the engine.</p>
-<p>Reading about six modes is one thing; seeing each one do something is another. The engine repository carries one page of demos, <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/DEMOS.md">docs/DEMOS.md</a>, and a test, <code>tests/docs/demos.test.js</code>, that runs every command on that page in a scratch folder and compares what was printed with what the page says. This page is the short form: what each demo does, the commands, and the lines to look for. The full page has every step and every expected line.</p>
+<p class="summary"><strong>Summary</strong>Every mode as a small demo you can run in under five minutes from an empty folder, with the personas each one serves: the exact commands, the lines they print, and the one thing each proves. This page is the short form of the engine's docs/DEMOS.md, whose every command a test in the engine repository runs.</p>
+<p>Reading about six modes is one thing; seeing each one do something is another. The engine repository carries one page of demos, <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/DEMOS.md">docs/DEMOS.md</a>, and a test, <code>tests/docs/demos.test.js</code>, that runs every command on that page in a scratch folder and compares what was printed with what the page says. This page is the short form: what each demo does, the commands, and the lines to look for. The full page has every step and every expected line, and it is the tested copy: where the two differ, DEMOS.md is right.</p>
 <h2 id="before-you-start">Before you start</h2>
 <p>Node.js 22.13 or later, <code>git</code> and a POSIX shell. Everything runs offline; no account, no key.</p>
 <pre tabindex="0" data-lang="bash"><code>mkdir agsc-demos &amp;&amp; cd agsc-demos
@@ -60,7 +60,7 @@ mkdir -p .well-known &amp;&amp; cp ../security.txt .well-known/security.txt
 cp ../boiling-point.md content/concepts/boiling-point.md
 printf 'Salt it like [pasta water](%s).\n' salting.md &gt;&gt; content/concepts/brewing.md
 agsc lint                                          # error: AGSC-E310 … resolves to nothing … brewing.md:15
-agsc build                                         # error: AGSC-E901 … emits no route for it; nothing under www/
+agsc build                                         # error: AGSC-E310 body reference &quot;salting.md&quot; resolves to nothing … brewing.md:15; nothing under www/
 grep -v salting content/concepts/brewing.md &gt; brewing.tmp &amp;&amp; mv brewing.tmp content/concepts/brewing.md
 agsc build                                         # build: pass — www/ holds the site, graph.jsonld, llms.txt, search.json, the discovery document
 grep -A2 '## Stale items' www/now.md               # - boiling-point
@@ -107,7 +107,7 @@ agsc import ../b/dist/export/okf --from okf                                     
 cd .. &amp;&amp; node &quot;$ENGINE/tools/validate-wellknown&quot; level-0/.well-known/knowledge-linkset --level 0   # pass (level 0)</code></pre>
 <p>Personas: the standards implementer, the port implementer, the agent using a node as memory.</p>
 <h2 id="mode-2-live-specifications">Mode 2 — live specifications</h2>
-<p><strong>What it proves.</strong> A project's decisions, specifications, tasks and gates are ordinary items; a gate compiles into forge files whose one required check is a check a CI job really reports; the steering files an assistant reads are the same bytes for every assistant; a person reading the pages sees a task's state, a gate's checks and a decision's typed links.</p>
+<p><strong>What it proves.</strong> A project's decisions, specifications, tasks and gates are ordinary items; a gate compiles into forge files whose one required check is a check a CI job really reports; the steering files an assistant reads are the same bytes for every assistant; a person reading the pages sees a task's state, a gate's checks and the typed links each item declares. A page lists only the links its own item declares; at 1.0.0 it does not list the links other items make to it.</p>
 <pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-2-project&quot; . &amp;&amp; cd mode-2-project
 agsc ci                                            # ci: pass; dist/gate.json, dist/forge/ruleset.json, dist/forge/status-checks.json
 cat dist/forge/status-checks.json                  # [&quot;links&quot;,&quot;review&quot;,&quot;schema&quot;]
@@ -157,7 +157,7 @@ agsc refresh --agent worker --dry-run                # writes dist/proposal/1.pa
 <li><strong>An isolating runner</strong> — <code>agsc run</code> executing a step. None ships; <code>run --dry-run</code> resolves the steps and <code>run</code> refuses with the reason.</li>
 </ul>
 <h2 id="how-the-page-stays-true">How the page stays true</h2>
-<p>The engine's test reads the full demos page, runs every marked command block in order in a fresh scratch folder with the fixed build instant and an empty git identity, and asserts that every line the page says to expect was printed, exactly. When the engine changes what it prints, that test fails and the page is corrected — never the other way round. The <a href="/docs/scenarios/">scenarios</a> are the same behaviour written as Given/When/Then; the <a href="/docs/modes/">six modes</a> explain what each mode is for.</p>
+<p>The engine's test reads the full demos page, runs every marked command block in order in a fresh scratch folder with the fixed build instant and an empty git identity, and asserts that every line the page says to expect was printed, exactly. When the engine changes what it prints, that test fails and the page is corrected — never the other way round. The test runs DEMOS.md, not this short form, so the comments on this page are checked only by hand against it. The security reviewer starts from the Mode 0 demo (<code>ci</code> before the security contact exists, then <code>verify --ledger</code>); the researcher and the restricted publisher have no demo here, and DEMOS.md names where each one starts. The <a href="/docs/scenarios/">scenarios</a> are the same behaviour written as Given/When/Then; the <a href="/docs/modes/">six modes</a> explain what each mode is for.</p>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/demos.md">Propose an edit</a> — opens <code>site/docs/demos.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
