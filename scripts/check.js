@@ -89,7 +89,7 @@ for (const f of ['disc-0013-llms-txt-byte-layout-with-content-version', 'disc-00
 // (3) discovery document
 const validator = path.join(ENGINE, 'tools', 'validate-wellknown');
 // Every SKILL.md opens with YAML frontmatter that agent runtimes and editors parse. A plain
-// (unquoted) value must not hold ": " or " #", nor start with a YAML indicator, or the whole
+// (unquoted) value must not hold ": " (or a colon before a tab or at its end) or " #", nor start with a YAML indicator, or the whole
 // frontmatter fails to parse (the engine writes descriptions unquoted).
 {
   const skillFiles = fs.readdirSync(path.join(WWW, 'skills'), { withFileTypes: true }).filter(d => d.isDirectory()).map(d => path.join(WWW, 'skills', d.name, 'SKILL.md'));
@@ -100,7 +100,7 @@ const validator = path.join(ENGINE, 'tools', 'validate-wellknown');
     for (const line of m[1].split('\n')) {
       const kv = /^([A-Za-z_-]+): (.*)$/.exec(line);
       if (!kv || /^["'|>]/.test(kv[2])) continue; // quoted or block values are fine
-      if (/: | #|^[-?:,[\]{}#&*!%@`]/.test(kv[2])) fails.push(`${path.relative(WWW, f)}: frontmatter ${kv[1]} is not valid plain YAML (quote it or reword it): ${kv[2].slice(0, 60)}`);
+      if (/:(?:[ \t]|$)|[ \t]#|^[-?:,[\]{}#&*!%@`]/.test(kv[2])) fails.push(`${path.relative(WWW, f)}: frontmatter ${kv[1]} is not valid plain YAML (quote it or reword it): ${kv[2].slice(0, 60)}`);
     }
   }
 }
