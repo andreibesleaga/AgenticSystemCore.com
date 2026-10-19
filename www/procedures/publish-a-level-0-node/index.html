@@ -50,9 +50,9 @@
 <dt>Provenance</dt><dd>Written with AI assistance and reviewed by the operator (origin <code>ai-assisted</code>, operator <code>human:andreibesleaga</code>)</dd>
 </dl>
 <p><strong>When:</strong> You want an existing CMS, wiki or static-site export to become a conforming Level-0 node without running an engine.</p>
-<h2 id="when">When</h2>
+<h2 id="when"><span id="chunk-ef631cd2c2de3044"></span>When</h2>
 <p>You have content in a CMS, a wiki or a static-site generator and want people and agents to discover and read it as a node, without adopting an engine. Level 0 asks for static files only.</p>
-<h2 id="steps">Steps</h2>
+<h2 id="steps"><span id="chunk-5054b2c80f6cb7de"></span>Steps</h2>
 <p>1. Choose the site base, an absolute <code>https:</code> URL. Every item IRI is the base, the type folder and the slug, with a trailing slash.
 2. Export each piece of knowledge as <code>content/&lt;type-plural&gt;/&lt;slug&gt;.md</code> with frontmatter carrying at least <code>type</code>, <code>title</code> and <code>prov</code>. An item without <code>prov</code> inherits the operator of the Bundle at Level 0, with a warning.
 3. Write <code>content/index.md</code> with <code>spec_version</code>, <code>okf_version</code>, <code>title</code>, <code>description</code> and <code>base</code>.
@@ -62,7 +62,7 @@
 7. Serve that file as <code>application/linkset+json</code> with the <code>profile</code> parameter, or send a <code>Link</code> header with <code>rel=&quot;profile&quot;</code>.
 8. Serve the public artefacts with <code>Access-Control-Allow-Origin: *</code>, and put a <code>describedby</code> link to the discovery document in the head of your pages.
 9. Check the discovery document with an implementation of <a class="ref" href="/specs/09-conformance/page-2/#AGSC-09-93">AGSC-09-93</a>, such as <code>tools/validate-wellknown</code> of the reference implementation, or run the Level-0 vectors in your own language.</p>
-<h2 id="checks">Checks</h2>
+<h2 id="checks"><span id="chunk-a6a70473dbf6e934"></span>Checks</h2>
 <ul>
 <li>The discovery document parses as I-JSON and <code>linkset</code> is its only top-level member.</li>
 <li>Every <code>href</code> is absolute, and the targets within one relation are ordered by <code>href</code>.</li>
