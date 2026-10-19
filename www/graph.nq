@@ -4,6 +4,7 @@
 <https://agenticsystemcore.com/> <https://w3id.org/agentic-system-core/ns#specVersion> "1.0.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/agentic-system-core/ns#Cluster> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <http://www.w3.org/2004/02/skos/core#definition> "Procedures for publishing and reading a node, each step naming the rule or the check that proves it."@en <https://agenticsystemcore.com/> .
+<https://agenticsystemcore.com/clusters/guides/> <http://www.w3.org/2004/02/skos/core#member> <https://agenticsystemcore.com/concepts/procedure/> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <http://www.w3.org/2004/02/skos/core#member> <https://agenticsystemcore.com/procedures/publish-a-level-0-node/> <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <http://www.w3.org/2004/02/skos/core#prefLabel> "Guides"@en <https://agenticsystemcore.com/> .
 <https://agenticsystemcore.com/clusters/guides/> <https://schema.org/license> "LicenseRef-AgenticSystemCore-Content-Use-1.0"^^<http://www.w3.org/2001/XMLSchema#string> <https://agenticsystemcore.com/> .

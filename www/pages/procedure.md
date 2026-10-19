@@ -8,6 +8,7 @@ tags:
   - specification
 clusters:
   - vocabulary
+  - guides
 prov:
   origin: ai-assisted
   agent: Claude Code
