@@ -413,7 +413,11 @@ function md(src, o = {}) {
       continue;
     }
     if ((m = /^(#{1,6}) +(.*?)\s*$/.exec(l))) {
-      const level = Math.min(6, m[1].length + (o.shift || 0)), text = m[2], id = headingId(text, used);
+      // An item body's headings take the engine's AGSC-03-13 ids (o.headingIds, see itemBodyHtml);
+      // every other page keeps this site's own ids, the specification pages' `section-<n>` among them.
+      const level = Math.min(6, m[1].length + (o.shift || 0)), text = m[2];
+      const id = o.headingIds ? o.headingIds.take(m[1].length, text) : headingId(text, used);
+      if (o.headingIds) used.add(id);
       if (level === 2 && o.toc) toc.push({ id, html: mdInline(text, o) });
       html += `<h${level} id="${id}">${mdInline(text, o)}</h${level}>\n`; i++; continue;
     }
@@ -914,6 +918,19 @@ const engineHtml = engineModule('src/distribution/html.js');
 const CHUNK_ANCHORS = engineHtml.chunkAnchors(require('./chunk-anchors.js').records(
   String(ENGINE_BUILD.files.get('/chunks.jsonl') || die('the engine emitted no /chunks.jsonl (AGSC-06-26)')),
   r => String(ENGINE_BUILD.files.get(r) || die(`the engine emitted no ${r}, which /chunks.jsonl names (AGSC-06-31)`))));
+// AGSC-03-13: an item page's heading ids are the engine's own (src/knowledge/markdown.js, the
+// function that also gives each chunk its `section`), taken in document order as md() meets each
+// heading, so a heading such as "Foo/Bar" is #foobar on the page and in /chunks.jsonl alike. A
+// heading md() and the engine do not both see, in the same order and at the same level, stops the build.
+const engineMarkdown = engineModule('src/knowledge/markdown.js');
+const itemBodyHtml = it => {
+  try {
+    const headingIds = require('./chunk-anchors.js').headingIds(engineMarkdown.headings(it.body), it.rel);
+    const html = md(it.body, { ruleLinks: true, shift: 0, headingIds });
+    headingIds.finish();
+    return html;
+  } catch (e) { return die(e.message); }
+};
 const withChunkAnchors = (it, html) => {
   const anchors = CHUNK_ANCHORS.get(it.slug) || [];
   const out = engineHtml.withChunkAnchors(html, anchors);
@@ -1700,7 +1717,7 @@ const itemPage = it => addPage(it.url, {
   jsonld: it.type === 'concept'
     ? { '@context': 'https://schema.org', '@type': 'DefinedTerm', name: it.fm.title, description: it.fm.description, url: it.iri, inDefinedTermSet: `${BASE}concepts/` }
     : { '@context': 'https://schema.org', '@type': 'TechArticle', headline: it.fm.title, description: it.fm.description, url: it.iri, author: { '@type': 'Person', name: config.site.author } },
-  body: `${itemMeta(it)}${it.fm.when ? `<p><strong>When:</strong> ${esc(it.fm.when)}</p>\n` : ''}${withChunkAnchors(it, md(it.body, { ruleLinks: true, shift: 0 }))}${it.type === 'cluster' ? `<h2 id="members">Members</h2>\n<ul>\n${members(it).map(m => `<li><a href="${m.url}">${esc(m.fm.title)}</a>: ${esc(m.fm.description || '')}</li>`).join('\n')}\n</ul>\n` : ''}${sourcesList(it)}${editLink('site', it.rel)}`,
+  body: `${itemMeta(it)}${it.fm.when ? `<p><strong>When:</strong> ${esc(it.fm.when)}</p>\n` : ''}${withChunkAnchors(it, itemBodyHtml(it))}${it.type === 'cluster' ? `<h2 id="members">Members</h2>\n<ul>\n${members(it).map(m => `<li><a href="${m.url}">${esc(m.fm.title)}</a>: ${esc(m.fm.description || '')}</li>`).join('\n')}\n</ul>\n` : ''}${sourcesList(it)}${editLink('site', it.rel)}`,
 });
 items.forEach(itemPage);
 const listPage = (url, title, description, list, section) => addPage(url, {

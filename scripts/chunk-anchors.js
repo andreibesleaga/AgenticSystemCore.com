@@ -62,4 +62,32 @@ function check(recs, pageOf) {
   return { failures, anchors, pages: pages.size };
 }
 
-module.exports = { records, check, anchored, anchorOf };
+/**
+ * AGSC-03-13 on an item page: the ids of the body's headings, in document order, as the engine
+ * computes them (`headings()` of the engine's `src/knowledge/markdown.js`, the same algorithm that
+ * gives each chunk its `section`). The page's renderer takes one id per heading it meets; a
+ * heading the engine does not have at that place and level, or one the renderer never reached,
+ * is an error, so a heading a chunk names can never be rendered under another id.
+ *
+ * @param {Array<{level:number, text:string, id:string}>} headings the engine's headings of the body
+ * @param {string} where the item, for the error message
+ * @returns {{take: (level: number, text: string) => string, finish: () => void}}
+ */
+function headingIds(headings, where) {
+  let at = 0;
+  return {
+    take(level, text) {
+      const h = headings[at];
+      at += 1;
+      if (!h || h.level !== level) {
+        throw new Error(`${where}: the heading "${text}" (level ${level}) is not the engine's heading ${at}${h ? ` "${h.text}" (level ${h.level})` : ''} (AGSC-03-13)`);
+      }
+      return h.id;
+    },
+    finish() {
+      if (at !== headings.length) throw new Error(`${where}: the page rendered ${at} of the engine's ${headings.length} headings (AGSC-03-13)`);
+    },
+  };
+}
+
+module.exports = { records, check, anchored, anchorOf, headingIds };
