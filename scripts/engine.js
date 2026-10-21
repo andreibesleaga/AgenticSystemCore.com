@@ -51,7 +51,9 @@ const walk = d => fs.readdirSync(d, { withFileTypes: true })
  * @param {number} o.epoch        SOURCE_DATE_EPOCH, so the two builds share one instant
  * @param {string} o.privacy      the privacy notice, as Markdown (the engine's PRIVACY.md input)
  * @param {string} o.securityTxt  the authored RFC 9116 contact file (AGSC-06-36)
- * @returns {{files: Map<string, Buffer>, skipped: string[], findings: object[], version: string}}
+ * @returns {{files: Map<string, Buffer>, skipped: string[], findings: object[], version: string, specVersion: string}}
+ *   `version` is the engine's package version, `specVersion` the specification it implements;
+ *   a package-only patch (1.0.1) implements the same specification (1.0.0).
  *   `files` is keyed by absolute route, `/chunks.jsonl` and the like.
  */
 function build({ engine, config, epoch, privacy, securityTxt }) {
@@ -118,7 +120,7 @@ function build({ engine, config, epoch, privacy, securityTxt }) {
   const exportDir = path.join(scratch, 'dist', 'export', 'llm-context');
   for (const f of walk(exportDir).sort()) exports_.set(path.relative(exportDir, f).split(path.sep).join('/'), fs.readFileSync(f));
 
-  return { files, exports: exports_, skipped, findings: envelope.findings || [], version: envelope.version };
+  return { files, exports: exports_, skipped, findings: envelope.findings || [], version: envelope.version, specVersion: envelope.spec_version };
 }
 
 module.exports = { build };
