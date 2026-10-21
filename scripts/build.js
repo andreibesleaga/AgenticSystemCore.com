@@ -912,7 +912,10 @@ const SECURITY_TXT = [
 const ENGINE_BUILD = require('./engine.js').build({
   engine: ENGINE, config, epoch: EPOCH, privacy: read('site/privacy.md'), securityTxt: SECURITY_TXT,
 });
-if (ENGINE_BUILD.version !== SPEC_VERSION) die(`the engine at ${ENGINE} is ${ENGINE_BUILD.version}, this build publishes ${SPEC_VERSION}`);
+// The engine must implement the specification this site publishes. Its PACKAGE version may be
+// a later patch of that specification (engine 1.0.1 implements specification 1.0.0), so the two
+// compared are the specification versions, never the package version.
+if (ENGINE_BUILD.specVersion !== SPEC_VERSION) die(`the engine at ${ENGINE} (package ${ENGINE_BUILD.version}) implements specification ${ENGINE_BUILD.specVersion}, this build publishes ${SPEC_VERSION}`);
 // AGSC-06-28 / AGSC-06-30: the in-page anchor of each chunk of the engine's own /chunks.jsonl that
 // begins with a heading — an empty <span> opening that heading — placed on the item pages by the
 // engine's own two functions, so these pages carry the anchors the engine's pages carry, from the

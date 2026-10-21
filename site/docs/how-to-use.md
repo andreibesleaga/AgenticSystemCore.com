@@ -12,7 +12,7 @@ You need Node.js 22.13 or later and `git`. One install gives the `agsc` command:
 
 ```bash
 npm install -g agentic-system-core     # or: npm install -g agsc-cli (the short alias, the same engine)
-agsc --version                         # 1.0.0
+agsc --version                         # agsc 1.0.1 (the package version; the specification is 1.0.0)
 ```
 
 Three facts carry the whole page:
