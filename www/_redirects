@@ -3,3 +3,5 @@
 /.well-known/agentic-knowledge /.well-known/knowledge-linkset 301
 # Browsers and tools that ask for the classic icon address get the site's icon.
 /favicon.ico /favicon.svg 301
+# The folder of the three JSON Schemas has no page of its own; /ns/ lists them.
+/ns/schema/ /ns/ 301
