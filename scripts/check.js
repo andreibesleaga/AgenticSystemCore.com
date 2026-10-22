@@ -474,6 +474,7 @@ for (const route of ['/.well-known/knowledge-linkset', '/graph.jsonld', '/graph.
 for (const route of headerBlocks.keys()) if (/\/\*$/.test(route) && route !== '/*' && (headerBlocks.get(route) || []).some(l => /^Content-Type:/.test(l))) fails.push(`_headers: ${route} sets a Content-Type on a pattern that also matches the folder's index page`);
 const redirects = exists(path.join(WWW, '_redirects')) ? fs.readFileSync(path.join(WWW, '_redirects'), 'utf8') : '';
 ok(/^\/\.well-known\/agentic-knowledge \/\.well-known\/knowledge-linkset 301$/m.test(redirects), '_redirects lacks the 0.0.x alias (AGSC-06-17)');
+ok(/^\/ns\/schema\/ \/ns\/ 301$/m.test(redirects), '_redirects lacks /ns/schema/ -> /ns/ (the schema folder has no page)');
 const sitemap = exists(path.join(WWW, 'sitemap.xml')) ? fs.readFileSync(path.join(WWW, 'sitemap.xml'), 'utf8') : '';
 const locs = [...sitemap.matchAll(/<loc>https:\/\/agenticsystemcore\.com(\/[^<]*)<\/loc>/g)].map(m => m[1]);
 ok(locs.length > 0 && locs.join('\n') === [...locs].sort().join('\n'), 'sitemap empty or not ordered by URL (AGSC-06-19)');
