@@ -37,7 +37,7 @@ function recording(t) {
     map.set(at('/.well-known/security.txt'), response(200, { 'content-type': 'text/plain; charset=utf-8', 'strict-transport-security': 'max-age=15552000' },
       'Contact: https://example.org/contact/\nExpires: 2027-10-07T07:30:56Z\nPreferred-Languages: en\n'));
     map.set(at('/.well-known/sustainability-data'), response(200, { 'content-type': 'application/sustainability-data+json', 'strict-transport-security': 'max-age=15552000' },
-      JSON.stringify({ 'reporting-period': '2026-09', target: new URL(node.base).host })));
+      JSON.stringify({ period: { start: '2026-09-01T00:00:00Z', end: '2026-10-01T00:00:00Z' }, target: new URL(node.base).host })));
     for (const [route, file] of Object.entries(node.committed)) {
       fs.mkdirSync(path.dirname(path.join(www, file)), { recursive: true });
       fs.writeFileSync(path.join(www, file), PAGE);
@@ -106,10 +106,23 @@ test('security.txt must expire more than sixty days ahead', async t => {
 test('a sustainability report more than two months old fails', async t => {
   const r = recording(t);
   const url = r.at(MAIN, '/.well-known/sustainability-data');
-  r.map.set(url, response(200, { 'content-type': 'application/sustainability-data+json', 'strict-transport-security': 'max-age=1' }, '{"reporting-period":"2026-07"}'));
-  assert.match(fails(await run(r)).map(x => x.message).join('\n'), /reporting period 2026-07 is 3 month\(s\) old/);
-  r.map.set(url, response(200, { 'content-type': 'application/sustainability-data+json', 'strict-transport-security': 'max-age=1' }, '{"reporting-period":"2026-08"}'));
+  const report = (start, end) => response(200, { 'content-type': 'application/sustainability-data+json', 'strict-transport-security': 'max-age=1' },
+    JSON.stringify({ period: { start, end } }));
+  r.map.set(url, report('2026-07-01T00:00:00Z', '2026-08-01T00:00:00Z'));
+  assert.match(fails(await run(r)).map(x => x.message).join('\n'), /the period ending 2026-08-01T00:00:00Z is 3 month\(s\) old/);
+  r.map.set(url, report('2026-08-01T00:00:00Z', '2026-09-01T00:00:00Z'));
   assert.deepEqual(fails(await run(r)), []);
+  // A year-long period is as recent as its last month.
+  r.map.set(url, report('2025-09-01T00:00:00Z', '2026-09-01T00:00:00Z'));
+  assert.deepEqual(fails(await run(r)), []);
+  // An offset is honoured: this period ends on 1 September in UTC, so its last month is August.
+  r.map.set(url, report('2026-08-01T03:00:00+03:00', '2026-09-01T03:00:00+03:00'));
+  assert.deepEqual(fails(await run(r)), []);
+  // The pre-draft-10 field alone, a period whose end is not after its start, or no JSON at all.
+  for (const body of ['{"reporting-period":"2026-09"}', JSON.stringify({ period: { start: '2026-09-01T00:00:00Z', end: '2026-09-01T00:00:00Z' } }), 'not json']) {
+    r.map.set(url, response(200, { 'content-type': 'application/sustainability-data+json', 'strict-transport-security': 'max-age=1' }, body));
+    assert.match(fails(await run(r)).map(x => x.message).join('\n'), /no period \{ start, end \} with start before end/, body);
+  }
   r.map.set(url, response(404, { 'strict-transport-security': 'max-age=1' }, 'not found'));
   assert.match(fails(await run(r)).map(x => x.message).join('\n'), /answers 404/);
 });

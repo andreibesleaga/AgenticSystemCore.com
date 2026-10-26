@@ -19,7 +19,8 @@
 //   - no Network Error Logging (`NEL`, `Report-To`) or speculation rules header from the edge
 //     network, unless the node's own statements name it (then a warning);
 //   - `/.well-known/security.txt` expires more than 60 days ahead (RFC 9116 §2.5.5);
-//   - `/.well-known/sustainability-data` reports a month at most two months old;
+//   - `/.well-known/sustainability-data` covers a period that ended at most two months ago (the
+//     `period` object of draft-besleaga-sustainability-wellknown-10, Section 3.2);
 // and once: the w3id addresses answer 303, npm and PyPI each name a version of
 // `agentic-system-core` with files, and both released checkers pass Level 2 on both nodes with the
 // mutual check (AGSC-10-12).
@@ -162,14 +163,18 @@ export async function liveCheck({ get, now, committedRoot, checkers, requireChec
       const route = '/.well-known/sustainability-data';
       const r = await fetchRoute(route);
       if (usable(route, r, 'sustainability')) {
+        // Draft -10, Section 3.2: `period` is { start, end }, two RFC 3339 instants, start included
+        // and end excluded. The report's age is counted from the last month the period covers.
         let period = null;
-        try { period = JSON.parse(r.body.toString('utf8'))['reporting-period']; } catch { /* reported below */ }
-        const m = /^(\d{4})-(\d{2})$/.exec(String(period));
-        if (!m) add(node.name, 'sustainability', 'fail', `${route}: no reporting-period of the form YYYY-MM`);
+        try { period = JSON.parse(r.body.toString('utf8')).period; } catch { /* reported below */ }
+        const start = Date.parse(period && period.start);
+        const end = Date.parse(period && period.end);
+        if (!(start < end)) add(node.name, 'sustainability', 'fail', `${route}: no period { start, end } with start before end (draft -10, Section 3.2)`);
         else {
-          const months = (now.getUTCFullYear() * 12 + now.getUTCMonth()) - (Number(m[1]) * 12 + Number(m[2]) - 1);
+          const last = new Date(end - 1);
+          const months = (now.getUTCFullYear() * 12 + now.getUTCMonth()) - (last.getUTCFullYear() * 12 + last.getUTCMonth());
           const ok = months <= REPORT_MONTHS;
-          add(node.name, 'sustainability', ok ? 'pass' : 'fail', `${route}: reporting period ${period} is ${months} month(s) old${ok ? '' : `; at most ${REPORT_MONTHS} are allowed`}`);
+          add(node.name, 'sustainability', ok ? 'pass' : 'fail', `${route}: the period ending ${period.end} is ${months} month(s) old${ok ? '' : `; at most ${REPORT_MONTHS} are allowed`}`);
         }
       }
     }
