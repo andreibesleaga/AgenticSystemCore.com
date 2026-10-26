@@ -34,7 +34,7 @@ const STATUS = {
   // the preprint of the version this site publishes; `concept` is the DOI that names every version of it
   preprint: { doi: '10.5281/zenodo.23365416', concept: '10.5281/zenodo.23052709', title: 'AgenticSystemCore: Distributed Knowledge Bundles and Runnable Systems, for People and Agents', date: '2026-10-14', version: '1.0.0' },               // e.g. { doi: '10.5281/zenodo.NNNNNNN', title: '…', date: 'YYYY-MM-DD' } once published
   // the reference engine's source archive of the same version, deposited as software
-  software: { doi: '10.5281/zenodo.23469027', version: '1.0.0' },
+  software: { doi: '10.5281/zenodo.23588053', version: '1.0.1' },
 };
 
 // ------------------------------------------------------------------ basics
