@@ -28,7 +28,8 @@ node scripts/check.js      # the gate: reproducible build, llms vectors, discove
 
 Needs Node 22.13 or later and the engine repository at `../agentic-system-core` (or
 `SITE_ENGINE=<path>`), with its `npm ci` done. `SOURCE_DATE_EPOCH` fixes the build
-instant; without it the instant comes from the last commit.
+instant; without it the instant is the commit instant of the specification tag in the engine
+repository (the engine's last commit when `SITE_SPEC_SOURCE=worktree`).
 
 Run both commands with the same `SITE_ENGINE` and `SOURCE_DATE_EPOCH`: the gate rebuilds
 the site and compares the result with `www/`, so a variable set on one line only makes the

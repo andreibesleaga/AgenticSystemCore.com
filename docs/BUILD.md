@@ -52,9 +52,12 @@ The picture above is rendered from this Mermaid source; the source is the truth.
 | Front page | the "works with" lists are read from the engine's registries and the measured numbers from its `docs/measurements.json`; the build stops if a name on the page has no registry entry | `scripts/build.js` |
 | Gate | two builds must be byte-identical; the discovery document passes the engine's `tools/validate-wellknown` at Levels 0 and 2; links, headers, contrast, the page tools, the content checks and public hygiene are checked | `scripts/check.js`, `scripts/check-content.js` |
 
-The instant every date on the site derives from is `SOURCE_DATE_EPOCH`, or the last
-commit when it is unset. Until the specification's tag exists the build reads the
-engine's working tree, and says so in its first line of output.
+The instant every date on the site derives from is `SOURCE_DATE_EPOCH`, or, when it is
+unset, the commit instant of the specification tag in the engine repository (the engine's
+last commit when `SITE_SPEC_SOURCE=worktree`). Until the specification's tag exists the
+build reads the engine's working tree, and says so in its first line of output.
+
+Tag only when the specification version shown on the site changes.
 
 ## Committing the output
 
