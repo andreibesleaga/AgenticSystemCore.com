@@ -23,8 +23,29 @@ need `playwright-core` and `axe-core` installed outside the repository.
 | `live-check.mjs` | read-only check of both live nodes: served pages against the committed `www/`, response headers, no edge-network header the statements do not name, `security.txt` expiry, the sustainability report's month, the w3id redirects, the npm and PyPI versions, both released checkers at Level 2 with the mutual check; run weekly by `.github/workflows/live.yml`; tests on recorded responses in `live-check.test.mjs` |
 | `community-files-check.mjs` | checks that the community files (`SECURITY.md`, `CONTRIBUTING.md`, the code of conduct, the issue and pull-request templates, the README) send a security report to private reporting first and name the `CA-v1` sign-off; `node scripts/community-files-check.mjs ../agsc-demo-node --repo andreibesleaga/agsc-demo-node` checks the demonstration node |
 | `a11y.js` | optional: axe-core over every page in both colour schemes at a phone, a tablet and a desktop width (390, 768 and 1280 px), each file served with the headers `_headers` gives it (the `! Name` detach line included), CSP, third-party requests (the graph explorer's reads of the declared peer nodes are answered offline and counted apart; on `/` and `/graph/` axe runs once the explorer has marked itself `data-state="ready"`), keyboard checks; no sideways scroll, one left edge for the logo, the title, the summary, the first wide block and the footer (`assets/layout.css`), prose lines of 80 characters or fewer, no word split in a table cell |
-| `shots.js`, `compare-baseline.js` | optional: screenshots, and the "the site still looks the same" comparison against a baseline kept outside the repository (`AGSC_SITE_BASELINE`) |
+| `shots.js`, `compare-baseline.js` | optional: screenshots, and the "the site still looks the same" comparison against a baseline kept outside the repository (`SITE_BASELINE_DIR`) |
 
 ```bash
 node scripts/build.js && node scripts/check.js   # "check: pass" when everything holds
 ```
+
+The tests of the helpers (no network; CI runs exactly this):
+
+```bash
+node --test scripts/built-commit.test.js scripts/live-check.test.mjs scripts/release-feed.test.js scripts/graph-explorer.test.js scripts/chunk-anchors.test.js
+```
+
+## Environment variables
+
+| Variable | What it sets | Read by |
+|---|---|---|
+| `SITE_ENGINE` | the engine repository; default `../agentic-system-core` | `build.js`, `check.js`, `check-release.js`, `page-tools-check.js`, `chunk-anchors.test.js` |
+| `SOURCE_DATE_EPOCH` | the build instant, in seconds; default the commit instant of the specification tag in the engine repository (its last commit when `SITE_SPEC_SOURCE` is `worktree`) | `build.js` |
+| `SITE_SPEC_TAG` | the specification tag the site is built from; default `1.0.0` | `build.js`, `check.js`, `check-release.js` |
+| `SITE_SPEC_SOURCE` | `tag` or `worktree`; default `tag` when the tag exists, else `worktree` | `build.js`, `check.js`, `check-release.js` |
+| `SITE_PAGE_BUDGET` | a page-size budget below the default 100,000 bytes, to exercise the split of long pages; a larger value changes nothing | `build.js` |
+| `CHROME_EXE` | the Chromium binary of the browser lanes | `a11y.js`, `shots.js` |
+| `NODE_PATH` | where Node finds `playwright-core` and `axe-core`, installed outside the repository | `a11y.js`, `shots.js` (through Node's module lookup) |
+| `SITE_A11Y_WWW` | another built node's output for the accessibility lane | `a11y.js` |
+| `SITE_BASELINE_DIR` | the baseline kept outside the repository | `compare-baseline.js` |
+| `SITE_LIVE_NODE_CHECKER`, `SITE_LIVE_PYTHON` | the released checkers: the npm package's `tools/validate-wellknown`, and a Python with the PyPI package | `live-check.mjs` |

@@ -19,6 +19,10 @@ engine checked out beside this repository and its `npm ci` done:
 node scripts/build.js && node scripts/check.js   # "check: pass" when everything holds
 ```
 
+`node scripts/build.js` rewrites `www/` in your working copy. Leave those changes out of
+your pull request: the maintainer rebuilds `www/` and commits it on its own, as the gate
+expects (see "Committing the output" in [docs/BUILD.md](docs/BUILD.md)).
+
 For an item, keep its provenance (`prov`) honest: it says how the text was made and
 names the person accountable for it. For anything larger than a correction, describe
 the change in an issue first.
