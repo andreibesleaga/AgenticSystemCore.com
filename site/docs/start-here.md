@@ -77,7 +77,7 @@ AgenticSystemCore has several doors. Find yourself below and follow that path; e
 3. [`/chunks.jsonl`](/chunks.jsonl), the graph dumps and the [ontology](/ns/): for retrieval and for joining with other nodes.
 4. The [agent skill](/docs/agent-skill/): one file to load into a coding agent so it can use the engine in every mode.
 5. [How to use it](/docs/how-to-use/), the section for agents: what to fetch, in which order, and how to propose a change.
-6. On every item page and on `/compose/` of this site, the seven page tools, when your browser offers them; everything from here is marked untrusted, and `propose` returns text for a person to review.
+6. On every item page and on `/compose/` of this site, the ten page tools, when your browser offers them; everything from here is marked untrusted, and `propose` returns text for a person to review.
 
 ## Where a node can live
 

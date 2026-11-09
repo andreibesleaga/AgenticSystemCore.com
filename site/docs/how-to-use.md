@@ -52,7 +52,7 @@ Three facts carry the whole page:
 | review | `agsc review` | the review lane over a proposal: lint only, no model reachable |
 | run a lane | `agsc refresh --agent <name> --dry-run [--task <t>]` | a dry run of a declared agent lane: the proposal it would open and the Episode of the run, with no model call; without `--dry-run` it refuses, because no model adapter ships |
 | skills | `agsc skills [install <dir>] [import <file>]` | packs under `dist/skills/`; install into an agent's skills folder; a foreign `SKILL.md` back as a procedure |
-| tools | `agsc mcp` | a local tool server over standard input and output: seven tools, every item as a resource |
+| tools | `agsc mcp` | a local tool server over standard input and output, or from 1.1 over HTTP on the loopback address (`--http <port>`): ten tools, every item as a resource |
 | execute | `agsc run <slug> [--dry-run]`, `agsc trace <file.json>` | a procedure's steps under an allow list; a traced run recorded as an Episode |
 | claim | `agsc conform --level <n> [--to <path>]` | the conformance report for the Level the node meets, at `dist/conformance-report.json` unless `--to` says otherwise |
 
@@ -115,23 +115,26 @@ cd my-notes && agsc build                              # the server reads the Bu
 claude mcp add --transport stdio my-knowledge -- npx -y agsc-cli mcp
 ```
 
-The assistant then has exactly seven tools (AGSC-09-13):
+The assistant then has exactly ten tools (AGSC-09-13):
 
 | Tool | Does | Writes |
 |---|---|---|
-| `search` | finds items by words | nothing |
-| `read` | one item: frontmatter and text | nothing |
+| `search` | finds items by words; a hit on an item with a domain type, role, context or warrant also carries them, as `domain` | nothing |
+| `read` | one item: frontmatter and text, the citation record of each of its chunks, and its `domain` parts when it has any | nothing |
 | `links` | the typed links authored on one item | nothing |
 | `compose` | whether a selection of items fits together | nothing |
 | `ask` | the descriptions of the best-matching items from this memory only, each with its address, or exactly `no answer in this memory`; no model is called | nothing |
 | `propose` | the prepared text of a change to one item, or a task-state change on a board | nothing — the text comes back to you |
 | `remember` | a new, well-formed item from what you told it | nothing — the text comes back to you |
+| `brief` | the brief of a selection: why each item is in it, the order to adopt them, what is missing and what to do next | nothing |
+| `explain` | whether one typed link holds between two items, and why: authored, or the steps that make it hold | nothing |
+| `check` | the link warnings about a selection, or about every item | nothing |
 
-Every item is also a resource, and one prompt, *answer from this memory with citations*, sets the assistant up to cite. The server opens no network connection and takes no path or shell string as an argument. To put what an agent prepared into the node: save the text where it says, `agsc lint --fix`, `agsc propose <slug>`, and open the pull request it describes.
+Every item is also a resource, and one prompt, *answer from this memory with citations*, sets the assistant up to cite. Over standard input and output the server opens no network connection; with `--http` it listens on the loopback address only. It takes no path or shell string as an argument. To put what an agent prepared into the node: save the text where it says, `agsc lint --fix`, `agsc propose <slug>`, and open the pull request it describes.
 
-### The same seven tools in a browser
+### The same ten tools in a browser
 
-Every item page and the `/compose/` page of a published node register the same seven tools for a browser's own assistant through `document.modelContext`, with nothing installed and no server (AGSC-09-16). The answers equal the local server's for the same input; `propose` and `remember` hand back text there too.
+Every item page and the `/compose/` page of a published node register the same ten tools for a browser's own assistant through `document.modelContext`, with nothing installed and no server (AGSC-09-16). The answers equal the local server's for the same input; `propose` and `remember` hand back text there too.
 
 ### Many agents, many nodes
 
@@ -286,7 +289,7 @@ An agent that meets a node for the first time, with no human in the loop, does t
 5. **To change something**, prepare a proposal — `propose` or `remember` over `agsc mcp` or the page tools, or `agsc propose <slug>` on a clone — and hand it to the route the discovery document declares, or back to your caller. Never write to the content branch, merge, push or send anything to another node.
 6. **On a board**, claim with `propose({slug, task_state: "TASK_STATE_WORKING"})`, hold at most your lane's `max_claims`, and stop when the board is done, a task needs a person, or your budget is spent.
 
-The seven tools answer in one shape: `{ type, source, body, trust: "untrusted", license }`; a fault is the same envelope with `type: "error"` and a body of `code` and `message`, never a transport error. A coding agent that works *in* a node's repository reads the repository's `AGENTS.md` first. To give a coding agent all of this page at once, install the [agent skill](/docs/agent-skill/).
+The ten tools answer in one shape: `{ type, source, body, trust: "untrusted", license }`; a fault is the same envelope with `type: "error"` and a body of `code` and `message`, never a transport error. A coding agent that works *in* a node's repository reads the repository's `AGENTS.md` first. To give a coding agent all of this page at once, install the [agent skill](/docs/agent-skill/).
 
 ## Hooks: connecting agents and tools to a node
 
@@ -297,8 +300,8 @@ Each route already exists in the engine; pick by what your tool reads. None need
 | agent skill | one `SKILL.md` that teaches the agent the engine itself | download it, see the [agent skill](/docs/agent-skill/) page | any agent that reads Agent Skills |
 | steering file | one Markdown file at the path the coding agent reads every session | `agsc export --steer --target <name>` — `agents` (`AGENTS.md`), `claude`, `codex`, `cursor`, `copilot`, `gemini`, `kiro`, `windsurf`, `cline`, `aider`, `gabbe` | always-on context |
 | skill packs | one Agent Skills folder per cluster, lock-verified | `agsc skills`, `agsc skills install <dir>` | step-by-step procedures |
-| live tools | the seven tools and every item as a resource over the Model Context Protocol | `agsc mcp` | an assistant that searches while it works |
-| the page tools | the same seven tools on every item page and `/compose/` | nothing: `agsc build` | a browser's own assistant |
+| live tools | the ten tools and every item as a resource over the Model Context Protocol | `agsc mcp` | an assistant that searches while it works |
+| the page tools | the same ten tools on every item page and `/compose/` | nothing: `agsc build` | a browser's own assistant |
 | memory archive | a COGX archive another memory system imports | `agsc export --to cogx`, `agsc import --from cogx <dir>` | a framework with its own store |
 | agent kit | the GABBE kit's own folders | `agsc export --to gabbe`, `agsc import --from gabbe <kit>` | a project run with that kit |
 | skills collections | Agent Skills, Claude Code plugins and marketplaces, Cursor and Windsurf rules, from a local clone | `agsc import --from skills <dir>`, `agsc export --to skills --layout <l>` | a team with a shared collection |

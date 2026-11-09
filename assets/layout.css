@@ -85,6 +85,10 @@ header.site ul { flex: 1 1 18rem; }
    under the menu's last link, like everything else. Below 60rem the room is zero, and below 53.5rem
    the paragraph is simply the screen's width, like the content. */
 footer.site p { max-width: 53.5rem; margin-left: max(0px, calc((100% - 60rem) / 2)); margin-right: 0; }
+/* The footer's row of links is one box: it starts on a line of its own when the sentence before it
+   leaves no room for the whole row, so a desktop width never strands its last links on a line of
+   their own; on a narrow screen the row wraps inside its box like any text. */
+footer.site .footer-links { display: inline-block; }
 
 /* Large screens: the container stays at 60rem, centred; only the page background and the header's
    and footer's rules run edge to edge. */
@@ -92,3 +96,9 @@ footer.site p { max-width: 53.5rem; margin-left: max(0px, calc((100% - 60rem) / 
 @media print {
   header.site nav, main, main.wide, footer.site p { max-width: none; }
 }
+
+/* The compose page shows its workspace only once its script has read the published graph, and the
+   workspace is taller than the sentence it replaces: the footer would then jump down while the
+   reader looks at the page (a layout shift above 0.1 at 1280 px). The page is given the screen's
+   height from the start, so the footer starts below the fold and nothing visible moves. */
+main:has(> #workspace) { min-height: 100vh; }

@@ -57,7 +57,7 @@ if (!CSP) { console.error('a11y: _headers gives no Content-Security-Policy for /
 const typeProblems = [];
 const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
 const pages = walk(WWW).filter(f => f.endsWith('index.html')).map(f => '/' + path.relative(WWW, path.dirname(f)).split(path.sep).join('/') + '/').map(p => p === '//' ? '/' : p).sort();
-const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.txt': 'text/plain' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.txt': 'text/plain', '.wasm': 'application/wasm', '.png': 'image/png', '.toon': 'text/toon' };
 // The reading measures (they run inside the page; layout does not depend on the colour scheme,
 // so they run once per width, in the light scheme).
 const MAX_LINE = 130; // characters in one rendered line of prose: the full 60rem container (since 15 Oct 2026); WCAG 1.4.8 (80, AAA) is not a bar here

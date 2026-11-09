@@ -11,8 +11,8 @@
 #              runner first, so this step proves the sources, not the committed
 #              output: rebuild and commit after every engine change; the discovery document at
 #              Levels 0 and 2; links, headers, contrast, the page tools, public
-#              hygiene), `node scripts/page-tools-check.js` (the seven page tools
-#              proved against the built site, no browser) and the engine's hygiene
+#              hygiene), `node scripts/page-tools-check.js` (the engine's page tools,
+#              ten at specification 1.1, proved against the built site, no browser) and the engine's hygiene
 #              sweep over this repository.
 #   Engine     `andreibesleaga/agentic-system-core` at ENGINE_REF (below):
 #              `main` by default, the state the committed output was built from.
@@ -117,7 +117,7 @@ jobs:
       - name: build twice and run the gate
         working-directory: AgenticSystemCore.com
         run: node scripts/build.js && node scripts/check.js
-      - name: the seven page tools, proved against the built site
+      - name: the page tools, proved against the built site
         working-directory: AgenticSystemCore.com
         run: node scripts/page-tools-check.js
       - name: public means clean

@@ -42,14 +42,14 @@ Six files, one per thing. Each is a header between `---` lines and a short Markd
 |---|---|---|
 | `content/clusters/<board>.md` | `type: cluster` | a group of items; the tasks in it form a board |
 | `content/concepts/<name>.md` | `kind: decision` | by convention, a `## Decision` section |
-| `content/concepts/<name>.md` | `kind: spec` | by convention, a `## Specification` section; `implements:` the decision |
+| `content/concepts/<name>.md` | `kind: spec` | by convention, a `## Specification` section; `decided-by:` the decision |
 | `content/concepts/<name>.md` | `kind: task` | `task_state:` — `TASK_STATE_` followed by `SUBMITTED` (new), `WORKING`, `INPUT_REQUIRED`, `AUTH_REQUIRED`, `COMPLETED`, `FAILED`, `CANCELED` or `REJECTED`; `clusters:` names its board; `blocked-by:` other tasks |
 | `content/gates/<name>.md` | `type: gate` | `level:` `L1` (schema and links) or `L2` (adds provenance, determinism, review); `checks:`, when given, exactly the set the level implies (AGSC-02-18); `enforce:` (`status-check`, `ruleset`, `hook`, `codeowner`) |
 
 Nothing checks the `## Decision` and `## Specification` sections; they are the
-convention readers and the pages expect. At 1.0.0 `lint` does not yet report a gate
-whose `checks:` differ from its level, so keep the two in step by hand, or leave
-`checks:` out.
+convention readers and the pages expect. From 1.1 `lint` reports a gate whose `checks:`
+differ from its level as a warning (`AGSC-E203`, AGSC-02-18; at 1.0 it did not), so keep
+the two in step by hand, or leave `checks:` out.
 
 The board and the decision:
 
@@ -102,7 +102,7 @@ prov:
   origin: human
   operator: human:you
 kind: spec
-implements:
+decided-by:
   - decide-the-login
 ---
 
@@ -187,7 +187,7 @@ ITEM
 Then the configuration, the security contact and a first commit, as in [Mode 0](/docs/guides/mode-0/):
 
 ```bash demo
-agsc init > /dev/null
+agsc init > /dev/null 2>&1
 find content -name '*.md' | sort
 mkdir -p .well-known && printf 'Contact: mailto:security@example.org\n' > .well-known/security.txt
 git init -q -b main && git add -A && git commit -q -m 'the login project'
@@ -214,25 +214,23 @@ how to set the real one. A wrong value is an error with its file and line, for e
 ```bash demo
 agsc ci
 cat dist/forge/status-checks.json
-node -e 'console.log(JSON.stringify(require("./dist/forge/ruleset.json").rules.required_status_checks))'
+node -e 'console.log(JSON.stringify(require("./dist/forge/ruleset.json").rules.map((r) => r.type)))'
 ```
 
 ```text expect
-ci: pass (0 error, 1 warn)
+ci: pass (0 error, 2 warn)
 ["determinism","links","provenance","review","schema"]
-["agsc ci"]
+["pull_request","required_status_checks"]
 ```
 
-`dist/forge/status-checks.json` lists the gate's checks; `dist/forge/ruleset.json`
-requires one status, `agsc ci`, because that is the one job a forge runs and its verdict
-(`dist/gate.json`) covers every check. On GitHub, the action in the root
-[README](https://github.com/andreibesleaga/agentic-system-core/blob/main/README.md#connecting-agents-and-repositories) runs that job.
-`dist/forge/ruleset.json` is a description of the rule, not the shape GitHub's ruleset
-import takes: transcribe it by hand, as a branch ruleset in the repository's settings
-that requires the status check `agsc ci`. `agsc ci` does not enforce the check
-`review`; it means turning on the forge's own required review, on GitHub the rule
-"Require a pull request before merging" with at least one required approval, in the
-same ruleset.
+`dist/forge/status-checks.json` lists the gate's checks; `dist/forge/ruleset.json` is a
+GitHub repository ruleset in the shape its "Import a ruleset" takes (Settings, Rules,
+Rulesets, New ruleset, Import a ruleset). It requires one status, `agsc ci`, because that
+is the one job a forge runs and its verdict (`dist/gate.json`) covers every check. On
+GitHub, the action in the root [README](https://github.com/andreibesleaga/agentic-system-core/blob/main/README.md#connecting-agents-and-repositories)
+runs that job. `agsc ci` does not enforce the check `review` itself; the ruleset does, as
+the forge's own rule "Require a pull request before merging" with one approval and the
+Code Owners' review.
 
 ## 3. One steering file for every assistant
 
@@ -260,7 +258,7 @@ node -e 'const b = require("./www/boards/login.json"); console.log("done:", b.do
 ```
 
 ```text expect
-build: pass (0 error, 1 warn)
+build: pass (0 error, 2 warn)
 done: false
 task-login-form TASK_STATE_SUBMITTED blocked by: -
 task-login-tests TASK_STATE_SUBMITTED blocked by: task-login-form

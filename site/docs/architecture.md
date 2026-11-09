@@ -87,7 +87,7 @@ The context map: Knowledge feeds Distribution as a conformist supplier (Distribu
 | Container | What it is |
 |---|---|
 | `agsc` CLI | Node ≥ 22.13, CommonJS, a small set of pinned and audited libraries; sixteen verbs, exit codes 0, 1 and 2, `--json` everywhere; five context directories under `src/` plus ports and Node adapters |
-| `agsc mcp` | A local stdio JSON-RPC server exposing seven tools: search, read, links, compose, propose, ask, remember |
+| `agsc mcp` | A local JSON-RPC server, over stdio or, from 1.1, Streamable HTTP on the loopback address (`--http`), exposing ten tools: search, read, links, compose, propose, ask, remember, brief, explain, check |
 | Browser bundle | `www/js/agsc-core.js`: the same composition modules with no Node imports, plus the WebMCP page tools |
 | GitHub Actions | `ci.yml`, `release.yml`, `refresh.yml`: the only backend |
 | Static site | `www/`: pages, graph files, per-item Markdown and JSON-LD, the search index, llms.txt, skills, `/ns/`, the discovery document, the NOW page |
@@ -103,8 +103,8 @@ The context map: Knowledge feeds Distribution as a conformist supplier (Distribu
 | Network, CI only | HTTP | Node fetch, permitted in `refresh` and `mcp` only; a test fails if it is reachable from the knowledge context | none |
 | ContentStore | The Bundle | Local git working tree | GitHub API, Obsidian, Solid |
 | GraphExport | Items to RDF | JSON-LD, Turtle, N-Quads (RDF/XML reserved) | SPARQL dump, Wikibase |
-| ToolTransport | Tools to agents | Local stdio MCP, seven tools | Remote responder (declared now, served later) |
-| PageTools | Tools in the page | WebMCP `document.modelContext`, the same seven tools, degrading to plain JavaScript | none |
+| ToolTransport | Tools to agents | Local MCP over stdio or loopback HTTP, ten tools | Remote responder (declared now, served later) |
+| PageTools | Tools in the page | WebMCP `document.modelContext`, the same ten tools, degrading to plain JavaScript | none |
 | Reviewer | Proposal verdict | Lint only, no model on a gating lane | The optional, non-gating model review lane (AGSC-08-27), off by default |
 | Host | Where `www/` lands | Cloudflare Pages | GitHub or GitLab Pages, Netlify |
 | Forge | Pull-request and CI shim | GitHub, at most twenty lines of workflow | GitLab, Forgejo |
@@ -169,7 +169,7 @@ A node is a set of files, and so is its build; neither depends on a transport. I
 | 010 | Part II scope under the simplicity rule: `run` and `trace` opt-in and off by default, `conform` a thin verb over the vector runner, federation as a validator flag, runtime emitters as template renderings of the seven kinds of Harness file |
 | 011 | A link set instead of a vendor manifest: the discovery document is an RFC 9264 link set with integrity on the links, one profile URI, no new media type or scheme |
 | 012 | Plugins are declared surfaces under the contract declare, pin, inherit, prove |
-| 013 | Two reference plugins, local MCP and WebMCP, with the same seven tools; the Agent Card only as an optional card beside a responder |
+| 013 | Two reference plugins, local MCP and WebMCP, with the same seven tools (ten from 1.1); the Agent Card only as an optional card beside a responder |
 | 014 | The agent federates; nodes never call nodes: nine static, client-side parts, citation instead of cross-Bundle links |
 | 015 | Visibility and dynamic hooks are specified now and built later |
 | 016 | Ports are wired verdict-neutrally in the fifth composition step |
@@ -187,7 +187,7 @@ A node is a set of files, and so is its build; neither depends on a transport. I
 | NFR-07 agent safety | The lint lane, tool-shape tests and the skills-inertness test |
 | NFR-08 WCAG 2.2 AA | An accessibility lane over the golden build, with alt text asserted |
 | NFR-09 unattended operation | An idempotence test for the refresh workflow and a restore-from-zero drill before launch |
-| NFR-10 licence stack | An SPDX header on every browser script and a terms-embedded assertion on every prose export (a REUSE layout is a 1.1 item) |
+| NFR-10 licence stack | An SPDX header on every browser script of the project's own, the licence texts beside each third-party one (the query engine under `/query/vendor/`), and a terms-embedded assertion on every prose export; from 1.1 the engine repository also follows the REUSE layout (`REUSE.toml` and `LICENSES/`) |
 | NFR-11 cost ceiling | No model call reachable from the launch lanes, asserted by grep, and a spend line on the NOW page |
 | NFR-12 clean room | The clean-room lint and an importer that refuses book references |
 | NFR-13 offline and cross-platform | A portability checklist on three operating systems |
@@ -245,7 +245,7 @@ workspace "AgenticSystemCore" "Distributed Ontological Agentic Memory engine —
         interchange = component "Interchange" "import/export/steer/skills" "src/interchange/"
         ports = component "Ports & Node adapters" "FileSystem, Clock, ProcessRunner, Network[CI-only]" "src/ports/, src/adapters/"
       }
-      mcpserver = container "agsc mcp" "Local stdio JSON-RPC server: search read links compose propose ask remember" "Node.js"
+      mcpserver = container "agsc mcp" "Local JSON-RPC server over stdio or loopback HTTP: search read links compose propose ask remember brief explain check" "Node.js"
       browser = container "Browser bundle" "www/js/agsc-core.js — same composition core, no node: imports; WebMCP page tools" "JavaScript (ESM)"
       site = container "Static site" "www/: pages, graph.*, pages/*.md|.jsonld, search.json, llms.txt, skills/, /ns/, /.well-known/knowledge-linkset, now.md" "Static files"
       pipeline = container "GitHub Actions" "ci.yml, release.yml, refresh.yml — the only backend" "YAML workflows"
@@ -259,7 +259,7 @@ workspace "AgenticSystemCore" "Distributed Ontological Agentic Memory engine —
 
     reader -> site "Reads pages and machine surfaces" "HTTPS"
     reader -> github "Opens a Proposal (fork-and-edit)" "HTTPS"
-    agent -> mcpserver "Calls seven tools" "stdio JSON-RPC"
+    agent -> mcpserver "Calls ten tools" "JSON-RPC over stdio or HTTP"
     agent -> site "Fetches linkset, graph, llms.txt, skills" "HTTPS"
     agent -> browser "Uses page tools" "WebMCP"
     owner -> github "All git writes, merges, tags" "git/HTTPS"

@@ -22,7 +22,7 @@ From the repository root, with Node 22.13 or later:
 
 ```bash
 node scripts/build.js && node scripts/check.js   # "check: pass" when everything holds
-node scripts/page-tools-check.js                 # the seven page tools, no browser
+node scripts/page-tools-check.js                 # the ten page tools, no browser
 node --test scripts/built-commit.test.js scripts/live-check.test.mjs scripts/release-feed.test.js scripts/graph-explorer.test.js scripts/chunk-anchors.test.js
 node ../agentic-system-core/tools/public-hygiene .   # nothing private or forbidden is public
 ```

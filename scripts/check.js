@@ -16,7 +16,10 @@
 // both schemes; (7) the page tools; (8) the content gate, scripts/check-content.js; (9) the release
 // gate, scripts/check-release.js; (5a) the graph explorer: the vendored libraries by SHA-256, the
 // SRI hashes of its scripts, no host in its own code, the policy of its two addresses; (4c) every
-// chunk of /chunks.jsonl on its item page, and the anchor of each heading chunk on its heading.
+// chunk of /chunks.jsonl on its item page, and the anchor of each heading chunk on its heading;
+// (5b) the views of specification 1.1 the engine builds for this node: the query page /query/ with
+// its engine, its ten examples and its own policy, the graph explorer of /clusters/, /chunks-index.toon,
+// and the preview card every page names for a shared link.
 'use strict';
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const ROOT = path.resolve(__dirname, '..');
@@ -31,7 +34,9 @@ const engineFile = p => SPEC_SOURCE === 'tag'
   : fs.readFileSync(path.join(ENGINE, p), 'utf8');
 const WWW = path.join(ROOT, (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www'); // build.out in agsc.config.json (README)
 const fails = [];
-const NO_TRACE_IN_SOURCE = new Set(['AGSC-05-26']); // the one rule whose source ends in a table with no bracket
+// The rules whose source carries no trailing trace bracket: AGSC-05-26 ends in a table; AGSC-05-34
+// (added for 1.1) ends in its amendment note, its table and SPARQL texts following it.
+const NO_TRACE_IN_SOURCE = new Set(['AGSC-05-26', 'AGSC-05-34']);
 // AGSC-06-05/06-17: the only <script> elements any page may carry — all same-origin, all classic,
 // all deferred, none inline. The four page-tool files are the engine's own emitted bytes;
 // `node scripts/page-tools-check.js` proves that and runs them.
@@ -42,6 +47,9 @@ const ALLOWED_SCRIPTS = new Set([
   '<script src="/compose/agsc-page-tools.js" defer>',
   '<script src="/compose/agsc-compose.js" defer>',
   '<script src="/compose/webmcp.js" defer>',
+  // the engine's own page scripts of the two 1.1 views (section 5b)
+  '<script src="/query/agsc-query.js" defer>',
+  '<script src="/clusters/agsc-explorer.js" defer>',
 ]);
 // The graph explorer's scripts on / and /graph/ carry an SRI hash; section (5a) checks each tag exactly.
 const GX_SCRIPT = /^<script src="\/assets\/(?:graph-data\.js|graph-explorer\.js|vendor\/force-graph-1\.52\.0\.min\.js)" integrity="sha384-[A-Za-z0-9+/]{64}" defer>$/;
@@ -74,10 +82,11 @@ ok(d2 === true, `committed output directory differs from a fresh build — run n
 // (2) llms vectors
 const llms = require('./llms.js');
 const provenanceLines = require(path.join(ENGINE, 'src/knowledge/provenance-header.js')).provenanceLines;
-// disc-0006 and disc-0007 were WITHDRAWN at rc.6 and replaced by the pair below, which carries
-// the `bundle_version:` and `assistance:` lines. A withdrawn vector has no expected output, so a
-// build that still named the old pair would have proved nothing at all.
-for (const f of ['disc-0013-llms-txt-byte-layout-with-content-version', 'disc-0014-llms-full-with-content-version']) {
+// disc-0006 and disc-0007 were WITHDRAWN at rc.6 and replaced by disc-0013 and disc-0014, which carry
+// the `bundle_version:` and `assistance:` lines; those two were withdrawn for 1.1 and replaced by the
+// pair below (the summary before the provenance block, the link text escaped). A withdrawn vector
+// has no expected output, so a build that still named an old pair would have proved nothing at all.
+for (const f of ['disc-0024-llms-txt-byte-layout-1-1', 'disc-0025-llms-full-1-1']) {
   const v = JSON.parse(engineFile(`tests/vectors/discovery/${f}.json`));
   ok(v.expected.withdrawn === undefined, `llms vector ${f} is withdrawn — name the vector that replaced it`);
   const i = v.input;
@@ -313,6 +322,8 @@ for (const f of files.filter(f => f.endsWith('.html'))) {
     const [p, frag] = href.split('#');
     const tf = p === '' ? f : targetFile(p);
     if (!tf) { E(`broken internal link: ${href}`); continue; }
+    // The query page's share link keeps the query in its fragment, `#query=…` (AGSC-06-39 (e)): it names no element.
+    if (r === 'query/index.html' && p === '' && /^query=/.test(frag || '')) continue;
     if (frag !== undefined && frag !== '' && tf.endsWith('.html') && !idsOf.get(tf).has(frag)) E(`broken fragment: ${href}`);
     else if (frag !== undefined && RULE_ID.test(frag) && RULE_PAGE.has(frag) && RULE_PAGE.get(frag) !== tf) E(`rule link lands on the wrong page: ${href} — ${frag} is on ${routeOf(RULE_PAGE.get(frag))} (AGSC-06-21 parts)`);
   }
@@ -408,6 +419,11 @@ for (const f of files) {
   const r = rel(f), b = fs.readFileSync(f);
   // The one binary file: the touch icon, copied from assets/ as it is (scripts/check-content.js checks its size).
   if (r === 'apple-touch-icon.png') { ok(b.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex')), `${r}: not a PNG`); continue; }
+  // The preview card of a shared link (section 5b checks its size), copied from assets/ as it is.
+  if (r === 'assets/og-card.png') { ok(b.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex')), `${r}: not a PNG`); continue; }
+  // The query page's engine: one release of Oxigraph compiled to WebAssembly, the engine's bytes
+  // (AGSC-06-39), with its licence texts; third-party files, published as they are.
+  if (/^query\/vendor\//.test(r)) { if (r.endsWith('.wasm')) ok(b.subarray(0, 4).equals(Buffer.from('0061736d', 'hex')), `${r}: not a WebAssembly module`); continue; }
   if (/\.(png|jpe?g|gif|webp|ico|woff2?)$/.test(r)) { fails.push(`${r}: binary asset not expected in site v0`); continue; }
   const s = b.toString('utf8');
   if (!Buffer.from(s, 'utf8').equals(b)) { fails.push(`${r}: not UTF-8`); continue; }
@@ -422,7 +438,8 @@ for (const f of files) {
     else if (want !== targetFile(`/specs/${m[1]}`)) fails.push(`${r}: rule link lands on the wrong page: ${m[0]} — ${m[2]} is on ${routeOf(want)} (AGSC-06-21 parts)`);
   }
   // The tagged requirements document names two forbidden framings in order to forbid them (NFR-12); that one quoted sentence is allowed.
-  const t = ['no Web4/crypto framing, book or &quot;companion&quot; strings', 'no Web4/crypto framing, book or \\"companion\\" strings', 'with no reading order imposed', 'no &quot;start here&quot; link and no imposed reading order', 'no \\"start here\\" link and no imposed reading order'].reduce((x, q) => x.split(q).join(''), s);
+  // the folder beside a Harness, the "companion directory" of AGSC-07-25 (`<harness>.companion`), as the guides and scenarios quote it
+  const t = ['<code>.companion</code>', '/*.companion)', '`<dir>.companion/', 'companion director', 'no Web4/crypto framing, book or &quot;companion&quot; strings', 'no Web4/crypto framing, book or \\"companion\\" strings', 'with no reading order imposed', 'no &quot;start here&quot; link and no imposed reading order', 'no \\"start here\\" link and no imposed reading order'].reduce((x, q) => x.split(q).join(''), s);
   if (!r.startsWith('specs/') && r !== 'assets/search-site.json' && new RegExp(['wiley', 'companion', 'chapter \\d', 'reading order', 'discovery' + '-product', '05-' + 'WILEY'].join('|'), 'i').test(t)) fails.push(`${r}: forbidden string (AGSC-06-03 / private record)`);
   if (/\bWeb4\b|W3C (?:standard|Recommendation) for AgenticSystemCore/i.test(t)) fails.push(`${r}: forbidden claim`);
   if (/andrei\.besleaga\.nicolae@|abnmaster@|@gmail\.com/i.test(s)) fails.push(`${r}: the operator's e-mail address is published`);
@@ -447,7 +464,7 @@ for (const need of [
   '/graph.ttl\n  Content-Type: text/turtle; charset=utf-8',
   '/now.md\n  Content-Type: text/markdown; charset=utf-8; variant=GFM\n  Cache-Control: no-cache',
   '/skills/*.md\n  Content-Type: text/markdown; charset=utf-8; variant=GFM',
-  '/exports/chunks-index.toon\n  Content-Type: text/plain; charset=utf-8',
+  '/chunks-index.toon\n  Content-Type: text/toon; charset=utf-8',
   '/exports/llms-ctx.txt\n  Content-Type: text/plain; charset=utf-8',
   '/agent-skill/agentic-system-core/SKILL.md\n  Content-Type: text/markdown; charset=utf-8; variant=GFM',
   'Content-Type: application/linkset+json; profile="https://w3id.org/agentic-system-core/profile/agentic-knowledge"',
@@ -466,7 +483,7 @@ for (const block of headers.split(/\n\n+/)) {
   if (headerBlocks.has(lines[0])) fails.push(`_headers: the address ${lines[0]} has two blocks; the host keeps only the later one`);
   headerBlocks.set(lines[0], lines.slice(1).map(l => l.trim()));
 }
-for (const route of ['/.well-known/knowledge-linkset', '/graph.jsonld', '/graph.nq', '/graph.ttl', '/llms.txt', '/llms-full.txt', '/search.json', '/chunks.jsonl', '/ledger.jsonl', '/now.md', '/exports/chunks-index.toon', '/exports/llms-ctx.txt']) {
+for (const route of ['/.well-known/knowledge-linkset', '/graph.jsonld', '/graph.nq', '/graph.ttl', '/llms.txt', '/llms-full.txt', '/search.json', '/chunks.jsonl', '/ledger.jsonl', '/now.md', '/chunks-index.toon', '/exports/llms-ctx.txt']) {
   const lines = headerBlocks.get(route) || [];
   ok(lines.includes('Access-Control-Expose-Headers: Link, ETag, Content-Type') && lines.includes('Access-Control-Allow-Origin: *'), `_headers: ${route} lacks the cross-origin headers in its own block (AGSC-11-03)`);
 }
@@ -524,11 +541,15 @@ for (const l of locs) ok(targetFile(l), `sitemap URL has no page: ${l}`);
   ok(/<p class="lead">[^<]*(?:<[^/][^>]*>[^<]*<\/[a-z]+>[^<]*)*<\/p>\n<figure class="gx gx-embed" data-gx="embed"/.test(home) && home.includes('<a href="/graph/">Open the explorer</a>'), 'the front page does not carry the graph picture right below its lead paragraph, with the link "Open the explorer" to /graph/');
   ok(locs.includes('/graph/'), 'the sitemap does not list /graph/');
   // The Content-Security-Policy: site-wide on `/*`; replaced (detached, then set) on `/` and on
-  // `/graph/` only, where only connect-src differs.
+  // `/graph/`, where only connect-src differs, and on `/query/*`, where only script-src differs.
   const CSP_BASE = "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
   const linkset = JSON.parse(fs.readFileSync(path.join(WWW, '.well-known', 'knowledge-linkset'), 'utf8'));
   const peerOrigins = [...new Set(((linkset.linkset || [])[0]['https://w3id.org/agentic-system-core/rel#peer'] || []).map(l => new URL(l.href).origin))].sort();
   const want = new Map([['/*', [`Content-Security-Policy: ${CSP_BASE}`]], ['/graph/', ['! Content-Security-Policy', `Content-Security-Policy: ${CSP_BASE.replace("connect-src 'self'", "connect-src 'self' https:")}`]]]);
+  // AGSC-06-39, AGSC-06-17: the query page runs its engine as WebAssembly, so its address and its
+  // files (one block, `/query/*`, whose splat also matches `/query/` itself) add 'wasm-unsafe-eval'
+  // to script-src and to nothing else.
+  want.set('/query/*', ['! Content-Security-Policy', `Content-Security-Policy: ${CSP_BASE.replace("script-src 'self'", "script-src 'self' 'wasm-unsafe-eval'")}`]);
   if (peerOrigins.length) want.set('/', ['! Content-Security-Policy', `Content-Security-Policy: ${CSP_BASE.replace("connect-src 'self'", `connect-src ${["'self'", ...peerOrigins].join(' ')}`)}`]);
   for (const [route, lines] of headerBlocks) {
     const csp = lines.filter(l => /^(?:! )?Content-Security-Policy\b/.test(l));
@@ -546,7 +567,12 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
   // the surfaces the engine now builds for this node.
   'chunks.jsonl', 'graph.nq', 'graph.ttl', 'now.md', 'now/index.html', 'skills/index.json', 'skills/index.html',
   'tags/index.html', 'tags/vocabulary/index.html', 'exports/index.html',
-  'exports/chunks-index.toon', 'exports/llms-ctx.txt',
+  'exports/llms-ctx.txt',
+  // the views of 1.1 (section 5b): the chunk index, the query page and its files, the explorer's files
+  'chunks-index.toon', 'query/index.html', 'query/agsc-query.js', 'query/agsc-query-worker.js', 'query/agsc-query.css',
+  'query/vendor/oxigraph-0.5.13/web.js', 'query/vendor/oxigraph-0.5.13/web_bg.wasm', 'query/vendor/oxigraph-0.5.13/LICENSE-APACHE.txt',
+  'query/vendor/oxigraph-0.5.13/LICENSE-MIT.txt', 'query/vendor/oxigraph-0.5.13/THIRD-PARTY.txt',
+  'clusters/agsc-explorer.js', 'clusters/agsc-explorer.css', 'assets/og-card.png',
   // the agent skill and its guide page
   'agent-skill/agentic-system-core/SKILL.md', 'docs/agent-skill/index.html'])
   ok(exists(path.join(WWW, need)), `missing route: /${need}`);
@@ -588,6 +614,43 @@ for (const need of ['.well-known/knowledge-linkset', '.well-known/security.txt',
   }
   const r = cp.spawnSync(process.execPath, [path.join(__dirname, 'page-tools-check.js'), '--out', WWW], { encoding: 'utf8' });
   ok(r.status === 0, `page-tools-check failed:\n${r.stdout}${r.stderr}`);
+}
+
+// (5b) the views of specification 1.1 the engine builds for this node, in this site's page shell.
+// The query page (AGSC-06-39): the editor starts hidden and only its script shows it, a sentence says
+// where the same answers come from without the script, the ten questions of the graph are offered as
+// examples, and the page loads its own stylesheet and script. The graph explorer of /clusters/
+// (AGSC-06-38) beside the clusters list, with a link to this site's own /graph/ explorer. Every page
+// with an address of its own names the preview card for a shared link (Open Graph, ogp.me), and the
+// search page lists every page for a reader without script.
+{
+  const page = r => (exists(path.join(WWW, r)) ? fs.readFileSync(path.join(WWW, r), 'utf8') : '');
+  const query = page('query/index.html');
+  ok(/<section id="query" class="query"[^>]*\shidden>/.test(query), '/query/: no editor section that starts hidden (AGSC-06-39 (a))');
+  ok(query.includes('<p id="query-noscript">'), '/query/: no sentence for a reader without script (AGSC-06-39 (a))');
+  const examples = [...query.matchAll(/data-example="example-(\d+)-query"/g)].map(m => Number(m[1]));
+  ok(examples.join(',') === '1,2,3,4,5,6,7,8,9,10', `/query/: the examples are ${examples.join(',') || 'none'}, not the ten questions of the graph (AGSC-06-39 (b), AGSC-05-34)`);
+  ok(query.includes('<section id="vocabulary"'), '/query/: no vocabulary explorer (AGSC-06-39 (f))');
+  ok(query.includes('<link rel="stylesheet" href="/query/agsc-query.css">') && query.includes('<script src="/query/agsc-query.js" defer></script>'), '/query/: does not load /query/agsc-query.css and /query/agsc-query.js');
+  ok(locs.includes('/query/'), 'the sitemap does not list /query/');
+  const linkers = files.filter(f => f.endsWith('.html') && rel(f) !== 'query/index.html' && fs.readFileSync(f, 'utf8').includes('href="/query/"'));
+  ok(linkers.length > 0, 'no page of the site links /query/');
+  const clusters = page('clusters/index.html');
+  ok(/<section id="explorer" class="explorer"[^>]*\shidden>/.test(clusters), '/clusters/: no graph explorer section (AGSC-06-38)');
+  ok(clusters.includes('<link rel="stylesheet" href="/clusters/agsc-explorer.css">') && clusters.includes('<script src="/clusters/agsc-explorer.js" defer></script>'), '/clusters/: does not load /clusters/agsc-explorer.css and /clusters/agsc-explorer.js');
+  ok(clusters.includes('href="/graph/"'), '/clusters/: does not link this site\'s own explorer, /graph/');
+  // The preview card: a 1200 × 630 PNG, named with its text alternative on every page with a canonical address.
+  const card = exists(path.join(WWW, 'assets', 'og-card.png')) ? fs.readFileSync(path.join(WWW, 'assets', 'og-card.png')) : Buffer.alloc(0);
+  ok(card.length > 24 && card.readUInt32BE(16) === 1200 && card.readUInt32BE(20) === 630, `/assets/og-card.png is missing or not 1200 × 630`);
+  ok(exists(path.join(ROOT, 'assets', 'og-card.png')) && card.equals(fs.readFileSync(path.join(ROOT, 'assets', 'og-card.png'))), '/assets/og-card.png differs from assets/og-card.png');
+  for (const f of files.filter(x => x.endsWith('.html') && !rel(x).startsWith('boards/'))) {
+    const h = fs.readFileSync(f, 'utf8'), r = rel(f);
+    if (!/<link rel="canonical"/.test(h)) continue;
+    ok(h.includes('<meta property="og:site_name" content="AgenticSystemCore">\n<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">\n<meta property="og:image:alt" content="')
+      && h.includes('<meta name="twitter:card" content="summary_large_image">'), `${r}: does not name the preview card (og:site_name, og:image, og:image:alt, twitter:card)`);
+  }
+  const search = page('search/index.html');
+  ok(/<div class="search" role="search" id="search-box" hidden>/.test(search) && search.includes('<section id="site-index"'), '/search/: the form must start hidden (only its script works it) and every page must be listed for a reader without script');
 }
 
 // (6) contrast (WCAG 2.2 SC 1.4.3: 4.5:1 for body text)

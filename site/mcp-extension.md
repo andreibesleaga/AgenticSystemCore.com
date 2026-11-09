@@ -29,7 +29,7 @@ The settings object has exactly one member, `linkset`: the absolute `https` URL 
 
 ## The tools
 
-A server declaring the extension exposes exactly seven tools, as ordinary core MCP tools. Their names, arguments and results are fixed by the specification (AGSC-09-13), and their results are equal as values to the same node's browser-side tools for the same input and the same Bundle: the same members, in the same order, with the same contents (AGSC-09-16).
+A server declaring the extension exposes exactly ten tools, as ordinary core MCP tools. Their names, arguments and results are fixed by the specification (AGSC-09-13), and their results are equal as values to the same node's browser-side tools for the same input and the same Bundle: the same members, in the same order, with the same contents (AGSC-09-16).
 
 | Tool | What it returns |
 | --- | --- |
@@ -51,7 +51,7 @@ The vendor prefix is a reversed domain name the author controls, as SEP-2133 ask
 
 ## Compatibility
 
-Nothing in the base protocol changes. A client that does not recognise the identifier ignores it and uses the seven tools as ordinary tools.
+Nothing in the base protocol changes. A client that does not recognise the identifier ignores it and uses the ten tools as ordinary tools.
 
 ## Security considerations
 
@@ -63,4 +63,4 @@ A surface never restates this floor. It inherits it (AGSC-11-18).
 
 ## Reference implementation
 
-The reference engine's local tool server, `agsc mcp`, advertises the extension in its capabilities, with the `linkset` of the node it serves (AGSC-11-18); it runs on the reader's own machine over standard input and output. This node itself runs no tool server: it serves the discovery document and the static artefacts it names. The [status page](/docs/status/) says what is live and what is not.
+The reference engine's local tool server, `agsc mcp`, advertises the extension in its capabilities, with the `linkset` of the node it serves (AGSC-11-18); it runs on the reader's own machine, over standard input and output or, from 1.1, over HTTP on the loopback address (`agsc mcp --http <port>`). This node itself runs no tool server: it serves the discovery document and the static artefacts it names. The [status page](/docs/status/) says what is live and what is not.

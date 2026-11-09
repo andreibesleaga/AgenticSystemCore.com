@@ -171,3 +171,39 @@ test('an address that cannot be read is a failure with its reason, not a crash',
   const report = await run(r);
   assert.match(fails(report).map(x => `${x.node} ${x.message}`).join('\n'), /demonstration node .*security\.txt.*no recording/);
 });
+
+// The query page (AGSC-06-39), once the committed output has one: `/query/` must carry exactly one
+// policy, the one of its own `_headers` block with 'wasm-unsafe-eval' (the block's detach line drops
+// the site-wide one), and the engine file must be served as application/wasm.
+const QUERY_POLICY = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'";
+function withQueryPage(r) {
+  fs.mkdirSync(path.join(r.www, 'query', 'vendor', 'oxigraph-0.5.13'), { recursive: true });
+  fs.writeFileSync(path.join(r.www, 'query', 'index.html'), PAGE);
+  fs.writeFileSync(path.join(r.www, 'query', 'vendor', 'oxigraph-0.5.13', 'web_bg.wasm'), Buffer.from('0061736d01000000', 'hex'));
+  r.map.set(r.at(MAIN, '/query/'), response(200, { ...html, 'content-security-policy': QUERY_POLICY }, PAGE));
+  r.map.set(r.at(MAIN, '/query/vendor/oxigraph-0.5.13/web_bg.wasm'), response(200, { 'content-type': 'application/wasm', 'strict-transport-security': 'max-age=15552000' }, '\0asm'));
+}
+
+test('a committed output without a query page reads no /query/ address', async t => {
+  const r = recording(t);
+  const report = await run(r);
+  assert.deepEqual(fails(report), []);
+  assert.ok(!r.seen.some(u => u.includes('/query/')), `read ${r.seen.filter(u => u.includes('/query/')).join(', ')}`);
+});
+
+test('the query page: one policy with wasm-unsafe-eval, and the engine served as application/wasm', async t => {
+  const r = recording(t);
+  withQueryPage(r);
+  let report = await run(r);
+  assert.deepEqual(fails(report), []);
+  assert.match(report.results.filter(x => x.severity === 'pass').map(x => x.message).join('\n'), /\/query\/: one Content-Security-Policy, with 'wasm-unsafe-eval'/);
+  r.map.set(r.at(MAIN, '/query/'), response(200, { ...html, 'content-security-policy': `${html['content-security-policy']}, ${QUERY_POLICY}` }, PAGE));
+  r.map.set(r.at(MAIN, '/query/vendor/oxigraph-0.5.13/web_bg.wasm'), response(200, { 'content-type': 'application/octet-stream', 'strict-transport-security': 'max-age=15552000' }, '\0asm'));
+  report = await run(r);
+  const messages = fails(report).map(x => x.message).join('\n');
+  assert.match(messages, /\/query\/: 2 Content-Security-Policy policies are served; the \/query\/\* block must replace the site-wide one/);
+  assert.match(messages, /web_bg\.wasm: Content-Type application\/octet-stream, not application\/wasm/);
+  r.map.set(r.at(MAIN, '/query/'), response(200, html, PAGE));
+  report = await run(r);
+  assert.match(fails(report).map(x => x.message).join('\n'), /\/query\/: the Content-Security-Policy has no 'wasm-unsafe-eval'/);
+});

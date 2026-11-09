@@ -10,7 +10,8 @@
 #              PyPI versions, and both released checkers at Level 2 on both nodes with the
 #              mutual check. `scripts/live-check.test.mjs` proves each rule on recorded responses.
 #   Checkers   the latest npm package `agentic-system-core` and the version PyPI names as
-#              its latest, each installed outside the repository in a folder of the runner.
+#              its latest, each installed outside the repository in a folder of the runner;
+#              npm runs no install script of the package or its dependencies (--ignore-scripts).
 #   Required   no. What it reads can change without a commit here (the edge network, the
 #              registries, w3id), so it reports and never blocks a pull request.
 #   Schedule   Mondays 06:17 UTC. GitHub turns a schedule off after 60 days without activity
@@ -47,7 +48,7 @@ jobs:
       - name: the released checkers, outside the repository
         shell: bash
         run: |
-          npm i --prefix "$RUNNER_TEMP/npm" --no-save --no-audit --no-fund agentic-system-core@latest
+          npm i --prefix "$RUNNER_TEMP/npm" --no-save --no-audit --no-fund --ignore-scripts agentic-system-core@latest
           version="$(python3 -c 'import json, urllib.request; print(json.load(urllib.request.urlopen("https://pypi.org/pypi/agentic-system-core/json", timeout=60))["info"]["version"])')"
           python3 -m venv "$RUNNER_TEMP/py"
           "$RUNNER_TEMP/py/bin/pip" install --disable-pip-version-check --no-cache-dir "agentic-system-core==$version"
