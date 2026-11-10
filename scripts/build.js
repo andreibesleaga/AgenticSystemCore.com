@@ -840,11 +840,16 @@ const EXTERNAL = [
   ['dcterms:license', null], ['dcterms:created', XSD + 'dateTime'], ['dcterms:modified', XSD + 'dateTime'],
   ['prov:wasDerivedFrom', '@id'], ['schema:license', null], ['schema:usageInfo', null],
 ];
+// AGSC-06-32: the context is that of the context version (1.0.0); the terms the vocabulary gained
+// later, which the engine lists, are not in it.
+const LATER_TERMS = new Set(engineModule('src/knowledge/jsonld.js').TERMS_AFTER_CONTEXT_VERSION || []);
 const CONTEXT = (() => {
   const c = { '@protected': true, '@version': 1.1, asc: NS, dcterms: 'http://purl.org/dc/terms/', prov: 'http://www.w3.org/ns/prov#', rdfs: RDFS, schema: 'https://schema.org/', skos: 'http://www.w3.org/2004/02/skos/core#', xsd: XSD };
   const ascNames = new Set();
   for (const s of ascSubjects) {
-    const name = s.slice(NS.length); ascNames.add(name);
+    const name = s.slice(NS.length);
+    if (LATER_TERMS.has(name)) continue;
+    ascNames.add(name);
     const k = kindOf(s), def = { '@id': `asc:${name}` };
     if (k === 'object') def['@type'] = '@id';
     if (k === 'datatype') { const r = one(s, RDFS + 'range'); if (r) def['@type'] = r; }
@@ -2091,11 +2096,10 @@ const QUICKSTART = [
   ['P9', 'Maintainer', ['agsc ci', 'agsc verify --ledger', 'agsc refresh --agent <name> --dry-run   (an agent lane declared in agsc.config.json)']],
   ['P10', 'Port implementer', ['read spec/, schema/, ontology/ and tests/vectors/', 'run the vector set against your engine', 'agsc conform --level <n>   to write the claim']],
   ['P11', 'Standards implementer', ['fetch /.well-known/knowledge-linkset', 'validate-wellknown <file> --level 2', 'follow rel="describedby" from any page']],
-  // P12 is a persona of the requirements (Mode 5) that the quickstart rule does not list yet; its
-  // path is this site's content, beyond what AGSC-06-24 asks.
+  // P12, the live board (Mode 5), is in the quickstart rule from 1.1.0 (AGSC-06-24 as amended 2026-11-10).
   ['P12', 'Self-driving team on a live board', ['author task items in a cluster', 'agsc build   (the board renders as a page and a JSON file)', 'agsc mcp', 'call propose with a task_state to claim or move a task', 'a person reviews and merges the proposal']],
-  // P13–P15 are the three personas of the requirements' Amendment 12; like P12, their paths are
-  // this site's content, beyond what AGSC-06-24 asks.
+  // P13–P15 are the three personas of the requirements' Amendment 12; their paths are this
+  // site's content, beyond what AGSC-06-24 asks.
   ['P13', 'Security reviewer or auditor', ['agsc ci   (without .well-known/security.txt it stops with AGSC-E901)', 'agsc verify --ledger   (the ledger re-derives from the history)', 'fetch /.well-known/security.txt and check the headers each file is served with', 'in a clone of the engine: SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer security --scratch <dir>']],
   ['P14', 'Researcher', ['in a clone of the engine at its release tag:', 'SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer determinism --scratch <dir>', 'run it again: the same files, the same bytes', 'cite the node, its content version, the specification version, the engine you measured (its software DOI) and the preprint DOI (/docs/standards/#how-to-cite)']],
   ['P15', 'Restricted publisher', ['set "visibility": "restricted" and an "access" URL in agsc.config.json', 'agsc build', 'validate-wellknown <file> --level 0   (the public view: the discovery document, /llms.txt, /graph.jsonld)']],
