@@ -30,6 +30,10 @@ Needs Node 22.13 or later and the engine repository at `../agentic-system-core` 
 `SITE_ENGINE=<path>`), with its `npm ci` done. `SOURCE_DATE_EPOCH` fixes the build
 instant; without it the instant is the commit instant of the specification tag in the engine
 repository (the engine's last commit when `SITE_SPEC_SOURCE=worktree`).
+Until the engine carries the tag of the specification version it implements, a build against
+that engine needs `SITE_SPEC_SOURCE=worktree`: by default the build reads the specification at
+the tag `SITE_SPEC_TAG` names (`1.0.0`), and that tag's registries lack the adapters a later
+engine adds, so the front-page check stops the build.
 
 Run both commands with the same `SITE_ENGINE` and `SOURCE_DATE_EPOCH`: the gate rebuilds
 the site and compares the result with `www/`, so a variable set on one line only makes the

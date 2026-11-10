@@ -2715,4 +2715,4 @@ fs.rmSync(OUT, { recursive: true, force: true });
 fs.renameSync(tmp, OUT);
 if (RULES_WITHOUT_TRACE.length) process.stdout.write(`build: rules without a trailing trace bracket in the source: ${RULES_WITHOUT_TRACE.join(', ')}\n`);
 process.stdout.write(`build: the items form ${GRAPH_PIECES === 1 ? 'one connected piece' : `${GRAPH_PIECES} pieces not joined by any cluster membership or typed Link`}\n`);
-process.stdout.write(`build: ${files.size} files, ${routes.length} pages, ${items.length} items, ${DIAGRAMS.size} diagrams, spec ${SPEC_VERSION} from ${SPEC_SOURCE === 'tag' ? `tag ${SPEC_TAG}` : `the WORKING TREE of ${path.basename(ENGINE)} (${SPEC_TAG} is not tagged yet)`}, generated_at ${GENERATED_AT} -> ${path.relative(ROOT, OUT) || '.'}\n`);
+process.stdout.write(`build: ${files.size} files, ${routes.length} pages, ${items.length} items, ${DIAGRAMS.size} diagrams, spec ${SPEC_VERSION} from ${SPEC_SOURCE === 'tag' ? `tag ${SPEC_TAG}` : `the WORKING TREE of ${path.basename(ENGINE)} (${tagExists ? 'SITE_SPEC_SOURCE=worktree' : `${SPEC_TAG} is not tagged yet`})`}, generated_at ${GENERATED_AT} -> ${path.relative(ROOT, OUT) || '.'}\n`);
