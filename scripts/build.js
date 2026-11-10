@@ -1369,7 +1369,7 @@ ${md(index.body)}<h2 id="benefits">What each reader gets</h2>
 <p>What it shares with others' work, and how it differs:</p>
 <ul>
 <li><strong>LLM wikis</strong> (<a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f">Andrej Karpathy's idea</a>, the <a href="https://github.com/decodingai-magazine/llm-wiki-workshop">Decoding AI workshop</a>): the same aim — Markdown pages, sources kept apart, knowledge prepared in advance. There a model writes pages and a link's kind lives in prose; here links are typed, deterministic checks find orphans and stale links, and a model proposes but never merges.</li>
-<li><strong><a href="https://technicspub.com/ontology-pipeline/">The Ontology Pipeline</a></strong> (Jessica Talisman): six stages from controlled vocabulary to knowledge graph. The graph stage works today, the others in part; version 1.1 is planned to follow them. No compatibility is claimed.</li>
+<li><strong><a href="https://technicspub.com/ontology-pipeline/">The Ontology Pipeline</a></strong> (Jessica Talisman): six stages from controlled vocabulary to knowledge graph. Version 1.1 has a part for each stage; <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/ONTOLOGY-PIPELINE.md">which part does what</a>. No compatibility is claimed.</li>
 <li><strong>Google's <a href="https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md">Open Knowledge Format</a></strong>: also Markdown with a header, but link kinds stay in prose; no discovery layer or digests.</li>
 <li><strong><a href="https://llmstxt.org/">llms.txt</a></strong>: a node publishes one, with a fixed grammar, beside a discovery document giving each artefact's digest.</li>
 <li><strong>Agent discovery</strong> (<a href="https://datatracker.ietf.org/doc/draft-jimenez-dawn-discovery-landscape/">IETF survey</a>) finds who can act; this finds what is known. <a href="https://www.rfc-editor.org/info/rfc9727">RFC 9727 (api-catalog)</a> is the design precedent.</li>
@@ -2000,7 +2000,7 @@ const featuresCoverage = sectionOf(DOC.featuresReadme, '## Scenario-coverage tab
 const featureTitle = f => (/^\s*Feature: (.*)$/m.exec(f.src) || [, f.name])[1];
 const featureUrl = f => `/docs/scenarios/${f.name}/`;
 const featuresHtml = `<ul>\n${FEATURES.map(f => `<li id="${esc(f.name)}"><a href="${esc(featureUrl(f))}"><code>${esc(f.name)}.feature</code></a>: ${esc(featureTitle(f))}</li>`).join('\n')}\n</ul>\n`;
-const relatedWork = ['## 1. One sentence', '## 3. The agent-discovery mechanisms', '## 4. Adjacent work', '## 5. What is new here'].map(h => {
+const relatedWork = ['## 1. One sentence', '## 3. The agent-discovery mechanisms', '## 4. Adjacent work', '## 5. What is new here', '## 6. Standards status'].map(h => {
   const line = DOC.related.split('\n').find(l => l.startsWith(h));
   return `### ${line.replace(/^## /, '')}\n\n${sectionOf(DOC.related, h)}`;
 }).join('\n');
