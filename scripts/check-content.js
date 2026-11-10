@@ -101,6 +101,30 @@ function check(www) {
   }
   ok(legal.includes('the per-crawler groups of /robots.txt') && !legal.includes('the AI-usage signals of'), '/legal/ does not name the per-crawler groups of robots.txt as the first licence dialect');
   ok(compliance.includes('the per-crawler groups in robots.txt') && !compliance.includes('the AI-usage signals in'), '/docs/compliance/ does not name the per-crawler groups of robots.txt as the first licence dialect');
+
+  // The specification pages: every rule item shows its trace bracket, also a rule whose bracket stands on a line of its
+  // own after a table or a fenced block (AGSC-09-91, the carve-out for a bracket after a block).
+  const untraced = [];
+  const specPages = d => (fs.existsSync(file(d)) ? fs.readdirSync(file(d), { withFileTypes: true }) : [])
+    .flatMap(e => (e.isDirectory() ? specPages(`${d}/${e.name}`) : e.name === 'index.html' ? [`${d}/${e.name}`] : []));
+  for (const page of specPages('specs')) {
+    for (const rule of read(page).split(/<li id="(?=AGSC-\d\d-\d+[a-z]?" class="rule-item")/).slice(1)) {
+      const own = rule.split('<li id="AGSC-')[0];
+      if (!own.includes('class="trace"') && !/\(reserved:|retired at/.test(own)) untraced.push(/^[^"]+/.exec(rule)[0]);
+    }
+  }
+  ok(untraced.length === 0, `a rule of the specification pages shows no trace bracket: ${untraced.join(', ')}`);
+
+  // Sentences that sent to 1.1 what AGSC-00-20 defers to a later MINOR, or that name a version after 1.1. The
+  // specification pages keep what each dated note said on its day, and the requirements pages are the 1.0.0
+  // document with its dated 1.1 notes, so neither is read.
+  const stale = /reserved (?:to|for) 1\.1\b|reserved names? of 1\.1\b|planned for 1\.1\b|comes? with 1\.1\b|seven page tools|(?:planned|reserved|deferred|listed|not before)(?: for| with| to)? 1\.2\b/i;
+  const docPages = d => (fs.existsSync(file(d)) ? fs.readdirSync(file(d), { withFileTypes: true }) : [])
+    .flatMap(e => (e.isDirectory() ? docPages(`${d}/${e.name}`) : e.name === 'index.html' ? [`${d}/${e.name}`] : []));
+  for (const page of ['index.html', 'about/index.html', ...docPages('docs').filter(p => !p.startsWith('docs/requirements/'))]) {
+    const hit = stale.exec(text(page));
+    ok(hit === null, `/${page.replace(/index\.html$/, '')} still says "${hit && hit[0]}"`);
+  }
   return fails;
 }
 

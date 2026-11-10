@@ -34,9 +34,9 @@ const engineFile = p => SPEC_SOURCE === 'tag'
   : fs.readFileSync(path.join(ENGINE, p), 'utf8');
 const WWW = path.join(ROOT, (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www'); // build.out in agsc.config.json (README)
 const fails = [];
-// The rules whose source carries no trailing trace bracket: AGSC-05-26 ends in a table; AGSC-05-34
-// (added for 1.1) ends in its amendment note, its table and SPARQL texts following it.
-const NO_TRACE_IN_SOURCE = new Set(['AGSC-05-26', 'AGSC-05-34']);
+// The rules whose source carries no trailing trace bracket: AGSC-05-26 ends in a table. (AGSC-05-34 carries
+// its bracket on a line of its own after its SPARQL block; the renderer reads it there, AGSC-09-91.)
+const NO_TRACE_IN_SOURCE = new Set(['AGSC-05-26']);
 // AGSC-06-05/06-17: the only <script> elements any page may carry — all same-origin, all classic,
 // all deferred, none inline. The four page-tool files are the engine's own emitted bytes;
 // `node scripts/page-tools-check.js` proves that and runs them.

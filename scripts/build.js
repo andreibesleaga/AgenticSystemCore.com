@@ -380,7 +380,7 @@ function headingId(text, used) {
 // rendered as a separate small line (class trace) so that the rule sentence reads on its own.
 // A rule may close with an italic amendment note after its bracket — "[…] *(Amended
 // <date> for <version>: …)*" — so the note is allowed to follow and is kept where the author put it.
-const TRACE_RE = /\s\[([^\[\]]{3,})\]((?:\s*\*\(.*\)\*)?)\s*$/;
+const TRACE_RE = /(?:^|\s)\[([^\[\]]{3,})\]((?:\s*\*\(.*\)\*)?)\s*$/;
 // Mark the trace record of a rule: the trailing bracket group on the last prose line of the item
 // (never a table row, never a line inside a fenced block). Returns true when one was found.
 function markTrace(c) {
@@ -554,7 +554,7 @@ const FORGE = {
 if (!FORGE.site) die('agsc.config.json: contribute[] needs one entry with mode "pr" (AGSC-11-14)');
 
 // Configuration guards, against schema/config.schema.json at the tag.
-// `build.feed` and `build.rdfxml` are RESERVED names of 1.1 and are rejected (AGSC-06-01, AGSC-01-18).
+// `build.feed` and `build.rdfxml` are names reserved to a later MINOR and are rejected (AGSC-06-01, AGSC-01-18).
 for (const k of Object.keys(config.build || {})) if (k !== 'out') die(`agsc.config.json: build.${k} is a reserved name, AGSC-E004`);
 // THE PATTERNS-NODE SWITCH. One setting turns the second node on or off for this
 // site: `"x-patterns-node": false` in agsc.config.json. It lives in the vendor-extension

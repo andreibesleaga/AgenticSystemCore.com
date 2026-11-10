@@ -151,7 +151,7 @@ A node is a set of files, and so is its build; neither depends on a transport. I
 - **Error handling.** Exit 0 for success, 1 for findings or a failed gate, 2 for a usage error; diagnostics as JSON lines on standard error sorted by file, line, column and code; one code format, `AGSC-E<nnn>` ([AGSC-09 §9.3](/specs/09-conformance/#section-9-3)).
 - **Configuration.** Exactly one schema-validated `agsc.config.json`; precedence flags, then environment, then project, then user; unknown keys are errors.
 - **Logging.** None at runtime, because there is no runtime; the durable record is the ledger, git history and Episode items; no telemetry, cookies or beacons.
-- **Internationalisation.** Language variants of an item — sharing its slug and address, served under a language path with `hreflang` alternates — are reserved to 1.1 (AGSC-01-13); at 1.0 a variant file beside its primary is refused (`AGSC-E206`).
+- **Internationalisation.** Language variants of an item — sharing its slug and address, served under a language path with `hreflang` alternates — are reserved to a later MINOR (AGSC-01-13); at 1.0 and 1.1 a variant file beside its primary is refused (`AGSC-E206`).
 
 ## 10. Decisions of record
 
