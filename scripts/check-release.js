@@ -57,7 +57,7 @@ function check(www, opts = {}) {
   const fails = [];
   const ok = (c, m) => { if (!c) fails.push(m); };
   const ENGINE = path.resolve(ROOT, opts.engine || process.env.SITE_ENGINE || '../agentic-system-core');
-  const SPEC_TAG = opts.specTag || process.env.SITE_SPEC_TAG || '1.0.0';
+  const SPEC_TAG = opts.specTag || process.env.SITE_SPEC_TAG || '1.1.0';
   const git = (...a) => cp.execFileSync('git', ['-C', ENGINE, ...a], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   const tagExists = cp.spawnSync('git', ['-C', ENGINE, 'rev-parse', '-q', '--verify', `${SPEC_TAG}^{commit}`], { stdio: 'ignore' }).status === 0;
   const SPEC_SOURCE = opts.specSource || process.env.SITE_SPEC_SOURCE || (tagExists ? 'tag' : 'worktree');

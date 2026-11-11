@@ -64,6 +64,12 @@ test('every written summary has five to ten plain lines, without the words publi
   }
 });
 
+test('the specification version of agsc.config.json has its summary before its tag exists', () => {
+  // The build stops on a tagged release with no summary; this finds the gap before the tag does.
+  const { spec_version: v } = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, '..', 'agsc.config.json'), 'utf8'));
+  assert.ok(Array.isArray(feed.SUMMARIES[v]), `no summary for ${v} in scripts/release-feed.js`);
+});
+
 test('the 1.0.0 summary says what the version adds: one section, and no rule', () => {
   const lines = feed.SUMMARIES['1.0.0'];
   const text = lines.join('\n');

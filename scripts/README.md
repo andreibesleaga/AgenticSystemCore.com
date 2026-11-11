@@ -42,7 +42,7 @@ node --test scripts/built-commit.test.js scripts/live-check.test.mjs scripts/rel
 |---|---|---|
 | `SITE_ENGINE` | the engine repository; default `../agentic-system-core` | `build.js`, `check.js`, `check-release.js`, `page-tools-check.js`, `chunk-anchors.test.js` |
 | `SOURCE_DATE_EPOCH` | the build instant, in seconds; default the commit instant of the specification tag in the engine repository (its last commit when `SITE_SPEC_SOURCE` is `worktree`) | `build.js` |
-| `SITE_SPEC_TAG` | the specification tag the site is built from; default `1.0.0` | `build.js`, `check.js`, `check-release.js` |
+| `SITE_SPEC_TAG` | the specification tag the site is built from; default `1.1.0` | `build.js`, `check.js`, `check-release.js` |
 | `SITE_SPEC_SOURCE` | `tag` or `worktree`; default `tag` when the tag exists, else `worktree` | `build.js`, `check.js`, `check-release.js` |
 | `SITE_PAGE_BUDGET` | a page-size budget below the default 100,000 bytes, to exercise the split of long pages; a larger value changes nothing | `build.js` |
 | `CHROME_EXE` | the Chromium binary of the browser lanes | `a11y.js`, `shots.js` |
