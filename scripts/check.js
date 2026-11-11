@@ -218,6 +218,12 @@ const targetFile = urlPath => {
 // build serves those bytes under /ns/<version>/ with a page of its own, and serves the copy of the
 // current version, the one /ns/agsc.ttl names in owl:versionInfo, beside them.
 const FROZEN_NS = {
+  '1.0.0': {
+    'agsc.nt': '9ae8f57c417314d98299b8f81a2fa11dcb0d3c5b30a1b3b843a857c83c636a48',
+    'agsc.rdf': 'ce91aa51aed5536ba7bb5c657bf39c729589fb9a491500995b18297906ae1905',
+    'agsc.ttl': '1e36cf86f48430a0a9c7c93d9dc773cc1f9f821d85723ff2a79c0888c6ebd08d',
+    'context.jsonld': '8f25f2d250db309a2462c62a24e776bfb450252efce631b17832f52658438030',
+  },
   '1.0.0-draft.1': {
     'agsc.nt': 'e9e04762e90d609207b4a85bacd8c5dc3b257b93f2eee26b0dfcf7b8a68ab2f4',
     'agsc.rdf': 'b79f375dfc15915ce8f10236895233bc444640628ba89871ddf6d0e285e433fd',
