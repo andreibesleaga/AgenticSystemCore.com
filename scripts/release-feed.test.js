@@ -70,6 +70,16 @@ test('the specification version of agsc.config.json has its summary before its t
   assert.ok(Array.isArray(feed.SUMMARIES[v]), `no summary for ${v} in scripts/release-feed.js`);
 });
 
+test('the default specification tag is the spec_version of agsc.config.json, written in no script', () => {
+  // One place for the version a release moves: the three scripts read it from the configuration.
+  const fs = require('fs'), path = require('path');
+  for (const name of ['build.js', 'check.js', 'check-release.js']) {
+    const text = fs.readFileSync(path.join(__dirname, name), 'utf8');
+    assert.doesNotMatch(text, /SITE_SPEC_TAG \|\| '\d/u, `${name} writes a version as the default tag`);
+    assert.match(text, /SITE_SPEC_TAG \|\| [^\n]*spec_version/u, `${name} takes the default tag from spec_version`);
+  }
+});
+
 test('the 1.0.0 summary says what the version adds: one section, and no rule', () => {
   const lines = feed.SUMMARIES['1.0.0'];
   const text = lines.join('\n');

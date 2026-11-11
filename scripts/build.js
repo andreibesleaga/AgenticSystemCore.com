@@ -8,7 +8,7 @@
 //
 //   node scripts/build.js [--out <dir>]      (default: www)
 //   SOURCE_DATE_EPOCH=<seconds> node scripts/build.js
-//   SITE_ENGINE=<path> SITE_SPEC_TAG=<tag>   (defaults: ../agentic-system-core, 1.1.0)
+//   SITE_ENGINE=<path> SITE_SPEC_TAG=<tag>   (defaults: ../agentic-system-core, spec_version of agsc.config.json)
 //   SITE_SPEC_SOURCE=tag|worktree            (default: tag when the tag exists, else worktree)
 'use strict';
 const fs = require('fs'), path = require('path'), crypto = require('crypto'), cp = require('child_process');
@@ -16,10 +16,12 @@ const { compile: compileDiagram } = require('./diagram.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const ENGINE = path.resolve(ROOT, process.env.SITE_ENGINE || '../agentic-system-core');
-const SPEC_TAG = process.env.SITE_SPEC_TAG || '1.1.0';
+const SITE_CONFIG = JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8'));
+// The specification tag defaults to the version agsc.config.json declares (the build refuses a mismatch).
+const SPEC_TAG = process.env.SITE_SPEC_TAG || SITE_CONFIG.spec_version;
 // Output directory: `build.out` of agsc.config.json, `www` — the folder Cloudflare Pages serves,
 // so a push to `main` publishes what this script wrote.
-const CONFIG_OUT = (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www';
+const CONFIG_OUT = (SITE_CONFIG.build || {}).out || 'www';
 const OUT = path.resolve(ROOT, (() => { const i = process.argv.indexOf('--out'); return i > 0 ? process.argv[i + 1] : CONFIG_OUT; })());
 
 // Status of the external steps. Update these, rebuild and redeploy after each step (the
@@ -1038,7 +1040,7 @@ const LEDGER = (() => {
   if (!GIT_LOG) die('no git history to derive /ledger.jsonl from; this node publishes the Level-2 form, which links it (AGSC-08-20a, AGSC-10-04)');
   const tree = cp.execFileSync('git', ['-C', ROOT, 'rev-parse', 'HEAD:content'], { encoding: 'utf8' }).trim();
   if (!/^[0-9a-f]{40,64}$/.test(tree)) die(`the content tree hash is not a git object id: ${tree}`);
-  const derived = engineLedger.derive(GIT_LOG, tree, ENGINE_BUILD.version, { epoch: EPOCH });
+  const derived = engineLedger.derive(GIT_LOG, tree, { epoch: EPOCH, actors: (config.ledger || {}).actors });
   return { fromEngine: false, bytes: derived.ledger, head: derived.head };
 })();
 

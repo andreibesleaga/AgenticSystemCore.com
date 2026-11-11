@@ -24,7 +24,7 @@
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const ROOT = path.resolve(__dirname, '..');
 const ENGINE = path.resolve(ROOT, process.env.SITE_ENGINE || '../agentic-system-core');
-const SPEC_TAG = process.env.SITE_SPEC_TAG || '1.1.0';
+const SPEC_TAG = process.env.SITE_SPEC_TAG || JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).spec_version;
 // The same parameter scripts/build.js reads: the vectors come from the release tag, and from the
 // engine's working tree while the candidate has not been tagged yet.
 const tagExists = cp.spawnSync('git', ['-C', ENGINE, 'rev-parse', '-q', '--verify', `${SPEC_TAG}^{commit}`], { stdio: 'ignore' }).status === 0;
@@ -492,6 +492,14 @@ for (const block of headers.split(/\n\n+/)) {
 for (const route of ['/.well-known/knowledge-linkset', '/graph.jsonld', '/graph.nq', '/graph.ttl', '/llms.txt', '/llms-full.txt', '/search.json', '/chunks.jsonl', '/ledger.jsonl', '/now.md', '/chunks-index.toon', '/exports/llms-ctx.txt']) {
   const lines = headerBlocks.get(route) || [];
   ok(lines.includes('Access-Control-Expose-Headers: Link, ETag, Content-Type') && lines.includes('Access-Control-Allow-Origin: *'), `_headers: ${route} lacks the cross-origin headers in its own block (AGSC-11-03)`);
+}
+// Every instant of the derived ledger has the form of AGSC-04-10 (a wrong call of the engine's
+// derive() once wrote `0NaN-NaN-NaNTNaN:NaN:NaNZ` and every other check still passed).
+const ledgerLines = exists(path.join(WWW, 'ledger.jsonl')) ? fs.readFileSync(path.join(WWW, 'ledger.jsonl'), 'utf8').split('\n').filter(Boolean) : [];
+ok(ledgerLines.length > 0, '/ledger.jsonl is missing or empty (AGSC-06-08)');
+for (const line of ledgerLines) {
+  const ts = JSON.parse(line).ts;
+  ok(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(ts) && !Number.isNaN(Date.parse(ts)), `/ledger.jsonl: ts ${ts} is not an AGSC-04-10 instant`);
 }
 // A pattern that also matches a page would give that page a machine content type (it once served /exports/ as text).
 for (const route of headerBlocks.keys()) if (/\/\*$/.test(route) && route !== '/*' && (headerBlocks.get(route) || []).some(l => /^Content-Type:/.test(l))) fails.push(`_headers: ${route} sets a Content-Type on a pattern that also matches the folder's index page`);
