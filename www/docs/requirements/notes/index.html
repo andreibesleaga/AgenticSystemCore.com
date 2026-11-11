@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Requirements: notes — AgenticSystemCore</title>
+<meta name="description" content="The notes of the AgenticSystemCore product requirements document: the compatibility section, notes to further rows and the notes at 1.0.0.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/requirements/notes/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/requirements/notes/">
+<meta property="og:title" content="Requirements: notes">
+<meta property="og:description" content="The notes of the AgenticSystemCore product requirements document: the compatibility section, notes to further rows and the notes at 1.0.0.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Requirements: notes","url":"https://agenticsystemcore.com/docs/requirements/notes/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/requirements/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main" class="wide">
+<h1>Requirements: notes</h1>
+<p class="summary"><strong>Summary</strong>The notes the requirements document appends after its requirements: how later rows read beside the frozen ones, and what holds at each version.</p>
+<p>The second page of the <a href="/docs/requirements/">requirements</a>, rendered as the document stands in the engine repository.</p>
+<h2 id="the-compatibility-section-and-the-content-version">The compatibility section and the content version</h2>
+<p>Two capabilities added at <code>1.0.0-rc.6</code> add no requirement id: both are discharged by requirements this
+document already carries.</p>
+<p><strong>A compatibility and plugin section</strong> (<code>spec/00</code> §0.6, <a class="ref" href="/specs/00-overview/page-2/#AGSC-00-21">AGSC-00-21</a>…25). It states in one place what
+a tool does with a construct this specification does not define, what survives a round trip through
+<code>lint --fix</code>, <code>export --markdown</code>, an adapter and an import, what a tool may never originate, the
+closed list of eight plugin kinds with what each may read, may emit and may never do, and three
+names reserved to 1.1 — <code>weights</code> (weighted Links), <code>routing</code> (model-routing declarations) and
+<code>executable</code> (an executable Harness with its optimisation step). It serves <a class="ref" href="/docs/requirements/#PRD-002">PRD-002</a> (the format a
+reader must accept), <a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a> (lossless export and import) and <a class="ref" href="/docs/requirements/#PRD-055">PRD-055</a> (Levels and platform
+adoption), and it mints no error code: every fault it names takes a code the registry already holds.</p>
+<p><strong>A content version</strong> (<code>spec/04</code> §4.9, <a class="ref" href="/specs/04-canonicalization/#AGSC-04-25">AGSC-04-25</a>), <code>bundle_version</code>: one short, human-readable name
+for the state a build published or a consumer saved, derived from the git history and the build
+instant, never authored and never counted by the engine. It serves <a class="ref" href="/docs/requirements/#PRD-008">PRD-008</a> (version and changelog
+agreement) and <a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a> (the discovery document's bundle facts), and it is what a citation, an
+imported item and a reader of <code>/now/</code> need and cannot get from the bundle hash, which says only
+whether two retrievals carry the same bytes and never what the publisher calls them. <code>import</code>
+records <code>prov.source_version</code> and <code>prov.source_hash</code> on every item it writes (<a class="ref" href="/docs/requirements/#PRD-042">PRD-042</a>, provenance on
+every item) and refuses a source whose <code>spec_version</code> MAJOR it does not implement unless the adapter's own
+<code>--allow-newer</code> flag is passed; a source of a newer MINOR of the same MAJOR is imported with a
+warning (<a class="ref" href="/specs/01-bundle/#AGSC-01-22">AGSC-01-22</a>).</p>
+<h2 id="prd-044-at-1-0"><a class="ref" href="/docs/requirements/#PRD-044">PRD-044</a> at 1.0</h2>
+<p><strong>Note to <a class="ref" href="/docs/requirements/#PRD-044">PRD-044</a>.</strong> The row names a weekly <code>refresh --auto</code> that re-checks
+staleness and external links. At 1.0 there is no <code>--auto</code> flag (<a class="ref" href="/specs/09-conformance/#AGSC-09-09">AGSC-09-09</a>'s closed flag list
+does not name one; <code>refresh</code> takes <code>--agent &lt;name&gt;</code> with <code>--dry-run</code>), and no lane of the
+reference engine reaches the network: its network port refuses every call with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E905"><code>AGSC-E905</code></a>.
+So at 1.0 staleness is reported offline — the NOW page of every build lists the items whose
+<code>stale_after</code> has passed — and no external link is fetched. The row's other promises stand: at
+most one issue, never a commit.</p>
+<h2 id="notes-to-further-rows-the-rows-above-stay-as-written">Notes to further rows (the rows above stay as written)</h2>
+<p><strong>Note to <a class="ref" href="/docs/requirements/#PRD-037">PRD-037</a> and <a class="ref" href="/docs/requirements/#PRD-049">PRD-049</a>.</strong> The six runtime renderings of a Harness
+(<a class="ref" href="/specs/07-composition/#AGSC-07-18">AGSC-07-18</a>: <code>gabbe</code>, <code>kaiban-distributed</code>, <code>crewai</code>, <code>langgraph</code>, <code>adk-msaf</code>, <code>n8n</code>) and
+the forge shims for forges other than GitHub (<a class="ref" href="/docs/requirements/#PRD-049">PRD-049</a>) ship at 1.1. At 1.0 the emitter
+names are registered and refused with the registry's code (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E203"><code>AGSC-E203</code></a>), and the GitHub
+shim is the one forge shim; Amendment 6's &quot;v1.x reads as v1.0&quot; does not reach these two rows.</p>
+<p><strong>Note to <a class="ref" href="/docs/requirements/#PRD-047">PRD-047</a> and <a class="ref" href="/docs/requirements/#NFR-10">NFR-10</a>.</strong> The REUSE layout is not adopted at 1.0. The
+licences are stated by <code>LICENSE</code>, <code>LICENSE-CONTENT</code>, <code>NOTICE</code>, the <code>license</code> field of
+<code>package.json</code> and the SPDX header of every browser script; &quot;REUSE green&quot; is not claimed. A
+REUSE layout is a 1.1 item. <em>(Amended for 1.1.0: adopted — <code>REUSE.toml</code> and <code>LICENSES/</code> at the
+root, <code>reuse lint</code> compliant with REUSE 3.3; docs/ENGINEERING.md §7.)</em> <em>(Note of 2026-11-11: &quot;every browser script&quot; excludes the vendored query engine of <code>/query/</code>, third-party code served with its upstream bytes and no SPDX header; <code>docs/COMPLIANCE-CROSSWALK.md</code>.)</em></p>
+<p><strong>Note to <a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a>.</strong> The acceptance &quot;Bundle opens as an Obsidian vault&quot; is
+read as: the content directory is plain Markdown files with relative links and YAML
+frontmatter, which any vault-style editor opens; no test asserts a particular editor. JSON-LD
+and JSONL are export-only at 1.0 (<code>export --jsonld</code>, <code>export --jsonl</code>); the round trip the
+row names is Markdown/OKF.</p>
+<p><strong>Note to <a class="ref" href="/docs/requirements/#NFR-12">NFR-12</a>, in plain words.</strong> The system carries no framing that presents
+a node as an ordered reading or as a supplement to another publication, and no whole-corpus
+PDF/EPUB emitter (<a class="ref" href="/specs/06-surfaces/#AGSC-06-03">AGSC-06-03</a>, <a class="ref" href="/specs/08-governance/#AGSC-08-17">AGSC-08-17</a>). The parenthesis in the row names a list held
+outside every repository; a reader needs only the two rules.</p>
+<p><strong>Note to §1, persona P10.</strong> <code>features/persona-l-port-implementer.feature</code> names the port
+implementer in two scenarios: a Level-0 node written without the engine passes the shipped
+checker, and the Python checker distribution runs the shared vector set beside the engine's
+<code>conform</code> and the two reports are compared case by case. That distribution's own test suite runs
+the shared vector set over seven of the nineteen areas natively and reports the rest as not run
+by that package (<a class="ref" href="/specs/09-conformance/#AGSC-09-02">AGSC-09-02</a>, <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-15">AGSC-10-15</a>).</p>
+<p><strong>Note to <a class="ref" href="/docs/requirements/#PRD-009">PRD-009</a> (what <code>init</code> writes at 1.0).</strong> In an empty folder <code>agsc init</code> writes four
+files — <code>agsc.config.json</code>, <code>content/index.md</code>, <code>.gitignore</code> and <code>.env.example</code> — and takes no
+flags of its own. It writes no example Concepts, no type folders and no forge workflow; a Gate's
+workflow is compiled by <code>ci</code> into <code>dist/forge/</code> (<a class="ref" href="/specs/08-governance/#AGSC-08-12">AGSC-08-12</a>), not by <code>init</code>. <code>ci</code> passes only
+after the publisher adds <code>.well-known/security.txt</code> with a <code>Contact:</code> line and commits once or
+sets <code>SOURCE_DATE_EPOCH</code>, the three steps <code>init</code> prints on its way out (<a class="ref" href="/specs/02-item/#AGSC-02-94">AGSC-02-94</a>, <a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-36">AGSC-06-36</a>,
+<a class="ref" href="/specs/04-canonicalization/#AGSC-04-09">AGSC-04-09</a>). Example content and a scaffolded workflow are not in the declared scope of any
+version (<a class="ref" href="/specs/00-overview/#AGSC-00-20">AGSC-00-20</a>), so they are not planned; the row's acceptance &quot;<code>ci</code> passes unedited&quot; does
+not hold at 1.0.</p>
+<p><strong>Note to <a class="ref" href="/docs/requirements/#PRD-056">PRD-056</a> (channels at 1.0).</strong> What exists at 1.0 is the specification of channels
+(<a class="ref" href="/specs/01-bundle/page-2/#AGSC-01-30">AGSC-01-30</a> to <a class="ref" href="/specs/01-bundle/page-2/#AGSC-01-33">AGSC-01-33</a>, <a class="ref" href="/specs/08-governance/#AGSC-08-26">AGSC-08-26</a>), the <code>channels[]</code> configuration keys and the
+<code>channel-adapter</code> plugin kind (<a class="ref" href="/specs/00-overview/page-2/#AGSC-00-24">AGSC-00-24</a>). No channel adapter ships, there is no
+<code>refresh --ingest</code> option and no reference stub, and the engine's <code>channel-adapter</code> hook covers
+carrying a Proposal to a review lane, not ingest (<code>docs/PLUGINS.md</code> §1). The <code>ask</code> half is the
+<code>ask</code> tool of the local tool server and the page tools (<a class="ref" href="/specs/09-conformance/#AGSC-09-13">AGSC-09-13</a>, <a class="ref" href="/specs/09-conformance/#AGSC-09-16">AGSC-09-16</a>), which returns the
+best-matching items with their addresses and calls no model. The ingest stub and the first
+adapters are not in the declared scope of any version (<a class="ref" href="/specs/00-overview/#AGSC-00-20">AGSC-00-20</a>), so they are not planned.</p>
+<p><strong>Note to the scope cells that Amendment 6 reads as v1.0.</strong> Amendment 6's sentence &quot;scope cells
+reading <code>v1.x</code>/<code>should</code> above READ AS <code>v1.0</code>&quot; does not reach these cells, which stay as follows:</p>
+<ul>
+<li><a class="ref" href="/docs/requirements/#PRD-022">PRD-022</a>, RDF/XML: not emitted at 1.x; <code>build.rdfxml</code> is reserved to 1.1 and refused at 1.0
+with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E004"><code>AGSC-E004</code></a> (<a class="ref" href="/specs/05-graph/#AGSC-05-06">AGSC-05-06</a>, <a class="ref" href="/specs/01-bundle/#AGSC-01-18">AGSC-01-18</a>, <a class="ref" href="/specs/00-overview/#AGSC-00-20">AGSC-00-20</a>).</li>
+<li><a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a>, &quot;Mem0/Letta/Zep/CSV&quot;: no adapter of those names ships (<code>export --to csv</code> and
+<code>--to mem0</code> are <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E203"><code>AGSC-E203</code></a>); memories reach Mem0, Letta and Zep through the COGX archive that
+Cognee reads (<code>export --to cogx</code>, <code>docs/CONNECTORS.md</code>). Direct adapters and CSV are not
+planned for a version.
+<em>Added 2026-11-09:</em> settled on 9 November 2026: the direct adapters for Mem0,
+Letta, Zep and CSV, and for Basic Memory and Claude Code's memory files, ship in 1.1 as
+capabilities of the reference distribution under <a class="ref" href="/specs/01-bundle/#AGSC-01-26a">AGSC-01-26a</a> (a MAY), and <a class="ref" href="/specs/00-overview/#AGSC-00-20">AGSC-00-20</a> is amended
+the same day. Until they are in the tree the two sentences above describe the engine; no rule
+and no case changes.
+<em>Added 2026-11-09, later the same day:</em> they are in the tree, stated as <a class="ref" href="/docs/requirements/#PRD-070">PRD-070</a>: the six
+adapters write and read files only and reach no network (<a class="ref" href="/specs/00-overview/page-2/#AGSC-00-24">AGSC-00-24</a>), so a person moves the
+files to and from Mem0, Letta and Zep with each tool's own client.</li>
+<li><a class="ref" href="/docs/requirements/#PRD-033">PRD-033</a>, &quot;Cursor/Copilot/Gemini/Codex/GABBE&quot; and the <code>&lt;site&gt;</code> argument: <code>skills install</code>
+writes the three trees <code>.agents/skills</code>, <code>.claude/skills</code> and <code>.github/skills</code> from the local
+Bundle (<a class="ref" href="/specs/07-composition/#AGSC-07-21">AGSC-07-21</a>) and refuses a URL with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E003"><code>AGSC-E003</code></a>; GABBE is reached by
+<code>export --to gabbe</code>. Other install trees and installing from a site are not planned for a
+version.</li>
+<li><a class="ref" href="/docs/requirements/#PRD-048">PRD-048</a>, &quot;PyPI/GHCR/Homebrew/Nix&quot;: the engine is published on npm only. The PyPI package
+<code>agentic-system-core</code> is the independent Python checker, not the engine. No container image,
+Homebrew formula or Nix package is planned for a version.</li>
+<li><a class="ref" href="/docs/requirements/#PRD-041">PRD-041</a>, &quot;LLM review: v1.0&quot;: the optional review lane is specified (<a class="ref" href="/specs/08-governance/#AGSC-08-27">AGSC-08-27</a>) and off by
+default; no model client ships with the reference engine, so <code>review</code> is lint-only.</li>
+<li><a class="ref" href="/docs/requirements/#PRD-010">PRD-010</a>, &quot;<code>/conformance/</code>: v1.x&quot;: the public conformance page is a 1.1 item (<a class="ref" href="/specs/00-overview/#AGSC-00-20">AGSC-00-20</a>).</li>
+</ul>
+<p><strong>Note to <a class="ref" href="/docs/requirements/#PRD-011">PRD-011</a> and <a class="ref" href="/docs/requirements/#PRD-052">PRD-052</a> (<code>/about/</code>).</strong> The reference engine emits the fixed route set
+except the routes a node authors or that no rule pins: <code>/about/</code> is authored and conditional
+(<a class="ref" href="/specs/06-surfaces/#AGSC-06-01">AGSC-06-01</a>, <a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-24">AGSC-06-24</a>), and <code>build</code> names it among its skipped routes (&quot;this page is
+authored, not derived&quot;); <code>/specs/</code> is the specification site's. A node that publishes <code>/about/</code>
+carries the per-persona Quickstart of <a class="ref" href="/docs/requirements/#PRD-052">PRD-052</a> there, as the main site does; a node that emits
+no <code>/about/</code>, such as the demonstration node, has no Quickstart page; the engine's guides
+(<code>docs/guides/</code>) give the same paths.</p>
+<p><strong>Notes to other statements that no longer match what was delivered.</strong></p>
+<ul>
+<li>§4 (non-goals), &quot;<code>bench</code> is the <strong>v1.0.1</strong> gate … the only verb off the GA path&quot;: <code>bench</code> is
+not a verb (<code>agsc bench</code> is <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E001"><code>AGSC-E001</code></a>); the benchmark kit is the program <code>tools/bench</code> with
+<code>bench/measure.js</code>, and <a class="ref" href="/specs/00-overview/#AGSC-00-20">AGSC-00-20</a> makes it normative at 1.1.</li>
+<li>§4, &quot;No functional PyPI wrapper (v1.x)&quot;: the non-goal stands for the engine. The working PyPI
+package is the independent Python checker (<a class="ref" href="/docs/requirements/#PRD-054">PRD-054</a>), not a wrapper of the engine.</li>
+<li>The Goal line, <a class="ref" href="/docs/requirements/#PRD-021">PRD-021</a> and <a class="ref" href="/docs/requirements/#PRD-013">PRD-013</a>: the patterns of the retired site are not published on
+agenticsystemcore.com. A selection of 22 pattern Concepts in 20 Clusters is published on the
+demonstration node, patterns.agenticsystemcore.com; the counts &quot;153 cards&quot;, &quot;66 render, 87
+dark&quot; and &quot;153 compile&quot; describe the retired site's corpus, which <code>import --from old-site</code>
+converts.</li>
+<li><a class="ref" href="/docs/requirements/#PRD-053">PRD-053</a>, the scope note: adoption is part of plain <code>init</code>, which takes no flags, and a host's
+configuration is written by <code>agsc-host emit &lt;profile&gt;</code>; <code>init --adopt</code> and
+<code>init --host cloudflare</code> are unknown options (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E002"><code>AGSC-E002</code></a>).</li>
+<li><a class="ref" href="/docs/requirements/#PRD-053">PRD-053</a>, &quot;≤3 commands … <code>ci</code> green&quot;: two steps come between <code>init</code> and a passing <code>ci</code> — the
+security contact <code>.well-known/security.txt</code> and one commit (or <code>SOURCE_DATE_EPOCH</code>), as the
+note to <a class="ref" href="/docs/requirements/#PRD-009">PRD-009</a> says; <code>README.md</code> and <code>docs/USE-CASES.md</code> (L5) give the full path.</li>
+<li><a class="ref" href="/docs/requirements/#PRD-045">PRD-045</a>, restore-from-zero: the clone-and-rebuild half holds (<code>ci</code> builds twice and compares
+the bytes; a fresh clone plus <code>ci</code> reproduces <code>www/</code>). The per-release archive deposit is the
+Zenodo record of the software, one version per GitHub release (concept DOI
+10.5281/zenodo.23233817; on 2026-11-11 it holds <code>v1.0.0-rc.7</code>, <code>1.0.0</code> and <code>1.0.1</code>); the
+specification archive and the paper are the separate record 10.5281/zenodo.23052709, with
+deposits for <code>1.0.0-rc.6</code> and <code>1.0.0</code>. A release with no deposit is kept by its tag. A git mirror and a weekly attested
+snapshot are not in place at 1.0.0; they are planned for later, with no version fixed.</li>
+<li><a class="ref" href="/docs/requirements/#PRD-062">PRD-062</a>, &quot;<code>ETag</code> equal to the artefact digest&quot;: <a class="ref" href="/specs/11-boundary/#AGSC-11-05">AGSC-11-05</a> requires an <code>ETag</code> on every public
+artefact and fixes its value only where the writer sets it; a static host sets its own entity
+tags, so a reader takes integrity from the <code>digest</code> of the discovery document (<a class="ref" href="/specs/06-surfaces/#AGSC-06-08">AGSC-06-08</a>),
+never from an <code>ETag</code>.</li>
+</ul>
+<p><strong>Note to Amendment 9: why the Node floor is 22.13.0.</strong> Node 22.12.0 prints a warning on standard
+error whenever the engine requires one of its ES-module libraries, and a warning there breaks the
+MCP server's clean-stderr contract; 22.13.0 is the first 22.x release that prints it only on
+request. The development gates (the linter) need 22.13.0 as well. <code>package.json</code>, the CI matrix
+and a test that keeps the two equal carry the floor.</p>
+<h2 id="notes-at-1-0-0-2026-10-10">Notes at 1.0.0 (2026-10-10)</h2>
+<p>The rows, the amendments and the notes above stay as they were written. These notes say how
+some of them read at <code>1.0.0</code>; where one of them and an earlier note differ, the note here
+governs.</p>
+<p><strong>Note on the capabilities planned for 1.1.</strong> Eleven capabilities of the reference distribution
+are planned for 1.1 (<a class="ref" href="/specs/00-overview/#AGSC-00-20">AGSC-00-20</a>):</p>
+<p>1. an ingest stub and channel adapters (<a class="ref" href="/docs/requirements/#PRD-056">PRD-056</a>);
+2. <code>init</code> writing example Concepts, type folders and a forge workflow, with the options
+<code>init --forge</code> and <code>init --host</code> (<a class="ref" href="/docs/requirements/#PRD-009">PRD-009</a>, <a class="ref" href="/docs/requirements/#PRD-053">PRD-053</a>);
+3. direct memory adapters for Mem0, Letta, Zep and CSV (<a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a>);
+4. installing skill packs into other agents' install trees, and installing them from a published
+site (<a class="ref" href="/docs/requirements/#PRD-033">PRD-033</a>);
+5. distribution through GHCR, Homebrew and Nix, and a PyPI wrapper of the engine (<a class="ref" href="/docs/requirements/#PRD-048">PRD-048</a>, §4);
+6. a git mirror and a weekly attested snapshot of a node (<a class="ref" href="/docs/requirements/#PRD-045">PRD-045</a>);
+7. a model client for the review lane (<a class="ref" href="/docs/requirements/#PRD-041">PRD-041</a>);
+8. <code>narrate</code>, a model-written narration of a composition, run on the reader's own key (§4 rules
+out a server-side one);
+9. memory adapters for Basic Memory and for Claude Code's memory files;
+10. running the engine's library on Deno, Bun and Cloudflare Workers;
+11. a model adapter for the agent lane (<a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a>).</p>
+<p>They are capabilities of the reference distribution, not parts of the format: no version
+requires a tool to ship them, and no conformance claim depends on them. They wait for 1.1
+because each one adds behaviour, and <code>1.0.0</code> adds no behaviour beyond a defect fix. So where a
+note above says of one of them &quot;not planned&quot;, &quot;not in the declared scope of any version&quot;, &quot;not
+planned for a version&quot; or &quot;planned for later, with no version fixed&quot;, or that no container
+image, Homebrew formula or Nix package &quot;is planned for a version&quot;, read &quot;planned for 1.1&quot;. §4's &quot;No functional PyPI wrapper&quot; and the note that
+keeps that non-goal for the engine read the same way: at 1.0 the PyPI package is the
+independent Python checker, and a wrapper of the engine is planned for 1.1.</p>
+<p><em>(Reconciliation, 2026-11-11, for 1.1.0: <a class="ref" href="/specs/00-overview/#AGSC-00-20">AGSC-00-20</a> as amended for 1.1.0 governs. The direct memory adapters (items 3 and 9) ship in 1.1 as capabilities of the reference distribution under <a class="ref" href="/specs/01-bundle/#AGSC-01-26a">AGSC-01-26a</a>; the other nine, and the model-adapter plugin kind named below, are planned for a later MINOR, so wherever this document says &quot;planned for 1.1&quot; of one of them, read &quot;planned for a later MINOR&quot;.)</em></p>
+<p><strong>Note to <a class="ref" href="/docs/requirements/#PRD-063">PRD-063</a> (a live run of an agent lane at 1.0).</strong> The Mode 5 note above says that the
+engine implements the agent lane, &quot;channels, refresh&quot; included. At 1.0 the reference engine
+ships no model adapter and no channel adapter: <code>refresh --agent &lt;name&gt;</code> runs only with
+<code>--dry-run</code>, which writes the Proposal the lane would open, with the Episode of the run, and
+calls no model; without <code>--dry-run</code> the verb refuses. A live run is made by an agent outside the
+engine — Claude Code, a script — as a client of the local tool server (<code>agsc mcp</code>) or of the
+page tools, under the rules of the lane it runs as (<a class="ref" href="/specs/08-governance/#AGSC-08-28">AGSC-08-28</a> allows both routes); the gating
+lanes stay model-free. The model adapter for the agent lane is planned for 1.1 (the note
+above). A model-adapter plugin kind beside the eight of <a class="ref" href="/specs/00-overview/page-2/#AGSC-00-24">AGSC-00-24</a> is a candidate for 1.1, since
+a new plugin kind is a change of the specification.</p>
+<p><strong>Note to <a class="ref" href="/docs/requirements/#PRD-027">PRD-027</a> and §4 (<code>memory://</code> at 1.0).</strong> The row's &quot;not resolve it&quot;, its acceptance
+&quot;Alias-only; no resolver&quot;, its version cell &quot;(resolver: v2)&quot; and §4's
+&quot;<code>memory://</code> = documented alias only&quot; read as follows at 1.0: the command line and the local
+tool server resolve <code>memory://&lt;bundle-id&gt;/&lt;slug&gt;</code> to the item when <code>&lt;bundle-id&gt;</code> is the Bundle's own <code>bundle.id</code>, and
+refuse another Bundle's id with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E309"><code>AGSC-E309</code></a> (<a class="ref" href="/specs/05-graph/#AGSC-05-04b">AGSC-05-04b</a>; the cases <code>graph-0005</code> and
+<code>cli-0015</code>). The alias is never dereferenced over the network and never emitted as an RDF
+subject (<a class="ref" href="/specs/05-graph/#AGSC-05-04">AGSC-05-04</a>), and the <code>https://</code> IRI may always be used instead (the note to <a class="ref" href="/docs/requirements/#PRD-027">PRD-027</a>
+above).</p>
+<p><strong>Note to <a class="ref" href="/docs/requirements/#NFR-03">NFR-03</a> (the coverage bar at 1.0).</strong> The bar that continuous integration enforces on
+<code>src/</code> is higher than the row's 99 % of lines: lines 99.9 %, functions 99 % and branches 93 %,
+the thresholds of <code>npm run test:coverage</code>, which runs inside a check every pull request must
+pass (<code>test (ubuntu-latest, Node 24)</code>). <code>CONTRIBUTING.md</code> states the same three figures. The
+row's &quot;no requirement without a test&quot; is checked by <code>node tools/requirements-matrix --check</code>.
+Read &quot;coverage ≥99%&quot; in §5's definition of done the same way.</p>
+<p><strong>Note to §5, the definition of done at 1.0.0.</strong></p>
+<ul>
+<li>Item (1), &quot;persona walkthroughs (a)–(j)&quot;, reads as one walkthrough for each persona of §1 and
+§1.1: the feature files <code>persona-0</code> and <code>persona-a</code> to <code>persona-o</code> under <code>features/</code> (P0 to
+P15), which the acceptance runner executes, a scenario that needs a forge, a model or an
+outside service being listed as pending with its reason; with them, the six mode walks of
+<code>tests/e2e/modes/</code> and the runs of the guides and the demos (<code>tests/docs/</code>).</li>
+<li>Item (2): the coverage figure reads as the note to <a class="ref" href="/docs/requirements/#NFR-03">NFR-03</a> says.</li>
+<li>Item (4), the benchmark kit run on real data with its results and datasheet on Zenodo, is 1.1
+work, when <a class="ref" href="/specs/00-overview/#AGSC-00-20">AGSC-00-20</a> makes the kit normative. At <code>1.0.0</code> the measurement half runs
+(<code>bench/measure.js</code>, recorded in <code>docs/MEASUREMENTS.md</code>), and the kit's study belongs to the
+<code>tools/bench</code> program. Item 1 of &quot;Resolved at review&quot;,
+&quot;published benchmarks are a v1.0.1 gate within 30 days of launch&quot;, reads &quot;published
+benchmarks are 1.1 work&quot;; there is no <code>bench</code> verb and no 1.0.1 gate.</li>
+<li>Item (6), &quot;a DOI for each release&quot;: the software's Zenodo record (concept DOI
+10.5281/zenodo.23233817) gets a version for each GitHub release, as the note to <a class="ref" href="/docs/requirements/#PRD-045">PRD-045</a>
+says. The Internet-Draft is an individual Internet-Draft.</li>
+</ul>
+<p><strong>Note to §1, persona P10 (the areas at 1.0.0; 2026-10-11).</strong> The note to persona P10 above
+says that the Python checker distribution runs &quot;seven of the nineteen areas&quot;. At <code>1.0.0</code> the
+shared vector set has twenty populated areas, the <code>export</code> area having been added; the Python
+checker distribution runs the same seven of them natively and reports the other thirteen as
+not run by that package.</p>
+<p><strong>Note to §1, persona P10 (1.1; 2026-11-11).</strong> At 1.1 the Python checker runs the same seven
+areas natively, at the parity of the 1.1 engine. It does not check the domain layer (<a class="ref" href="/docs/requirements/#PRD-076">PRD-076</a>):
+the cases of the layer in those areas are reported not run, with that reason. A port
+implementer whose node uses the layer proves it with the engine's <code>conform</code> or with a runner of
+their own.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/agentic-system-core/edit/main/docs/PRD.md">Propose an edit</a> — opens <code>docs/PRD.md</code> in the specification repository; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
+</footer>
+</body>
+</html>

@@ -17,6 +17,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/docs/scenarios/persona-h-memory/">
 <meta property="og:title" content="Scenarios: Agent uses a node as external auditable memory">
 <meta property="og:description" content="The behaviour-driven scenarios of persona-h-memory.feature: Agent uses a node as external auditable memory.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Scenarios: Agent uses a node as external auditable memory","description":"The behaviour-driven scenarios of persona-h-memory.feature: Agent uses a node as external auditable memory.","url":"https://agenticsystemcore.com/docs/scenarios/persona-h-memory/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/scenarios/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
@@ -42,9 +46,9 @@
 </header>
 <main id="main" class="wide">
 <h1>Scenarios: Agent uses a node as external auditable memory</h1>
-<p class="summary"><strong>Summary</strong>The 8 scenarios of the feature file persona-h-memory.feature, in the Given/When/Then form the reference engine runs; each names the requirement it proves.</p>
+<p class="summary"><strong>Summary</strong>The 16 scenarios of the feature file persona-h-memory.feature, in the Given/When/Then form the reference engine runs; each names the requirement it proves.</p>
 <p>One of the feature files of the <a href="/docs/scenarios/">scenarios</a>, where the coverage table names the requirements each file proves. Previous: <a href="/docs/scenarios/persona-g-team/" rel="prev"><code>persona-g-team.feature</code></a>. Next: <a href="/docs/scenarios/persona-i-maintainer/" rel="next"><code>persona-i-maintainer.feature</code></a>.</p>
-<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-022">PRD-022</a>, <a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a>, <a class="ref" href="/docs/requirements/#PRD-027">PRD-027</a>, <a class="ref" href="/docs/requirements/#PRD-061">PRD-061</a> · PLAN §5.2 ContentStore
+<pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-021">PRD-021</a>, <a class="ref" href="/docs/requirements/#PRD-022">PRD-022</a>, <a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a>, <a class="ref" href="/docs/requirements/#PRD-027">PRD-027</a>, <a class="ref" href="/docs/requirements/#PRD-061">PRD-061</a>, <a class="ref" href="/docs/requirements/#PRD-070">PRD-070</a> · PLAN §5.2 ContentStore
 @persona-h @mode-1
 Feature: Agent uses a node as external auditable memory
   As P8 (agent-as-memory, Mode 1)
@@ -79,6 +83,30 @@ Feature: Agent uses a node as external auditable memory
     And a second run writes nothing and reports every item unchanged
     And &quot;npx agentic-system-core lint&quot; finds no error in the imported items except a concept &quot;kind&quot; the foreign bundle never declared
 
+  @<a class="ref" href="/docs/requirements/#PRD-021">PRD-021</a> @<a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a> @<a class="ref" href="/docs/requirements/#PRD-075">PRD-075</a> @human @matrix-A5
+  Scenario: A thesaurus kept as SKOS arrives as drafts and imports idempotently
+    Given a SKOS thesaurus &quot;thesaurus.ttl&quot; with a scheme, a collection and two concepts
+    When the author imports &quot;thesaurus.ttl&quot; with &quot;--from skos&quot; into a copy of the Bundle that holds no item
+    Then every item the SKOS import wrote is a draft with the provenance &quot;imported&quot;, keeping its SKOS IRI in &quot;x-skos-iri&quot;
+    And a statement the SKOS import cannot carry is reported as &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E506">AGSC-E506</a>&quot; naming its subject and predicate
+    And the same import run again writes nothing and reports every item unchanged
+    And no network call was attempted
+
+  @<a class="ref" href="/docs/requirements/#PRD-021">PRD-021</a> @<a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a> @human @matrix-A5
+  Scenario: A foreign OKF bundle arrives as drafts, whatever licence it declares
+    Given an OKF bundle &quot;licensed-bundle&quot; whose records declare the open licence &quot;CC0-1.0&quot; and the status &quot;stable&quot;
+    When the author imports &quot;licensed-bundle&quot; with &quot;--from okf&quot; into a copy of the Bundle that holds no item
+    Then every item the OKF import wrote is a draft, with one &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E506">AGSC-E506</a>&quot; warning each that names the status it replaced
+
+  @<a class="ref" href="/docs/requirements/#PRD-083">PRD-083</a> @human @matrix-A5
+  Scenario: A folder exported with a manifest is checked when it is imported
+    Given the Bundle root carries the Content Use Terms as &quot;LICENSE-CONTENT&quot;
+    When the author runs &quot;agsc export --okf --manifest&quot; under the network trap
+    Then the command exits 0
+    And &quot;dist/export/okf/export-manifest.json&quot; lists every other file of the export with its digest, the item count and the items digest
+    When one exported file is edited and the folder is imported into a copy of the Bundle that holds no item
+    Then the import warns once with &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E506">AGSC-E506</a>&quot; that the edited file differs from the manifest, and still writes the items
+
   @<a class="ref" href="/docs/requirements/#PRD-027">PRD-027</a> @agent @matrix-A5
   Scenario: memory:// URIs are documented as an alias only, never resolved
     Given an item's slug is &quot;a2a&quot; in bundle &quot;agenticsystemcore&quot;
@@ -97,6 +125,24 @@ Feature: Agent uses a node as external auditable memory
     And the same import run again writes nothing and reports every item unchanged
     And no network call was attempted
 
+  @<a class="ref" href="/docs/requirements/#PRD-070">PRD-070</a> @human @matrix-H13
+  Scenario Outline: A memory tool exchanges a node directly: &lt;tool&gt;
+    When the author runs &quot;agsc export --to &lt;tool&gt;&quot; under the network trap
+    Then the command exits 0
+    When the author imports &quot;dist/export/&lt;tool&gt;&quot; with &quot;--from &lt;tool&gt;&quot; into a copy of the Bundle that holds no item
+    Then every published item comes back as authored, with the exporting node's content version
+    And the same import run again writes nothing and reports every item unchanged
+    And no network call was attempted
+
+    Examples:
+      | tool         |
+      | mem0         |
+      | letta        |
+      | zep          |
+      | csv          |
+      | basic-memory |
+      | claude-code  |
+
   @<a class="ref" href="/docs/requirements/#PRD-061">PRD-061</a> @agent @matrix-A14
   Scenario: A memory framework takes the node's chunks through the records.js connector
     Given the Bundle is built
@@ -104,12 +150,51 @@ Feature: Agent uses a node as external auditable memory
     Then each shape gives one record per chunk, and every record keeps the item IRI, the chunk digest, the licence, the terms and the trust mark &quot;untrusted&quot;
     And no network call was attempted
 
+  @<a class="ref" href="/docs/requirements/#PRD-061">PRD-061</a> @<a class="ref" href="/docs/requirements/#PRD-079">PRD-079</a> @agent
+  Scenario: An agent checks the chunks it holds against what the node states about them
+    Given a fresh copy of the acceptance Bundle
+    And the Bundle is built and served on loopback
+    When the agent fetches &quot;/chunks.jsonl&quot;, &quot;/chunks-index.toon&quot; and the discovery document over loopback
+    Then the chunks surface link states the digest of the file, the number of lines and the commitment to their ids, and the agent recomputes all three
+    And the index has one row per chunk line, in the same order, with the first 16 characters of each line's id and digest
+    And with one chunk line dropped the recomputed count and commitment no longer match what the node states
+    And the shipped validate-wellknown passes at Level 2 over loopback
+
   @<a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a> @agent
   Scenario: The JSON-lines export is exactly the per-item graph nodes
     Given the Bundle is built
     When the agent runs &quot;agsc export --jsonl&quot; under the network trap
     Then the command exits 0
     And each line of &quot;dist/export/items.jsonl&quot; is the node of the item's &quot;www/pages/&lt;slug&gt;.jsonld&quot;, one line per item in slug order
+    And no network call was attempted
+
+  @<a class="ref" href="/docs/requirements/#PRD-075">PRD-075</a> @human
+  Scenario: A taxonomy tool reads the SKOS export with no inference step
+    Given the Bundle is built
+    When the author runs &quot;agsc export --skos&quot; under the network trap
+    Then the command exits 0
+    And &quot;dist/export/skos.ttl&quot; types the Bundle as a skos:ConceptScheme and each published concept, lesson and cluster as a skos:Concept or skos:Collection, and holds no episode, procedure or gate
+    And &quot;dist/export/skos.ttl&quot; is Turtle that a second run writes again byte for byte
+    And no network call was attempted
+
+  @<a class="ref" href="/docs/requirements/#PRD-075">PRD-075</a> @human
+  Scenario: The author asks which notes should be linked and no note is touched
+    Given a note &quot;alpha&quot; that links to the note &quot;beta&quot; in its body, with no Link between them
+    When the author runs &quot;agsc lint --suggest&quot; under the network trap
+    Then the command exits 0
+    And &quot;dist/suggestions.json&quot; proposes the Link &quot;related&quot; from &quot;alpha&quot; to &quot;beta&quot; with the evidence &quot;mention&quot;
+    And the content folder is byte for byte what it was before the suggestions were asked for
+    And &quot;dist/suggestions.json&quot; is canonical JSON that a second run writes again byte for byte
+    And no network call was attempted
+
+  @<a class="ref" href="/docs/requirements/#PRD-075">PRD-075</a> @human
+  Scenario: The author reads what the graph entails and the answer is never published
+    Given the Bundle is built
+    When the author runs &quot;agsc export --closure&quot; under the network trap
+    Then the command exits 0
+    And &quot;dist/export/closure.nt&quot; is not empty, shares no triple with &quot;www/graph.nq&quot; and types a concept skos:Concept
+    And &quot;dist/export/closure.nt&quot; is N-Quads that a second run writes again byte for byte
+    And no file under &quot;www&quot; has &quot;closure&quot; in its name
     And no network call was attempted
 
   @<a class="ref" href="/docs/requirements/#PRD-026">PRD-026</a> @human
@@ -128,7 +213,7 @@ Feature: Agent uses a node as external auditable memory
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/agentic-system-core/edit/main/features/persona-h-memory.feature">Propose an edit</a> — opens <code>features/persona-h-memory.feature</code> in the specification repository; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
 </footer>
 </body>
 </html>

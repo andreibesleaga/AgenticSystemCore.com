@@ -4,7 +4,7 @@
 // function below is the SOURCE TEXT of the function Node runs, so the local
 // tools and the page tools cannot drift. No network beyond this origin, no key,
 // no server, no cookie, no storage.
-// spec_version: 1.0.0
+// spec_version: 1.1.0
 (function () {
 function pageTerms() {
   return 'LicenseRef-AgenticSystemCore-Content-Use-1.0';
@@ -53,7 +53,7 @@ function pageApplyTypes(value, key) {
   if (value !== null && typeof value === 'object') {
     const out = {};
     const names = Object.keys(value);
-    for (let i = 0; i < names.length; i += 1) out[names[i]] = pageApplyTypes(value[names[i]], names[i]);
+    for (let i = 0; i < names.length; i += 1) pageSetOwn(out, names[i], pageApplyTypes(value[names[i]], names[i]));
     return out;
   }
   const type = typed[key];
@@ -82,6 +82,19 @@ function pageRememberFault(args, type, has) {
   if (typeof args.kind !== 'string' || pageKindToType()[args.kind] === undefined) {
     return fault('AGSC-E203', 'kind must be concept, episode, lesson, procedure or task');
   }
+  if (args.kind === 'gate') {
+    return fault('AGSC-E203', 'remember does not accept kind "gate": a Gate\'s Level is a governance decision');
+  }
+  if (type === 'episode' && typeof args.actor !== 'string') {
+    return fault('AGSC-E003', 'an episode needs the declared actor');
+  }
+  if (type === 'episode' && typeof args.at !== 'string') {
+    return fault('AGSC-E003', 'an episode needs the instant it started, `at`');
+  }
+  if (args.actor !== undefined
+    && !/^(?:human:[a-z0-9][a-z0-9._-]*|process:[a-z0-9][a-z0-9._-]*|[A-Za-z0-9][A-Za-z0-9._-]*\/[A-Za-z0-9][A-Za-z0-9._+-]*)$/u.test(String(args.actor))) {
+    return fault('AGSC-E204', 'actor must be human:<id>, process:<id> or <producer>/<version> (AGSC-02-09)');
+  }
   if (args.about !== undefined && (typeof args.about !== 'string' || typeof has !== 'function' || !has(args.about))) {
     return fault('AGSC-E301', 'about names no item of this Bundle');
   }
@@ -101,7 +114,7 @@ function pageRememberFault(args, type, has) {
     return fault('AGSC-E203', 'severity must be info, warn or block');
   }
   if (type === 'episode') {
-    if (typeof args.at !== 'string' || !/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/u.test(args.at)) {
+    if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/u.test(args.at)) {
       return fault('AGSC-E204', 'at must be an instant, YYYY-MM-DDTHH:MM:SSZ (AGSC-02-06)');
     }
     if (args.outcome !== undefined && ['success', 'partial', 'failure'].indexOf(args.outcome) === -1) {
@@ -119,6 +132,48 @@ function pageRememberFault(args, type, has) {
   }
   return null;
 }
+function pageRememberFindings(args) {
+  const findings = [];
+  if (args.origin === 'human') return findings;
+  for (const key of ['agent', 'model']) {
+    if (typeof args[key] !== 'string' || args[key] === '') {
+      findings.push({
+        code: 'AGSC-E202',
+        message: `prov.${key} is missing: an ai-generated item names its ${key} (AGSC-08-01); pass \`${key}\` or assert origin: human`,
+        severity: 'error',
+      });
+    }
+  }
+  return findings;
+}
+function pageKeptSources(supplied, findings) {
+  const list = Array.isArray(supplied) ? supplied : [];
+  const kept = [];
+  for (let i = 0; i < list.length; i += 1) {
+    const source = list[i];
+    const id = source ? source.id : undefined;
+    const idFits = id === undefined
+      || (typeof id === 'string' && /^[^\x00-\x1F\x7F\x85\u2028\u2029]+$/u.test(id) && [...id].length <= 200);
+    if (!source || typeof source.resource !== 'string' || !idFits
+      || !/^(https?:\/\/\S+|urn:agsc:channel:[a-z0-9-]+:\S+)$/u.test(source.resource)) {
+      findings.push({ code: 'AGSC-E506', message: 'source dropped', severity: 'warn' });
+      continue;
+    }
+    kept.push({ id, resource: source.resource });
+  }
+  return kept;
+}
+function pageSetOwn(target, key, value) {
+  Object.defineProperty(target, key, { configurable: true, enumerable: true, value, writable: true });
+  return target;
+}
+function pageFlatItem(item) {
+  const copy = { slug: item.slug, type: item.type };
+  const fm = item.frontmatter || {};
+  const names = Object.keys(fm);
+  for (let k = 0; k < names.length; k += 1) pageSetOwn(copy, names[k], fm[names[k]]);
+  return copy;
+}
 function pageEnvelope(source, type, body) {
   return { body, license: pageTerms(), source, trust: 'untrusted', type };
 }
@@ -126,7 +181,10 @@ function pageErrorEnvelope(source, code, message) {
   return pageEnvelope(source, 'error', { code, message: message === undefined ? '' : message });
 }
 function pageBaseIri(base) {
-  return `${String(base === undefined || base === null ? '/' : base).replace(/\/+$/, '')}/`;
+  const text = String(base === undefined || base === null ? '/' : base);
+  let end = text.length;
+  while (end > 0 && text.charAt(end - 1) === '/') end -= 1;
+  return `${text.slice(0, end)}/`;
 }
 function pageItemIri(base, type, slug) {
   return `${pageBaseIri(base)}${pageTypePlural(type)}/${slug}/`;
@@ -154,14 +212,30 @@ function pageAnchorOf(text) {
     .replace(/-$/, '');
 }
 function pageSlugify(title) {
-  const base = pageAnchorOf(title);
-  return base === '' ? 'note' : base;
+  const source = pageNfc(title).replace(/[A-Z]/g, (c) => c.toLowerCase());
+  let out = '';
+  let gap = false;
+  for (const ch of source) {
+    if (/^[a-z0-9]$/.test(ch)) {
+      if (gap && out !== '') out += '-';
+      out += ch;
+      gap = false;
+    } else {
+      gap = true;
+    }
+  }
+  if (out.length > 64) out = out.slice(0, 64).replace(/-$/, '');
+  return out === '' ? 'note' : out;
 }
 function pageDedupe(slug, taken) {
-  if (!taken || typeof taken.has !== 'function' || !taken.has(slug)) return slug;
-  let n = 2;
-  while (taken.has(`${slug}-${n}`)) n += 1;
-  return `${slug}-${n}`;
+  const has = (candidate) => Boolean(taken) && typeof taken.has === 'function' && taken.has(candidate);
+  if (!has(slug)) return slug;
+  for (let n = 2; ; n += 1) {
+    const suffix = `-${n}`;
+    let stem = slug.slice(0, 64 - suffix.length);
+    while (stem.charAt(stem.length - 1) === '-') stem = stem.slice(0, -1);
+    if (!has(`${stem}${suffix}`)) return `${stem}${suffix}`;
+  }
 }
 function pageSplitFrontmatter(text) {
   const source = String(text === undefined || text === null ? '' : text);
@@ -210,11 +284,11 @@ function pageParseMap(state, indent) {
     const rest = text.slice(colon + 1).trim();
     state.i += 1;
     if (rest === '') {
-      out[key] = pageParseValue(state, at);
+      pageSetOwn(out, key, pageParseValue(state, at));
     } else if (rest.charAt(0) === '|' || rest.charAt(0) === '>') {
-      out[key] = pageBlockScalar(state, at, rest);
+      pageSetOwn(out, key, pageBlockScalar(state, at, rest));
     } else {
-      out[key] = pageScalar(rest);
+      pageSetOwn(out, key, pageScalar(rest));
     }
   }
 }
@@ -252,12 +326,12 @@ function pageParseSeq(state, indent) {
     const map = {};
     const key = pageScalar(rest.slice(0, colon).trim());
     const value = rest.slice(colon + 1).trim();
-    if (value === '') map[key] = pageParseValue(state, inner);
-    else if (value.charAt(0) === '|' || value.charAt(0) === '>') map[key] = pageBlockScalar(state, inner, value);
-    else map[key] = pageScalar(value);
+    if (value === '') pageSetOwn(map, key, pageParseValue(state, inner));
+    else if (value.charAt(0) === '|' || value.charAt(0) === '>') pageSetOwn(map, key, pageBlockScalar(state, inner, value));
+    else pageSetOwn(map, key, pageScalar(value));
     const more = pageParseMap(state, inner);
     const names = Object.keys(more);
-    for (let i = 0; i < names.length; i += 1) map[names[i]] = more[names[i]];
+    for (let i = 0; i < names.length; i += 1) pageSetOwn(map, names[i], more[names[i]]);
     out.push(map);
   }
 }
@@ -397,7 +471,17 @@ function pageCorpus(sources, options) {
   // MANIFEST above it. `pageIndexOf` reads both shapes, so the corpus carries one
   // index whatever the node's size.
   const index = pageIndexOf(map);
-  return { base, bundleId: opts.bundleId, bySlug, claimed: pageClaimants(map), index, items };
+  return {
+    base,
+    bundleId: opts.bundleId,
+    bySlug,
+    chunks: toolChunkIndex(map),
+    claimed: pageClaimants(map),
+    host: toolHost(map),
+    index,
+    items,
+    licenseProse: opts.licenseProse,
+  };
 }
 function pageClaimants(map) {
   const out = Object.create(null);
@@ -517,6 +601,31 @@ function pageCompare(a, b) {
   }
   return left.length === right.length ? 0 : (left.length < right.length ? -1 : 1);
 }
+function pageHeadingText(line) {
+  let at = 0;
+  while (at < 3 && line.charAt(at) === ' ') at += 1;
+  let marks = 0;
+  while (marks < 6 && line.charAt(at + marks) === '#') marks += 1;
+  if (marks === 0) return null;
+  const rest = line.slice(at + marks);
+  if (rest === '') return '';
+  if (rest.charAt(0) !== ' ') return null;
+  let from = 0;
+  while (rest.charAt(from) === ' ') from += 1;
+  const text = rest.slice(from);
+  // `.` stops at a carriage return and at U+2028 and U+2029: such a line is no heading.
+  if (/[\r\u2028\u2029]/.test(text)) return null;
+  let end = text.length;
+  while (end > 0 && text.charAt(end - 1) === ' ') end -= 1;
+  let marked = end;
+  while (marked > 0 && text.charAt(marked - 1) === '#') marked -= 1;
+  if (marked < end && marked > 0 && text.charAt(marked - 1) === ' ') {
+    let blanks = marked - 1;
+    while (blanks > 0 && text.charAt(blanks - 1) === ' ') blanks -= 1;
+    return text.slice(0, blanks).trim();
+  }
+  return text.trim();
+}
 function pageAnchors(body) {
   const lines = String(body === undefined || body === null ? '' : body).split('\n');
   const texts = [];
@@ -529,9 +638,8 @@ function pageAnchors(body) {
       continue;
     }
     if (opened !== null) { fence = opened[1]; continue; }
-    const heading = /^ {0,3}#{1,6}(?: +(.*))?$/.exec(line);
-    if (heading === null) continue;
-    texts.push(String(heading[1] === undefined ? '' : heading[1]).replace(/ +#+ *$/, '').trim());
+    const heading = pageHeadingText(line);
+    if (heading !== null) texts.push(heading);
   }
   let empties = 0;
   const first = texts.map((t) => {
@@ -565,14 +673,37 @@ function pageInlineTargets(body) {
     }
     if (opened !== null) { fence = opened[1]; continue; }
     const stripped = line.replace(/`[^`]*`/g, '');
-    const pattern = /!?\[[^\]]*\]\(([^()\s]*)(?:\s+"[^"]*")?\)/g;
-    let match = pattern.exec(stripped);
-    while (match !== null) {
-      if (match[1] !== '') out.push(match[1]);
-      match = pattern.exec(stripped);
+    // Each `]` is tried once: every `[` before it that has no `]` in between shares it,
+    // so when its tail is no link none of them starts one, and the scan goes on after it.
+    let from = 0;
+    for (;;) {
+      const open = stripped.indexOf('[', from);
+      if (open === -1) break;
+      const close = stripped.indexOf(']', open + 1);
+      if (close === -1) break;
+      const tail = pageLinkTail(stripped, close + 1);
+      if (tail === null) {
+        from = close + 1;
+        continue;
+      }
+      if (tail.target !== '') out.push(tail.target);
+      from = tail.end;
     }
   }
   return out;
+}
+function pageLinkTail(text, at) {
+  if (text.charAt(at) !== '(') return null;
+  let end = at + 1;
+  while (end < text.length && '()'.indexOf(text.charAt(end)) === -1 && !/\s/.test(text.charAt(end))) end += 1;
+  const target = text.slice(at + 1, end);
+  if (text.charAt(end) === ')') return { end: end + 1, target };
+  if (end >= text.length || !/\s/.test(text.charAt(end))) return null;
+  while (end < text.length && /\s/.test(text.charAt(end))) end += 1;
+  if (text.charAt(end) !== '"') return null;
+  const closing = text.indexOf('"', end + 1);
+  if (closing === -1 || text.charAt(closing + 1) !== ')') return null;
+  return { end: closing + 2, target };
 }
 function pageResolveBodyReference(item, raw, byPath) {
   const text = String(raw);
@@ -599,9 +730,11 @@ function pageResolveBodyReference(item, raw, byPath) {
   if (fragment !== null && pageAnchors(target.body).indexOf(fragment) === -1) return null;
   return target;
 }
-function pageToolset(corpus, core) {
+function pageToolset(corpus, core, hash) {
   const model = corpus || { base: '/', bundleId: undefined, bySlug: {}, index: null, items: [] };
   const base = model.base;
+  const host = model.host || { bundleVersion: '', instant: '', specVersion: '' };
+  const chunkIndex = model.chunks || { bySlug: {}, incomplete: false, missing: [] };
   // re-key into a prototype-free map whatever the caller supplied, so that a
   // corpus built by hand is as safe as one `pageCorpus` built.
   const bySlug = Object.create(null);
@@ -655,6 +788,18 @@ function pageToolset(corpus, core) {
     return typeof fm.description === 'string' && fm.description !== '' ? fm.description : String(fm.title === undefined ? '' : fm.title);
   };
 
+  // AGSC-09-16: the three tools of 1.1 read the corpus, which IS the listed set.
+  let edgeList = null;
+  const edgesOfCorpus = () => {
+    if (edgeList === null) edgeList = pageEdges(model.items);
+    return edgeList;
+  };
+  const kindOf = (slug) => {
+    const fm = bySlug[slug].frontmatter || {};
+    return { kind: fm.kind, status: fm.status, type: bySlug[slug].type };
+  };
+  const ordered = (list) => list.slice().sort(pageCompare);
+
   const implementations = {
     ask: (args) => {
       const fault = indexFault();
@@ -678,20 +823,43 @@ function pageToolset(corpus, core) {
       };
     },
 
-    compose: (args) => {
-      // AGSC-09-13a: a selection that is not an array is not the empty one (finding G4).
-      if (!Array.isArray(args.selection)) {
-        return pageErrorEnvelope('compose', 'AGSC-E201', 'selection must be an array of slugs (AGSC-09-13)');
+    // AGSC-09-13 `brief`: the content of brief.json over the listed set, writing nothing.
+    brief: (args) => {
+      if (hash === undefined && (typeof crypto === 'undefined' || !crypto.subtle)) {
+        return pageErrorEnvelope('brief', 'AGSC-E901', 'this page has no Web Crypto (a secure context) to compute the selection digest');
       }
+      const facts = {
+        base: pageBaseIri(base),
+        host,
+        items: model.items.map((item) => Object.assign(pageFlatItem(item), { body: item.body })),
+        licenseProse: model.licenseProse === undefined ? pageTerms() : model.licenseProse,
+      };
+      const answer = toolBrief(core, facts, args.selection, hash === undefined ? toolSha256Hex : hash);
+      const wrap = (value) => (value.fault === undefined ? pageEnvelope('brief', 'brief', value.body)
+        : pageErrorEnvelope('brief', value.fault.code, value.fault.message));
+      return typeof answer.then === 'function' ? answer.then(wrap) : wrap(answer);
+    },
+
+    // AGSC-09-13 `check`: the Link warnings of AGSC-03-23…03-26 about the selection.
+    check: (args) => {
+      if (args.selection !== undefined && !Array.isArray(args.selection)) {
+        return pageErrorEnvelope('check', 'AGSC-E201', 'selection must be an array of slugs (AGSC-09-13)');
+      }
+      const selection = args.selection === undefined ? Object.keys(bySlug) : args.selection;
+      for (let i = 0; i < selection.length; i += 1) {
+        if (typeof selection[i] !== 'string' || bySlug[selection[i]] === undefined) {
+          return pageErrorEnvelope('check', 'AGSC-E301', 'no item with that slug in this Bundle');
+        }
+      }
+      const checked = ordered(selection.filter((slug, i) => selection.indexOf(slug) === i));
+      const findings = toolLinkWarnings(edgesOfCorpus(), kindOf).filter((f) => checked.indexOf(f.slug) !== -1);
+      return pageEnvelope('check', 'findings', { findings, selection: checked });
+    },
+
+    compose: (args) => {
+      // AGSC-09-13a: a selection that is not an array is not the empty one (`pageArgumentTypeFault`).
       const selection = args.selection;
-      const flat = model.items.map((i) => {
-        const copy = { slug: i.slug, type: i.type };
-        const fm = i.frontmatter || {};
-        const names = Object.keys(fm);
-        for (let k = 0; k < names.length; k += 1) copy[names[k]] = fm[names[k]];
-        return copy;
-      });
-      const result = core.compose(flat, selection);
+      const result = core.compose(model.items.map(pageFlatItem), selection);
       return pageEnvelope('compose', 'verdict', {
         added: result.added,
         conflicts: result.conflicts,
@@ -700,6 +868,18 @@ function pageToolset(corpus, core) {
         valid: result.valid,
         warnings: result.warnings,
       });
+    },
+
+    // AGSC-09-13 `explain`: whether one edge holds over the listed set, and why (AGSC-05-33).
+    explain: (args) => {
+      if (!Object.prototype.hasOwnProperty.call(toolPartners(), args.key)) {
+        return pageErrorEnvelope('explain', 'AGSC-E203', 'key must be one of the fourteen Link keys or a computed inverse name (AGSC-03-01)');
+      }
+      if (typeof args.source !== 'string' || bySlug[args.source] === undefined
+        || typeof args.target !== 'string' || bySlug[args.target] === undefined) {
+        return pageErrorEnvelope('explain', 'AGSC-E301', 'no item with that slug in this Bundle');
+      }
+      return pageEnvelope('explain', 'explanation', toolExplanation(edgesOfCorpus(), args.key, args.source, args.target));
     },
 
     links: (args) => {
@@ -751,8 +931,15 @@ function pageToolset(corpus, core) {
     read: (args) => {
       const item = bySlug[args.slug];
       if (item === undefined) return pageErrorEnvelope('read', 'AGSC-E301', 'no item with that slug in this Bundle');
+      // AGSC-06-31: a chunk export the page could not read whole is said, never an empty list.
+      if (chunkIndex.incomplete === true) {
+        return pageErrorEnvelope('read', 'AGSC-E901', `the chunk export is incomplete: ${chunkIndex.missing.join(', ')} could not be read from this origin`);
+      }
+      // AGSC-09-13: the citation records of the item's chunks, from the published chunk lines.
+      const lines = chunkIndex.bySlug[item.slug] || [];
       return pageEnvelope('read', 'item', {
         body: item.body,
+        chunks: lines.map((line) => toolCitationRecord(line, host.bundleVersion)),
         frontmatter: item.frontmatter,
         iri: pageItemIri(base, item.type, item.slug),
         slug: item.slug,
@@ -762,34 +949,18 @@ function pageToolset(corpus, core) {
     // AGSC-09-14b: a total function — an invalid `sources[]` entry is DROPPED with
     // AGSC-E506, never rejected. `at` supplies the instant; a clock is never read.
     remember: (args) => {
-      const kinds = pageKindToType();
-      const kind = kinds[args.kind] === undefined ? 'concept' : args.kind;
-      const type = kinds[kind];
-      // AGSC-09-14b: a Gate's Level is a governance decision a
-      // tool call may not invent, and an episode's schema branch requires `actor`.
-      if (args.kind === 'gate') {
-        return pageErrorEnvelope('remember', 'AGSC-E203', 'remember does not accept kind "gate": a Gate\'s Level is a governance decision (AGSC-09-14b)');
-      }
-      if (type === 'episode' && typeof args.actor !== 'string') {
-        return pageErrorEnvelope('remember', 'AGSC-E003', 'an episode needs the declared actor (AGSC-09-14b)');
-      }
-      // AGSC-09-14b: no `at` on an episode is AGSC-E003; an actor outside AGSC-02-09 is refused.
-      if (type === 'episode' && typeof args.at !== 'string') {
-        return pageErrorEnvelope('remember', 'AGSC-E003', 'an episode needs the instant it started, `at` (AGSC-09-14b)');
-      }
-      if (args.actor !== undefined && !/^(?:human:[a-z0-9][a-z0-9._-]*|process:[a-z0-9][a-z0-9._-]*|[A-Za-z0-9][A-Za-z0-9._-]*\/[A-Za-z0-9][A-Za-z0-9._+-]*)$/u.test(String(args.actor))) {
-        return pageErrorEnvelope('remember', 'AGSC-E204', 'actor must be human:<id>, process:<id> or <producer>/<version> (AGSC-02-09)');
-      }
+      const type = pageKindToType()[args.kind];
       const refused = pageRememberFault(args, type, (slug) => bySlug[slug] !== undefined);
       if (refused !== null) return pageErrorEnvelope('remember', refused.code, refused.message);
       const title = typeof args.title === 'string' ? args.title : '';
       const findings = [];
-      // AGSC-09-14b (2026-09-25): the page has no identity to declare, so a call
-      // without an operator returns the item with `prov.operator` absent and says
-      // so; the Proposal path refuses it until a person supplies one.
+      // AGSC-09-14b: the page has no identity to declare, so a call without an operator
+      // returns the item with `prov.operator` absent and says so; the Proposal path
+      // refuses it until a person supplies one.
       if (typeof args.operator !== 'string') {
         findings.push({ code: 'AGSC-E506', message: 'no operator declared: prov.operator is absent and the Proposal needs one (AGSC-09-14b)', severity: 'warn' });
       }
+      findings.push(...pageRememberFindings(args));
       const taken = new Set(Object.keys(bySlug));
       const slug = pageDedupe(pageSlugify(title), taken);
       const frontmatter = { title, type };
@@ -804,7 +975,7 @@ function pageToolset(corpus, core) {
       if (type === 'episode') {
         frontmatter.started = args.at;
         frontmatter.outcome = args.outcome === undefined ? 'partial' : args.outcome;
-        // no `severity`: the episode branch has no such key (AGSC-09-14b, 2026-09-24)
+        // no `severity`: the episode branch has no such key
       }
       // the lesson branch requires `severity` (AGSC-09-14b default).
       if (type === 'lesson') frontmatter.severity = args.severity === undefined ? 'info' : args.severity;
@@ -819,17 +990,7 @@ function pageToolset(corpus, core) {
         operator: args.operator,
         origin: args.origin === 'human' ? 'human' : 'ai-generated',
       };
-      const sources = [];
-      const supplied = Array.isArray(args.sources) ? args.sources : [];
-      for (let i = 0; i < supplied.length; i += 1) {
-        const source = supplied[i];
-        if (!source || typeof source.resource !== 'string'
-          || !/^(https?:\/\/\S+|urn:agsc:channel:[a-z0-9-]+:\S+)$/u.test(source.resource)) {
-          findings.push({ code: 'AGSC-E506', message: 'source dropped', severity: 'warn' });
-          continue;
-        }
-        sources.push({ id: source.id, resource: source.resource });
-      }
+      const sources = pageKeptSources(args.sources, findings);
       if (sources.length > 0) frontmatter.sources = sources;
       return pageEnvelope('remember', 'proposal', {
         body: typeof args.body === 'string' ? pageNfc(args.body) : '',
@@ -843,9 +1004,8 @@ function pageToolset(corpus, core) {
     search: (args) => {
       const fault = indexFault();
       if (fault !== null) return pageErrorEnvelope('search', 'AGSC-E901', fault);
-      return pageEnvelope('search', 'items', {
-        hits: hitsFor(typeof args.query === 'string' ? args.query : ''),
-      });
+      // AGSC-09-13: at most 100 hits, and `total` beside them only above the bound.
+      return pageEnvelope('search', 'items', toolBounded(hitsFor(typeof args.query === 'string' ? args.query : '')));
     },
   };
 
@@ -853,7 +1013,7 @@ function pageToolset(corpus, core) {
     call: (name, args) => {
       // AGSC-09-13: the tool set is the set of implementations above and is stated
       // nowhere else in this module — `boundary/surfaces.js#TOOL_NAMES` is the one
-      // declaration of the seven names, and `tests/distribution/page-tools.test.js`
+      // declaration of the ten names, and `tests/distribution/page-tools.test.js`
       // asserts that these implementations are exactly those names.
       if (!Object.prototype.hasOwnProperty.call(implementations, name)) {
         return pageErrorEnvelope(String(name), 'AGSC-E001', 'no such tool');
@@ -864,6 +1024,8 @@ function pageToolset(corpus, core) {
       if (missing.length > 0) {
         return pageErrorEnvelope(name, 'AGSC-E003', `missing required argument: ${missing.join(', ')}`);
       }
+      const mistyped = pageArgumentTypeFault(name, supplied);
+      if (mistyped !== null) return pageErrorEnvelope(name, 'AGSC-E201', mistyped);
       const cap = 1024 * 1024;
       const oversized = pageArguments()[name].filter((key) => typeof supplied[key] === 'string'
         && new TextEncoder().encode(supplied[key]).length > cap);
@@ -885,7 +1047,7 @@ function pageToolset(corpus, core) {
         if (resolved.code !== null) refused = resolved.code;
         return resolved.slug;
       };
-      ['about', 'cluster', 'slug'].forEach((key) => {
+      ['about', 'cluster', 'slug', 'source', 'target'].forEach((key) => {
         if (Object.prototype.hasOwnProperty.call(normalized, key)) normalized[key] = one(normalized[key]);
       });
       if (Array.isArray(normalized.selection)) normalized.selection = normalized.selection.map(one);
@@ -901,7 +1063,10 @@ function pageToolset(corpus, core) {
 function pageArguments() {
   return {
     ask: ['question'],
+    brief: ['selection'],
+    check: ['selection'],
     compose: ['selection'],
+    explain: ['key', 'source', 'target'],
     links: ['iri', 'slug'],
     propose: ['agent', 'at', 'slug', 'task_state'],
     read: ['slug'],
@@ -913,13 +1078,30 @@ function pageArguments() {
 function pageRequiredArguments() {
   return {
     ask: ['question'],
+    brief: ['selection'],
+    check: [],
     compose: ['selection'],
+    explain: ['key', 'source', 'target'],
     links: [],
     propose: ['slug'],
     read: ['slug'],
     remember: ['body', 'kind', 'title'],
     search: ['query'],
   };
+}
+function pageArgumentTypeFault(name, supplied) {
+  const types = { selection: 'array', sources: 'array', usage: 'object' };
+  const keys = pageArguments()[name];
+  for (let i = 0; i < keys.length; i += 1) {
+    const value = supplied[keys[i]];
+    const type = types[keys[i]] || 'string';
+    if (value === undefined || value === null) continue;
+    const isArray = Array.isArray(value);
+    const ok = type === 'array' ? isArray : (type === 'object' ? typeof value === 'object' && !isArray : typeof value === 'string');
+    if (!ok && keys[i] === 'selection') return 'selection must be an array of slugs (AGSC-09-13)';
+    if (!ok) return `${keys[i]} must be ${type === 'string' ? 'a string' : `an ${type}`}, as the tool's inputSchema states (AGSC-09-13a)`;
+  }
+  return null;
 }
 function pageSlugOfIri(iri, base, bundleId) {
   const text = String(iri);
@@ -1055,6 +1237,236 @@ function pageBoardMove(block, body, frontmatter, type, slug, args, claimedBy) {
     task_state: args.task_state,
   };
 }
+function toolHitBound() {
+  return 100;
+}
+function toolBounded(hits) {
+  const bound = toolHitBound();
+  if (hits.length <= bound) return { hits };
+  return { hits: hits.slice(0, bound), total: hits.length };
+}
+function toolParse(text) {
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    return null;
+  }
+}
+function toolDescribed(map, key) {
+  const raw = (map || {})['/.well-known/knowledge-linkset'];
+  const doc = typeof raw === 'string' ? toolParse(raw) : null;
+  const sets = (doc && Array.isArray(doc.linkset)) ? doc.linkset : [];
+  for (let i = 0; i < sets.length; i += 1) {
+    const described = (sets[i] && Array.isArray(sets[i].describedby)) ? sets[i].describedby : [];
+    for (let j = 0; j < described.length; j += 1) {
+      const values = described[j] && described[j][key];
+      if (Array.isArray(values) && values.length > 0) return String(values[0]);
+    }
+  }
+  return '';
+}
+function toolHost(map) {
+  return {
+    bundleVersion: toolDescribed(map, 'agsc-bundle-version'),
+    instant: toolDescribed(map, 'agsc-generated-at'),
+    specVersion: toolDescribed(map, 'agsc-spec-version'),
+  };
+}
+function toolChunkShardRoutes(text) {
+  const first = typeof text === 'string' ? toolParse(text.split('\n')[0]) : null;
+  if (!first || !Array.isArray(first.shards)) return [];
+  const out = [];
+  for (let i = 0; i < first.shards.length; i += 1) {
+    const route = String(first.shards[i]);
+    if (/^\/chunks-[0-9]{2,}\.jsonl$/.test(route) && out.indexOf(route) === -1) out.push(route);
+  }
+  return out;
+}
+function toolChunkIndex(map) {
+  const sources = map || {};
+  const bySlug = Object.create(null);
+  const root = sources['/chunks.jsonl'];
+  const shards = toolChunkShardRoutes(root);
+  const missing = [];
+  const texts = [];
+  if (shards.length === 0 && typeof root === 'string') texts.push(root);
+  for (let i = 0; i < shards.length; i += 1) {
+    if (typeof sources[shards[i]] === 'string') texts.push(sources[shards[i]]);
+    else missing.push(shards[i]);
+  }
+  for (let t = 0; t < texts.length; t += 1) {
+    const lines = texts[t].split('\n');
+    for (let l = 0; l < lines.length; l += 1) {
+      const line = lines[l] === '' ? null : toolParse(lines[l]);
+      if (line === null || typeof line !== 'object' || typeof line.item !== 'string') continue;
+      if (bySlug[line.item] === undefined) bySlug[line.item] = [];
+      bySlug[line.item].push(line);
+    }
+  }
+  return { bySlug, incomplete: missing.length > 0, missing };
+}
+function toolCitationRecord(line, bundleVersion) {
+  const out = {
+    algorithm: 'sha-256',
+    bundle_version: bundleVersion,
+    coverage: 'text',
+    digest: line.digest,
+    id: line.id,
+    iri: line.iri,
+    item: line.item,
+    license: line.license,
+  };
+  if (line.license_url !== undefined) out.license_url = line.license_url;
+  out.ordinal = line.ordinal;
+  out.section = line.section;
+  out.terms = line.terms;
+  return out;
+}
+function toolRelations() {
+  const any = { any: true };
+  const concept = (kinds) => ({ kinds, type: 'concept' });
+  return {
+    related: { inverse: 'related', selfWarns: true, targets: any, transitive: false },
+    broader: { inverse: 'narrower', selfWarns: false, targets: { sameFamily: true }, transitive: true },
+    narrower: { inverse: 'broader', selfWarns: false, targets: { sameFamily: true }, transitive: true },
+    uses: { inverse: 'used-by', selfWarns: true, targets: any, transitive: false },
+    requires: { inverse: 'required-by', selfWarns: false, targets: any, transitive: true },
+    excludes: { inverse: 'excludes', selfWarns: true, targets: any, transitive: false },
+    'derived-from': { inverse: 'derivation-of', selfWarns: true, targets: { any: true, lessonTarget: { type: 'episode' } }, transitive: true },
+    contradicts: { inverse: 'contradicts', selfWarns: true, targets: any, transitive: false },
+    supersedes: { inverse: 'superseded-by', selfWarns: true, targets: { sameType: true }, transitive: true },
+    implements: { inverse: 'implemented-by', selfWarns: true, targets: concept(['spec', 'pattern', 'architecture']), transitive: false },
+    verifies: { inverse: 'verified-by', selfWarns: true, targets: { oneOf: [concept(['spec', 'task']), { type: 'procedure' }, { type: 'gate' }] }, transitive: false },
+    covers: { inverse: 'covered-by', selfWarns: true, targets: any, transitive: false },
+    'blocked-by': { inverse: 'blocks', selfWarns: true, targets: concept(['task']), transitive: true },
+    'decided-by': { inverse: 'decides', selfWarns: true, targets: concept(['decision']), transitive: false },
+  };
+}
+function toolPartners() {
+  const table = toolRelations();
+  const out = Object.create(null);
+  const keys = Object.keys(table);
+  for (let i = 0; i < keys.length; i += 1) {
+    out[keys[i]] = table[keys[i]].inverse;
+    out[table[keys[i]].inverse] = keys[i];
+  }
+  return out;
+}
+function toolChain(edges, key, source, target) {
+  const adjacency = Object.create(null);
+  for (let i = 0; i < edges.length; i += 1) {
+    if (edges[i].key !== key) continue;
+    if (adjacency[edges[i].source] === undefined) adjacency[edges[i].source] = [];
+    adjacency[edges[i].source].push(edges[i].target);
+  }
+  const order = (list) => list.slice().sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  const reached = Object.create(null);
+  reached[source] = { depth: 0, from: null };
+  let frontier = [source];
+  for (let depth = 1; frontier.length > 0; depth += 1) {
+    const next = [];
+    for (let f = 0; f < frontier.length; f += 1) {
+      const targets = order(adjacency[frontier[f]] || []);
+      for (let t = 0; t < targets.length; t += 1) {
+        if (reached[targets[t]] !== undefined) continue;
+        reached[targets[t]] = { depth, from: frontier[f] };
+        next.push(targets[t]);
+      }
+    }
+    frontier = order(next);
+  }
+  const end = reached[target];
+  if (end === undefined || end.depth < 2) return null;
+  const chain = [];
+  for (let node = target; reached[node].from !== null; node = reached[node].from) {
+    chain.unshift([reached[node].from, key, node]);
+  }
+  return chain;
+}
+function toolExplanation(edges, key, source, target) {
+  const answer = (because) => ({ because, holds: because.length > 0, key, source, target });
+  let computed = false;
+  for (let i = 0; i < edges.length; i += 1) {
+    const e = edges[i];
+    if (e.source !== source || e.key !== key || e.target !== target) continue;
+    if (!e.computed) return answer([{ from: [[source, key, target]], rule: 'authored' }]);
+    computed = true;
+  }
+  const partner = toolPartners()[key];
+  if (computed) {
+    const rule = partner === key ? 'symmetric' : 'inverse';
+    return answer([{ from: [[target, partner, source]], rule }]);
+  }
+  const table = toolRelations();
+  const row = table[key] || table[partner];
+  if (row === undefined || !row.transitive) return answer([]);
+  const chain = toolChain(edges, key, source, target);
+  if (chain === null) return answer([]);
+  return answer([{ from: chain, rule: key === 'requires' || key === 'required-by' ? 'closure' : 'transitive' }]);
+}
+function toolIsKind(spec, target) {
+  return target.type === spec.type && (spec.kinds === undefined || spec.kinds.indexOf(target.kind) !== -1);
+}
+function toolTargetMatches(cell, owner, target) {
+  const family = (type) => (type === 'lesson' ? 'concept' : type);
+  if (cell.any) return cell.lessonTarget === undefined || owner.type !== 'lesson' || toolIsKind(cell.lessonTarget, target);
+  if (cell.sameFamily) return family(owner.type) === family(target.type);
+  if (cell.sameType) return owner.type === target.type;
+  if (cell.oneOf) return cell.oneOf.some((spec) => toolIsKind(spec, target));
+  return toolIsKind(cell, target);
+}
+function toolLinkWarnings(edges, itemOf) {
+  const table = toolRelations();
+  const out = [];
+  const nul = String.fromCharCode(0);
+  const has = Object.create(null);
+  for (let i = 0; i < edges.length; i += 1) has[edges[i].source + nul + edges[i].key + nul + edges[i].target] = true;
+  const warn = (code, e, extra) => out.push(Object.assign({ code, key: e.key, severity: 'warn', slug: e.source, target: e.target }, extra));
+  for (let i = 0; i < edges.length; i += 1) {
+    const e = edges[i];
+    const row = table[e.key];
+    if (e.computed || row === undefined) continue;
+    const owner = itemOf(e.source);
+    const target = itemOf(e.target);
+    if (e.source === e.target && row.selfWarns) warn('AGSC-E313', e, {});
+    if (!toolTargetMatches(row.targets, owner, target)) warn('AGSC-E315', e, {});
+    if (e.key === 'supersedes' && (target.status === undefined || target.status === 'stable')) warn('AGSC-E316', e, {});
+    const pairs = { requires: ['contradicts', 'excludes', 'supersedes'], uses: ['excludes'] }[e.key] || [];
+    for (let p = 0; p < pairs.length; p += 1) {
+      if (e.source !== e.target && has[e.source + nul + pairs[p] + nul + e.target]) warn('AGSC-E314', e, { with: pairs[p] });
+    }
+  }
+  const text = (value) => (value === undefined ? '' : String(value));
+  const compare = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+  return out.sort((a, b) => compare(a.slug, b.slug) || compare(a.code, b.code) || compare(a.key, b.key)
+    || compare(a.target, b.target) || compare(text(a.with), text(b.with)));
+}
+function toolBrief(core, facts, selection, hash) {
+  if (facts.host.instant === '') {
+    return { fault: { code: 'AGSC-E901', message: 'no build instant: the discovery document of a build '
+      + '(/.well-known/knowledge-linkset) is absent or unreadable, and the brief carries its instant and content version (AGSC-07-25)' } };
+  }
+  const result = core.compose(facts.items, selection);
+  const finish = (digest) => ({ body: core.briefOf(result, {
+    base: facts.base,
+    bundleVersion: facts.host.bundleVersion === '' ? undefined : facts.host.bundleVersion,
+    instant: facts.host.instant,
+    items: facts.items,
+    licenseProse: facts.licenseProse,
+    selectionDigest: digest,
+    specVersion: facts.host.specVersion,
+  }) });
+  const digest = hash(core.selectionDigestInput(result));
+  return digest !== null && typeof digest === 'object' && typeof digest.then === 'function' ? digest.then(finish) : finish(digest);
+}
+function toolSha256Hex(text) {
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then((buffer) => {
+    const view = new Uint8Array(buffer);
+    let out = '';
+    for (let i = 0; i < view.length; i += 1) out += view[i].toString(16).padStart(2, '0');
+    return out;
+  });
+}
   var API = {
     pageTerms: pageTerms,
     pageNoAnswer: pageNoAnswer,
@@ -1065,6 +1477,10 @@ function pageBoardMove(block, body, frontmatter, type, slug, args, claimedBy) {
     pageApplyTypes: pageApplyTypes,
     pageKindToType: pageKindToType,
     pageRememberFault: pageRememberFault,
+    pageRememberFindings: pageRememberFindings,
+    pageKeptSources: pageKeptSources,
+    pageSetOwn: pageSetOwn,
+    pageFlatItem: pageFlatItem,
     pageEnvelope: pageEnvelope,
     pageErrorEnvelope: pageErrorEnvelope,
     pageBaseIri: pageBaseIri,
@@ -1092,27 +1508,49 @@ function pageBoardMove(block, body, frontmatter, type, slug, args, claimedBy) {
     pageBaseOf: pageBaseOf,
     pageEdges: pageEdges,
     pageCompare: pageCompare,
+    pageHeadingText: pageHeadingText,
     pageAnchors: pageAnchors,
     pageInlineTargets: pageInlineTargets,
+    pageLinkTail: pageLinkTail,
     pageResolveBodyReference: pageResolveBodyReference,
     pageToolset: pageToolset,
     pageArguments: pageArguments,
     pageRequiredArguments: pageRequiredArguments,
+    pageArgumentTypeFault: pageArgumentTypeFault,
     pageSlugOfIri: pageSlugOfIri,
     pageTaskStates: pageTaskStates,
     pageQuoteTemporal: pageQuoteTemporal,
     pageSetLine: pageSetLine,
     pageUnifiedDiff: pageUnifiedDiff,
-    pageBoardMove: pageBoardMove
+    pageBoardMove: pageBoardMove,
+    toolHitBound: toolHitBound,
+    toolBounded: toolBounded,
+    toolParse: toolParse,
+    toolDescribed: toolDescribed,
+    toolHost: toolHost,
+    toolChunkShardRoutes: toolChunkShardRoutes,
+    toolChunkIndex: toolChunkIndex,
+    toolCitationRecord: toolCitationRecord,
+    toolRelations: toolRelations,
+    toolPartners: toolPartners,
+    toolChain: toolChain,
+    toolExplanation: toolExplanation,
+    toolIsKind: toolIsKind,
+    toolTargetMatches: toolTargetMatches,
+    toolLinkWarnings: toolLinkWarnings,
+    toolBrief: toolBrief,
+    toolSha256Hex: toolSha256Hex
   };
   globalThis.AGSC_PAGE_TOOLS = API;
 
   // AGSC-05-04b: a page resolves `memory://<bundle-id>/<slug>` only for THIS
-  // Bundle's id, which no published route carries, so the writer emits it here.
+  // Bundle's id, which no published route carries, so the writer emits it here; and the
+  // brief states the prose licence (AGSC-07-25), which no published route carries either.
   API.BUNDLE_ID = "agenticsystemcore";
+  API.LICENSE_PROSE = "LicenseRef-AgenticSystemCore-Content-Use-1.0";
 
   // AGSC-06-01: the routes a page reads, and no others. Every one is same-origin.
-  API.ROUTES = ['/.well-known/knowledge-linkset', '/search.json'];
+  API.ROUTES = ['/.well-known/knowledge-linkset', '/search.json', '/chunks.jsonl'];
 
   API.load = function (fetchLike) {
     var get = function (route) {
@@ -1126,10 +1564,12 @@ function pageBoardMove(block, body, frontmatter, type, slug, args, claimedBy) {
       // AGSC-06-21: above 500 items /search.json is the MANIFEST {docs_total,
       // shards[]} and the index is the shards. The page follows it exactly as the
       // local tools do, and only to the /search-<nn>.json routes of this origin
-      // (pageShardRoutes) — never to a URL a document named.
+      // (pageShardRoutes) — never to a URL a document named. AGSC-06-31: the chunk
+      // export is followed the same way, to its /chunks-<nn>.jsonl shards only.
       var manifest = null;
       try { manifest = JSON.parse(sources['/search.json']); } catch (e) { manifest = null; }
-      return Promise.all(pageShardRoutes(manifest).map(function (route) {
+      var shards = pageShardRoutes(manifest).concat(toolChunkShardRoutes(sources['/chunks.jsonl']));
+      return Promise.all(shards.map(function (route) {
         return get(route).then(function (text) { if (text !== null) sources[route] = text; });
       }));
     }).then(function () {
@@ -1156,11 +1596,11 @@ function pageBoardMove(block, body, frontmatter, type, slug, args, claimedBy) {
           });
         }));
       });
-    }).then(function () { return pageCorpus(sources, { bundleId: API.BUNDLE_ID }); });
+    }).then(function () { return pageCorpus(sources, { bundleId: API.BUNDLE_ID, licenseProse: API.LICENSE_PROSE }); });
   };
 
-  API.install = function (corpus, core) {
-    var toolset = pageToolset(corpus, core);
+  API.install = function (corpus, core, hash) {
+    var toolset = pageToolset(corpus, core, hash);
     globalThis.AGSC_TOOLS = toolset;
     return toolset;
   };
@@ -1179,10 +1619,13 @@ function pageBoardMove(block, body, frontmatter, type, slug, args, claimedBy) {
   // returns a promise of the envelope, exactly as before. No answer changes: the
   // same routes, the same bytes, the same toolset — read later or not at all.
   API.ready = null;
+  API.corpus = null;
   API.start = function () {
     if (API.ready !== null) return API.ready;
+    // The corpus stays readable as `API.corpus` once it is in: the /compose/ page writes the
+    // brief and the blueprint over the same items the page tool `brief` reads (AGSC-07-25).
     var pending = API.load(function (route) { return fetch(route); })
-      .then(function (corpus) { return pageToolset(corpus, globalThis.AGSC_CORE); });
+      .then(function (corpus) { API.corpus = corpus; return pageToolset(corpus, globalThis.AGSC_CORE); });
     // Once the corpus is in, the SYNCHRONOUS toolset replaces the promise wrapper, so
     // a tool call costs no round trip and executeTool resolves immediately.
     API.ready = pending.then(function (toolset) {

@@ -17,6 +17,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/docs/guides/mode-1/">
 <meta property="og:title" content="Mode 1 guide: memory for an assistant, and nodes that check each other">
 <meta property="og:description" content="Guide to Mode 1 of AgenticSystemCore: a local tool server for an assistant and two nodes that check each other, with every command and the lines it prints.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Mode 1 guide: memory for an assistant, and nodes that check each other","description":"Guide to Mode 1 of AgenticSystemCore: a local tool server for an assistant and two nodes that check each other, with every command and the lines it prints.","url":"https://agenticsystemcore.com/docs/guides/mode-1/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
@@ -42,14 +46,18 @@
 </header>
 <main id="main">
 <h1>Mode 1 guide: memory for an assistant, and nodes that check each other</h1>
-<p class="summary"><strong>Summary</strong>For a developer connecting an AI assistant, and for two publishers: the local tool server and its seven tools, two nodes that name and check each other, and how to verify a published node by hand.</p>
+<p class="summary"><strong>Summary</strong>For a developer connecting an AI assistant, and for two publishers: the local tool server and its ten tools, two nodes that name and check each other, and how to verify a published node by hand.</p>
 <p><strong>Who it is for:</strong> a developer who wants an AI assistant to search, read and cite a
 folder of notes; two publishers who want their nodes to name and check each other; an
 agent, or its operator, reading someone else's node.</p>
-<p><strong>What you get:</strong> a local tool server, <code>agsc mcp</code>, with seven tools over your Bundle —
-<code>search</code>, <code>read</code>, <code>links</code>, <code>compose</code>, <code>ask</code>, <code>propose</code>, <code>remember</code> — that runs on your
-computer, needs no key and writes nothing; two nodes that list each other as peers and a
-shipped checker that confirms it; the commands to verify any published node by hand.</p>
+<p><strong>What you get:</strong> a local tool server, <code>agsc mcp</code>, with ten tools over your Bundle —
+<code>search</code>, <code>read</code>, <code>links</code>, <code>compose</code>, <code>ask</code>, <code>propose</code>, <code>remember</code>, <code>brief</code>, <code>explain</code>, <code>check</code> — that runs on your
+computer, needs no key and writes nothing (over standard input and output, or from 1.1 with
+<code>agsc mcp --http &lt;port&gt;</code> over HTTP on the loopback address, see
+<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md">USING-WITH-ASSISTANTS.md</a>); two nodes that list each other as peers and a
+shipped checker that confirms it; the commands to verify any published node by hand; and,
+if you want it, a domain layer: your own classes, relations and rules, checked by <code>verify</code> and
+<code>ci</code> (§5, &quot;The domain layer&quot;).</p>
 <p><strong>Read after:</strong> <a href="/docs/guides/mode-0/">Mode 0</a>. <strong>Next:</strong> <a href="/docs/guides/mode-2/">Mode 2</a>.</p>
 <p>---</p>
 <h2 id="before-you-start">Before you start</h2>
@@ -98,7 +106,7 @@ kind: explainer
 
 It keeps the plan and checks each result before the next handoff.
 ITEM
-agsc init &gt; /dev/null
+agsc init &gt; /dev/null 2&gt;&amp;1
 mkdir -p .well-known &amp;&amp; printf 'Contact: mailto:security@example.org\n' &gt; .well-known/security.txt
 git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'start'
 agsc lint</code></pre>
@@ -114,9 +122,12 @@ The setup for Claude Desktop, Cursor, VS Code and Codex CLI is in
 <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md#5-setting-it-up">USING-WITH-ASSISTANTS.md</a>.</p>
 <p>To see what the assistant sees without one, the package has a small script that starts
 <code>agsc mcp</code>, makes one tool call and prints the answer:</p>
-<pre tabindex="0" data-lang="bash"><code>node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; ask '{&quot;question&quot;:&quot;who splits a task into parts&quot;}'
+<pre tabindex="0" data-lang="bash"><code>node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; search '{&quot;query&quot;:&quot;handoff&quot;}'
+node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; ask '{&quot;question&quot;:&quot;who splits a task into parts&quot;}'
 node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; links '{&quot;slug&quot;:&quot;handoff&quot;}'</code></pre>
-<pre tabindex="0" data-lang="text"><code>  &quot;body&quot;: &quot;An agent that splits a task into parts and hands each part to another agent. Content Use Terms: LicenseRef-AgenticSystemCore-Content-Use-1.0.&quot;,
+<pre tabindex="0" data-lang="text"><code>        &quot;title&quot;: &quot;Handoff&quot;
+  &quot;type&quot;: &quot;items&quot;
+  &quot;body&quot;: &quot;An agent that splits a task into parts and hands each part to another agent. Content Use Terms: LicenseRef-AgenticSystemCore-Content-Use-1.0.&quot;,
     &quot;http://localhost/concepts/supervisor/&quot;
   &quot;trust&quot;: &quot;untrusted&quot;,
   &quot;type&quot;: &quot;answer&quot;
@@ -155,10 +166,10 @@ fs.writeFileSync(file, `${JSON.stringify(config, null, 2)}\n`);
 JS
 node set-node.js node-a https://a.example/ https://b.example/
 node set-node.js node-b https://b.example/ https://a.example/
-(cd node-a &amp;&amp; git commit -qam 'peer b' &amp;&amp; agsc build &gt; /dev/null)
-(cd node-b &amp;&amp; git commit -qam 'peer a' &amp;&amp; agsc build &gt; /dev/null)
+(cd node-a &amp;&amp; git commit -qam 'peer b' &amp;&amp; agsc build &gt; /dev/null 2&gt;&amp;1)
+(cd node-b &amp;&amp; git commit -qam 'peer a' &amp;&amp; agsc build &gt; /dev/null 2&gt;&amp;1)
 node &quot;$ENGINE/tools/validate-wellknown&quot; node-a/www/.well-known/knowledge-linkset --level 2 --peer node-b/www/.well-known/knowledge-linkset</code></pre>
-<pre tabindex="0" data-lang="text"><code>validate-wellknown pass (level 2): 22 input file(s) read, 0 error(s), 0 warning(s)</code></pre>
+<pre tabindex="0" data-lang="text"><code>validate-wellknown pass (level 2): 26 input file(s) read, 0 error(s), 0 warning(s)</code></pre>
 <p>The checker reads both discovery documents, recomputes every digest they declare, and
 confirms that each names the other. If only one side lists the other, it fails with
 <code>resolved, not mutual</code>. Nodes never call each other: a client reads both.</p>
@@ -184,7 +195,277 @@ content
 llms-ctx.txt
 chunks-index.toon</code></pre>
 <p>The first is the Bundle itself, ready to be read back with <code>agsc import --from okf</code>; the
-second is one text file and one compact index for a model's context window.</p>
+second is one text file and one compact index for a model's context window. Read back by the
+node that wrote it, the export keeps every status; read by another node, or any foreign OKF
+folder, it arrives as <strong>drafts</strong>, whatever licence it declares, until a person publishes each
+item. Add <code>--manifest</code> to an export (<code>agsc export --okf --manifest</code>) and the folder carries
+<code>export-manifest.json</code>: the digest of every file, the item count and a digest of the item
+addresses, which <code>import</code> recomputes and reports as a warning wherever the copy differs.
+<code>agsc import thesaurus.ttl --from skos</code> brings a SKOS thesaurus in as draft items the same way
+(<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONNECTORS.md">CONNECTORS.md</a>).</p>
+<p><code>agsc export --skos</code> writes <code>dist/export/skos.ttl</code>, the node's concepts, lessons and
+clusters as SKOS, for a thesaurus or taxonomy tool that reads SKOS and runs no
+inference. It states the scheme (title, tagline, author and licence from the
+configuration, and the title again as the scheme's SKOS label), the top concepts, and the type of each entry; episodes, procedures and
+gates are not SKOS concepts and are left out.</p>
+<pre tabindex="0" data-lang="bash"><code>agsc export --skos
+head -n 2 dist/export/skos.ttl</code></pre>
+<pre tabindex="0" data-lang="text"><code>@prefix dcterms: &lt;http://purl.org/dc/terms/&gt; .
+@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .</code></pre>
+<p>Memory tools take the node directly too, from 1.1. <code>agsc export --to &lt;tool&gt;</code>, with <code>mem0</code>,
+<code>letta</code>, <code>zep</code>, <code>csv</code>, <code>basic-memory</code> or <code>claude-code</code>, writes that tool's own files under
+<code>dist/export/&lt;tool&gt;/</code>, and <code>agsc import --from &lt;tool&gt; &lt;folder&gt;</code> reads them back. Nothing reaches
+the network: you send the Mem0, Letta or Zep file with that tool's own client, and you copy the
+Basic Memory notes or the Claude Code memory folder where the tool reads them. A record this
+node wrote comes back exactly; anything else arrives as a draft. Here the node goes out as a
+table and as a Claude Code memory folder, and a sheet someone else kept is checked before it
+comes in:</p>
+<pre tabindex="0" data-lang="bash"><code>agsc export --to csv
+agsc export --to claude-code
+ls dist/export/csv
+test -f dist/export/claude-code/memory/MEMORY.md &amp;&amp; echo 'memory index written'
+mkdir -p ../from-sheet
+printf 'title,body\nOn-call rota,The rota changes every Monday.\n' &gt; ../from-sheet/rota.csv
+agsc import --from csv ../from-sheet --dry-run</code></pre>
+<pre tabindex="0" data-lang="text"><code>PROVENANCE.md
+items.csv
+memory index written
+import: --dry-run: 1 file(s) would be written, 0 unchanged</code></pre>
+<p>Without <code>--dry-run</code> the row becomes <code>content/concepts/on-call-rota.md</code>, with <code>status: draft</code>.
+<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONNECTORS.md">CONNECTORS.md</a>
+Route 10 shows the file each tool gets and the few lines that send it.</p>
+<p><code>agsc lint --suggest</code> proposes Links without making any. It reads the notes and writes
+<code>dist/suggestions.json</code>: for each pair that no Link joins, a <code>related</code> suggestion where one
+note links to the other in its text, where the two cite two or more of the same sources, or
+where one names the other's title or alias; a <code>uses</code> suggestion where a note names a term; and,
+for a lesson with no <code>derived-from</code>, the episodes it could come from. Each entry carries its
+evidence, so a person can judge it. Nothing under <code>content/</code> changes; you accept a suggestion
+by editing the note. A note whose provenance says a model wrote it is not evidence for itself.</p>
+<p>To have <code>lint</code> warn about a pattern, taxonomy, explainer or principle that cites too few sources,
+set a minimum in <code>agsc.config.json</code>, for example <code>{&quot;lint&quot;: {&quot;min_sources&quot;: 2}}</code>. The default,
+<code>0</code>, checks nothing. A note below the minimum gets the warning <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E417"><code>AGSC-E417</code></a>; a source that is the
+address of a note a model wrote does not count.</p>
+<pre tabindex="0" data-lang="bash"><code>agsc lint --suggest
+head -c 17 dist/suggestions.json</code></pre>
+<pre tabindex="0" data-lang="text"><code>{&quot;bundle_version&quot;</code></pre>
+<p><code>agsc export --closure</code> writes <code>dist/export/closure.nt</code>: the statements that follow from the
+graph under a small, named part of OWL 2 RL (domains, ranges, sub-properties, symmetric,
+inverse and transitive properties, and sub-classes), minus the ones the graph already holds.
+It is for reading what the graph implies, for example that every concept is a <code>skos:Concept</code>;
+it is never published and never part of a build, and running it twice gives the same bytes.
+An item that uses an irreflexive property toward itself is reported as the warning <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E313"><code>AGSC-E313</code></a>.</p>
+<pre tabindex="0" data-lang="bash"><code>agsc export --closure
+grep -o 'skos/core#ConceptScheme' dist/export/closure.nt</code></pre>
+<pre tabindex="0" data-lang="text"><code>skos/core#ConceptScheme</code></pre>
+<h3 id="the-domain-layer">The domain layer</h3>
+<p>A node can also bring a vocabulary of its own: classes and relations for its field, such as
+an <code>Engine</code> that is a kind of concept, or <code>controls</code> as a kind of <code>uses</code>. Write them in one
+Turtle file and name it in <code>agsc.config.json</code>, for example
+<code>{&quot;domain&quot;: {&quot;vocabulary&quot;: &quot;domain/vocabulary.ttl&quot;}}</code>. The file declares one <code>owl:Ontology</code>,
+whose IRI followed by <code>#</code> is the namespace of its terms. Each class must be a subclass of
+exactly one of the six note types and each relation an <code>owl:ObjectProperty</code> under one of the
+fourteen link types, every term needs an <code>rdfs:label</code>, and no relation may state a domain or a
+range. That way a reader that knows only the six note types and the fourteen links still
+understands every note.</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir -p domain
+cat &gt; domain/vocabulary.ttl &lt;&lt;'TTL'
+@prefix asc: &lt;https://w3id.org/agentic-system-core/ns#&gt; .
+@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+
+asc:Concept a owl:Class .
+asc:uses a owl:ObjectProperty .
+
+&lt;https://example.org/ns/domain&gt; a owl:Ontology ; rdfs:label &quot;Our domain vocabulary&quot; .
+
+&lt;https://example.org/ns/domain#Engine&gt; a owl:Class ; rdfs:label &quot;Engine&quot; ;
+    rdfs:subClassOf asc:Concept .
+
+&lt;https://example.org/ns/domain#controls&gt; a owl:ObjectProperty ; rdfs:label &quot;controls&quot; ;
+    rdfs:subPropertyOf asc:uses .
+TTL
+node &quot;$ENGINE/tools/validate-ontology&quot; domain/vocabulary.ttl
+node -e 'const fs = require(&quot;fs&quot;); const c = JSON.parse(fs.readFileSync(&quot;agsc.config.json&quot;)); c.domain = { vocabulary: &quot;domain/vocabulary.ttl&quot; }; fs.writeFileSync(&quot;agsc.config.json&quot;, JSON.stringify(c, null, 2) + &quot;\n&quot;)'</code></pre>
+<pre tabindex="0" data-lang="text"><code>validate-ontology: 1 input file(s) read, site vocabulary, 10 triples, 1 classes, 1 properties, 0 error, 0 warn</code></pre>
+<p>The two lines at the top declare the note type and the link the file builds on. <code>agsc lint</code>
+and <code>agsc build</code> check the file, and a fault is the error <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E420"><code>AGSC-E420</code></a>;
+<code>node &quot;$ENGINE/tools/validate-ontology&quot; domain/vocabulary.ttl</code> checks it alone (<code>$ENGINE</code> is the
+engine's folder, as in section 3). The build publishes every
+statement of the file in <code>graph.nq</code>, <code>graph.ttl</code> and <code>graph.jsonld</code>, and <code>agsc export --closure</code>
+reads it. The file is not copied into the site, and a node without it builds byte for byte as
+before.</p>
+<p>A note then says which of these terms it is, and what part it plays, in its front matter:</p>
+<pre tabindex="0" data-lang="yaml"><code>domain_type: Engine
+domain_role: aggregate-root
+domain_links:
+  controls:
+    - supervisor</code></pre>
+<p><code>domain_type</code> names a class of the vocabulary file, <code>domain_role</code> is one of <code>aggregate-root</code>,
+<code>entity</code>, <code>value-object</code>, <code>domain-event</code> and <code>policy</code>, and each member of <code>domain_links</code> names
+a relation of the file, with the notes it points to, written as for any link. If the file says
+that two relations are each other's inverse (<code>owl:inverseOf</code>), write only one of them: the
+build adds the other. Both relations of such a pair must be relations the file defines; an
+<code>owl:inverseOf</code> that names anything else, such as <code>rdf:type</code> or <code>asc:uses</code>, is <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E420"><code>AGSC-E420</code></a>.
+Which one you write is fixed by the file: the object of the
+<code>owl:inverseOf</code> statement, or, where the file states the pair both ways, the one whose address
+sorts last, is the one the build adds. <code>agsc lint</code> refuses a <code>domain_type</code> the file does not
+define (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E418"><code>AGSC-E418</code></a>) and a member that is no relation of the file, that is the added inverse,
+or that is a kind of <code>skos:related</code>, <code>skos:broader</code> or <code>skos:narrower</code> used on a cluster
+(<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E317"><code>AGSC-E317</code></a>); a <code>domain_role</code> outside the five is <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E203"><code>AGSC-E203</code></a>. On a node with no vocabulary
+file, <code>domain_type</code> is the error <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E418"><code>AGSC-E418</code></a> and <code>domain_links</code> the warning <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E207"><code>AGSC-E207</code></a>: nothing
+reads them there.</p>
+<pre tabindex="0" data-lang="bash"><code>node -e 'const fs = require(&quot;fs&quot;); const f = &quot;content/concepts/handoff.md&quot;; fs.writeFileSync(f, fs.readFileSync(f, &quot;utf8&quot;).replace(&quot;kind: explainer\n&quot;, &quot;kind: explainer\ndomain_type: Engine\ndomain_role: aggregate-root\ndomain_links:\n  controls:\n    - supervisor\n&quot;))'
+git add -A &amp;&amp; git commit -qm 'domain vocabulary'
+agsc lint
+agsc build &gt; /dev/null 2&gt;&amp;1
+grep -o '&lt;https://a.example/concepts/handoff/&gt; &lt;https://example.org/ns/domain#controls&gt; &lt;https://a.example/concepts/supervisor/&gt;' www/graph.nq</code></pre>
+<pre tabindex="0" data-lang="text"><code>lint: pass (0 error, 2 warn)
+&lt;https://a.example/concepts/handoff/&gt; &lt;https://example.org/ns/domain#controls&gt; &lt;https://a.example/concepts/supervisor/&gt;</code></pre>
+<p>A term can also say why it belongs to the vocabulary, with a <code>warrant</code>: what grounds it, and
+which of the three kinds of warrant of ANSI/NISO Z39.19 that ground is. <code>literary</code> means the
+term is used in the published writing of the field, <code>user</code> that the people who look for the
+subject use it, and <code>organisational</code> that your organisation requires it. A warrant needs no
+vocabulary file.</p>
+<pre tabindex="0" data-lang="yaml"><code>warrant:
+  source: https://example.org/glossary
+  type: literary</code></pre>
+<p><code>source</code> is one line: an address where there is one, otherwise a citation. The build adds two
+statements to the note in <code>graph.nq</code>, <code>graph.ttl</code> and <code>graph.jsonld</code>: <code>dcterms:source</code> with the
+source and <code>asc:warrant</code> with the kind. A warrant is not an entry of <code>sources</code>, and it changes
+none of them. <code>agsc lint</code> refuses a warrant without a <code>source</code> or a <code>type</code>, or of another kind
+(<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E512"><code>AGSC-E512</code></a>), and an empty or multi-line source (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E204"><code>AGSC-E204</code></a>).</p>
+<p>A node can also write down what must always hold in its graph, and the questions its graph
+must answer, and have <code>agsc verify</code> and <code>agsc ci</code> check both. Rules that must always hold, such
+as &quot;every engine has a controller&quot;, are SHACL shapes in a Turtle file named by <code>domain.shapes</code>;
+<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/SHACL-SHAPES.md">SHACL-SHAPES.md</a>
+lists the part of SHACL the engine runs. Questions are a JSON file named by <code>domain.questions</code>:
+each entry has an <code>id</code>, the <code>question</code> in words, a SPARQL <code>query</code> and the <code>expected</code> answer. The
+query is an <code>ASK</code> or a <code>SELECT</code> made of basic patterns, the path operators <code>/</code>, <code>^</code>, <code>+</code> and
+<code>*</code>, <code>FILTER</code> with comparisons, <code>&amp;&amp;</code>, <code>||</code>, <code>!</code> and <code>NOT EXISTS</code>, <code>DISTINCT</code>, <code>ORDER BY</code> of
+variables and <code>LIMIT</code>. An <code>ORDER BY</code> of a <code>SELECT</code> names every variable the query returns, and
+<code>LIMIT</code> comes only after such an <code>ORDER BY</code>, so the rows kept and their order never depend on
+the engine. The expected answer of an <code>ASK</code> is <code>true</code> or <code>false</code>; that of a <code>SELECT</code>
+is <code>{&quot;rows&quot;: [[...]]}</code>, each cell a term written as in N-Triples (<code>&quot;&lt;https://example.org/x&gt;&quot;</code>,
+<code>&quot;\&quot;text\&quot;&quot;</code>) or <code>null</code> where a variable has no value. Both files run over <code>graph.nq</code> together
+with the statements <code>agsc export --closure</code> would add. A broken rule is <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E421"><code>AGSC-E421</code></a>, a question
+whose answer differs is the error <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E422"><code>AGSC-E422</code></a>, and a file outside these limits is <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E420"><code>AGSC-E420</code></a>.
+The rows of a <code>SELECT</code> without <code>ORDER BY</code> are compared as a set, in any order, and a title or
+description is written with its language tag (<code>&quot;\&quot;Handoff\&quot;@en&quot;</code>). Neither file needs a
+vocabulary file, and <code>agsc lint</code> and <code>agsc build</code> do not read them. Below, the shapes file asks
+every engine to control something, which <code>handoff</code> does, and one question asks whether the node
+holds a concept.</p>
+<pre tabindex="0" data-lang="bash"><code>cat &gt; domain/shapes.ttl &lt;&lt;'TTL'
+@prefix dom: &lt;https://example.org/ns/domain#&gt; .
+@prefix sh: &lt;http://www.w3.org/ns/shacl#&gt; .
+
+&lt;https://example.org/ns/domain-shapes#EngineControls&gt; a sh:NodeShape ;
+    sh:targetClass dom:Engine ;
+    sh:property [ sh:path dom:controls ; sh:minCount 1 ; sh:message &quot;Every engine controls something.&quot;@en ] .
+TTL
+cat &gt; domain/questions.json &lt;&lt;'JSON'
+[
+  {
+    &quot;expected&quot;: true,
+    &quot;id&quot;: &quot;has-a-concept&quot;,
+    &quot;query&quot;: &quot;ASK { ?note a &lt;https://w3id.org/agentic-system-core/ns#Concept&gt; }&quot;,
+    &quot;question&quot;: &quot;Does the node hold at least one concept?&quot;
+  }
+]
+JSON
+node -e 'const fs = require(&quot;fs&quot;); const c = JSON.parse(fs.readFileSync(&quot;agsc.config.json&quot;)); c.domain.shapes = &quot;domain/shapes.ttl&quot;; c.domain.questions = &quot;domain/questions.json&quot;; fs.writeFileSync(&quot;agsc.config.json&quot;, JSON.stringify(c, null, 2) + &quot;\n&quot;)'
+agsc verify
+sed -i.bak 's/&quot;expected&quot;: true/&quot;expected&quot;: false/' domain/questions.json
+agsc verify || echo &quot;verify exited $?&quot;</code></pre>
+<pre tabindex="0" data-lang="text"><code>verify: pass (0 error, 0 warn)
+error: AGSC-E422 the competency question has-a-concept (&quot;Does the node hold at least one concept?&quot;) is answered true, not the expected false (AGSC-05-41) — domain/questions.json
+verify exited 1</code></pre>
+<p>A cluster can also be a <strong>bounded context</strong>: a part of the field with words of its own, where
+a term has one meaning. Name it under <code>domain.contexts</code> with a namespace of its own, for example
+<code>{&quot;cluster&quot;: &quot;coordination&quot;, &quot;namespace&quot;: &quot;https://example.org/ns/coordination#&quot;}</code>. A note is in
+the context its <code>domain_context</code> names, or else in the context of its first cluster, or in none.
+Inside one context two notes with the same title, of any type, are the warning <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E419"><code>AGSC-E419</code></a>;
+notes in two different contexts may share a title without a warning, because the same word can
+mean two things in two contexts. With a vocabulary file, a context's namespace holds the classes
+and relations that belong to that context alone: a note inside a context names its <code>domain_type</code>
+and its <code>domain_links</code> from that context's namespace, and a note in no context names them from
+the vocabulary's own namespace. When such a node composes, <code>agsc compose</code> also
+writes <code>context-map.json</code> beside the Harness, in the folder whose name is the Harness folder's
+with <code>.companion</code> added: which context each member is in, the links between members of two
+contexts, and the members in none. The seven Harness files do not change, and a node without
+contexts gets no extra file.</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir -p content/clusters
+cat &gt; content/clusters/coordination.md &lt;&lt;'ITEM'
+---
+type: cluster
+title: Coordination
+description: How agents divide work between them, in the words this team uses.
+prov:
+  origin: human
+  operator: human:you
+---
+
+# Coordination
+ITEM
+cat &gt; content/concepts/supervisor.md &lt;&lt;'ITEM'
+---
+type: concept
+title: Supervisor
+description: An agent that splits a task into parts and hands each part to another agent.
+prov:
+  origin: human
+  operator: human:you
+kind: explainer
+domain_context: coordination
+---
+
+# Supervisor
+
+It keeps the plan and checks each result before the next handoff.
+ITEM
+node -e 'const fs = require(&quot;fs&quot;); const c = JSON.parse(fs.readFileSync(&quot;agsc.config.json&quot;)); c.domain.contexts = [{ cluster: &quot;coordination&quot;, namespace: &quot;https://example.org/ns/coordination#&quot; }]; fs.writeFileSync(&quot;agsc.config.json&quot;, JSON.stringify(c, null, 2) + &quot;\n&quot;)'
+agsc compose handoff supervisor &gt; /dev/null 2&gt;&amp;1
+map=&quot;$(ls -d dist/harness/*.companion)/context-map.json&quot;
+node -e 'const m = JSON.parse(require(&quot;fs&quot;).readFileSync(process.argv[1], &quot;utf8&quot;)); console.log(JSON.stringify(m.contexts)); console.log(JSON.stringify(m.unassigned))' &quot;$map&quot;</code></pre>
+<pre tabindex="0" data-lang="text"><code>[{&quot;members&quot;:[&quot;supervisor&quot;],&quot;name&quot;:&quot;coordination&quot;,&quot;namespace&quot;:&quot;https://example.org/ns/coordination#&quot;}]
+[&quot;handoff&quot;]</code></pre>
+<p>Readers and agents see these parts too. On a node with a vocabulary file, a note's page lists
+its domain type, role, context and warrant under its relations table, each with its label: the
+<code>rdfs:label</code> the file gives the class, the role in words, the title of the context's cluster and
+the warrant's kind and source. Where a related note has a domain type or a context, the
+relations table shows them in two more columns. For a note that states any of <code>domain_type</code>,
+<code>domain_role</code>, <code>domain_context</code> and <code>warrant</code>, the tools <code>search</code> and <code>read</code> add a member
+<code>domain</code> with its parts, on the local server and in the page tools alike, and a brief
+(<code>agsc compose --brief</code>) lists them under <code>## Domain</code> in <code>BRIEF.md</code>, on the note's entry in
+<code>brief.json</code> and in its section of <code>context.md</code>. A context that is a draft or held-back cluster
+is never named in a page's domain parts, a tool answer's <code>domain</code> member or the brief's four
+files; the note's own front matter, published at <code>/pages/&lt;slug&gt;.md</code> and returned by <code>read</code>, still
+says what it states. A domain link appears in the brief's relations like any other link, with the inverse
+the vocabulary declares. A note that states none of them gets no <code>domain</code> member and no brief
+line; its page changes only where a related note has a domain type or a context (the two
+columns).</p>
+<pre tabindex="0" data-lang="bash"><code>agsc build &gt; /dev/null 2&gt;&amp;1
+grep -o '&lt;dt&gt;Domain [a-z]*&lt;/dt&gt;&lt;dd&gt;[^&lt;]*&lt;/dd&gt;' www/concepts/handoff/index.html
+agsc compose handoff supervisor --brief &gt; /dev/null 2&gt;&amp;1
+grep -A3 '^## Domain' &quot;$(ls -d dist/harness/*.companion)/BRIEF.md&quot;</code></pre>
+<pre tabindex="0" data-lang="text"><code>&lt;dt&gt;Domain type&lt;/dt&gt;&lt;dd&gt;Engine&lt;/dd&gt;
+&lt;dt&gt;Domain role&lt;/dt&gt;&lt;dd&gt;aggregate root&lt;/dd&gt;
+## Domain
+
+- `handoff`: type Engine; role aggregate-root
+- `supervisor`: context coordination</code></pre>
+<p>A peer can say how its model relates to yours. Instead of the address alone, write the entry
+of <code>peers</code> as <code>{&quot;url&quot;: &quot;&lt;address&gt;&quot;, &quot;relationship&quot;: &quot;&lt;kind&gt;&quot;, &quot;crosswalk&quot;: &quot;&lt;file&gt;&quot;}</code>: the kind
+is <code>shared-kernel</code> (the two nodes own part of the model together), <code>conformist</code> (this node
+takes the peer's model as it is) or <code>translation-layer</code> (this node keeps its own model and
+translates). The crosswalk, required for <code>translation-layer</code>, is a Turtle file of statements
+<code>&lt;a note of yours&gt; skos:exactMatch &lt;the peer's note&gt;</code>, with <code>skos:closeMatch</code>,
+<code>skos:broadMatch</code> or <code>skos:narrowMatch</code> where the match is not exact; the subject is one of
+your concepts or lessons. <code>agsc lint</code> refuses any other statement (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E209"><code>AGSC-E209</code></a>) and a crosswalk
+file that is missing (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E901"><code>AGSC-E901</code></a>). The built site names the peer by its address alone, as
+before. A node that declares contexts also writes the relationship and the crosswalk into
+<code>context-map.json</code> when it composes; a node without contexts keeps them in its configuration
+only. The engine fetches no peer and a build never applies a crosswalk: a client that federates
+over peers must mark each result from that peer with them.</p>
 <p><code>agsc export --to cogx</code> writes the memory archive that Cognee reads; the routes for
 other agent frameworks are in <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONNECTORS.md">CONNECTORS.md</a>.</p>
 <h2 id="what-next">What next</h2>
@@ -198,7 +479,7 @@ other agent frameworks are in <a href="https://github.com/andreibesleaga/agentic
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/guides/mode-1.md">Propose an edit</a> — opens <code>site/docs/guides/mode-1.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
 </footer>
 </body>
 </html>

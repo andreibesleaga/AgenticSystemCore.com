@@ -17,6 +17,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/docs/architecture/">
 <meta property="og:title" content="Architecture">
 <meta property="og:description" content="arc42 and C4 architecture of AgenticSystemCore: quality goals, constraints, context, containers, bounded contexts, ports, runtime views, deployment, architecture decision records, quality lanes, risks and the STRIDE threat model.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Architecture","description":"arc42 and C4 architecture of AgenticSystemCore: quality goals, constraints, context, containers, bounded contexts, ports, runtime views, deployment, architecture decision records, quality lanes, risks and the STRIDE threat model.","url":"https://agenticsystemcore.com/docs/architecture/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
@@ -45,7 +49,7 @@
 <p class="summary"><strong>Summary</strong>The architecture of the reference implementation in the arc42 and C4 forms: quality goals, constraints, the system in its context, containers, five bounded contexts and their ports, the runtime sequences, deployment, the decisions of record and the threat model.</p>
 <p>This page restates the frozen architecture document of the project (its first architecture baseline, arc42 with C4 views and ISO 42010 correspondence rules) for readers who are not going to read the engine's source. It adds nothing to it. The architecture satisfies the <a href="/docs/requirements/">requirements</a> and never overrides a rule of the <a href="/specs/">specification</a>; where this page and a rule disagree, the rule wins.</p>
 <h2 id="1-quality-goals-ranked">1. Quality goals, ranked</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
 <thead><tr><th scope="col">#</th><th scope="col">Quality goal</th><th scope="col">Meaning here</th><th scope="col">Requirements</th></tr></thead>
 <tbody>
 <tr><td>Q1</td><td>Correctness and determinism</td><td>Byte-identical rebuilds on every operating system; every requirement has a test; the ledger re-verifies offline</td><td><a class="ref" href="/docs/requirements/#NFR-03">NFR-03</a>, <a class="ref" href="/docs/requirements/#NFR-04">NFR-04</a>, <a class="ref" href="/docs/requirements/#NFR-05">NFR-05</a></td></tr>
@@ -56,7 +60,7 @@
 </tbody></table></div>
 <p>Two floors are never traded: the licence stack (<a class="ref" href="/docs/requirements/#NFR-10">NFR-10</a>) and the clean-room rule (<a class="ref" href="/docs/requirements/#NFR-12">NFR-12</a>).</p>
 <h2 id="2-stakeholders">2. Stakeholders</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 30"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 32"><table>
 <thead><tr><th scope="col">Who</th><th scope="col">Primary concern</th></tr></thead>
 <tbody>
 <tr><td>Human reader</td><td>Find a pattern with evidence; the site works without JavaScript</td></tr>
@@ -74,7 +78,7 @@
 <tr><td>Future port implementers in other languages</td><td>No hidden behaviour in the JavaScript; byte-level vectors; no build step</td></tr>
 </tbody></table></div>
 <h2 id="3-constraints">3. Constraints</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 33"><table>
 <thead><tr><th scope="col">#</th><th scope="col">Constraint</th><th scope="col">Consequence</th></tr></thead>
 <tbody>
 <tr><td>C1</td><td>Zero runtime dependencies: Node built-ins only, Node 22.14 or later <em>(superseded — see the amendment below)</em></td><td>Every parser and writer is hand-written</td></tr>
@@ -140,7 +144,7 @@
 <p>People read the pages and machine surfaces over HTTPS and open proposals as pull requests. Agents call the local tool server over standard input and output, fetch the discovery document, the graph, llms.txt and the skill packs over HTTPS, and use the page tools where a browser exposes them. The owner performs every git write. Standards implementers request the link set and negotiate the vocabulary through w3id. Port implementers read the specification and the vectors. GitHub holds the repositories and runs the pipeline; Cloudflare Pages serves the site; w3id.org resolves the namespace; the npm registry distributes the engine. External interfaces are files and URLs only: there is no API to call.</p>
 <h2 id="5-solution-strategy">5. Solution strategy</h2>
 <p>A functional core compiles a folder of Markdown into every surface the product has. The content directory and the configuration file are the sole system of record; the engine is a pure compiler behind ports; GitHub Actions is the only thing that ever writes; Cloudflare Pages serves the output byte for byte. Every interactive path, in the browser, over MCP, over WebMCP or on the command line, ends in a local patch that a person turns into a proposal, and nothing publishes until a person merges.</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 32"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 34"><table>
 <thead><tr><th scope="col">Context</th><th scope="col">Responsibility</th><th scope="col">Aggregates</th><th scope="col">Verbs owned</th></tr></thead>
 <tbody>
 <tr><td>Knowledge</td><td>Parse, validate, link, ontology, graph; the vectors</td><td>Bundle, item (six types), Link, Source</td><td>Serves all</td></tr>
@@ -226,18 +230,18 @@
 </svg>
 <figcaption>The highlighted static site is written only by the CLI under CI; the MCP server and the browser bundle read what it publishes.</figcaption>
 </figure>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 33"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 35"><table>
 <thead><tr><th scope="col">Container</th><th scope="col">What it is</th></tr></thead>
 <tbody>
 <tr><td><code>agsc</code> CLI</td><td>Node ≥ 22.13, CommonJS, a small set of pinned and audited libraries; sixteen verbs, exit codes 0, 1 and 2, <code>--json</code> everywhere; five context directories under <code>src/</code> plus ports and Node adapters</td></tr>
-<tr><td><code>agsc mcp</code></td><td>A local stdio JSON-RPC server exposing seven tools: search, read, links, compose, propose, ask, remember</td></tr>
+<tr><td><code>agsc mcp</code></td><td>A local JSON-RPC server, over stdio or, from 1.1, Streamable HTTP on the loopback address (<code>--http</code>), exposing ten tools: search, read, links, compose, propose, ask, remember, brief, explain, check</td></tr>
 <tr><td>Browser bundle</td><td><code>www/js/agsc-core.js</code>: the same composition modules with no Node imports, plus the WebMCP page tools</td></tr>
 <tr><td>GitHub Actions</td><td><code>ci.yml</code>, <code>release.yml</code>, <code>refresh.yml</code>: the only backend</td></tr>
 <tr><td>Static site</td><td><code>www/</code>: pages, graph files, per-item Markdown and JSON-LD, the search index, llms.txt, skills, <code>/ns/</code>, the discovery document, the NOW page</td></tr>
 <tr><td>Bundle</td><td><code>content/**/*.md</code> plus <code>agsc.config.json</code>: the system of record; the ledger is derived into <code>www/</code>, not stored here</td></tr>
 </tbody></table></div>
 <h3 id="ports-and-adapters">Ports and adapters</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 34"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 36"><table>
 <thead><tr><th scope="col">Port</th><th scope="col">Purpose</th><th scope="col">Reference adapter</th><th scope="col">Plugin adapters, never required</th></tr></thead>
 <tbody>
 <tr><td>FileSystem</td><td>Read and write files</td><td>Node <code>fs</code></td><td>In-memory (tests), Deno, Bun, Workers</td></tr>
@@ -246,8 +250,8 @@
 <tr><td>Network, CI only</td><td>HTTP</td><td>Node fetch, permitted in <code>refresh</code> and <code>mcp</code> only; a test fails if it is reachable from the knowledge context</td><td>none</td></tr>
 <tr><td>ContentStore</td><td>The Bundle</td><td>Local git working tree</td><td>GitHub API, Obsidian, Solid</td></tr>
 <tr><td>GraphExport</td><td>Items to RDF</td><td>JSON-LD, Turtle, N-Quads (RDF/XML reserved)</td><td>SPARQL dump, Wikibase</td></tr>
-<tr><td>ToolTransport</td><td>Tools to agents</td><td>Local stdio MCP, seven tools</td><td>Remote responder (declared now, served later)</td></tr>
-<tr><td>PageTools</td><td>Tools in the page</td><td>WebMCP <code>document.modelContext</code>, the same seven tools, degrading to plain JavaScript</td><td>none</td></tr>
+<tr><td>ToolTransport</td><td>Tools to agents</td><td>Local MCP over stdio or loopback HTTP, ten tools</td><td>Remote responder (declared now, served later)</td></tr>
+<tr><td>PageTools</td><td>Tools in the page</td><td>WebMCP <code>document.modelContext</code>, the same ten tools, degrading to plain JavaScript</td><td>none</td></tr>
 <tr><td>Reviewer</td><td>Proposal verdict</td><td>Lint only, no model on a gating lane</td><td>The optional, non-gating model review lane (<a class="ref" href="/specs/08-governance/#AGSC-08-27">AGSC-08-27</a>), off by default</td></tr>
 <tr><td>Host</td><td>Where <code>www/</code> lands</td><td>Cloudflare Pages</td><td>GitHub or GitLab Pages, Netlify</td></tr>
 <tr><td>Forge</td><td>Pull-request and CI shim</td><td>GitHub, at most twenty lines of workflow</td><td>GitLab, Forgejo</td></tr>
@@ -350,17 +354,17 @@
 </figure>
 <p><strong>Browser composition.</strong> <code>/compose/</code> loads the graph and the browser bundle, which is the same composition module set with no Node imports. The user ticks Concepts; the closure runs client-side in the normative order (<a class="ref" href="/specs/07-composition/#AGSC-07-04">AGSC-07-04</a> to <a class="ref" href="/specs/07-composition/#AGSC-07-08">AGSC-07-08</a>); the user names the Harness; its files, of the seven kinds, are generated in memory and downloaded as a store-only zip, or file by file as the documented fallback. The bytes equal those of the command-line invocation for the same selection, and a vector asserts it (<a class="ref" href="/specs/07-composition/#AGSC-07-13">AGSC-07-13</a>).</p>
 <h2 id="8-deployment">8. Deployment</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 35"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 37"><table>
 <thead><tr><th scope="col">Lane</th><th scope="col">Trigger</th><th scope="col">Permissions</th><th scope="col">Result</th></tr></thead>
 <tbody>
 <tr><td>Engine CI</td><td>Push, pull request</td><td>Read only</td><td>Tests with a fixed clock and no network, coverage, self-lint, vectors, every independent validator</td></tr>
 <tr><td>Engine release</td><td>A version tag pushed by the maintainer</td><td>Identity token and attestation write</td><td>Trusted publishing of the packages to npm with provenance attestations</td></tr>
 <tr><td>Content CI and deploy</td><td>Push to the main branch, pull request</td><td>Read only; the deploy job holds the host token</td><td>The pipeline, then publication of <code>www/</code> to Cloudflare Pages</td></tr>
-<tr><td>Refresh and channel ingest</td><td>Weekly cron; per-channel schedule</td><td>Read plus issue creation; the ingest job has no repository write of its own</td><td>Staleness and link checks producing at most one issue and never a commit; channel ingest under the guards of <a class="ref" href="/specs/01-bundle/#AGSC-01-30">AGSC-01-30</a> and <a class="ref" href="/specs/08-governance/#AGSC-08-26">AGSC-08-26</a></td></tr>
+<tr><td>Refresh and channel ingest</td><td>Weekly cron; per-channel schedule</td><td>Read plus issue creation; the ingest job has no repository write of its own</td><td>Staleness and link checks producing at most one issue and never a commit; channel ingest under the guards of <a class="ref" href="/specs/01-bundle/page-2/#AGSC-01-30">AGSC-01-30</a> and <a class="ref" href="/specs/08-governance/#AGSC-08-26">AGSC-08-26</a></td></tr>
 </tbody></table></div>
 <p>Every action is pinned by commit hash; <code>pull_request_target</code> is never used; there is no cache step; each secret lives only in the job that needs it and expires within ninety days. Content negotiation for the namespace is a fixed table in the w3id <code>.htaccess</code> mapping <code>Accept</code> to same-origin static files, with immutable versioned copies; until the w3id pull request merges, the namespace simply does not resolve, which blocks nothing else.</p>
 <h3 id="where-a-node-can-live">Where a node can live</h3>
-<p>A node is a set of files, and so is its build; neither depends on a transport. It can be served from a web host, a laptop or a small device, a clone of its repository, IPFS behind an HTTP gateway, or a web interface in front of a store anchored in a ledger. What the rules ask of the place is fixed: an HTTPS origin that serves the discovery document and the routes with the response headers the build wrote (<a class="ref" href="/specs/06-surfaces/#AGSC-06-01">AGSC-06-01</a>, <a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-17">AGSC-06-17</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-05">AGSC-11-05</a>). How each kind of place is told is a <em>hosting profile</em>, one of the plugin kinds (<a class="ref" href="/specs/00-overview/#AGSC-00-24">AGSC-00-24</a>): the reference engine's <code>agsc-host</code> command carries seven, from Cloudflare Pages (the reference, and this site's host) to nginx and Apache, GitHub Pages behind a proxy, a local server, a clone, IPFS and a ledger anchor that records the bundle hash and the content version of each build (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-25">AGSC-04-25</a>). Each profile states what its place cannot do, and a conformance claim names its profile. No rule of version 1.x pins a transport other than HTTP.</p>
+<p>A node is a set of files, and so is its build; neither depends on a transport. It can be served from a web host, a laptop or a small device, a clone of its repository, IPFS behind an HTTP gateway, or a web interface in front of a store anchored in a ledger. What the rules ask of the place is fixed: an HTTPS origin that serves the discovery document and the routes with the response headers the build wrote (<a class="ref" href="/specs/06-surfaces/#AGSC-06-01">AGSC-06-01</a>, <a class="ref" href="/specs/06-surfaces/#AGSC-06-17">AGSC-06-17</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-05">AGSC-11-05</a>). How each kind of place is told is a <em>hosting profile</em>, one of the plugin kinds (<a class="ref" href="/specs/00-overview/page-2/#AGSC-00-24">AGSC-00-24</a>): the reference engine's <code>agsc-host</code> command carries seven, from Cloudflare Pages (the reference, and this site's host) to nginx and Apache, GitHub Pages behind a proxy, a local server, a clone, IPFS and a ledger anchor that records the bundle hash and the content version of each build (<a class="ref" href="/specs/04-canonicalization/#AGSC-04-25">AGSC-04-25</a>). Each profile states what its place cannot do, and a conformance claim names its profile. No rule of version 1.x pins a transport other than HTTP.</p>
 <p><em>(Note of 2026-10-12, for 1.0.0.)</em> The lanes above are the planned shape. At 1.0.0 the site is published by the host's git integration from the committed <code>www/</code> of the main branch; the demonstration node by the maintainer's upload of a checked build; no workflow of any repository holds a secret (every repository's secrets list is empty); and the weekly job is a read-only live check of the published addresses.</p>
 <h2 id="9-crosscutting-concepts">9. Crosscutting concepts</h2>
 <ul>
@@ -369,10 +373,10 @@
 <li><strong>Error handling.</strong> Exit 0 for success, 1 for findings or a failed gate, 2 for a usage error; diagnostics as JSON lines on standard error sorted by file, line, column and code; one code format, <code>AGSC-E&lt;nnn&gt;</code> (<a href="/specs/09-conformance/#section-9-3">AGSC-09 §9.3</a>).</li>
 <li><strong>Configuration.</strong> Exactly one schema-validated <code>agsc.config.json</code>; precedence flags, then environment, then project, then user; unknown keys are errors.</li>
 <li><strong>Logging.</strong> None at runtime, because there is no runtime; the durable record is the ledger, git history and Episode items; no telemetry, cookies or beacons.</li>
-<li><strong>Internationalisation.</strong> Language variants of an item — sharing its slug and address, served under a language path with <code>hreflang</code> alternates — are reserved to 1.1 (<a class="ref" href="/specs/01-bundle/#AGSC-01-13">AGSC-01-13</a>); at 1.0 a variant file beside its primary is refused (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E206"><code>AGSC-E206</code></a>).</li>
+<li><strong>Internationalisation.</strong> Language variants of an item — sharing its slug and address, served under a language path with <code>hreflang</code> alternates — are reserved to a later MINOR (<a class="ref" href="/specs/01-bundle/#AGSC-01-13">AGSC-01-13</a>); at 1.0 and 1.1 a variant file beside its primary is refused (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E206"><code>AGSC-E206</code></a>).</li>
 </ul>
 <h2 id="10-decisions-of-record">10. Decisions of record</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 36"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 38"><table>
 <thead><tr><th scope="col">ADR</th><th scope="col">Decision</th></tr></thead>
 <tbody>
 <tr><td>001</td><td>Agent safety by structural defence, not by a classifier and not by sandboxing: trust-marked results, fenced prose, deterministic lints, identifier-only tools, inert skills, human merge; with the honest limit that hashes prove tampering, not safety</td></tr>
@@ -387,13 +391,13 @@
 <tr><td>010</td><td>Part II scope under the simplicity rule: <code>run</code> and <code>trace</code> opt-in and off by default, <code>conform</code> a thin verb over the vector runner, federation as a validator flag, runtime emitters as template renderings of the seven kinds of Harness file</td></tr>
 <tr><td>011</td><td>A link set instead of a vendor manifest: the discovery document is an RFC 9264 link set with integrity on the links, one profile URI, no new media type or scheme</td></tr>
 <tr><td>012</td><td>Plugins are declared surfaces under the contract declare, pin, inherit, prove</td></tr>
-<tr><td>013</td><td>Two reference plugins, local MCP and WebMCP, with the same seven tools; the Agent Card only as an optional card beside a responder</td></tr>
+<tr><td>013</td><td>Two reference plugins, local MCP and WebMCP, with the same seven tools (ten from 1.1); the Agent Card only as an optional card beside a responder</td></tr>
 <tr><td>014</td><td>The agent federates; nodes never call nodes: nine static, client-side parts, citation instead of cross-Bundle links</td></tr>
 <tr><td>015</td><td>Visibility and dynamic hooks are specified now and built later</td></tr>
 <tr><td>016</td><td>Ports are wired verdict-neutrally in the fifth composition step</td></tr>
 </tbody></table></div>
 <h2 id="11-quality-lanes">11. Quality lanes</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 37"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 39"><table>
 <thead><tr><th scope="col">Requirement</th><th scope="col">Proved by</th></tr></thead>
 <tbody>
 <tr><td><a class="ref" href="/docs/requirements/#NFR-01">NFR-01</a> pinned, audited dependencies</td><td>The production dependency list is pinned to exact versions with a committed lockfile, <code>npm ci</code> installs and an <code>npm audit</code> gate</td></tr>
@@ -405,13 +409,13 @@
 <tr><td><a class="ref" href="/docs/requirements/#NFR-07">NFR-07</a> agent safety</td><td>The lint lane, tool-shape tests and the skills-inertness test</td></tr>
 <tr><td><a class="ref" href="/docs/requirements/#NFR-08">NFR-08</a> WCAG 2.2 AA</td><td>An accessibility lane over the golden build, with alt text asserted</td></tr>
 <tr><td><a class="ref" href="/docs/requirements/#NFR-09">NFR-09</a> unattended operation</td><td>An idempotence test for the refresh workflow and a restore-from-zero drill before launch</td></tr>
-<tr><td><a class="ref" href="/docs/requirements/#NFR-10">NFR-10</a> licence stack</td><td>An SPDX header on every browser script and a terms-embedded assertion on every prose export (a REUSE layout is a 1.1 item)</td></tr>
+<tr><td><a class="ref" href="/docs/requirements/#NFR-10">NFR-10</a> licence stack</td><td>An SPDX header on every browser script of the project's own, the licence texts beside each third-party one (the query engine under <code>/query/vendor/</code>), and a terms-embedded assertion on every prose export; from 1.1 the engine repository also follows the REUSE layout (<code>REUSE.toml</code> and <code>LICENSES/</code>)</td></tr>
 <tr><td><a class="ref" href="/docs/requirements/#NFR-11">NFR-11</a> cost ceiling</td><td>No model call reachable from the launch lanes, asserted by grep, and a spend line on the NOW page</td></tr>
 <tr><td><a class="ref" href="/docs/requirements/#NFR-12">NFR-12</a> clean room</td><td>The clean-room lint and an importer that refuses book references</td></tr>
 <tr><td><a class="ref" href="/docs/requirements/#NFR-13">NFR-13</a> offline and cross-platform</td><td>A portability checklist on three operating systems</td></tr>
 </tbody></table></div>
 <h2 id="12-risks">12. Risks</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 38"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 40"><table>
 <thead><tr><th scope="col">Risk</th><th scope="col">Mitigation</th></tr></thead>
 <tbody>
 <tr><td>The hand-written Markdown renderer, which must render every imported body</td><td>Golden tests over the whole corpus; unsupported syntax is a lint error, never a rendering surprise</td></tr>
@@ -425,7 +429,7 @@
 </tbody></table></div>
 <h2 id="13-threat-model">13. Threat model</h2>
 <p>The assets are the content repository, the engine repository and its packages, the published site and exports, the CI secrets, the accounts, the domains and the w3id prefix, contributor personal data, the memories of downstream agents, and the clean-room invariants. The threats and their mitigations, in STRIDE terms:</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 39"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 41"><table>
 <thead><tr><th scope="col">Threat</th><th scope="col">Mitigation</th></tr></thead>
 <tbody>
 <tr><td>Prompt injection through merged content reaching agents</td><td>Trust-marked results, fenced prose, the injection scan at error severity for agent-authored changes, identifier-only tools, inert skills, human merge</td></tr>
@@ -458,7 +462,7 @@
         interchange = component &quot;Interchange&quot; &quot;import/export/steer/skills&quot; &quot;src/interchange/&quot;
         ports = component &quot;Ports &amp; Node adapters&quot; &quot;FileSystem, Clock, ProcessRunner, Network[CI-only]&quot; &quot;src/ports/, src/adapters/&quot;
       }
-      mcpserver = container &quot;agsc mcp&quot; &quot;Local stdio JSON-RPC server: search read links compose propose ask remember&quot; &quot;Node.js&quot;
+      mcpserver = container &quot;agsc mcp&quot; &quot;Local JSON-RPC server over stdio or loopback HTTP: search read links compose propose ask remember brief explain check&quot; &quot;Node.js&quot;
       browser = container &quot;Browser bundle&quot; &quot;www/js/agsc-core.js — same composition core, no node: imports; WebMCP page tools&quot; &quot;JavaScript (ESM)&quot;
       site = container &quot;Static site&quot; &quot;www/: pages, graph.*, pages/*.md|.jsonld, search.json, llms.txt, skills/, /ns/, /.well-known/knowledge-linkset, now.md&quot; &quot;Static files&quot;
       pipeline = container &quot;GitHub Actions&quot; &quot;ci.yml, release.yml, refresh.yml — the only backend&quot; &quot;YAML workflows&quot;
@@ -472,7 +476,7 @@
 
     reader -&gt; site &quot;Reads pages and machine surfaces&quot; &quot;HTTPS&quot;
     reader -&gt; github &quot;Opens a Proposal (fork-and-edit)&quot; &quot;HTTPS&quot;
-    agent -&gt; mcpserver &quot;Calls seven tools&quot; &quot;stdio JSON-RPC&quot;
+    agent -&gt; mcpserver &quot;Calls ten tools&quot; &quot;JSON-RPC over stdio or HTTP&quot;
     agent -&gt; site &quot;Fetches linkset, graph, llms.txt, skills&quot; &quot;HTTPS&quot;
     agent -&gt; browser &quot;Uses page tools&quot; &quot;WebMCP&quot;
     owner -&gt; github &quot;All git writes, merges, tags&quot; &quot;git/HTTPS&quot;
@@ -502,7 +506,7 @@
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/architecture.md">Propose an edit</a> — opens <code>site/docs/architecture.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
 </footer>
 </body>
 </html>

@@ -4,9 +4,9 @@
 // One tool contract, two transports: the manifest below is the stdio server's
 // manifest, and every handler dispatches to the same pure implementation.
 (function () {
-  var MANIFEST = {"tools":[{"annotations":{"readOnlyHint":true,"untrustedContentHint":true},"description":"Return the descriptions of the best-matching items for a question, citing their item IRIs; no model is called.","inputSchema":{"properties":{"question":{"type":"string"}},"required":["question"],"type":"object"},"name":"ask"},{"annotations":{"readOnlyHint":true,"untrustedContentHint":true},"description":"Run the AGSC-07 closure algebra over a selection of item slugs.","inputSchema":{"properties":{"selection":{"type":"array"}},"required":["selection"],"type":"object"},"name":"compose"},{"annotations":{"readOnlyHint":true,"untrustedContentHint":false},"description":"Return the typed Links authored on one item.","inputSchema":{"properties":{"iri":{"type":"string"},"slug":{"type":"string"}},"required":[],"type":"object"},"name":"links"},{"annotations":{"consequentialHint":true,"readOnlyHint":false,"untrustedContentHint":true},"description":"Return the Proposal payload for one item — with task_state, a prepared board move (claim, progress, finish) as a patch; performs no write.","inputSchema":{"properties":{"agent":{"type":"string"},"at":{"type":"string"},"slug":{"type":"string"},"task_state":{"type":"string"}},"required":["slug"],"type":"object"},"name":"propose"},{"annotations":{"readOnlyHint":true,"untrustedContentHint":true},"description":"Return one item by slug.","inputSchema":{"properties":{"slug":{"type":"string"}},"required":["slug"],"type":"object"},"name":"read"},{"annotations":{"consequentialHint":true,"readOnlyHint":false,"untrustedContentHint":true},"description":"Synthesize a conforming item — a new task on a board (kind task, cluster), a comment on one (about) — and return it as a Proposal payload.","inputSchema":{"properties":{"about":{"type":"string"},"actor":{"type":"string"},"agent":{"type":"string"},"at":{"type":"string"},"body":{"type":"string"},"cluster":{"type":"string"},"kind":{"type":"string"},"model":{"type":"string"},"operator":{"type":"string"},"origin":{"type":"string"},"outcome":{"type":"string"},"severity":{"type":"string"},"sources":{"type":"array"},"title":{"type":"string"},"usage":{"type":"object"}},"required":["body","kind","title"],"type":"object"},"name":"remember"},{"annotations":{"readOnlyHint":true,"untrustedContentHint":true},"description":"Search this memory and return matching items.","inputSchema":{"properties":{"query":{"type":"string"}},"required":["query"],"type":"object"},"name":"search"}]};
+  var MANIFEST = {"tools":[{"annotations":{"readOnlyHint":true,"untrustedContentHint":true},"description":"Return the descriptions of the best-matching items for a question, citing their item IRIs; no model is called.","inputSchema":{"properties":{"question":{"type":"string"}},"required":["question"],"type":"object"},"name":"ask"},{"annotations":{"readOnlyHint":true,"untrustedContentHint":true},"description":"Return the composition brief of a selection of item slugs (why each member is there, the order, the gaps, the checklist); writes nothing.","inputSchema":{"properties":{"selection":{"type":"array"}},"required":["selection"],"type":"object"},"name":"brief"},{"annotations":{"readOnlyHint":true,"untrustedContentHint":false},"description":"Return the Link warnings about a selection of item slugs (every listed item when omitted).","inputSchema":{"properties":{"selection":{"type":"array"}},"required":[],"type":"object"},"name":"check"},{"annotations":{"readOnlyHint":true,"untrustedContentHint":true},"description":"Run the AGSC-07 closure algebra over a selection of item slugs.","inputSchema":{"properties":{"selection":{"type":"array"}},"required":["selection"],"type":"object"},"name":"compose"},{"annotations":{"readOnlyHint":true,"untrustedContentHint":false},"description":"Say whether a typed Link holds between two items and why: authored, or the steps of the reading.","inputSchema":{"properties":{"key":{"type":"string"},"source":{"type":"string"},"target":{"type":"string"}},"required":["key","source","target"],"type":"object"},"name":"explain"},{"annotations":{"readOnlyHint":true,"untrustedContentHint":false},"description":"Return the typed Links authored on one item.","inputSchema":{"properties":{"iri":{"type":"string"},"slug":{"type":"string"}},"required":[],"type":"object"},"name":"links"},{"annotations":{"consequentialHint":true,"readOnlyHint":false,"untrustedContentHint":true},"description":"Return the Proposal payload for one item — with task_state, a prepared board move (claim, progress, finish) as a patch; performs no write.","inputSchema":{"properties":{"agent":{"type":"string"},"at":{"type":"string"},"slug":{"type":"string"},"task_state":{"type":"string"}},"required":["slug"],"type":"object"},"name":"propose"},{"annotations":{"readOnlyHint":true,"untrustedContentHint":true},"description":"Return one item by slug.","inputSchema":{"properties":{"slug":{"type":"string"}},"required":["slug"],"type":"object"},"name":"read"},{"annotations":{"consequentialHint":true,"readOnlyHint":false,"untrustedContentHint":true},"description":"Synthesize a conforming item — a new task on a board (kind task, cluster), a comment on one (about) — and return it as a Proposal payload.","inputSchema":{"properties":{"about":{"type":"string"},"actor":{"type":"string"},"agent":{"type":"string"},"at":{"type":"string"},"body":{"type":"string"},"cluster":{"type":"string"},"kind":{"type":"string"},"model":{"type":"string"},"operator":{"type":"string"},"origin":{"type":"string"},"outcome":{"type":"string"},"severity":{"type":"string"},"sources":{"type":"array"},"title":{"type":"string"},"usage":{"type":"object"}},"required":["body","kind","title"],"type":"object"},"name":"remember"},{"annotations":{"readOnlyHint":true,"untrustedContentHint":true},"description":"Search this memory and return matching items.","inputSchema":{"properties":{"query":{"type":"string"}},"required":["query"],"type":"object"},"name":"search"}]};
   var LOCAL_ONLY = ["propose","remember"];
-  var state = { localOnlyCalls: 0, manifest: MANIFEST, registered: 0, transport: 'webmcp' };
+  var state = { localOnlyCalls: 0, manifest: MANIFEST, registered: 0, rejected: [], transport: 'webmcp' };
   globalThis.AGSC_WEBMCP = state;
 
   function invoke(name, args) {
@@ -30,14 +30,27 @@
 
   for (var i = 0; i < MANIFEST.tools.length; i += 1) {
     (function (tool) {
-      context.registerTool({
-        annotations: tool.annotations,
-        description: tool.description,
-        execute: function (args) { return invoke(tool.name, args); },
-        inputSchema: tool.inputSchema,
-        name: tool.name
-      });
-      state.registered += 1;
+      // The browser may refuse a registration, by throwing or by a rejected promise (a name
+      // already registered, say). The tool is then not registered, the others still are,
+      // and the page goes on working.
+      var result;
+      try {
+        result = context.registerTool({
+          annotations: tool.annotations,
+          description: tool.description,
+          execute: function (args) { return invoke(tool.name, args); },
+          inputSchema: tool.inputSchema,
+          name: tool.name
+        });
+      } catch (e) {
+        state.rejected.push(tool.name);
+        return;
+      }
+      if (result && typeof result.then === 'function') {
+        result.then(function () { state.registered += 1; }, function () { state.rejected.push(tool.name); });
+      } else {
+        state.registered += 1;
+      }
     }(MANIFEST.tools[i]));
   }
 }());

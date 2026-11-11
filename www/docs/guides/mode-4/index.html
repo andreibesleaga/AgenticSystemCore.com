@@ -17,6 +17,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/docs/guides/mode-4/">
 <meta property="og:title" content="Mode 4 guide: a selection becomes a starting harness">
 <meta property="og:description" content="Guide to Mode 4 of AgenticSystemCore: a selection of items becomes a starting harness, with every command and the lines it prints.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Mode 4 guide: a selection becomes a starting harness","description":"Guide to Mode 4 of AgenticSystemCore: a selection of items becomes a starting harness, with every command and the lines it prints.","url":"https://agenticsystemcore.com/docs/guides/mode-4/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
@@ -42,7 +46,7 @@
 </header>
 <main id="main">
 <h1>Mode 4 guide: a selection becomes a starting harness</h1>
-<p class="summary"><strong>Summary</strong>For an architect: compose a selection of items into a harness of seven kinds of file and an archive, try the opt-in run verb, and record a run that happened elsewhere.</p>
+<p class="summary"><strong>Summary</strong>For an architect: compose a selection of items into a harness of seven kinds of file and an archive, with a brief of the selection and, for a saved architecture, a blueprint; try the opt-in run verb, and record a run that happened elsewhere.</p>
 <p><strong>Who it is for:</strong> an architect or a developer who wants to pick a few patterns,
 procedures and decisions and get the files a system — or an agent runtime — starts from;
 anyone curious about the opt-in <code>run</code> verb.</p>
@@ -134,7 +138,7 @@ echo checkout answers
 checkout answers
 ```
 ITEM
-agsc init &gt; /dev/null
+agsc init &gt; /dev/null 2&gt;&amp;1
 mkdir -p .well-known &amp;&amp; printf 'Contact: mailto:security@example.org\n' &gt; .well-known/security.txt
 git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'checkout'
 agsc lint</code></pre>
@@ -158,6 +162,79 @@ in <code>dist/harness/&lt;name&gt;/</code> and the archive beside it. On a built
 runtime (<code>--emit crewai</code> and the others the specification lists) is refused with
 <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E203"><code>AGSC-E203</code></a>; <code>--emit ./my-emitter.js</code> runs a rendering you write as a plugin
 (<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/PLUGINS.md">PLUGINS.md</a>).</p>
+<p>Add <code>--brief</code> and <code>compose</code> also explains the composition, in four files beside the Harness
+(in the folder whose name is the Harness folder's with <code>.companion</code> added): <code>BRIEF.md</code> for you,
+<code>context.md</code> for an agent, <code>brief.json</code> for a program and <code>brief.mmd</code> as a diagram. They say why
+each item is there, the order to adopt them in (an item comes after what it requires), what is
+missing, and a checklist. The Harness files do not change, and <code>&quot;compose&quot;: {&quot;brief&quot;: true}</code> in
+<code>agsc.config.json</code> asks for the brief on every run. When a member states a domain type, a role, a
+context or a warrant (the domain layer, <a href="/docs/guides/mode-1/">mode-1.md</a>), the brief also lists those parts:
+under <code>## Domain</code> in <code>BRIEF.md</code>, on the member's entry in <code>brief.json</code> and in its section of
+<code>context.md</code>.</p>
+<pre tabindex="0" data-lang="bash"><code>agsc compose retry-with-backoff smoke-test --brief &gt; /dev/null 2&gt;&amp;1
+brief=&quot;$(ls -d dist/harness/*.companion)&quot;
+ls &quot;$brief&quot;
+sed -n '/^## Dependency order/,/^## Gaps/p' &quot;$brief/BRIEF.md&quot;</code></pre>
+<pre tabindex="0" data-lang="text"><code>BRIEF.md
+brief.json
+brief.mmd
+context.md
+## Dependency order
+
+1. `idempotency-key`
+2. `retry-with-backoff`
+3. `smoke-test`
+
+## Gaps</code></pre>
+<p>A brief is written for a composition that is not valid too, where no Harness is: its checklist
+then says which conflict to resolve. <code>--narrate &lt;agent&gt;</code> would add a summary written by a model;
+this distribution ships no way to reach a model, so it answers <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E001"><code>AGSC-E001</code></a> and writes the brief
+alone.</p>
+<p>One brief is cut short. Its <code>derived</code> list holds a reading, with its whole path, for each pair of
+items on a chain of <code>requires</code> (or another chain key), so it grows with the cube of the chain's
+length. Above 1,000,000 path steps, which a chain of 145 items passes, <code>derived</code> keeps the first
+readings in their order and <code>derived_total</code> says how many there are, as <code>search</code> does with its
+hits; below that bound the brief has no <code>derived_total</code>.</p>
+<p>Keep a selection as an item and you have a <strong>saved architecture</strong>: a concept of
+<code>kind: architecture</code> whose body holds the selection in a <code>yaml agsc-selection</code> block.
+<code>compose --from &lt;slug&gt; --brief</code> then also writes the architecture's <strong>blueprint</strong> into
+<code>blueprint/</code> of the same folder: the first three levels of the C4 model as Mermaid diagrams
+(<code>c4-context.mmd</code>, <code>c4-containers.mmd</code>, <code>c4-components.mmd</code>), one decision record for each
+decision a selected item names with <code>decided-by</code>, and <code>build-plan.md</code>, one step per item in the
+order to adopt them, with what each step needs and what checks it. JSON Schema, OpenAPI and test
+scaffolds are not part of a blueprint in 1.1. On a built site the item's page shows the brief and
+links <code>/compose/?from=&lt;slug&gt;</code>, where the browser shows the same brief and offers it, with the
+blueprint, for download — each as its own archive, never inside the Harness archive.</p>
+<pre tabindex="0" data-lang="bash"><code>rm -rf dist/harness
+cat &gt; content/concepts/checkout-plan.md &lt;&lt;'ITEM'
+---
+type: concept
+kind: architecture
+title: Checkout plan
+description: The saved selection of a checkout service that retries safely and is tested after each deploy.
+prov:
+  origin: human
+  operator: human:you
+---
+
+# Checkout plan
+
+```yaml agsc-selection
+- retry-with-backoff
+- smoke-test
+```
+ITEM
+agsc compose --from checkout-plan --brief &gt; /dev/null 2&gt;&amp;1
+blueprint=&quot;$(ls -d dist/harness/*.companion)/blueprint&quot;
+ls &quot;$blueprint&quot;
+sed -n '/^### Step/p' &quot;$blueprint/build-plan.md&quot;</code></pre>
+<pre tabindex="0" data-lang="text"><code>build-plan.md
+c4-components.mmd
+c4-containers.mmd
+c4-context.mmd
+### Step 1 — adopt `idempotency-key`
+### Step 2 — adopt `retry-with-backoff`
+### Step 3 — adopt `smoke-test`</code></pre>
 <h2 id="3-the-run-verb-off-by-default">3. The <code>run</code> verb (off by default)</h2>
 <p><code>run</code> reads a procedure's <code>run</code> blocks. It is off until the configuration turns it on
 and names the programs a step may start:</p>
@@ -185,7 +262,7 @@ cat &gt; run1.json &lt;&lt;JSON
 JSON
 agsc trace run1.json
 git add -A &amp;&amp; git commit -qm 'a recorded run'
-agsc build &gt; /dev/null
+agsc build &gt; /dev/null 2&gt;&amp;1
 sed -n '/## Monthly spend/,/^- cap/p' www/now.md</code></pre>
 <pre tabindex="0" data-lang="text"><code>trace: wrote content/episodes/smoke-test-after-deploy.md (an Episode, through the AGSC-01-22/AGSC-02-14 import path; no process was executed)
 - spent: 0.25 USD
@@ -208,7 +285,7 @@ until a cluster or another item links to it.</p>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/guides/mode-4.md">Propose an edit</a> — opens <code>site/docs/guides/mode-4.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
 </footer>
 </body>
 </html>

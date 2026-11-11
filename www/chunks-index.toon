@@ -1,0 +1,22 @@
+chunks[21]{id,item,kind,section,ordinal,title,digest}:
+  3bb4f25f4fb8a70b,bundle,concept,"",0,Bundle,304f1cbcef40c2c4
+  ad750a7932a82146,cluster,concept,"",0,Cluster,ca72c726fb85a136
+  faac607bd6362a3b,concept,concept,"",0,Concept,f5016810b2c8cca8
+  4e1148835e0535b6,episode,concept,"",0,Episode,c29d066dfe06e0ef
+  a079891dcf540536,gate,concept,"",0,Gate,cd20df0fd4045e88
+  b89264401f09339d,guides,cluster,"",0,Guides,0e49de8271a4bc4e
+  3253d319f6ec7dc1,harness,concept,"",0,Harness,522c951938f6cc18
+  34a4c4976427befb,item,concept,"",0,Item,abc7adabb273b62d
+  42df1a2db6882fdb,lesson,concept,"",0,Lesson,dc8097f8bc6af8f2
+  06170a21be48b5c9,link,concept,"",0,Link,4b631789bf673c25
+  874a1048562869fb,now,concept,"",0,NOW,b28ed97b053dca7a
+  e40ed2dfc40e0b52,procedure,concept,"",0,Procedure,20665738a94ae2a4
+  c4f75c2f0bb3d723,project-board,cluster,"",0,Project board,28cea1efc4d60728
+  a6a70473dbf6e934,publish-a-level-0-node,procedure,checks,0,Publish a Level-0 node,d371ae88bed144c8
+  5054b2c80f6cb7de,publish-a-level-0-node,procedure,steps,0,Publish a Level-0 node,ba34e1eb4fcfb177
+  ef631cd2c2de3044,publish-a-level-0-node,procedure,when,0,Publish a Level-0 node,8ce7ba0db6e49ce0
+  905773aa03d020b3,release-version-1-0-0,concept,"",0,Release version 1.0.0 of the specification,4098ce5a3f088158
+  63c33d7dec459a42,release-version-1-0-0,concept,what-done-means,0,Release version 1.0.0 of the specification,ec89db3895a7299f
+  b2b16463fbb1d812,release-version-1-0-0,concept,who-does-it,0,Release version 1.0.0 of the specification,0270e6ebab72394d
+  92804114176fdfa0,source,concept,"",0,Source,f48143c2e52fc9d7
+  0fff08f88b4faacc,vocabulary,cluster,"",0,Vocabulary,956323940c68ccfc

@@ -4,9 +4,9 @@
 bundle: https://agenticsystemcore.com/
 license: LicenseRef-AgenticSystemCore-Content-Use-1.0
 terms: LicenseRef-AgenticSystemCore-Content-Use-1.0
-spec_version: 1.0.0
-bundle_version: v1.0.0+38.g3b18ac857d11
-generated_at: 2026-10-14T09:45:37Z
+spec_version: 1.1.0
+bundle_version: v1.0.1+7.g64b74b653a62
+generated_at: 2026-11-11T10:09:50Z
 assistance: content may be AI-assisted; each item states its origin in prov.origin and each accepted contribution carries an Assisted-by: trailer
 -->
 
@@ -25,7 +25,6 @@ assistance: content may be AI-assisted; each item states its origin in prov.orig
 - ordinal: 0
 
 ```text agsc-content
-
 A **Bundle** is one directory tree of Markdown items plus exactly one `agsc.config.json`. It is the unit of publication and the unit of conformance: one repository is one Bundle.
 
 Items live at `content/<type-plural>/<slug>.md`. The Bundle root document, `content/index.md`, carries `spec_version`, `okf_version`, `title`, `description` and `base`, and is not itself an item. The Bundle IRI is the site base followed by `/`, and in the graph the Bundle is an `asc:Bundle`, the concept scheme every Concept is in.
@@ -40,7 +39,6 @@ Items live at `content/<type-plural>/<slug>.md`. The Bundle root document, `cont
 - ordinal: 0
 
 ```text agsc-content
-
 A **Cluster** groups items for navigation. Membership is authored on the item, in `clusters[]`, never on the cluster file; the first cluster listed is the item's primary cluster.
 
 In the graph a Cluster is an `asc:Cluster`, a subclass of `skos:Collection`, and membership is `skos:member`. A cluster may name at most one parent with `broader`, which is exported as membership of the parent, never as `skos:broader`.
@@ -55,7 +53,6 @@ In the graph a Cluster is an `asc:Cluster`, a subclass of `skos:Collection`, and
 - ordinal: 0
 
 ```text agsc-content
-
 A **Concept** is a unit of knowledge in a Bundle. Its `kind` says what sort of knowledge it is: a pattern, a taxonomy, an explainer, a principle, a decision, a spec, a task, a term or an architecture.
 
 In the graph a Concept is an `asc:Concept`, a subclass of `skos:Concept`, and carries `skos:inScheme` the Bundle, its title as `skos:prefLabel` and its description as `skos:definition`. Every term on this site is a Concept of kind `term`.
@@ -70,7 +67,6 @@ In the graph a Concept is an `asc:Concept`, a subclass of `skos:Concept`, and ca
 - ordinal: 0
 
 ```text agsc-content
-
 An **Episode** records something that happened: a session, a run or an incident. It carries `started`, `actor` and an `outcome` of `success`, `partial` or `failure`, and may carry `ended`, `refs[]` and token accounting in `usage{}`.
 
 In the graph an Episode is an `asc:Episode`, a subclass of `prov:Activity`. Knowledge distilled from Episodes is written as a Lesson.
@@ -85,7 +81,6 @@ In the graph an Episode is an `asc:Episode`, a subclass of `prov:Activity`. Know
 - ordinal: 0
 
 ```text agsc-content
-
 A **Gate** declares the checks a change must pass. It carries a `level` of `L1` (schema and links) or `L2` (which adds provenance, determinism and review), and may say how it is enforced.
 
 In the graph a Gate is an `asc:Gate`, a subclass of `prov:Plan`; its runs are Episodes.
@@ -112,7 +107,6 @@ Procedures for publishing and reading a node, each step naming the rule or the c
 - ordinal: 0
 
 ```text agsc-content
-
 A **Harness** is generated output. A composition takes an ordered selection of item slugs and the resolved graph and produces a verdict plus a Harness: files of seven kinds, written outside `content/`, that describe a system built from the selected items: a record of the selection and its closure in canonical JSON (`harness.jsonld`, not an RDF JSON-LD document), a context file for agents, a Structurizr model, a Mermaid diagram, an arc42 skeleton, one decision record per selected item and one skill file per selected Procedure.
 
 In agentic systems the word *harness* names the frame an agent runs inside: the scaffolding that embeds the agents and dictates the rules they follow. The specification uses the word in that sense, with one precision: a Harness here is that frame written down as files, not the running process. A runtime such as GABBE, kaiban-distributed, CrewAI or LangGraph can start from these files or render them into its own form; such a rendering is never part of the Harness itself, and none ships with the reference engine at 1.0. In the ontology a Harness is a plan (`asc:Harness`, a kind of `prov:Plan`).
@@ -129,7 +123,6 @@ A composition needs no network, key or server. A Harness is never authored and n
 - ordinal: 0
 
 ```text agsc-content
-
 An **item** is one `.md` file with YAML frontmatter whose `type` is one of `concept`, `episode`, `procedure`, `lesson`, `cluster` or `gate`.
 
 "Item" is a term of the specification only: the ontology has no common superclass for the six types, because an Activity is not an Entity. Every item carries `type`, `title` and `prov`; its slug is the file stem and the last path segment of its IRI, and a slug is permanent.
@@ -144,7 +137,6 @@ An **item** is one `.md` file with YAML frontmatter whose `type` is one of `conc
 - ordinal: 0
 
 ```text agsc-content
-
 A **Lesson** is knowledge distilled from one or more Episodes. It carries a `severity` of `info`, `warn` or `block` and should name the Episode it derives from; its body uses the headings `Lesson`, `Evidence` and `Check before`.
 
 In the graph a Lesson is an `asc:Lesson`, a subclass of `asc:Concept`: failure knowledge is kept as items, not in a separate error file.
@@ -159,7 +151,6 @@ In the graph a Lesson is an `asc:Lesson`, a subclass of `asc:Concept`: failure k
 - ordinal: 0
 
 ```text agsc-content
-
 A **Link** is a typed relation between two items of the same Bundle. It is written as a frontmatter array under one of fourteen keys: the nine core keys `related`, `broader`, `narrower`, `uses`, `requires`, `excludes`, `derived-from`, `contradicts` and `supersedes`, and the five Mode-2 keys `implements`, `verifies`, `covers`, `blocked-by` and `decided-by`.
 
 Each value is a slug. A Link never crosses Bundles: a reference to another node is a citation in `sources[]`.
@@ -174,7 +165,6 @@ Each value is a slug. A Link never crosses Bundles: a reference to another node 
 - ordinal: 0
 
 ```text agsc-content
-
 **NOW** is generated context: counts, the last build, stale items, open Lessons and monthly spend. It is produced from stored state only and is never hand-edited; a section whose input is absent is omitted, not guessed.
 
 NOW is never an item.
@@ -189,7 +179,6 @@ NOW is never an item.
 - ordinal: 0
 
 ```text agsc-content
-
 A **Procedure** is a plan a reader can execute. It may carry `when`, a one-line trigger saying when it applies, and `inputs[]`; its body uses the headings `When`, `Steps` and `Checks`. Procedures are published in skill packs, one pack per cluster holding the cluster's published items, and the pack takes its description from the cluster; a skill imported from elsewhere arrives as a Procedure whose `when` is that skill's description.
 
 In the graph a Procedure is an `asc:Procedure`, a subclass of `prov:Plan`.
@@ -269,7 +258,6 @@ You have content in a CMS, a wiki or a static-site generator and want people and
 - ordinal: 0
 
 ```text agsc-content
-
 Version 1.0.0 of the specification was released and tagged, and with it the reference engine published its own conformance claim: a claim needs a green run of that Level's whole vector set at a released version, which a release candidate is not (AGSC-10-05).
 ```
 
@@ -313,7 +301,6 @@ The maintainer decides and tags. Anyone may propose a correction to a rule throu
 - ordinal: 0
 
 ```text agsc-content
-
 A **Source** is an external work an item cites. It has no file of its own: it is written inline as an entry of `sources[]`, whose `resource` is a web URL or a channel identifier.
 
 In the graph each entry becomes an `asc:Source`, a subclass of `prov:Entity`, at the IRI `<item-IRI>#source-<n>`, and the item points to it with `asc:source`.

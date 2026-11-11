@@ -1,6 +1,6 @@
 # Now
 
-content version v1.0.0+38.g3b18ac857d11, built at 2026-10-14T09:45:37Z, fingerprint 71c5063e8e3e891aca8aad673c5300ba63098af3d40351597be784ebbc5fb0f9, specification 1.0.0
+content version v1.0.1+7.g64b74b653a62, built at 2026-11-11T10:09:50Z, fingerprint eb6adfb2197ac758eb76a241606cb9ac4365fef521ae4c352c2c470aa784be08, specification 1.1.0
 
 ## Counts
 
@@ -13,6 +13,6 @@ content version v1.0.0+38.g3b18ac857d11, built at 2026-10-14T09:45:37Z, fingerpr
 
 ## Monthly spend
 
-- month: 2026-10
+- month: 2026-11
 - spent: 0 USD
 - cap: 10 USD
