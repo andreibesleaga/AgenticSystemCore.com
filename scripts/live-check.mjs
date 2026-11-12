@@ -51,7 +51,7 @@ export const NODES = [
 ];
 export const W3ID = {
   base: 'https://w3id.org/agentic-system-core/',
-  paths: ['ns', 'ns/1.0.0', 'profile/agentic-knowledge', 'rel', 'specs/mcp/'],
+  paths: ['ns', 'ns/1.0.0', 'ns/1.1.0', 'profile/agentic-knowledge', 'rel', 'specs/mcp/'],
   target: 'https://agenticsystemcore.com/',
 };
 export const REGISTRIES = {

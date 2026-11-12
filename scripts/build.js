@@ -2615,6 +2615,12 @@ for (const [route, type, ...rest] of [
   ['/ns/schema/*.json', 'application/json; charset=utf-8'],
 ]) addHeaders(route, `Content-Type: ${type}`, ...rest);
 for (const route of PUBLIC_ARTEFACT) addHeaders(route, 'Access-Control-Allow-Origin: *', 'Access-Control-Expose-Headers: Link, ETag, Content-Type');
+// AGSC-06-06 (1.1.0 amendment): every file under a version directory /ns/<x.y.z>/ is immutable. The
+// blocks are the engine's own (headerSets reads the version directories from the routes), so the
+// directive and the pre-release copy /ns/1.0.0-draft.1/, which gets none, have one source.
+for (const { route, headers } of engineModule('src/distribution/headers.js').headerSets({}, SERVED_NS.map(v => `/ns/${v}/agsc.ttl`))) {
+  if (route.startsWith('/ns/')) addHeaders(route, ...headers.map(([name, value]) => `${name}: ${value}`));
+}
 // The signed monthly sustainability report (draft-besleaga-sustainability-wellknown), written into
 // static/ by the operator's report tool and republished byte for byte (static/README.md): a
 // rebuild keeps it, and its header block is part of this file instead of being appended later.

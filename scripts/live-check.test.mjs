@@ -207,3 +207,9 @@ test('the query page: one policy with wasm-unsafe-eval, and the engine served as
   report = await run(r);
   assert.match(fails(report).map(x => x.message).join('\n'), /\/query\/: the Content-Security-Policy has no 'wasm-unsafe-eval'/);
 });
+
+test('the weekly check reads the w3id address of the vocabulary version the site declares, and of 1.0.0', () => {
+  const declared = JSON.parse(fs.readFileSync(new URL('../agsc.config.json', import.meta.url), 'utf8')).spec_version;
+  assert.ok(W3ID.paths.includes(`ns/${declared}`), `W3ID.paths lacks ns/${declared}`);
+  assert.ok(W3ID.paths.includes('ns/1.0.0'));
+});

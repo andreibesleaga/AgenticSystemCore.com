@@ -493,6 +493,12 @@ for (const route of ['/.well-known/knowledge-linkset', '/graph.jsonld', '/graph.
   const lines = headerBlocks.get(route) || [];
   ok(lines.includes('Access-Control-Expose-Headers: Link, ETag, Content-Type') && lines.includes('Access-Control-Allow-Origin: *'), `_headers: ${route} lacks the cross-origin headers in its own block (AGSC-11-03)`);
 }
+// AGSC-06-06 (1.1.0 amendment): every file under a version directory /ns/<x.y.z>/ is served
+// immutable; the pre-release copy /ns/1.0.0-draft.1/ is not a version directory and gets nothing.
+for (const v of fs.readdirSync(path.join(WWW, 'ns'), { withFileTypes: true }).filter(e => e.isDirectory() && /^\d+\.\d+\.\d+$/.test(e.name)).map(e => e.name)) {
+  ok((headerBlocks.get(`/ns/${v}/*`) || []).includes('Cache-Control: public, max-age=31536000, immutable'), `_headers: /ns/${v}/* lacks Cache-Control: public, max-age=31536000, immutable (AGSC-06-06)`);
+}
+ok(![...headerBlocks].some(([route, lines]) => !/^\/ns\/\d+\.\d+\.\d+\/\*$/.test(route) && lines.some(l => /immutable/.test(l))), '_headers: only a version directory /ns/<x.y.z>/* is immutable (AGSC-06-06)');
 // Every instant of the derived ledger has the form of AGSC-04-10 (a wrong call of the engine's
 // derive() once wrote `0NaN-NaN-NaNTNaN:NaN:NaNZ` and every other check still passed).
 const ledgerLines = exists(path.join(WWW, 'ledger.jsonl')) ? fs.readFileSync(path.join(WWW, 'ledger.jsonl'), 'utf8').split('\n').filter(Boolean) : [];
