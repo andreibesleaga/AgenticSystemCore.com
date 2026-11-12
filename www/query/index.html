@@ -178,9 +178,9 @@ PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
 PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
 SELECT DISTINCT ?item ?reason WHERE { VALUES ?item { &lt;https://agenticsystemcore.com/concepts/bundle/&gt; }
   { ?item asc:status ?reason FILTER (?reason IN (&quot;draft&quot;, &quot;deprecated&quot;, &quot;retired&quot;)) }
-  UNION { ?item asc:staleAfter ?at FILTER (?at &lt; &quot;2026-11-12T03:39:09Z&quot;^^xsd:dateTime) BIND (&quot;stale&quot; AS ?reason) } }
+  UNION { ?item asc:staleAfter ?at FILTER (?at &lt; &quot;2026-11-12T05:45:55Z&quot;^^xsd:dateTime) BIND (&quot;stale&quot; AS ?reason) } }
   ORDER BY ?item ?reason</code></pre>
-<p class="example-note" id="example-9-note">Filled in from this node: &lt;S...&gt; is “Bundle” (bundle); &quot;T&quot; is 2026-11-12T03:39:09Z, the instant of this build. No item of this node has what this question asks about, so the answer is empty.</p>
+<p class="example-note" id="example-9-note">Filled in from this node: &lt;S...&gt; is “Bundle” (bundle); &quot;T&quot; is 2026-11-12T05:45:55Z, the instant of this build. No item of this node has what this question asks about, so the answer is empty.</p>
 <button type="button" data-example="example-9-query" aria-describedby="example-9-question example-9-note" hidden>Put this query in the editor</button>
 </li>
 <li id="example-10">
