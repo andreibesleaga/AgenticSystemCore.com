@@ -1,6 +1,6 @@
 Contact: https://github.com/andreibesleaga/agentic-system-core/security/advisories/new
 Contact: https://andreibesleaga.com/contact/
-Expires: 2027-11-11T05:45:55Z
+Expires: 2027-11-11T10:26:22Z
 Preferred-Languages: en
 Canonical: https://agenticsystemcore.com/.well-known/security.txt
 Policy: https://github.com/andreibesleaga/agentic-system-core/blob/main/SECURITY.md
