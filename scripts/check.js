@@ -489,6 +489,12 @@ for (const block of headers.split(/\n\n+/)) {
   if (headerBlocks.has(lines[0])) fails.push(`_headers: the address ${lines[0]} has two blocks; the host keeps only the later one`);
   headerBlocks.set(lines[0], lines.slice(1).map(l => l.trim()));
 }
+// One line per header name in a block: the host joins a repeated header's values with a comma,
+// and a browser refuses "Access-Control-Allow-Origin: *, *" (AGSC-11-03).
+for (const [route, lines] of headerBlocks) {
+  const names = lines.map(l => l.split(':')[0].toLowerCase());
+  ok(new Set(names).size === names.length, `_headers: ${route} names a header twice (the host joins the values with a comma)`);
+}
 for (const route of ['/.well-known/knowledge-linkset', '/graph.jsonld', '/graph.nq', '/graph.ttl', '/llms.txt', '/llms-full.txt', '/search.json', '/chunks.jsonl', '/ledger.jsonl', '/now.md', '/chunks-index.toon', '/exports/llms-ctx.txt']) {
   const lines = headerBlocks.get(route) || [];
   ok(lines.includes('Access-Control-Expose-Headers: Link, ETag, Content-Type') && lines.includes('Access-Control-Allow-Origin: *'), `_headers: ${route} lacks the cross-origin headers in its own block (AGSC-11-03)`);

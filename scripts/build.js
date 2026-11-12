@@ -2619,7 +2619,9 @@ for (const route of PUBLIC_ARTEFACT) addHeaders(route, 'Access-Control-Allow-Ori
 // blocks are the engine's own (headerSets reads the version directories from the routes), so the
 // directive and the pre-release copy /ns/1.0.0-draft.1/, which gets none, have one source.
 for (const { route, headers } of engineModule('src/distribution/headers.js').headerSets({}, SERVED_NS.map(v => `/ns/${v}/agsc.ttl`))) {
-  if (route.startsWith('/ns/')) addHeaders(route, ...headers.map(([name, value]) => `${name}: ${value}`));
+  // Only the version directories' blocks: the site writes /ns/* and /ns/*.<ext> itself above,
+  // and a second copy of those would repeat each header (the host joins repeats with a comma).
+  if (/^\/ns\/\d+\.\d+\.\d+\/\*$/.test(route)) addHeaders(route, ...headers.map(([name, value]) => `${name}: ${value}`));
 }
 // The signed monthly sustainability report (draft-besleaga-sustainability-wellknown), written into
 // static/ by the operator's report tool and republished byte for byte (static/README.md): a
