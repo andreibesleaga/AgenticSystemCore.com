@@ -115,20 +115,26 @@
 
 /ns/*.ttl
   Content-Type: text/turtle; charset=utf-8
+  Content-Type: text/turtle; charset=utf-8
 
 /ns/*.jsonld
+  Content-Type: application/ld+json; charset=utf-8
   Content-Type: application/ld+json; charset=utf-8
 
 /ns/*.rdf
   Content-Type: application/rdf+xml; charset=utf-8
+  Content-Type: application/rdf+xml; charset=utf-8
 
 /ns/*.nt
+  Content-Type: application/n-triples; charset=utf-8
   Content-Type: application/n-triples; charset=utf-8
 
 /ns/schema/*.json
   Content-Type: application/json; charset=utf-8
 
 /ns/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
   Access-Control-Allow-Origin: *
   Access-Control-Expose-Headers: Link, ETag, Content-Type
 
@@ -139,6 +145,12 @@
 /boards/*
   Access-Control-Allow-Origin: *
   Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/ns/1.0.0/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/ns/1.1.0/*
+  Cache-Control: public, max-age=31536000, immutable
 
 /.well-known/sustainability-data
   Content-Type: application/sustainability-data+json

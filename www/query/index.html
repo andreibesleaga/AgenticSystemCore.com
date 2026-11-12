@@ -67,8 +67,8 @@ SELECT ?item ?name WHERE { ?item skos:prefLabel ?name } ORDER BY ?item LIMIT 100
 </section>
 <section id="query-result" aria-labelledby="query-result-heading" hidden>
 <h2 id="query-result-heading">Result</h2>
-<p class="query-downloads"><a id="query-csv" data-format="csv" download="query-result.csv" hidden>Download the result as CSV</a>
-<a id="query-json" data-format="json" download="query-result.json" hidden>Download the result as JSON</a>
+<p class="query-downloads"><a id="query-csv" data-format="csv" hidden>Download the result as CSV</a>
+<a id="query-json" data-format="json" hidden>Download the result as JSON</a>
 <span id="query-csv-none" hidden>A yes-or-no answer has no CSV form; the JSON file holds it.</span></p>
 <p>The files follow the W3C Recommendations “SPARQL 1.1 Query Results CSV and TSV Formats” and “SPARQL 1.1 Query Results JSON Format”. A <code>CONSTRUCT</code> or <code>DESCRIBE</code> result is given as its triples, one row each, in the columns subject, predicate and object. The CSV file holds each value as the query gave it: a spreadsheet may run a value that starts with <code>=</code>, <code>+</code>, <code>-</code> or <code>@</code> as a formula, so import the file with its columns as text.</p>
 <div id="query-table" class="table-wrap"></div>
@@ -178,9 +178,9 @@ PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
 PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
 SELECT DISTINCT ?item ?reason WHERE { VALUES ?item { &lt;https://agenticsystemcore.com/concepts/bundle/&gt; }
   { ?item asc:status ?reason FILTER (?reason IN (&quot;draft&quot;, &quot;deprecated&quot;, &quot;retired&quot;)) }
-  UNION { ?item asc:staleAfter ?at FILTER (?at &lt; &quot;2026-11-12T00:18:08Z&quot;^^xsd:dateTime) BIND (&quot;stale&quot; AS ?reason) } }
+  UNION { ?item asc:staleAfter ?at FILTER (?at &lt; &quot;2026-11-12T02:40:45Z&quot;^^xsd:dateTime) BIND (&quot;stale&quot; AS ?reason) } }
   ORDER BY ?item ?reason</code></pre>
-<p class="example-note" id="example-9-note">Filled in from this node: &lt;S...&gt; is “Bundle” (bundle); &quot;T&quot; is 2026-11-12T00:18:08Z, the instant of this build. No item of this node has what this question asks about, so the answer is empty.</p>
+<p class="example-note" id="example-9-note">Filled in from this node: &lt;S...&gt; is “Bundle” (bundle); &quot;T&quot; is 2026-11-12T02:40:45Z, the instant of this build. No item of this node has what this question asks about, so the answer is empty.</p>
 <button type="button" data-example="example-9-query" aria-describedby="example-9-question example-9-note" hidden>Put this query in the editor</button>
 </li>
 <li id="example-10">
