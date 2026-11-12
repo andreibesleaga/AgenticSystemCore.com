@@ -178,9 +178,9 @@ PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
 PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
 SELECT DISTINCT ?item ?reason WHERE { VALUES ?item { &lt;https://agenticsystemcore.com/concepts/bundle/&gt; }
   { ?item asc:status ?reason FILTER (?reason IN (&quot;draft&quot;, &quot;deprecated&quot;, &quot;retired&quot;)) }
-  UNION { ?item asc:staleAfter ?at FILTER (?at &lt; &quot;2026-11-12T02:40:45Z&quot;^^xsd:dateTime) BIND (&quot;stale&quot; AS ?reason) } }
+  UNION { ?item asc:staleAfter ?at FILTER (?at &lt; &quot;2026-11-12T03:39:09Z&quot;^^xsd:dateTime) BIND (&quot;stale&quot; AS ?reason) } }
   ORDER BY ?item ?reason</code></pre>
-<p class="example-note" id="example-9-note">Filled in from this node: &lt;S...&gt; is “Bundle” (bundle); &quot;T&quot; is 2026-11-12T02:40:45Z, the instant of this build. No item of this node has what this question asks about, so the answer is empty.</p>
+<p class="example-note" id="example-9-note">Filled in from this node: &lt;S...&gt; is “Bundle” (bundle); &quot;T&quot; is 2026-11-12T03:39:09Z, the instant of this build. No item of this node has what this question asks about, so the answer is empty.</p>
 <button type="button" data-example="example-9-query" aria-describedby="example-9-question example-9-note" hidden>Put this query in the editor</button>
 </li>
 <li id="example-10">
@@ -202,8 +202,8 @@ SELECT DISTINCT ?resource ?other WHERE { &lt;https://agenticsystemcore.com/conce
 <h2 id="vocabulary-heading">Vocabulary</h2>
 <p>The classes and the relations of the graph, by the names a query uses. Every item of this node is in <code>/graph.nq</code> under one of these classes, and each link between two items is one of these relations.</p>
 <h3 id="vocabulary-classes">Classes</h3>
-<div class="table-wrap"><table id="vocabulary-class-table">
-<caption>The 12 classes of the vocabulary.</caption>
+<div class="table-wrap" tabindex="0" role="region" aria-labelledby="vocabulary-class-table-caption"><table id="vocabulary-class-table">
+<caption id="vocabulary-class-table-caption">The 12 classes of the vocabulary.</caption>
 <thead><tr><th scope="col">Class</th><th scope="col">IRI</th></tr></thead>
 <tbody>
 <tr><td><code>asc:Attachment</code></td><td><code>https://w3id.org/agentic-system-core/ns#Attachment</code></td></tr>
@@ -221,8 +221,8 @@ SELECT DISTINCT ?resource ?other WHERE { &lt;https://agenticsystemcore.com/conce
 </tbody>
 </table></div>
 <h3 id="vocabulary-relations">Relations</h3>
-<div class="table-wrap"><table id="vocabulary-relation-table">
-<caption>The 14 relations an item may name, in the order of the specification.</caption>
+<div class="table-wrap" tabindex="0" role="region" aria-labelledby="vocabulary-relation-table-caption"><table id="vocabulary-relation-table">
+<caption id="vocabulary-relation-table-caption">The 14 relations an item may name, in the order of the specification.</caption>
 <thead><tr><th scope="col">Key</th><th scope="col">Property</th><th scope="col">Meaning</th></tr></thead>
 <tbody>
 <tr><td><code>related</code></td><td><code>skos:related</code></td><td>The two items are connected in meaning, and neither depends on the other.</td></tr>

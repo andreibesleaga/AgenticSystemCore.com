@@ -39,8 +39,7 @@ button:focus-visible, .query-downloads a:focus-visible { outline: 2px solid var(
 .query-examples .question { margin: 0 0 0.35rem; font-weight: 600; }
 .query-table caption { text-align: left; caption-side: top; padding: 0 0 0.5rem; color: var(--muted); }
 .query-table td { font-family: ui-monospace, "SF Mono", Consolas, "Liberation Mono", monospace; font-size: 0.85rem; overflow-wrap: anywhere; }
-/* A long IRI in a vocabulary table wraps, so no table is wider than a phone screen (WCAG 2.1.1). */
-#vocabulary td { overflow-wrap: anywhere; }
+#vocabulary .table-wrap:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .query-boolean { font-size: 1.1rem; font-weight: 600; }
 /* The picture of a graph result: the explorer's scene writer, drawn with these rules. */
 .query-picture { border: 1px solid var(--rule); border-radius: 4px; background: var(--bg-alt); padding: 0.5rem; }
