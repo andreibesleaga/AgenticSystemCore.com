@@ -1326,7 +1326,7 @@ function toolRelations() {
   const any = { any: true };
   const concept = (kinds) => ({ kinds, type: 'concept' });
   return {
-    related: { inverse: 'related', selfWarns: true, targets: any, transitive: false },
+    related: { inverse: 'related', selfWarns: true, targets: { any: true, noCluster: true }, transitive: false },
     broader: { inverse: 'narrower', selfWarns: false, targets: { sameFamily: true }, transitive: true },
     narrower: { inverse: 'broader', selfWarns: false, targets: { sameFamily: true }, transitive: true },
     uses: { inverse: 'used-by', selfWarns: true, targets: any, transitive: false },
@@ -1409,6 +1409,7 @@ function toolIsKind(spec, target) {
 }
 function toolTargetMatches(cell, owner, target) {
   const family = (type) => (type === 'lesson' ? 'concept' : type);
+  if (cell.noCluster && (owner.type === 'cluster' || target.type === 'cluster')) return false;
   if (cell.any) return cell.lessonTarget === undefined || owner.type !== 'lesson' || toolIsKind(cell.lessonTarget, target);
   if (cell.sameFamily) return family(owner.type) === family(target.type);
   if (cell.sameType) return owner.type === target.type;

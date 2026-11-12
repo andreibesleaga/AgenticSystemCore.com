@@ -168,7 +168,7 @@
 <div class="table-wrap" tabindex="0" role="region" aria-label="Measured, reproducible"><table>
 <thead><tr><th scope="col">What</th><th scope="col">Result</th><th scope="col">Reproduce with</th></tr></thead>
 <tbody>
-<tr><th scope="row">Conformance</th><td>374 vectors pass, 0 fail, of 397 (23 withdrawn); 370 of 374 active rules have a machine check</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer conformance --scratch &lt;dir&gt;</code></td></tr>
+<tr><th scope="row">Conformance</th><td>376 vectors pass, 0 fail, of 399 (23 withdrawn); 370 of 374 active rules have a machine check</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer conformance --scratch &lt;dir&gt;</code></td></tr>
 <tr><th scope="row">Determinism</th><td>61 files compared across two builds, and across time zones and locales: 0 differ</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer determinism --scratch &lt;dir&gt;</code></td></tr>
 <tr><th scope="row">Security floor</th><td>108/108 seeded faults handled, 14/14 clean controls left alone. This proves neither safety nor the absence of new kinds of injection (AGSC-08-19)</td><td><code>SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer security --scratch &lt;dir&gt;</code></td></tr>
 <tr><th scope="row">Accessibility</th><td>0 automated violations on the 109 pages this site had when it was measured, in the light and dark schemes; automated checks find only part of what matters, so this is a floor, not a claim</td><td><code>SOURCE_DATE_EPOCH=1767225600 NODE_PATH=&lt;scratch&gt;/node_modules CHROME_EXE=&lt;chrome&gt; node bench/measure.js --layer a11y --scratch &lt;dir&gt; --nodes &lt;name&gt;=&lt;www&gt;,…</code></td></tr>
