@@ -170,7 +170,7 @@ collections are) comes in as procedures in a cluster you name. The package carri
 one-skill example; use your own folder the same way:</p>
 <pre tabindex="0" data-lang="bash"><code>agsc import --from skills --list &quot;$ENGINE/examples/demos/mode-3-skills/foreign&quot;
 agsc import &quot;$ENGINE/examples/demos/mode-3-skills/foreign&quot; --from skills --cluster releasing
-sed -i 's/^status: draft$/status: stable/' content/procedures/plain-notes.md
+sed -i.bak 's/^status: draft$/status: stable/' content/procedures/plain-notes.md &amp;&amp; rm content/procedures/plain-notes.md.bak
 agsc skills &gt; /dev/null 2&gt;&amp;1
 grep '^- item:' dist/skills/releasing/SKILL.md</code></pre>
 <pre tabindex="0" data-lang="text"><code>skills: [agentskills] skill plain-notes plain-notes/SKILL.md licence Apache-2.0 (license key) -&gt; draft (open licence; published when a person changes the status)
