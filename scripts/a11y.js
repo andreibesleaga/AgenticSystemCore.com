@@ -186,8 +186,19 @@ srv.listen(0, async () => {
         }
       }
       if (scheme === 'light' && width === 1280) {
-        const sw = await page.evaluate(() => { const b = document.getElementById('theme'); const s = b && b.querySelector('select'); const n = s && s.getAttribute('aria-label'); const ul = document.querySelector('header.site ul'); const same = !ul || innerWidth < 1000 || Math.abs(s.getBoundingClientRect().top - ul.getBoundingClientRect().top) < 12; return !!(b && !b.hidden && s && n && same); });
-        if (!sw) problems.push(`${p}: theme switcher missing, hidden, unnamed or not on the navigation line`);
+        // The switcher: present, shown, named, and on the navigation line (its top within 12 px of the
+        // list's). A failure says what was measured: the geometry, how many rows the list took and
+        // which font the links resolved to, so a runner whose fonts differ is told apart from the site.
+        const sw = await page.evaluate(() => {
+          const b = document.getElementById('theme'); const s = b && b.querySelector('select');
+          if (!b) return 'missing'; if (b.hidden) return 'hidden'; if (!s) return 'has no select'; if (!s.getAttribute('aria-label')) return 'unnamed';
+          const ul = document.querySelector('header.site ul'); if (!ul || innerWidth < 1000) return '';
+          const sr = s.getBoundingClientRect(), ur = ul.getBoundingClientRect();
+          if (Math.abs(sr.top - ur.top) < 12) return '';
+          const rows = new Set([...ul.querySelectorAll('li')].map(li => Math.round(li.getBoundingClientRect().top))).size;
+          return `not on the navigation line: select top ${sr.top.toFixed(1)} height ${sr.height.toFixed(1)}; list top ${ur.top.toFixed(1)} height ${ur.height.toFixed(1)} width ${ur.width.toFixed(0)} on ${rows} row(s); link font ${getComputedStyle(ul.querySelector('a')).fontFamily}`;
+        });
+        if (sw) problems.push(`${p}: theme switcher ${sw}`);
         await page.keyboard.press('Tab');
         const first = await page.evaluate(() => { const a = document.activeElement; return a && a.className === 'skip' && getComputedStyle(a).top !== '-48px'; });
         if (!first) problems.push(`${p}: first Tab does not reveal the skip link`);
