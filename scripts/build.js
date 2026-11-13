@@ -30,8 +30,10 @@ const OUT = path.resolve(ROOT, (() => { const i = process.argv.indexOf('--out');
 const STATUS = {
   wellknown: 'not-requested',   // not-requested | requested | registered
   profile: 'registered',         // not-filed | filed | registered
-  draft: 'draft-besleaga-agentic-knowledge-wellknown-01',                  // the current revision on the datatracker, e.g. 'draft-besleaga-agentic-knowledge-wellknown-01'
-  draftPosted: '2026-10-14', draftExpires: '2027-04-17', // the current revision's dates, as the datatracker shows them
+  // The draft's name WITHOUT a revision number: the datatracker page of that name always shows the
+  // latest revision and its dates, so a new revision (-02, -03, ...) needs no change here.
+  draft: 'draft-besleaga-agentic-knowledge-wellknown',
+  draftFirstPosted: '2026-09-30', // the day revision -00 was posted; it never changes
   w3id: true,                   // true once the w3id.org namespace redirects are live
   // the preprint of the version this site publishes; `concept` is the DOI that names every version of it
   preprint: { doi: '10.5281/zenodo.23365416', concept: '10.5281/zenodo.23052709', title: 'AgenticSystemCore: Distributed Knowledge Bundles and Runnable Systems, for People and Agents', date: '2026-10-14', version: '1.0.0' },               // e.g. { doi: '10.5281/zenodo.NNNNNNN', title: '…', date: 'YYYY-MM-DD' } once published
@@ -1133,7 +1135,7 @@ const PLAIN = Object.fromEntries(specPages.map(p => [p.slug, engineFile(`docs/pl
 const SPEC_DIAGRAM = { '00-overview': 'spec-00-conformance', '01-bundle': 'spec-01-bundle', '02-item': 'spec-02-item', '03-links': 'spec-03-links', '04-canonicalization': 'spec-04-canonicalization', '05-graph': 'spec-05-graph', '06-surfaces': 'spec-06-surfaces', '07-composition': 'spec-07-composition', '08-governance': 'spec-08-governance', '09-conformance': 'spec-09-conformance', '10-implementation-profiles': 'spec-10-profiles', '11-boundary': 'spec-11-boundary' };
 
 // ------------------------------------------------------------------ HTML layout
-const NAV = [['/docs/', 'Guide'], ['/specs/', 'Specification'], ['/concepts/', 'Vocabulary'], ['/ns/', 'Ontology'], ['/specs/agentic-knowledge/', 'Discovery'], ['/query/', 'Query'], ['/docs/standards/', 'Standards'], ['/docs/status/', 'Status'], ['/about/', 'About'], ['/search/', 'Search']];
+const NAV = [['/docs/', 'Guide'], ['/specs/', 'Specification'], ['/concepts/', 'Vocabulary'], ['/ns/', 'Ontology'], ['/specs/agentic-knowledge/', 'Discovery'], ['/query/', 'Query'], ['/docs/standards/', 'Standards'], ['/about/', 'About'], ['/search/', 'Search']];
 const summaryOf = url => { const s = SUMMARIES[url]; if (!s) die(`no summary for ${url} (site/summaries.json)`); return s; };
 // The preview card of a shared link (The Open Graph protocol, ogp.me): assets/og-card.png, a plain
 // text card drawn by scripts/og-card.js, whose CARD.alt is the text the image shows. Every page with
@@ -1229,7 +1231,7 @@ const editLink = (repo, file) => `<p class="edit"><a rel="noopener" href="${esc(
 const regText = {
   wellknown: { 'not-requested': STATUS.draft ? 'Not registered. Its registration in the Well-Known URIs registry (RFC 8615) is asked for in the Internet-Draft, which is posted; no request has been sent to the registry.' : 'Not yet requested. The suffix <code>knowledge-linkset</code> will be requested for the Well-Known URIs registry (RFC 8615) through an Internet-Draft; it is not registered.', requested: 'Requested for the Well-Known URIs registry (RFC 8615); not yet registered.', registered: 'Registered in the Well-Known URIs registry (RFC 8615).' }[STATUS.wellknown],
   profile: { 'not-filed': 'Not yet filed in the Profile URIs registry (RFC 7284).', filed: 'Filed in the Profile URIs registry (RFC 7284); not yet registered.', registered: 'Registered in the Profile URIs registry (RFC 7284).' }[STATUS.profile],
-  draft: STATUS.draft ? `<a href="https://datatracker.ietf.org/doc/${esc(STATUS.draft.replace(/-\d{2}$/, ''))}/"><code>${esc(STATUS.draft)}</code></a>, an individual Internet-Draft${STATUS.draftPosted ? `, posted on ${esc(STATUS.draftPosted)}` : ''}${STATUS.draftExpires ? `; it expires on ${esc(STATUS.draftExpires)} unless it is revised` : ''}.` : 'Not yet posted.',
+  draft: STATUS.draft ? `<a href="https://datatracker.ietf.org/doc/${esc(STATUS.draft)}/"><code>${esc(STATUS.draft)}</code></a>, an individual Internet-Draft, first posted on ${esc(STATUS.draftFirstPosted)}; the Datatracker page shows the latest revision, its date and its expiry.` : 'Not yet posted.',
   w3id: STATUS.w3id ? 'The namespace <code>https://w3id.org/agentic-system-core/</code> resolves to this site. Its permanent addresses redirect (HTTP 303) to the pages and files they name: the vocabulary at <code>/ns</code> and its versioned copies, by content negotiation to the vocabulary file in the format asked for; the two specification pages at <code>/specs/mcp/</code> and <code>/specs/agentic-knowledge/</code>; and the profile URI at <code>/profile/agentic-knowledge</code>.' : 'The namespace <code>https://w3id.org/agentic-system-core/</code> does not resolve yet; the pull request to w3id.org is open and not yet merged.',
   preprint: STATUS.preprint ? `Published: <a href="https://doi.org/${esc(STATUS.preprint.doi)}">${esc(STATUS.preprint.title)}</a>${STATUS.preprint.version ? `, version ${esc(STATUS.preprint.version)}` : ''} (${esc(STATUS.preprint.date)}), DOI <code>${esc(STATUS.preprint.doi)}</code>.${STATUS.preprint.concept ? ` The DOI <a href="https://doi.org/${esc(STATUS.preprint.concept)}"><code>${esc(STATUS.preprint.concept)}</code></a> names every version of the preprint.` : ''}` : 'In preparation; not yet published.',
   software: STATUS.software ? `The reference engine ${esc(STATUS.software.version)} is archived as software on Zenodo, DOI <a href="https://doi.org/${esc(STATUS.software.doi)}"><code>${esc(STATUS.software.doi)}</code></a>.` : '',
@@ -2051,7 +2053,7 @@ for (const f of DOCS) {
     status: { 'status-table': statusTable },
   }[slug] || {};
   addPage(url, {
-    title: fm.title, summary: fm.summary, description: fm.description, section: slug === 'standards' ? '/docs/standards/' : slug === 'status' ? '/docs/status/' : '/docs/', wide: WIDE_DOCS.has(slug),
+    title: fm.title, summary: fm.summary, description: fm.description, section: slug === 'standards' ? '/docs/standards/' : '/docs/', wide: WIDE_DOCS.has(slug),
     scripts: PAGE_TOOL_SCRIPTS,
     jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: fm.title, description: fm.description, url: ORIGIN + url, author: { '@type': 'Person', name: config.site.author }, isPartOf: `${BASE}docs/` },
     body: md(body, { ...o, slots }) + editLink('site', `site/docs/${f}`),
