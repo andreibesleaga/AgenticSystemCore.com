@@ -186,15 +186,17 @@ srv.listen(0, async () => {
         }
       }
       if (scheme === 'light' && width === 1280) {
-        // The switcher: present, shown, named, and on the navigation line (its top within 12 px of the
-        // list's). A failure says what was measured: the geometry, how many rows the list took and
-        // which font the links resolved to, so a runner whose fonts differ is told apart from the site.
+        // The switcher: present, shown, named, and on the navigation line: the header centres its items
+        // (site.css, `align-items: center`), so the switcher's vertical centre is the list's, within 12 px,
+        // whether the list takes one row or, under a wider font, wraps inside its 18rem minimum (the GitHub
+        // runner's fonts wrap it at 1280 px; the design allows that). A failure says what was measured:
+        // the geometry, how many rows the list took and which font the links resolved to.
         const sw = await page.evaluate(() => {
           const b = document.getElementById('theme'); const s = b && b.querySelector('select');
           if (!b) return 'missing'; if (b.hidden) return 'hidden'; if (!s) return 'has no select'; if (!s.getAttribute('aria-label')) return 'unnamed';
           const ul = document.querySelector('header.site ul'); if (!ul || innerWidth < 1000) return '';
           const sr = s.getBoundingClientRect(), ur = ul.getBoundingClientRect();
-          if (Math.abs(sr.top - ur.top) < 12) return '';
+          if (Math.abs((sr.top + sr.height / 2) - (ur.top + ur.height / 2)) < 12) return '';
           const rows = new Set([...ul.querySelectorAll('li')].map(li => Math.round(li.getBoundingClientRect().top))).size;
           return `not on the navigation line: select top ${sr.top.toFixed(1)} height ${sr.height.toFixed(1)}; list top ${ur.top.toFixed(1)} height ${ur.height.toFixed(1)} width ${ur.width.toFixed(0)} on ${rows} row(s); link font ${getComputedStyle(ul.querySelector('a')).fontFamily}`;
         });
