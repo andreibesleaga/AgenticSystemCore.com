@@ -17,6 +17,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/docs/how-to-use/">
 <meta property="og:title" content="How to use it">
 <meta property="og:description" content="How to use AgenticSystemCore today, mode by mode and persona by persona: install, first commands, scenarios for one person, one agent and many participants, the configuration switches, the hooks for agents and tools, and what the current version does not ship.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"How to use it","description":"How to use AgenticSystemCore today, mode by mode and persona by persona: install, first commands, scenarios for one person, one agent and many participants, the configuration switches, the hooks for agents and tools, and what the current version does not ship.","url":"https://agenticsystemcore.com/docs/how-to-use/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
@@ -47,7 +51,7 @@
 <h2 id="before-anything">Before anything</h2>
 <p>You need Node.js 22.13 or later and <code>git</code>. One install gives the <code>agsc</code> command:</p>
 <pre tabindex="0" data-lang="bash"><code>npm install -g agentic-system-core     # or: npm install -g agsc-cli (the short alias, the same engine)
-agsc --version                         # agsc 1.0.1 (the package version; the specification is 1.0.0)</code></pre>
+agsc --version                         # agsc 1.1.0 (the package version; the specification is 1.1.0)</code></pre>
 <p>Three facts carry the whole page:</p>
 <ul>
 <li><strong>A Bundle is a folder</strong> holding <code>agsc.config.json</code> and <code>content/</code> with one Markdown file per item. Every verb runs from inside that folder.</li>
@@ -55,7 +59,7 @@ agsc --version                         # agsc 1.0.1 (the package version; the sp
 <li><strong>Every published node has the same front door</strong>: <code>/.well-known/knowledge-linkset</code>, the discovery document, which names every machine file with its digest (<a class="ref" href="/specs/06-surfaces/#AGSC-06-07">AGSC-06-07</a>). An agent starts there; a person starts at the home page.</li>
 </ul>
 <h2 id="find-your-door">Find your door</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
 <thead><tr><th scope="col">You are</th><th scope="col">Start with</th><th scope="col">Mode</th><th scope="col">Section</th></tr></thead>
 <tbody>
 <tr><td>one person with a folder of notes</td><td><code>agsc init</code>, the security contact, one commit, <code>agsc ci</code>, <code>agsc build</code></td><td>0</td><td><a href="#mode-0-one-folder-becomes-a-checked-site">Mode 0</a></td></tr>
@@ -70,7 +74,7 @@ agsc --version                         # agsc 1.0.1 (the package version; the sp
 <tr><td>an implementer in another language</td><td>the vectors and <code>validate-wellknown</code>, <code>agsc conform</code></td><td>—</td><td><a href="/procedures/publish-a-level-0-node/">Publish a Level-0 node</a></td></tr>
 </tbody></table></div>
 <h2 id="the-sixteen-commands-by-job">The sixteen commands, by job</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 30"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 32"><table>
 <thead><tr><th scope="col">Job</th><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
 <tbody>
 <tr><td>start</td><td><code>agsc init</code></td><td>adopts the Markdown files in the folder, writes <code>agsc.config.json</code> and <code>content/index.md</code></td></tr>
@@ -85,14 +89,14 @@ agsc --version                         # agsc 1.0.1 (the package version; the sp
 <tr><td>review</td><td><code>agsc review</code></td><td>the review lane over a proposal: lint only, no model reachable</td></tr>
 <tr><td>run a lane</td><td><code>agsc refresh --agent &lt;name&gt; --dry-run [--task &lt;t&gt;]</code></td><td>a dry run of a declared agent lane: the proposal it would open and the Episode of the run, with no model call; without <code>--dry-run</code> it refuses, because no model adapter ships</td></tr>
 <tr><td>skills</td><td><code>agsc skills [install &lt;dir&gt;] [import &lt;file&gt;]</code></td><td>packs under <code>dist/skills/</code>; install into an agent's skills folder; a foreign <code>SKILL.md</code> back as a procedure</td></tr>
-<tr><td>tools</td><td><code>agsc mcp</code></td><td>a local tool server over standard input and output: seven tools, every item as a resource</td></tr>
+<tr><td>tools</td><td><code>agsc mcp</code></td><td>a local tool server over standard input and output, or from 1.1 over HTTP on the loopback address (<code>--http &lt;port&gt;</code>): ten tools, every item as a resource</td></tr>
 <tr><td>execute</td><td><code>agsc run &lt;slug&gt; [--dry-run]</code>, <code>agsc trace &lt;file.json&gt;</code></td><td>a procedure's steps under an allow list; a traced run recorded as an Episode</td></tr>
 <tr><td>claim</td><td><code>agsc conform --level &lt;n&gt; [--to &lt;path&gt;]</code></td><td>the conformance report for the Level the node meets, at <code>dist/conformance-report.json</code> unless <code>--to</code> says otherwise</td></tr>
 </tbody></table></div>
 <p>Global flags on every verb: <code>--json</code> (one envelope on standard output), <code>--quiet</code>, <code>--plain</code>, <code>--no-input</code> (<a class="ref" href="/specs/09-conformance/#AGSC-09-09">AGSC-09-09</a>). The exit code is 0 for pass, 1 for a failed check, 2 for a usage error.</p>
 <h2 id="reading-a-node-without-installing-anything">Reading a node without installing anything</h2>
 <p>A published node is a static site. A person opens its pages, the search, and each item's Markdown view; an agent fetches files. The files below are served by this site; a node's discovery document says which of them that node serves, and the first two are on every node:</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 33"><table>
 <thead><tr><th scope="col">File</th><th scope="col">What it holds</th><th scope="col">Who reads it</th></tr></thead>
 <tbody>
 <tr><td><a href="/.well-known/knowledge-linkset"><code>/.well-known/knowledge-linkset</code></a></td><td>every machine file with its digest, the peers, the contribution route, the tool surfaces</td><td>an agent, first</td></tr>
@@ -113,7 +117,7 @@ agsc ci                                                # ci: pass — or the exa
 agsc build                                             # www/ is the whole node; serve it anywhere that serves files over HTTPS</code></pre>
 <p>To put <code>www/</code> online and check the live address at Level 2 with both checkers, follow the <a href="/docs/guides/publish/">publishing guide</a>; when a command says no, look its code up on the <a href="/docs/guides/troubleshooting/">troubleshooting</a> page.</p>
 <p>To change something after that: edit the file, then <code>agsc lint --fix</code>, then <code>agsc propose &lt;slug&gt;</code>. The proposal is a patch plus a pull-request body under <code>dist/proposal/</code>; the engine prints the git commands and runs none (<a class="ref" href="/specs/08-governance/#AGSC-08-03">AGSC-08-03</a>). In the repository, a pull request runs the same <code>agsc ci</code> and a person merges.</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 32"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 34"><table>
 <thead><tr><th scope="col">Scenario</th><th scope="col">Who</th><th scope="col">Do</th><th scope="col">Result</th></tr></thead>
 <tbody>
 <tr><td>personal notes become a site</td><td>one person</td><td>the six lines above</td><td>pages, graph, search, <code>llms.txt</code>, the discovery document</td></tr>
@@ -131,23 +135,26 @@ agsc build                                             # www/ is the whole node;
 <p>Start the tool server in the Bundle and point the assistant at it. One line for Claude Code; the same four-line configuration for Claude Desktop, Cursor, VS Code and Codex CLI is in the engine's <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md">assistant guide</a>:</p>
 <pre tabindex="0" data-lang="bash"><code>cd my-notes &amp;&amp; agsc build                              # the server reads the Bundle once, at start
 claude mcp add --transport stdio my-knowledge -- npx -y agsc-cli mcp</code></pre>
-<p>The assistant then has exactly seven tools (<a class="ref" href="/specs/09-conformance/#AGSC-09-13">AGSC-09-13</a>):</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 33"><table>
+<p>The assistant then has exactly ten tools (<a class="ref" href="/specs/09-conformance/#AGSC-09-13">AGSC-09-13</a>):</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 35"><table>
 <thead><tr><th scope="col">Tool</th><th scope="col">Does</th><th scope="col">Writes</th></tr></thead>
 <tbody>
-<tr><td><code>search</code></td><td>finds items by words</td><td>nothing</td></tr>
-<tr><td><code>read</code></td><td>one item: frontmatter and text</td><td>nothing</td></tr>
+<tr><td><code>search</code></td><td>finds items by words; a hit on an item with a domain type, role, context or warrant also carries them, as <code>domain</code></td><td>nothing</td></tr>
+<tr><td><code>read</code></td><td>one item: frontmatter and text, the citation record of each of its chunks, and its <code>domain</code> parts when it has any</td><td>nothing</td></tr>
 <tr><td><code>links</code></td><td>the typed links authored on one item</td><td>nothing</td></tr>
 <tr><td><code>compose</code></td><td>whether a selection of items fits together</td><td>nothing</td></tr>
 <tr><td><code>ask</code></td><td>the descriptions of the best-matching items from this memory only, each with its address, or exactly <code>no answer in this memory</code>; no model is called</td><td>nothing</td></tr>
 <tr><td><code>propose</code></td><td>the prepared text of a change to one item, or a task-state change on a board</td><td>nothing — the text comes back to you</td></tr>
 <tr><td><code>remember</code></td><td>a new, well-formed item from what you told it</td><td>nothing — the text comes back to you</td></tr>
+<tr><td><code>brief</code></td><td>the brief of a selection: why each item is in it, the order to adopt them, what is missing and what to do next</td><td>nothing</td></tr>
+<tr><td><code>explain</code></td><td>whether one typed link holds between two items, and why: authored, or the steps that make it hold</td><td>nothing</td></tr>
+<tr><td><code>check</code></td><td>the link warnings about a selection, or about every item</td><td>nothing</td></tr>
 </tbody></table></div>
-<p>Every item is also a resource, and one prompt, <em>answer from this memory with citations</em>, sets the assistant up to cite. The server opens no network connection and takes no path or shell string as an argument. To put what an agent prepared into the node: save the text where it says, <code>agsc lint --fix</code>, <code>agsc propose &lt;slug&gt;</code>, and open the pull request it describes.</p>
-<h3 id="the-same-seven-tools-in-a-browser">The same seven tools in a browser</h3>
-<p>Every item page and the <code>/compose/</code> page of a published node register the same seven tools for a browser's own assistant through <code>document.modelContext</code>, with nothing installed and no server (<a class="ref" href="/specs/09-conformance/#AGSC-09-16">AGSC-09-16</a>). The answers equal the local server's for the same input; <code>propose</code> and <code>remember</code> hand back text there too.</p>
+<p>Every item is also a resource, and one prompt, <em>answer from this memory with citations</em>, sets the assistant up to cite. Over standard input and output the server opens no network connection; with <code>--http</code> it listens on the loopback address only. It takes no path or shell string as an argument. To put what an agent prepared into the node: save the text where it says, <code>agsc lint --fix</code>, <code>agsc propose &lt;slug&gt;</code>, and open the pull request it describes.</p>
+<h3 id="the-same-ten-tools-in-a-browser">The same ten tools in a browser</h3>
+<p>Every item page and the <code>/compose/</code> page of a published node register the same ten tools for a browser's own assistant through <code>document.modelContext</code>, with nothing installed and no server (<a class="ref" href="/specs/09-conformance/#AGSC-09-16">AGSC-09-16</a>). The answers equal the local server's for the same input; <code>propose</code> and <code>remember</code> hand back text there too.</p>
 <h3 id="many-agents-many-nodes">Many agents, many nodes</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 34"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 36"><table>
 <thead><tr><th scope="col">Scenario</th><th scope="col">Who</th><th scope="col">Do</th><th scope="col">Result</th></tr></thead>
 <tbody>
 <tr><td>an assistant answers from one folder</td><td>one person, one assistant</td><td><code>agsc mcp</code>; the assistant calls <code>search</code>, <code>read</code>, <code>links</code></td><td>answers citing item addresses; nothing leaves the machine</td></tr>
@@ -173,7 +180,7 @@ agsc ci                                   # dist/gate.json; dist/forge/ruleset.j
 agsc export --steer --target agents,claude,cursor   # dist/export/steer/: the same bytes at each tool's path
 agsc build                                # task pages show the state; a cluster of tasks is a board under /boards/</code></pre>
 <p>A gate's checks compile into the forge's required status checks (<a class="ref" href="/specs/08-governance/#AGSC-08-09">AGSC-08-09</a>); <code>agsc ci</code> runs the machine checks, and <code>review</code> means turning on the forge's own required review, which you set in the repository's ruleset by hand. The steering files are built only from the node's current state and its concepts, procedures, gates and lessons, so the same node always gives the same bytes; they are context for an agent, never enforcement.</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 35"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 37"><table>
 <thead><tr><th scope="col">Scenario</th><th scope="col">Who</th><th scope="col">Do</th><th scope="col">Result</th></tr></thead>
 <tbody>
 <tr><td>decisions with their reasons</td><td>a team</td><td><code>kind: decision</code> items with <code>decided-by</code> and <code>covers</code> links</td><td>a graph of what was decided and why, readable by people and agents</td></tr>
@@ -190,7 +197,7 @@ agsc build                                # task pages show the state; a cluster
 agsc skills install .claude/skills            # or .agents/skills or .github/skills (AGSC-07-21); lock-checked, nothing on a second run
 agsc skills import ./their/SKILL.md           # a foreign skill comes back as a procedure</code></pre>
 <p>A pack is content only: no scripts, no executables, no links, no tool allow-lists. A pack that no longer matches its lockfile installs nothing.</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 36"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 38"><table>
 <thead><tr><th scope="col">Scenario</th><th scope="col">Who</th><th scope="col">Do</th><th scope="col">Result</th></tr></thead>
 <tbody>
 <tr><td>a team's procedures in every agent's skills folder</td><td>a team</td><td><code>agsc skills install .claude/skills</code></td><td>the packs, verified file by file</td></tr>
@@ -201,7 +208,7 @@ agsc skills import ./their/SKILL.md           # a foreign skill comes back as a 
 </tbody></table></div>
 <p>Persona: the integrator.</p>
 <h2 id="mode-4-a-selection-becomes-a-starting-harness">Mode 4 — a selection becomes a starting harness</h2>
-<p><strong>For:</strong> an architect assembling a starting architecture from concepts; a runtime that executes a procedure under control. <strong>Switch:</strong> none for <code>compose</code>; <code>run.enabled: true</code> and <code>run.allow[]</code> for <code>run</code> and <code>trace</code> (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-09-94">AGSC-09-94</a>).</p>
+<p><strong>For:</strong> an architect assembling a starting architecture from concepts; a runtime that executes a procedure under control. <strong>Switch:</strong> none for <code>compose</code>; <code>run.enabled: true</code> and <code>run.allow[]</code> for <code>run</code> and <code>trace</code> (<a class="ref" href="/specs/09-conformance/page-3/#AGSC-09-94">AGSC-09-94</a>).</p>
 <pre tabindex="0" data-lang="bash"><code>agsc compose handoff run-the-tests task-login-form --zip   # dist/harness/&lt;name&gt;/: harness.jsonld, AGENTS.md, workspace.dsl, diagram.mmd, arc42.md, decisions/, skills/, and one archive
 agsc compose --from my-architecture                        # re-run a saved architecture item's selection</code></pre>
 <p>The combiner runs five steps in a fixed order — requirements closure, hiding superseded items, mutual exclusions, warnings, port wiring — and a valid selection gives a Harness of seven file kinds, byte-identical from the <code>/compose/</code> page and from the command line (<a class="ref" href="/specs/07-composition/#AGSC-07-12">AGSC-07-12</a>, <a class="ref" href="/specs/07-composition/#AGSC-07-13">AGSC-07-13</a>). An invalid selection gives only the verdict.</p>
@@ -209,7 +216,7 @@ agsc compose --from my-architecture                        # re-run a saved arch
 <pre tabindex="0" data-lang="bash"><code>agsc run greet --dry-run         # lists the procedure's steps; a program outside run.allow[] is marked REFUSED
 agsc run greet                   # refuses to execute without an isolating runner, and says so
 agsc trace run1.json             # a traced run becomes an Episode; the NOW page counts its spend</code></pre>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 37"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 39"><table>
 <thead><tr><th scope="col">Scenario</th><th scope="col">Who</th><th scope="col">Do</th><th scope="col">Result</th></tr></thead>
 <tbody>
 <tr><td>a starting architecture from a library of patterns</td><td>an architect</td><td>tick items on <code>/compose/</code>, download the archive</td><td>the same bytes <code>agsc compose … --zip</code> writes</td></tr>
@@ -232,9 +239,9 @@ agsc trace run1.json             # a traced run becomes an Episode; the NOW page
   }],
   &quot;budget&quot;: { &quot;usd_month&quot;: 10 }
 }</code></pre>
-<p>A lane is off unless <code>enabled</code>; its monthly budget may not exceed the node's; it may touch concepts, episodes and lessons but never a procedure, a gate, a cluster or the configuration (<a class="ref" href="/specs/01-bundle/#AGSC-01-36">AGSC-01-36</a>, <a class="ref" href="/specs/08-governance/#AGSC-08-26">AGSC-08-26</a>). The node ships no model adapter at this version: <code>agsc refresh --agent worker --dry-run</code> runs the lane's gates and budget and proposes the Episode of the run without a model call.</p>
+<p>A lane is off unless <code>enabled</code>; its monthly budget may not exceed the node's; it may touch concepts, episodes and lessons but never a procedure, a gate, a cluster or the configuration (<a class="ref" href="/specs/01-bundle/page-2/#AGSC-01-36">AGSC-01-36</a>, <a class="ref" href="/specs/08-governance/#AGSC-08-26">AGSC-08-26</a>). The node ships no model adapter at this version: <code>agsc refresh --agent worker --dry-run</code> runs the lane's gates and budget and proposes the Episode of the run without a model call.</p>
 <p>Working the board is the same for a person and an agent — every write is a prepared proposal:</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 38"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 40"><table>
 <thead><tr><th scope="col">To</th><th scope="col">Call</th><th scope="col">What comes back</th></tr></thead>
 <tbody>
 <tr><td>read the board</td><td><code>/boards/index.json</code>, <code>/boards/&lt;cluster&gt;.json</code>; or <code>search</code> and <code>read</code></td><td>tasks, states, <code>claimed_by</code>, <code>done</code></td></tr>
@@ -244,13 +251,13 @@ agsc trace run1.json             # a traced run becomes an Episode; the NOW page
 <tr><td>comment</td><td><code>remember({kind: &quot;lesson&quot;, about: &quot;&lt;task&gt;&quot;, title, body})</code></td><td>a lesson whose <code>related</code> names the task</td></tr>
 </tbody></table></div>
 <p>A person applies the patch and commits (<code>git apply</code>, or a pull request to the <code>contribute</code> target); the next build derives who holds the task from the history; from then on another claim of it is refused everywhere (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E511"><code>AGSC-E511</code></a>), and the first merged claim wins.</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 39"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 41"><table>
 <thead><tr><th scope="col">Scenario</th><th scope="col">Who</th><th scope="col">Do</th><th scope="col">Result</th></tr></thead>
 <tbody>
 <tr><td>one person and three agents</td><td>an operator</td><td>the configuration above with three lanes; <code>agsc build</code></td><td>each lane holds at most <code>max_claims</code> tasks and stops when its boards are done, a task needs a person, or its budget is spent (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-17">AGSC-10-17</a>)</td></tr>
 <tr><td>fast lane and slow lane</td><td>the same</td><td>nothing to configure</td><td>agents, automatic merges, refresh, the ledger and the exports run without a fresh decision; gates, reviews, decisions, releases and every change to a procedure, a gate, a cluster or the configuration need one (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-18">AGSC-10-18</a>)</td></tr>
 <tr><td>a self-driving wiki</td><td>an operator who decided once</td><td><code>publish: auto</code> on the lane's channel</td><td>items are created and updated under the standing decision, the lints at error severity and the budget; a reviewing agent labels and comments, never ratifies (<a class="ref" href="/specs/08-governance/#AGSC-08-29">AGSC-08-29</a>)</td></tr>
-<tr><td>cost that cannot run away</td><td>the operator</td><td><code>budget.usd_month</code>, each lane's <code>budget_usd_month</code></td><td>every model-calling path stops for the month at the cap; the NOW page shows the meter; a dry run counts (<a class="ref" href="/specs/01-bundle/#AGSC-01-38">AGSC-01-38</a>)</td></tr>
+<tr><td>cost that cannot run away</td><td>the operator</td><td><code>budget.usd_month</code>, each lane's <code>budget_usd_month</code></td><td>every model-calling path stops for the month at the cap; the NOW page shows the meter; a dry run counts (<a class="ref" href="/specs/01-bundle/page-2/#AGSC-01-38">AGSC-01-38</a>)</td></tr>
 <tr><td>the team plans in a tracker</td><td>a team</td><td>export the board from the tool; <code>agsc import --from board --format jira ./from-jira --dry-run</code>, then without; <code>agsc export --to board --format jira</code> the other way</td><td>every foreign row a draft until a person publishes it; formats: <code>github</code>, <code>gitlab</code>, <code>jira</code>, <code>trello</code>, <code>linear</code>, <code>asana</code>, <code>notion</code>, <code>obsidian-kanban</code>, <code>markdown</code>, <code>todotxt</code></td></tr>
 <tr><td>two nodes work one board</td><td>one person who merges, two agents</td><td>agent A on node A's <code>agsc mcp</code>, agent B on a clone or a node whose <code>peers[]</code> names A</td><td>each prepares against its own copy; the person merges into the board's home; the content version moves</td></tr>
 <tr><td>a remote agent takes part</td><td>a stranger's agent</td><td>the <code>contribute</code> route from the discovery document</td><td>a proposal through a pull request, a channel or a form; nodes never call nodes</td></tr>
@@ -264,17 +271,17 @@ agsc trace run1.json             # a traced run becomes an Episode; the NOW page
 4. <strong>Cite</strong> items by their addresses. Across nodes, carry each result's origin with it.
 5. <strong>To change something</strong>, prepare a proposal — <code>propose</code> or <code>remember</code> over <code>agsc mcp</code> or the page tools, or <code>agsc propose &lt;slug&gt;</code> on a clone — and hand it to the route the discovery document declares, or back to your caller. Never write to the content branch, merge, push or send anything to another node.
 6. <strong>On a board</strong>, claim with <code>propose({slug, task_state: &quot;TASK_STATE_WORKING&quot;})</code>, hold at most your lane's <code>max_claims</code>, and stop when the board is done, a task needs a person, or your budget is spent.</p>
-<p>The seven tools answer in one shape: <code>{ type, source, body, trust: &quot;untrusted&quot;, license }</code>; a fault is the same envelope with <code>type: &quot;error&quot;</code> and a body of <code>code</code> and <code>message</code>, never a transport error. A coding agent that works <em>in</em> a node's repository reads the repository's <code>AGENTS.md</code> first. To give a coding agent all of this page at once, install the <a href="/docs/agent-skill/">agent skill</a>.</p>
+<p>The ten tools answer in one shape: <code>{ type, source, body, trust: &quot;untrusted&quot;, license }</code>; a fault is the same envelope with <code>type: &quot;error&quot;</code> and a body of <code>code</code> and <code>message</code>, never a transport error. A coding agent that works <em>in</em> a node's repository reads the repository's <code>AGENTS.md</code> first. To give a coding agent all of this page at once, install the <a href="/docs/agent-skill/">agent skill</a>.</p>
 <h2 id="hooks-connecting-agents-and-tools-to-a-node">Hooks: connecting agents and tools to a node</h2>
 <p>Each route already exists in the engine; pick by what your tool reads. None needs a network connection or a key on the node's side.</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 40"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 42"><table>
 <thead><tr><th scope="col">Route</th><th scope="col">What the tool gets</th><th scope="col">Command</th><th scope="col">Suits</th></tr></thead>
 <tbody>
 <tr><td>agent skill</td><td>one <code>SKILL.md</code> that teaches the agent the engine itself</td><td>download it, see the <a href="/docs/agent-skill/">agent skill</a> page</td><td>any agent that reads Agent Skills</td></tr>
 <tr><td>steering file</td><td>one Markdown file at the path the coding agent reads every session</td><td><code>agsc export --steer --target &lt;name&gt;</code> — <code>agents</code> (<code>AGENTS.md</code>), <code>claude</code>, <code>codex</code>, <code>cursor</code>, <code>copilot</code>, <code>gemini</code>, <code>kiro</code>, <code>windsurf</code>, <code>cline</code>, <code>aider</code>, <code>gabbe</code></td><td>always-on context</td></tr>
 <tr><td>skill packs</td><td>one Agent Skills folder per cluster, lock-verified</td><td><code>agsc skills</code>, <code>agsc skills install &lt;dir&gt;</code></td><td>step-by-step procedures</td></tr>
-<tr><td>live tools</td><td>the seven tools and every item as a resource over the Model Context Protocol</td><td><code>agsc mcp</code></td><td>an assistant that searches while it works</td></tr>
-<tr><td>the page tools</td><td>the same seven tools on every item page and <code>/compose/</code></td><td>nothing: <code>agsc build</code></td><td>a browser's own assistant</td></tr>
+<tr><td>live tools</td><td>the ten tools and every item as a resource over the Model Context Protocol</td><td><code>agsc mcp</code></td><td>an assistant that searches while it works</td></tr>
+<tr><td>the page tools</td><td>the same ten tools on every item page and <code>/compose/</code></td><td>nothing: <code>agsc build</code></td><td>a browser's own assistant</td></tr>
 <tr><td>memory archive</td><td>a COGX archive another memory system imports</td><td><code>agsc export --to cogx</code>, <code>agsc import --from cogx &lt;dir&gt;</code></td><td>a framework with its own store</td></tr>
 <tr><td>agent kit</td><td>the GABBE kit's own folders</td><td><code>agsc export --to gabbe</code>, <code>agsc import --from gabbe &lt;kit&gt;</code></td><td>a project run with that kit</td></tr>
 <tr><td>skills collections</td><td>Agent Skills, Claude Code plugins and marketplaces, Cursor and Windsurf rules, from a local clone</td><td><code>agsc import --from skills &lt;dir&gt;</code>, <code>agsc export --to skills --layout &lt;l&gt;</code></td><td>a team with a shared collection</td></tr>
@@ -284,9 +291,9 @@ agsc trace run1.json             # a traced run becomes an Episode; the NOW page
 <tr><td>before each commit</td><td><code>agsc lint</code> when an item or the configuration changed</td><td>the <code>agsc-lint</code> hook from the engine's <code>.pre-commit-hooks.yaml</code></td><td>enforcement on the machine</td></tr>
 </tbody></table></div>
 <p>Two things to know about hooks. A steering file is context, not enforcement: to block an action no matter what an agent decides, use the agent's own pre-action hook or the CI check, which is what <code>agsc ci</code> and the forge files are for. And a Claude Code <code>CLAUDE.md</code> can import the node's file with one <code>@.agsc/CLAUDE.md</code> line, so your own instructions and the node's stay separate; the engine's <a href="https://github.com/andreibesleaga/agentic-system-core/tree/main/examples/connectors">connector examples</a> show this for Claude Code, Codex and Cursor.</p>
-<p>Eight kinds of plugin extend the engine without changing it — a memory adapter, a channel adapter, a forge shim, a deployment profile, a surface, a page tool, a composition emitter and a checker — under a forward-compatibility promise (<a class="ref" href="/specs/00-overview/#AGSC-00-24">AGSC-00-24</a>). At this version the engine loads a plugin you write for three of them: the memory adapter (<code>export --to &lt;path&gt;</code>, <code>import --from &lt;path&gt;</code>), the composition emitter (<code>compose --emit &lt;path&gt;</code>) and the deployment profile (<code>agsc-host emit &lt;path&gt;</code>). The engine's <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/PLUGINS.md">plugin guide</a> has the three rules every kind obeys.</p>
+<p>Eight kinds of plugin extend the engine without changing it — a memory adapter, a channel adapter, a forge shim, a deployment profile, a surface, a page tool, a composition emitter and a checker — under a forward-compatibility promise (<a class="ref" href="/specs/00-overview/page-2/#AGSC-00-24">AGSC-00-24</a>). At this version the engine loads a plugin you write for three of them: the memory adapter (<code>export --to &lt;path&gt;</code>, <code>import --from &lt;path&gt;</code>), the composition emitter (<code>compose --emit &lt;path&gt;</code>) and the deployment profile (<code>agsc-host emit &lt;path&gt;</code>). The engine's <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/PLUGINS.md">plugin guide</a> has the three rules every kind obeys.</p>
 <h2 id="where-a-node-lives">Where a node lives</h2>
-<p>A node is files, so it lives wherever files are served over HTTPS. <code>agsc-host list</code> names the hosting profiles the engine ships — Cloudflare Pages (the reference), any static server (nginx or Apache), GitHub Pages behind a header-setting proxy, the node's own machine (<code>agsc-host serve</code>, loopback only without a TLS terminator), a clone of the repository, IPFS through a gateway, a ledger-anchored record of each build — and each says plainly what that place cannot do. <code>agsc-host emit &lt;profile&gt;</code> writes that host's configuration from the build. The response headers the build wrote must be served as written (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-17">AGSC-06-17</a>); the engine's <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONNECTORS.md">connector guide</a> lists every profile.</p>
+<p>A node is files, so it lives wherever files are served over HTTPS. <code>agsc-host list</code> names the hosting profiles the engine ships — Cloudflare Pages (the reference), any static server (nginx or Apache), GitHub Pages behind a header-setting proxy, the node's own machine (<code>agsc-host serve</code>, loopback only without a TLS terminator), a clone of the repository, IPFS through a gateway, a ledger-anchored record of each build — and each says plainly what that place cannot do. <code>agsc-host emit &lt;profile&gt;</code> writes that host's configuration from the build. The response headers the build wrote must be served as written (<a class="ref" href="/specs/06-surfaces/#AGSC-06-17">AGSC-06-17</a>); the engine's <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONNECTORS.md">connector guide</a> lists every profile.</p>
 <h2 id="not-shipped-at-this-version">Not shipped at this version</h2>
 <p>Said plainly, so that no mode is picked up with a wrong expectation:</p>
 <ul>
@@ -310,7 +317,7 @@ agsc trace run1.json             # a traced run becomes an Episode; the NOW page
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/how-to-use.md">Propose an edit</a> — opens <code>site/docs/how-to-use.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
 </footer>
 </body>
 </html>

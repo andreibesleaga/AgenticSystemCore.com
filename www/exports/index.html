@@ -17,6 +17,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/exports/">
 <meta property="og:title" content="Machine-readable files">
 <meta property="og:description" content="Every machine-readable file this node publishes, what each is for, and which are additive.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Machine-readable files","url":"https://agenticsystemcore.com/exports/"}</script>
 </head>
 <body>
@@ -40,7 +44,7 @@
 <main id="main" class="wide">
 <h1>Machine-readable files</h1>
 <p class="summary"><strong>Summary</strong>Every machine-readable file this node publishes, what each is for, and which are pinned by a rule.</p>
-<p>Everything a program needs from this node is a static file it can fetch without a key, an account or a request to anyone. Start at the discovery document; everything else is reachable from it. The two files under <code>/exports/</code> are <strong>additive</strong>: no rule pins their bytes, nothing depends on them, and they exist because they are cheaper to read than the files they are derived from.</p>
+<p>Everything a program needs from this node is a static file it can fetch without a key, an account or a request to anyone. Start at the discovery document; everything else is reachable from it. The file under <code>/exports/</code> is <strong>additive</strong>: no rule pins its bytes, nothing depends on it, and it exists because it is cheaper to read than the files it is derived from.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Machine-readable files"><table>
 <thead><tr><th scope="col">File</th><th scope="col">Media type</th><th scope="col">What it is</th></tr></thead>
 <tbody>
@@ -59,17 +63,19 @@
 <tr><td><a href="/now.md"><code>/now.md</code></a></td><td><code>text/markdown</code></td><td>The state of this node at the last build.</td></tr>
 <tr><td><a href="/ledger.jsonl"><code>/ledger.jsonl</code></a></td><td><code>application/jsonl</code></td><td>The derived ledger: one hash-chained line per commit of this site's history and one for the build, re-verifiable offline. Its head is on the ledger link of the discovery document.</td></tr>
 <tr><td><a href="/ns/context.jsonld"><code>/ns/context.jsonld</code></a></td><td><code>application/ld+json</code></td><td>The JSON-LD context the graph files use.</td></tr>
-<tr><td><a href="/exports/chunks-index.toon"><code>/exports/chunks-index.toon</code></a></td><td><code>text/plain</code></td><td>The metadata of every passage in TOON tabular form &#8212; the same rows as <code>/chunks.jsonl</code> without the bodies, in about a quarter fewer tokens. Additive and non-normative.</td></tr>
+<tr><td><a href="/chunks-index.toon"><code>/chunks-index.toon</code></a></td><td><code>text/toon</code></td><td>The metadata of every passage in TOON tabular form &#8212; the same rows as <code>/chunks.jsonl</code> without the bodies, in about a quarter fewer tokens; its digest column is cut to 16 characters, so a reader that cites checks the full digest in <code>/chunks.jsonl</code> (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-37">AGSC-06-37</a>). Optional.</td></tr>
 <tr><td><a href="/exports/llms-ctx.txt"><code>/exports/llms-ctx.txt</code></a></td><td><code>text/plain</code></td><td>A skim view: one labelled section per passage. It drops the digests, the licence and the IRIs on purpose, so anything that needs to cite goes back to <code>/chunks.jsonl</code>. Additive and non-normative.</td></tr>
 <tr><td><a href="/robots.txt"><code>/robots.txt</code></a></td><td><code>text/plain</code></td><td>Who may crawl, and the text-and-data-mining reservation, in the crawler dialect.</td></tr>
 <tr><td><a href="/.well-known/tdmrep.json"><code>/.well-known/tdmrep.json</code></a></td><td><code>application/json</code></td><td>The same reservation, in the TDM dialect.</td></tr>
 <tr><td><a href="/sitemap.xml"><code>/sitemap.xml</code></a></td><td><code>application/xml</code></td><td>Every page of this site.</td></tr>
 </tbody></table></div>
+<h2 id="query">Questions in SPARQL</h2>
+<p>The graph above can be asked a question in SPARQL 1.1 on <a href="/query/">the query page</a>, in the visitor's browser: the page loads <code>/graph.nq</code> into a query engine compiled to WebAssembly, sends nothing anywhere and stores nothing; it offers the ten questions of the graph as examples (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-39">AGSC-06-39</a>, <a class="ref" href="/specs/05-graph/page-2/#AGSC-05-34">AGSC-05-34</a>). The same answers come from any SPARQL 1.1 store loaded with <code>/graph.nq</code>.</p>
 <h2 id="in-the-page">Tools inside the page</h2>
-<p>Every item page and every guide page of this site also offers seven tools to an assistant running in the visitor's browser: search, read, links, ask, compose, propose and remember. They read only the files above, contact no other host, carry no key and write nothing. <a href="/about/#tools-for-browser-assistants">How they work</a>, and <a href="/compose/">the page that uses them</a>.</p>
+<p>Every item page and every guide page of this site also offers ten tools to an assistant running in the visitor's browser: ask, brief, check, compose, explain, links, propose, read, remember and search. They read only the files above, contact no other host, carry no key and write nothing. <a href="/about/#tools-for-browser-assistants">How they work</a>, and <a href="/compose/">the page that uses them</a>.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
 </footer>
 </body>
 </html>

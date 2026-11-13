@@ -1,0 +1,64 @@
+/* AgenticSystemCore /clusters/: the relation filter and the explorer (AGSC-06-38). Same origin, no inline style (AGSC-06-17). */
+:root { --type-cluster: #7a3fb0; --type-concept: #245a9c; --type-procedure: #2b7a33; --type-lesson: #00707a; --type-episode: #a8326e; --type-gate: #b3261e; --type-other: #5c5c5c; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --type-cluster: #c9a4f2; --type-concept: #8ab4f8; --type-procedure: #81c995; --type-lesson: #4fd1c5; --type-episode: #f48fb1; --type-gate: #f28b82; --type-other: #a3a3a0; }
+}
+:root[data-theme="dark"] { --type-cluster: #c9a4f2; --type-concept: #8ab4f8; --type-procedure: #81c995; --type-lesson: #4fd1c5; --type-episode: #f48fb1; --type-gate: #f28b82; --type-other: #a3a3a0; }
+/* The relation filter: no script; while a key is checked, the overview table shows only its rows. */
+.relation-filter { border: 1px solid var(--rule); border-radius: 4px; padding: 0.5rem 0.75rem; margin: 0 0 1rem; }
+.relation-filter legend { padding: 0 0.25rem; }
+.relation-filter label { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 24px; margin: 0 1rem 0 0; }
+.relation-filter:has(#relation-filter-related:checked) ~ .table-wrap tr[data-relation]:not([data-relation="related"]) { display: none; }
+.relation-filter:has(#relation-filter-broader:checked) ~ .table-wrap tr[data-relation]:not([data-relation="broader"]) { display: none; }
+.relation-filter:has(#relation-filter-narrower:checked) ~ .table-wrap tr[data-relation]:not([data-relation="narrower"]) { display: none; }
+.relation-filter:has(#relation-filter-uses:checked) ~ .table-wrap tr[data-relation]:not([data-relation="uses"]) { display: none; }
+.relation-filter:has(#relation-filter-requires:checked) ~ .table-wrap tr[data-relation]:not([data-relation="requires"]) { display: none; }
+.relation-filter:has(#relation-filter-excludes:checked) ~ .table-wrap tr[data-relation]:not([data-relation="excludes"]) { display: none; }
+.relation-filter:has(#relation-filter-derived-from:checked) ~ .table-wrap tr[data-relation]:not([data-relation="derived-from"]) { display: none; }
+.relation-filter:has(#relation-filter-contradicts:checked) ~ .table-wrap tr[data-relation]:not([data-relation="contradicts"]) { display: none; }
+.relation-filter:has(#relation-filter-supersedes:checked) ~ .table-wrap tr[data-relation]:not([data-relation="supersedes"]) { display: none; }
+.relation-filter:has(#relation-filter-implements:checked) ~ .table-wrap tr[data-relation]:not([data-relation="implements"]) { display: none; }
+.relation-filter:has(#relation-filter-verifies:checked) ~ .table-wrap tr[data-relation]:not([data-relation="verifies"]) { display: none; }
+.relation-filter:has(#relation-filter-covers:checked) ~ .table-wrap tr[data-relation]:not([data-relation="covers"]) { display: none; }
+.relation-filter:has(#relation-filter-blocked-by:checked) ~ .table-wrap tr[data-relation]:not([data-relation="blocked-by"]) { display: none; }
+.relation-filter:has(#relation-filter-decided-by:checked) ~ .table-wrap tr[data-relation]:not([data-relation="decided-by"]) { display: none; }
+/* The explorer: shown by its script only; the picture, then the list and the detail side by side, stacked when narrow. */
+main > .explorer { max-width: none; }
+.explorer[hidden], .explorer-tip[hidden] { display: none; }
+.explorer-tools { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: center; margin: 0 0 0.75rem; }
+.explorer-tools input { font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--control); border-radius: 4px; padding: 0.25rem 0.5rem; min-height: 24px; }
+.explorer button { font: inherit; color: var(--fg); background: var(--bg-alt); border: 1px solid var(--control); border-radius: 4px; padding: 0.15rem 0.5rem; min-height: 24px; cursor: pointer; }
+.explorer-body { display: grid; gap: 1rem; }
+.explorer-side { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+@media (max-width: 40rem) {
+  .explorer-side { grid-template-columns: minmax(0, 1fr); }
+}
+.explorer-picture { position: relative; border: 1px solid var(--rule); border-radius: 4px; background: var(--bg-alt); overflow: hidden; }
+.explorer-svg { display: block; width: 100%; height: auto; touch-action: pan-y; cursor: grab; }
+.explorer-svg .link { stroke: var(--muted); stroke-width: 1.2; }
+.explorer-svg .rel-member { stroke: var(--control); stroke-dasharray: 3 3; }
+.explorer-svg .node { fill: var(--type-other); stroke: var(--bg-alt); stroke-width: 1.5; cursor: pointer; }
+.explorer-svg .t-cluster { fill: var(--type-cluster); }
+.explorer-svg .t-concept { fill: var(--type-concept); }
+.explorer-svg .t-procedure { fill: var(--type-procedure); }
+.explorer-svg .t-lesson { fill: var(--type-lesson); }
+.explorer-svg .t-episode { fill: var(--type-episode); }
+.explorer-svg .t-gate { fill: var(--type-gate); }
+.explorer-svg .label { fill: var(--fg); font-size: 13px; pointer-events: none; }
+.explorer-svg .is-faded { opacity: 0.25; }
+.explorer-svg .label.is-faded { opacity: 0.6; }
+.explorer-svg .link.is-near { stroke: var(--accent); stroke-width: 2; }
+.explorer-svg .node.is-selected { stroke: var(--focus); stroke-width: 3; }
+.explorer-svg .node.is-match { stroke: var(--accent); stroke-width: 2.5; }
+.explorer-tip { position: absolute; z-index: 1; max-width: 18rem; padding: 0.5rem 0.75rem; background: var(--bg); color: var(--fg); border: 1px solid var(--control); border-radius: 4px; font-size: 0.9rem; }
+.explorer-tip p { margin: 0.35rem 0 0; }
+.explorer-list { list-style: none; margin: 0 0 1rem; padding: 0; max-height: 20rem; overflow: auto; border: 1px solid var(--rule); border-radius: 4px; }
+.explorer-list li { margin: 0; }
+.explorer-list button { display: block; width: 100%; text-align: left; border: 0; border-radius: 0; background: none; }
+.explorer-list button[aria-pressed="true"] { background: var(--code-bg); font-weight: 650; }
+.explorer .type { color: var(--muted); font-size: 0.85rem; }
+.explorer-relations { padding-left: 1rem; }
+.explorer-relations .meaning { display: block; color: var(--muted); font-size: 0.85rem; }
+@media (pointer: coarse) {
+  .explorer button, .explorer input { min-height: 44px; }
+}

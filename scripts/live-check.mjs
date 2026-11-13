@@ -18,6 +18,8 @@
 //     AGSC-11-05);
 //   - no Network Error Logging (`NEL`, `Report-To`) or speculation rules header from the edge
 //     network, unless the node's own statements name it (then a warning);
+//   - on this site, once its committed output has the query page: one policy on `/query/`, with
+//     'wasm-unsafe-eval', and the query engine served as application/wasm (AGSC-06-39);
 //   - `/.well-known/security.txt` expires more than 60 days ahead (RFC 9116 §2.5.5);
 //   - `/.well-known/sustainability-data` covers a period that ended at most two months ago (the
 //     `period` object of draft-besleaga-sustainability-wellknown-10, Section 3.2);
@@ -49,7 +51,7 @@ export const NODES = [
 ];
 export const W3ID = {
   base: 'https://w3id.org/agentic-system-core/',
-  paths: ['ns', 'ns/1.0.0', 'profile/agentic-knowledge', 'rel', 'specs/mcp/'],
+  paths: ['ns', 'ns/1.0.0', 'ns/1.1.0', 'profile/agentic-knowledge', 'rel', 'specs/mcp/'],
   target: 'https://agenticsystemcore.com/',
 };
 export const REGISTRIES = {
@@ -122,6 +124,31 @@ export async function liveCheck({ get, now, committedRoot, checkers, requireChec
           }
         }
       } else if (injected.length === 0) add(node.name, 'served bytes', 'pass', `${route}: nothing added by the edge`);
+    }
+
+    // The query page (AGSC-06-39), on the node whose output is committed here, once that output has
+    // one: exactly one policy on `/query/`, the one of its `_headers` block with 'wasm-unsafe-eval'
+    // (the block's detach line drops the site-wide policy, so a second one means the host kept both),
+    // and the query engine served as application/wasm, which a browser needs to compile it as it streams.
+    const committedQuery = Object.keys(node.committed).length > 0 && fs.existsSync(path.join(committedRoot, 'query', 'index.html'));
+    if (committedQuery) {
+      const r = await fetchRoute('/query/');
+      if (usable('/query/', r, 'query page')) {
+        const csp = r.headers['content-security-policy'] || '';
+        const policies = (csp.match(/default-src/g) || []).length;
+        if (policies !== 1) add(node.name, 'query page', 'fail', `/query/: ${policies} Content-Security-Policy policies are served; the /query/* block must replace the site-wide one`);
+        else if (!csp.includes("'wasm-unsafe-eval'")) add(node.name, 'query page', 'fail', "/query/: the Content-Security-Policy has no 'wasm-unsafe-eval'; the page cannot start its query engine");
+        else add(node.name, 'query page', 'pass', "/query/: one Content-Security-Policy, with 'wasm-unsafe-eval'");
+      }
+      const vendor = path.join(committedRoot, 'query', 'vendor');
+      for (const dir of fs.existsSync(vendor) ? fs.readdirSync(vendor).sort() : []) {
+        const route = `/query/vendor/${dir}/web_bg.wasm`;
+        if (!fs.existsSync(path.join(vendor, dir, 'web_bg.wasm'))) continue;
+        const w = await fetchRoute(route);
+        if (!usable(route, w, 'query page')) continue;
+        const type = w.headers['content-type'] || '';
+        add(node.name, 'query page', /^application\/wasm\b/i.test(type) ? 'pass' : 'fail', /^application\/wasm\b/i.test(type) ? `${route}: served as application/wasm` : `${route}: Content-Type ${type || 'missing'}, not application/wasm`);
+      }
     }
 
     // The discovery document's headers.

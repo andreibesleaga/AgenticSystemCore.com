@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conformance — AgenticSystemCore</title>
+<meta name="description" content="What an AgenticSystemCore conformance claim says, how many test cases the specification has, the reference engine's claim, the nodes this project runs and how to record a claim of your own.">
+<link rel="canonical" href="https://agenticsystemcore.com/conformance/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/conformance/">
+<meta property="og:title" content="Conformance">
+<meta property="og:description" content="What an AgenticSystemCore conformance claim says, how many test cases the specification has, the reference engine's claim, the nodes this project runs and how to record a claim of your own.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Conformance","url":"https://agenticsystemcore.com/conformance/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Conformance</h1>
+<p class="summary"><strong>Summary</strong>What a conformance claim says, the number of test cases of the specification this site publishes, the reference engine's claim, the nodes this project runs and how to record a claim of your own.</p>
+<p>A conformance claim says that an implementation produces the bytes the specification's test cases expect, for one version of the specification and one Level. This page says what a claim contains, how many cases the specification this site publishes has, which claims this project makes, and where anyone can record a claim of their own. The rules are in <a href="/specs/09-conformance/">section 9</a> and <a href="/specs/10-implementation-profiles/">section 10</a> of the specification; the engine repository's <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONFORMANCE-STATEMENTS.md">guide to writing a claim</a> gives the sentence to use.</p>
+<h2 id="what-a-claim-says">What a claim says</h2>
+<p>A claim names the implementation and its version, the version of the specification, exactly one Level, and the cases it passed (<a class="ref" href="/specs/00-overview/#AGSC-00-12">AGSC-00-12</a>, <a class="ref" href="/specs/09-conformance/#AGSC-09-01">AGSC-09-01</a>, <a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-01">AGSC-10-01</a>). The Levels build on each other:</p>
+<ul>
+<li><strong>Level 0, publisher:</strong> a node's static files — the discovery document, <code>graph.jsonld</code> and <code>llms.txt</code> (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-02">AGSC-10-02</a>).</li>
+<li><strong>Level 1, reader:</strong> Level 0 and the parsing and checking of any conforming Bundle (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-03">AGSC-10-03</a>).</li>
+<li><strong>Level 2, writer:</strong> Level 1 and the deterministic writing of every surface, with export and import (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-04">AGSC-10-04</a>).</li>
+<li><strong>Level 3, full engine:</strong> Level 2 and composition, governance, the command line and the tool server (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-05">AGSC-10-05</a>).</li>
+</ul>
+<p>A claim exists only after a green run of its Level's cases. It is its author's own assertion: this project certifies nobody, and a claim says nothing about security, speed or correctness beyond the bytes the cases compare (<a class="ref" href="/specs/09-conformance/#AGSC-09-03">AGSC-09-03</a>).</p>
+<h2 id="the-cases">The cases</h2>
+<p>Specification <code>1.1.0</code> has 374 rules in force, 11 more reserved for later versions, and 105 registered error codes. Its test cases, the conformance vectors, number 399: 374 required, 2 optional and 23 withdrawn, which no claim counts for or against (<a class="ref" href="/specs/09-conformance/#AGSC-09-05">AGSC-09-05</a>). They fall in 20 areas: <code>adopt</code>, <code>boards</code>, <code>boundary</code>, <code>build</code>, <code>bundle</code>, <code>chunks</code>, <code>cli</code>, <code>compose</code>, <code>conform</code>, <code>discovery</code>, <code>export</code>, <code>frontmatter</code>, <code>graph</code>, <code>import</code>, <code>jcs</code>, <code>ledger</code>, <code>links</code>, <code>lint</code>, <code>prov</code>, <code>slug</code>; each Level takes the areas section 10 names (<a class="ref" href="/specs/10-implementation-profiles/#AGSC-10-01">AGSC-10-01</a>). The numbers are counted from the specification&#39;s files when this site is built, by the engine&#39;s <code>tools/count-artifacts</code>.</p>
+<h2 id="the-reference-engine-s-claim">The reference engine's claim</h2>
+<blockquote>
+<p>agentic-system-core 1.1.0 conforms to AgenticSystemCore 1.1.0, Level 3.
+Verified against the published conformance vectors on 2026-11-12: 376 of 376
+passed in the 20 populated areas (adopt, boards, boundary, build, bundle,
+chunks, cli, compose, conform, discovery, export, frontmatter, graph, import,
+jcs, ledger, links, lint, prov, slug), 374 required and 2 optional, the 23
+withdrawn cases excluded, with Unicode 17.0. Deployment profile:
+cloudflare-pages — the reference profile: <code>_headers</code> and <code>_redirects</code> as
+<code>agsc build</code> writes them. Surfaces: llms-txt (proved by disc-0024, disc-0025),
+chunks (proved by chk-0002, chk-0003, chk-0004, chk-0005, chk-0009, chk-0010,
+chk-0011, chk-0012, chk-0013, chk-0014, chk-0015, chk-0016), webmcp (proved by
+cli-0026).</p>
+</blockquote>
+<p>That is the claim as the engine repository's <a href="https://github.com/andreibesleaga/agentic-system-core/blob/1.1.0/docs/CONFORMANCE-STATEMENTS.md#the-reference-engines-claim">conformance statement</a> words it, with what each part rests on; it is run again for each release, and the engine's own test fails when the claim and the counted cases disagree.</p>
+<h2 id="the-nodes-this-project-runs">The nodes this project runs</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Nodes this project runs"><table>
+<thead><tr><th scope="col">Node</th><th scope="col">What is checked</th><th scope="col">Claim</th></tr></thead>
+<tbody>
+<tr><th scope="row"><code>agenticsystemcore.com</code>, this node</th><td>Before every publish: two builds compared byte for byte, the discovery document checked by the engine&#39;s discovery checker at Levels 0 and 2 with every declared digest compared with the bytes served, links, headers, contrast and the page tools (<code>scripts/check.js</code> in <a href="https://github.com/andreibesleaga/AgenticSystemCore.com">its repository</a>).</td><td>Level 0 against the specification version on the <a href="/docs/status/">status page</a> (<a class="ref" href="/specs/00-overview/#AGSC-00-12">AGSC-00-12</a>).</td></tr>
+<tr><th scope="row"><code>patterns.agenticsystemcore.com</code>, the demonstration node</th><td>On every push and pull request of <a href="https://github.com/andreibesleaga/agsc-demo-node">its repository</a>: <code>agsc verify --ledger</code>, <code>agsc ci</code> (two builds compared byte for byte, and the gate&#39;s verdict) and the discovery checker at Level 2 over the built discovery document.</td><td>None published.</td></tr>
+</tbody></table></div>
+<h2 id="record-a-claim-of-your-own">Record a claim of your own</h2>
+<p>Run the cases with the reference engine's runner, <code>agsc conform --level &lt;n&gt;</code>, or with a runner of your own: the cases define the expected bytes and nothing else, so either is valid, and nobody needs permission to run them or to publish the result. Then open an issue in the <a href="https://github.com/andreibesleaga/agentic-system-core/issues">engine repository</a> with a link to your software or node, the version and Level you claim, and your results. The issue records what was checked, by whom and on what date, and it records failures as readily as passes. Being recorded is not a certification and confers nothing.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/conformance.md">Propose an edit</a> — opens <code>site/conformance.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
+</footer>
+</body>
+</html>

@@ -1,16 +1,16 @@
 # AgenticSystemCore
 
+> An open specification for knowledge that people and software agents can both read, verify and build on, published here as a node of itself.
+
 <!-- agsc:provenance
 bundle: https://agenticsystemcore.com/
 license: LicenseRef-AgenticSystemCore-Content-Use-1.0
 terms: LicenseRef-AgenticSystemCore-Content-Use-1.0
-spec_version: 1.0.0
-bundle_version: v1.0.0+38.g3b18ac857d11
-generated_at: 2026-10-14T09:45:37Z
+spec_version: 1.1.0
+bundle_version: vsite-2026-11-13+3.g731952d2eb0f
+generated_at: 2026-11-13T09:14:46Z
 assistance: content may be AI-assisted; each item states its origin in prov.origin and each accepted contribution carries an Assisted-by: trailer
 -->
-
-> An open specification for knowledge that people and software agents can both read, verify and build on, published here as a node of itself.
 
 ## Guides
 
@@ -33,7 +33,7 @@ assistance: content may be AI-assisted; each item states its origin in prov.orig
 - [Link](https://agenticsystemcore.com/concepts/link/): A typed relation between two items of one Bundle, written as a frontmatter key whose values are slugs.
 - [NOW](https://agenticsystemcore.com/concepts/now/): Generated context about the current state of a Bundle, such as counts and last build. NOW is never an item.
 - [Procedure](https://agenticsystemcore.com/concepts/procedure/): A plan a reader can execute: a trigger, steps and checks. Procedures are published in skill packs, one pack per cluster.
-- [Source](https://agenticsystemcore.com/concepts/source/): An external work cited by an item, written inline as a sources[] entry and published under a fragment IRI.
+- [Source](https://agenticsystemcore.com/concepts/source/): An external work cited by an item, written inline as a sources\[\] entry and published under a fragment IRI.
 
 ## Publish a Level-0 node
 <!-- agsc:item https://agenticsystemcore.com/procedures/publish-a-level-0-node/ -->

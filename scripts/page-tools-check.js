@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// The seven in-page tools, PROVED against the artefact this site actually ships (AGSC-09-16).
+// The in-page tools — ten at specification 1.1, the engine's `TOOL_NAMES` — PROVED against the
+// artefact this site actually ships (AGSC-09-16).
 //
 //   node scripts/page-tools-check.js [--out <dir>] [--json]
 //
@@ -12,7 +13,7 @@
 // What it asserts:
 //   1. the four /compose/ scripts are BYTE-IDENTICAL to the engine's own emitters (no second
 //      implementation of any tool lives in this repository), and their SHA-256 is recorded;
-//   2. with `document.modelContext`, seven tools register with the names, argument names and the
+//   2. with `document.modelContext`, the engine's tools (ten) register with the names, argument names and the
 //      three WebMCP annotations the specification fixes;
 //   3. every tool answers over this site's published routes: search finds every item, read returns
 //      the item, links follows the authored connections, ask cites, compose composes this node's
@@ -62,7 +63,7 @@ const ENGINE_DESCRIBE = engineGit('describe', '--tags', '--always', '--dirty');
 const ENGINE_VERSION = (() => { try { return JSON.parse(fs.readFileSync(path.join(ENGINE, 'package.json'), 'utf8')).version; } catch { return 'unknown'; } })();
 
 const EXPECTED = {
-  '/compose/agsc-core.js': engineBrowser.bundle({ specVersion: SPEC_VERSION }),
+  '/compose/agsc-core.js': engineBrowser.bundle({ brief: true, specVersion: SPEC_VERSION }),
   '/compose/agsc-page-tools.js': enginePageTools.bundle({ bundleId: BUNDLE_ID, specVersion: SPEC_VERSION }),
   '/compose/agsc-compose.js': engineComposePage.controller({ licenseProse: LICENSE_PROSE, specVersion: SPEC_VERSION }),
   '/compose/webmcp.js': engineWebmcp.script(),
@@ -77,7 +78,11 @@ for (const [route, expected] of Object.entries(EXPECTED)) {
 // A script anywhere else would be a second implementation by another name. The graph explorer's
 // scripts (its own two and the two vendored drawing libraries, pinned by scripts/check.js) are not
 // page tools: they must register nothing and never touch `document.modelContext`.
-const EXPLORER_SCRIPTS = ['/assets/graph-data.js', '/assets/graph-explorer.js', '/assets/vendor/force-graph-1.52.0.min.js', '/assets/vendor/3d-force-graph-1.80.1.min.js'];
+// The scripts of the two views of 1.1 the engine writes — the explorer of /clusters/ and the query page
+// with its worker and its engine (AGSC-06-38, AGSC-06-39) — are the engine's bytes too and are held
+// to the same: no page tool, no WebMCP.
+const EXPLORER_SCRIPTS = ['/assets/graph-data.js', '/assets/graph-explorer.js', '/assets/vendor/force-graph-1.52.0.min.js', '/assets/vendor/3d-force-graph-1.80.1.min.js',
+  ...[...files.keys()].filter(r => r.endsWith('.js') && (r.startsWith('/query/') || r === '/clusters/agsc-explorer.js')).sort()];
 for (const route of EXPLORER_SCRIPTS) if (files.has(route)) ok(!/modelContext|registerTool|provideContext/.test(files.get(route)), `${route}: the graph explorer touches the WebMCP surface; the page tools are the engine's four /compose/ files only`);
 for (const route of [...files.keys()]) {
   if (route.endsWith('.js') && !route.startsWith('/compose/') && route !== '/assets/search.js' && route !== '/assets/theme.js' && !EXPLORER_SCRIPTS.includes(route)) {
@@ -177,9 +182,10 @@ const toolset = installCorpus(item);
 // registration is observed over the loaded implementation as well as before it.
 vm.runInContext(files.get('/compose/webmcp.js'), item.context, { filename: 'webmcp.js' });
 const registered = item.registered.slice(item.registered.length / 2);
-const SEVEN = engineSurfaces.TOOL_NAMES ? [...engineSurfaces.TOOL_NAMES] : ['ask', 'compose', 'links', 'propose', 'read', 'remember', 'search'];
-ok(registered.length === 7, `${registered.length} tools registered, expected seven (AGSC-09-13)`);
-ok(JSON.stringify(registered.map(t => t.name).sort()) === JSON.stringify([...SEVEN].sort()),
+// The tool set is the engine's own list (`src/boundary/surfaces.js`), never a number written here.
+const TOOLS = [...engineSurfaces.TOOL_NAMES];
+ok(registered.length === TOOLS.length, `${registered.length} tools registered, expected the engine's ${TOOLS.length} (AGSC-09-13)`);
+ok(JSON.stringify(registered.map(t => t.name).sort()) === JSON.stringify([...TOOLS].sort()),
   `the registered tool names are ${JSON.stringify(registered.map(t => t.name).sort())}`);
 for (const tool of registered) {
   ok(/^[A-Za-z0-9_.-]{1,128}$/.test(tool.name), `${tool.name}: not a WebMCP tool name`);
@@ -329,7 +335,8 @@ async function asynchronousPath() {
   const boardRoutes = files.has('/boards/index.json')
     ? ['/boards/index.json', ...JSON.parse(files.get('/boards/index.json')).boards.map(b => `/boards/${b.cluster}.json`)]
     : [];
-  const wanted = new Set(['/.well-known/knowledge-linkset', '/search.json', ...ITEMS.map(s2 => `/pages/${s2}.md`), ...boardRoutes]);
+  // From 1.1 `read` cites the chunks of an item (AGSC-09-13, AGSC-06-26), so the page also reads /chunks.jsonl.
+  const wanted = new Set(['/.well-known/knowledge-linkset', '/search.json', '/chunks.jsonl', ...ITEMS.map(s2 => `/pages/${s2}.md`), ...boardRoutes]);
   const unexpected = page.fetched.filter(route => !wanted.has(route));
   ok(unexpected.length === 0, `the page fetched routes the tools have no business reading: ${unexpected.join(', ')}`);
   const notFetched = [...wanted].filter(route => !page.fetched.includes(route));
@@ -343,14 +350,15 @@ async function asynchronousPath() {
   ok(state.items.length >= ITEMS.length, `the compose page recovered ${state.items.length} items from the published graph`);
   await vm.runInContext('globalThis.AGSC_PAGE_TOOLS.ready', composePage.context);
   const composeTools = composePage.sandbox.AGSC_TOOLS;
-  for (const name of SEVEN) {
+  for (const name of TOOLS) {
     const answer = plain(await composeTools.call(name, {
       actor: 'process:ci', at: '2026-01-01T00:00:00Z', body: 'A note.', kind: 'episode', question: 'bundle',
+      key: 'related', source: ITEMS[0], target: ITEMS[1] || ITEMS[0],
       query: 'bundle', selection: [ITEMS[0]], slug: ITEMS[0], title: 'A Recorded Run',
     }));
     ok(answer.type !== 'error', `/compose/: ${name} answered ${JSON.stringify(answer.body).slice(0, 160)}`);
   }
-  ok(composePage.registered.length === 7, `/compose/ registered ${composePage.registered.length} tools`);
+  ok(composePage.registered.length === TOOLS.length, `/compose/ registered ${composePage.registered.length} tools, not the engine's ${TOOLS.length}`);
   ok(composePage.consoleCalls.filter(c => c[0] === 'error').length === 0,
     `/compose/ wrote to the console: ${JSON.stringify(composePage.consoleCalls)}`);
 }
@@ -396,7 +404,7 @@ async function withoutWebmcp() {
     scripts: digests,
     status: fails.length ? 'fail' : 'pass',
     surface_version: engineSurfaces.WEBMCP_SURFACE_VERSION,
-    tools: SEVEN,
+    tools: TOOLS,
   };
   if (JSON_OUT) process.stdout.write(JSON.stringify(summary, null, 2) + '\n');
   if (fails.length) {
@@ -405,7 +413,7 @@ async function withoutWebmcp() {
   }
   if (!JSON_OUT) {
     for (const line of notes) process.stdout.write(`page-tools-check: ${line}\n`);
-    process.stdout.write(`page-tools-check: pass — 7 tools over ${ITEMS.length} items, ${asyncResults.join('; ')}, engine ${ENGINE_DESCRIBE}\n`);
+    process.stdout.write(`page-tools-check: pass — ${TOOLS.length} tools over ${ITEMS.length} items, ${asyncResults.join('; ')}, engine ${ENGINE_DESCRIBE}\n`);
     for (const [route, d] of Object.entries(digests)) process.stdout.write(`  ${route} ${d.bytes} bytes sha256:${d.sha256}\n`);
   }
 })();

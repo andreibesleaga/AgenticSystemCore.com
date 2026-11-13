@@ -17,6 +17,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/docs/scenarios/persona-c-agent-mcp/">
 <meta property="og:title" content="Scenarios: Agent reader queries structured knowledge without scraping">
 <meta property="og:description" content="The behaviour-driven scenarios of persona-c-agent-mcp.feature: Agent reader queries structured knowledge without scraping.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Scenarios: Agent reader queries structured knowledge without scraping","description":"The behaviour-driven scenarios of persona-c-agent-mcp.feature: Agent reader queries structured knowledge without scraping.","url":"https://agenticsystemcore.com/docs/scenarios/persona-c-agent-mcp/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/scenarios/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
@@ -42,7 +46,7 @@
 </header>
 <main id="main" class="wide">
 <h1>Scenarios: Agent reader queries structured knowledge without scraping</h1>
-<p class="summary"><strong>Summary</strong>The 14 scenarios of the feature file persona-c-agent-mcp.feature, in the Given/When/Then form the reference engine runs; each names the requirement it proves.</p>
+<p class="summary"><strong>Summary</strong>The 20 scenarios of the feature file persona-c-agent-mcp.feature, in the Given/When/Then form the reference engine runs; each names the requirement it proves.</p>
 <p>One of the feature files of the <a href="/docs/scenarios/">scenarios</a>, where the coverage table names the requirements each file proves. Previous: <a href="/docs/scenarios/persona-b-contributor/" rel="prev"><code>persona-b-contributor.feature</code></a>. Next: <a href="/docs/scenarios/persona-d-agent-proposer/" rel="next"><code>persona-d-agent-proposer.feature</code></a>.</p>
 <pre tabindex="0" class="feature" data-lang="gherkin"><code># Trace: <a class="ref" href="/docs/requirements/#PRD-019">PRD-019</a>, <a class="ref" href="/docs/requirements/#PRD-022">PRD-022</a>, <a class="ref" href="/docs/requirements/#PRD-023">PRD-023</a>, <a class="ref" href="/docs/requirements/#PRD-025">PRD-025</a>, <a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a>, <a class="ref" href="/docs/requirements/#PRD-051">PRD-051</a>, <a class="ref" href="/docs/requirements/#PRD-056">PRD-056</a>, <a class="ref" href="/docs/requirements/#PRD-061">PRD-061</a> · PLAN §5.2 ToolTransport
 @persona-c
@@ -58,7 +62,7 @@ Feature: Agent reader queries structured knowledge without scraping
   Scenario: Agent starts the local stdio MCP server
     When the operator runs &quot;npx agentic-system-core mcp &lt;bundle-path&gt;&quot; from outside the Bundle
     Then the server starts and speaks JSON-RPC 2.0 over stdio
-    And the server exposes exactly seven tools: &quot;search&quot;, &quot;read&quot;, &quot;links&quot;, &quot;compose&quot;, &quot;propose&quot;, &quot;ask&quot;, &quot;remember&quot;
+    And the server exposes exactly ten tools: &quot;search&quot;, &quot;read&quot;, &quot;links&quot;, &quot;compose&quot;, &quot;propose&quot;, &quot;ask&quot;, &quot;remember&quot;, &quot;brief&quot;, &quot;explain&quot;, &quot;check&quot;
 
   @<a class="ref" href="/docs/requirements/#PRD-023">PRD-023</a> @<a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a> @agent @mode-1 @matrix-A2
   Scenario: The server reads the local Bundle, never the network
@@ -77,6 +81,14 @@ Feature: Agent reader queries structured knowledge without scraping
     Then the result lists the &quot;requires&quot; Link from &quot;a2a&quot; as its computed inverse &quot;required-by&quot;
 
   @<a class="ref" href="/docs/requirements/#PRD-025">PRD-025</a> @agent @mode-1
+  Scenario: An agent that lands on any page finds the node's llms.txt and the page's Markdown copy by their link relations
+    Given a fresh copy of the acceptance Bundle
+    And the Bundle is built
+    Then every HTML page the build wrote names &quot;/llms.txt&quot; in its head with the relation &quot;describedby&quot; and the type &quot;text/plain&quot; (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-46">AGSC-06-46</a>)
+    And the page &quot;www/concepts/a2a/index.html&quot; names its Markdown copy &quot;/pages/a2a.md&quot; with the relation &quot;alternate&quot; and the type &quot;text/markdown&quot;, and the build wrote that copy
+    And the home page names no Markdown copy, and its first describedby link is still the discovery document (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-25">AGSC-06-25</a>)
+
+  @<a class="ref" href="/docs/requirements/#PRD-025">PRD-025</a> @agent @mode-1
   Scenario: Non-MCP agent reads via llms.txt and RDF instead
     Given the agent has no MCP client
     When the agent fetches &quot;/llms.txt&quot;
@@ -91,7 +103,7 @@ Feature: Agent reader queries structured knowledge without scraping
     When the agent calls tool &quot;ask&quot; with &quot;What pattern handles tool-use retries?&quot;
     Then the answer cites at least one item IRI from the Bundle (<a class="ref" href="/specs/09-conformance/#AGSC-09-14a">AGSC-09-14a</a>)
     And a question that shares no word with the Bundle returns exactly &quot;no answer in this memory&quot;
-    When the agent calls tool &quot;remember&quot; with kind &quot;episode&quot;, a title, a body, its actor, the instant &quot;at&quot; and its operator
+    When the agent calls tool &quot;remember&quot; with kind &quot;episode&quot;, a title, a body, its actor, the instant &quot;at&quot;, its operator, its agent and its model
     Then a conforming Episode item comes back as a Proposal with no finding (<a class="ref" href="/specs/09-conformance/#AGSC-09-14b">AGSC-09-14b</a>)
     And an episode without its declared actor is refused with &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E003">AGSC-E003</a>&quot;
     And nothing is written to the Bundle by the server
@@ -107,16 +119,16 @@ Feature: Agent reader queries structured knowledge without scraping
     And a prompt name that does not exist is answered with a JSON-RPC error, not a tool envelope
 
   @<a class="ref" href="/docs/requirements/#PRD-051">PRD-051</a> @agent @mode-1 @matrix-A6
-  Scenario: A page agent calls the seven page tools without a browser
+  Scenario: A page agent calls the ten page tools without a browser
     Given the node is built and its item page &quot;/concepts/handoff/&quot; loads the three page-tool scripts
-    When an agent runs those scripts with nothing but the node's own files to fetch, and calls each of the seven tools
+    When an agent runs those scripts with nothing but the node's own files to fetch, and calls each of the ten tools
     Then every answer equals the answer the local tool server gives to the same call (<a class="ref" href="/specs/09-conformance/#AGSC-09-16">AGSC-09-16</a>)
     And the page read nothing outside the node
 
   @<a class="ref" href="/docs/requirements/#PRD-051">PRD-051</a> @agent @mode-1 @matrix-A6
-  Scenario: A page agent calls the seven page tools in a browser through document.modelContext
+  Scenario: A page agent calls the ten page tools in a browser through document.modelContext
     Given the node is built and its item page &quot;/concepts/handoff/&quot; loads the three page-tool scripts
-    When a browser opens &quot;/concepts/handoff/&quot; offering &quot;document.modelContext&quot;, and the agent calls each of the seven tools the page registers
+    When a browser opens &quot;/concepts/handoff/&quot; offering &quot;document.modelContext&quot;, and the agent calls each of the ten tools the page registers
     Then every answer equals the answer the local tool server gives to the same call (<a class="ref" href="/specs/09-conformance/#AGSC-09-16">AGSC-09-16</a>)
     And the page read nothing outside the node
 
@@ -124,7 +136,7 @@ Feature: Agent reader queries structured knowledge without scraping
   Scenario: A crawler honours the robots.txt groups and the TDM reservation
     Given the node is built with &quot;site.tdm_crawlers&quot; naming &quot;CCBot&quot; and &quot;GPTBot&quot;
     When a crawler fetches &quot;/robots.txt&quot; and &quot;/.well-known/tdmrep.json&quot;
-    Then &quot;/robots.txt&quot; holds one group per named product token, in the configured order and before the &quot;User-agent: *&quot; group, each with &quot;Disallow: /&quot; (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-18">AGSC-06-18</a>)
+    Then &quot;/robots.txt&quot; holds one group per named product token, in the configured order and before the &quot;User-agent: *&quot; group, each with &quot;Disallow: /&quot; (<a class="ref" href="/specs/06-surfaces/#AGSC-06-18">AGSC-06-18</a>)
     And every group carries the same optional &quot;Content-Signal&quot; record
     And &quot;/.well-known/tdmrep.json&quot; is exactly [{&quot;location&quot;:&quot;/&quot;,&quot;tdm-reservation&quot;:1}]
     And a crawler the list does not name may fetch every page, and &quot;GPTBot&quot; may fetch none
@@ -154,6 +166,27 @@ Feature: Agent reader queries structured knowledge without scraping
     Then every chunk that begins with a heading is an in-page anchor &quot;chunk-&quot; and the first 16 hex characters of its &quot;id&quot; on that heading of its item page (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-28">AGSC-06-28</a>)
     And every other chunk is cited at the top of its page, and no page carries a chunk anchor that names no chunk (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-30">AGSC-06-30</a>)
 
+  @<a class="ref" href="/docs/requirements/#PRD-023">PRD-023</a> @<a class="ref" href="/docs/requirements/#PRD-080">PRD-080</a> @<a class="ref" href="/docs/requirements/#PRD-061">PRD-061</a> @agent @mode-1 @matrix-A2
+  Scenario: An agent asks why two items are linked, what to fix and what a selection needs, and cites a chunk
+    Given the item &quot;handoff&quot; lists itself under &quot;related&quot;, the Link warning &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E313">AGSC-E313</a>&quot; (<a class="ref" href="/specs/03-links/#AGSC-03-23">AGSC-03-23</a>)
+    And &quot;npx agentic-system-core mcp&quot; is running over the acceptance Bundle
+    When the agent calls tool &quot;explain&quot; with key &quot;required-by&quot;, source &quot;mcp&quot; and target &quot;a2a&quot;
+    Then the relation holds because &quot;a2a&quot; authors &quot;requires&quot; toward &quot;mcp&quot;, the reading &quot;inverse&quot; (<a class="ref" href="/specs/05-graph/page-2/#AGSC-05-33">AGSC-05-33</a>)
+    And a relation that no Link gives is the answer &quot;holds&quot; false with no step, not an error
+    When the agent calls tool &quot;check&quot; with no selection
+    Then the answer names every listed item it checked, in code-point order, and each Link warning without a position (<a class="ref" href="/specs/09-conformance/#AGSC-09-13">AGSC-09-13</a>)
+    When the agent calls tool &quot;brief&quot; with the selection &quot;a2a&quot;
+    Then the answer is the brief of that selection, &quot;mcp&quot; before &quot;a2a&quot; in its order, and nothing is written to the Bundle (<a class="ref" href="/specs/07-composition/#AGSC-07-25">AGSC-07-25</a>)
+    When the agent calls tool &quot;read&quot; with argument &quot;{slug: \&quot;a2a\&quot;}&quot;
+    Then each citation record of the answer carries the digest and id of its line in &quot;/chunks.jsonl&quot; and the content version of the build (<a class="ref" href="/specs/09-conformance/#AGSC-09-13">AGSC-09-13</a>)
+
+  @<a class="ref" href="/docs/requirements/#PRD-023">PRD-023</a> @<a class="ref" href="/docs/requirements/#PRD-080">PRD-080</a> @agent @mode-1
+  Scenario: A search that matches more than a hundred items is bounded and says how many matched
+    Given the acceptance Bundle holds 120 more concepts that all mention &quot;widget&quot;
+    When the agent calls tool &quot;search&quot; with the query &quot;widget&quot; on the local tool server
+    Then the answer carries the first 100 hits by slug and the member &quot;total&quot; 120 (<a class="ref" href="/specs/09-conformance/#AGSC-09-13">AGSC-09-13</a>)
+    And a search under the bound carries no &quot;total&quot;, as in 1.0
+
   @<a class="ref" href="/docs/requirements/#PRD-036">PRD-036</a> @agent @mode-4
   Scenario: An MCP client composes a selection through the compose tool
     Given &quot;npx agentic-system-core mcp&quot; is running over the acceptance Bundle
@@ -161,16 +194,53 @@ Feature: Agent reader queries structured knowledge without scraping
     Then the verdict equals the one &quot;agsc compose handoff&quot; prints for the same selection (<a class="ref" href="/specs/09-conformance/#AGSC-09-16">AGSC-09-16</a>)
     And nothing is written to the Bundle by the server
 
-  @<a class="ref" href="/docs/requirements/#PRD-023">PRD-023</a> @agent @mode-1 @matrix-A2
+  @<a class="ref" href="/docs/requirements/#PRD-080">PRD-080</a> @agent @mode-1 @matrix-A2
   Scenario: A missing resource is answered with -32002 under 2025-11-25
     Given the node is built
     When an MCP client that speaks the revision 2025-11-25 reads the resource &quot;memory://agenticsystemcore/no-such-item&quot;
     Then the server negotiated the revision &quot;2025-11-25&quot;
-    And the answer is the JSON-RPC error -32002, &quot;Resource not found&quot;, that revision defines, and not a tool envelope</code></pre>
+    And the answer is the JSON-RPC error -32002, &quot;Resource not found&quot;, that revision defines, and not a tool envelope
+
+  @<a class="ref" href="/docs/requirements/#PRD-080">PRD-080</a> @agent @mode-1 @matrix-A2
+  Scenario: An agent of the revision 2026-07-28 discovers the server and is answered with no handshake
+    Given the node is built
+    When an MCP client that speaks the revision 2026-07-28 asks &quot;server/discover&quot; and reads the resource &quot;memory://agenticsystemcore/no-such-item&quot;, with no &quot;initialize&quot;
+    Then the server names the revisions &quot;2026-07-28&quot; and &quot;2025-11-25&quot;, and its answer is complete and may not be cached (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-09-19">AGSC-09-19</a>)
+    And the missing resource is the JSON-RPC error -32602 that revision defines
+
+  @<a class="ref" href="/docs/requirements/#PRD-081">PRD-081</a> @agent @mode-1 @matrix-A2
+  Scenario: An agent on the same machine reaches the tool server over Streamable HTTP, and a page of another site is refused
+    Given the node is built
+    When &quot;agsc mcp --http 0&quot; serves the acceptance Bundle and an MCP client of the revision 2026-07-28 calls tool &quot;search&quot; with the query &quot;protocol&quot; over HTTP
+    Then the answer is the envelope the server gives over standard input and output for the same call (<a class="ref" href="/specs/09-conformance/#AGSC-09-18">AGSC-09-18</a>)
+    And a request from the origin &quot;https://evil.example&quot; is refused with HTTP 403 and runs no tool
+    And nothing is written to the Bundle by the server
+
+  @<a class="ref" href="/docs/requirements/#PRD-024">PRD-024</a> @agent @mode-1
+  Scenario: An A2A client finds an agent card only on a node that declares an A2A responder, and a catalogue crawler finds both files by digest
+    Given a fresh copy of the acceptance Bundle
+    And the configuration declares the a2a-card surface and no responder
+    When the publisher runs &quot;agsc build --json&quot;
+    Then the command exits 1
+    And the JSON envelope carries the error &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E210">AGSC-E210</a>&quot;
+    And the Bundle does not hold &quot;www/.well-known/agent-card.json&quot;
+    Given the configuration declares an MCP responder &quot;https://agenticsystemcore.com/mcp&quot; beside the a2a-card surface
+    When the publisher runs &quot;agsc build --json&quot;
+    Then the command exits 0
+    And the JSON envelope carries the warning &quot;<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E210">AGSC-E210</a>&quot;
+    And the output names &quot;the discovery document does not declare a2a-card at https://agenticsystemcore.com/.well-known/agent-card.json either&quot;
+    And the Bundle does not hold &quot;www/.well-known/agent-card.json&quot;
+    And the discovery file declares no a2a-card, so the shipped validate-wellknown has no a2a-card target to warn about (<a class="ref" href="/specs/11-boundary/#AGSC-11-16">AGSC-11-16</a>)
+    Given the configuration declares a responder &quot;https://agenticsystemcore.com/a2a&quot; beside the a2a-card surface and switches discovery.ai_catalog on
+    When the publisher runs &quot;agsc build --json&quot;
+    Then the command exits 0
+    And the official A2A SDK reads &quot;www/.well-known/agent-card.json&quot; back unchanged, with one skill for each skill pack
+    And the shipped validate-wellknown finds the a2a-card target of the discovery file served
+    And the entries of &quot;www/.well-known/ai-catalog.json&quot; and &quot;www/.well-known/ard.json&quot; carry the SHA-256 of the card and of the discovery document as built</code></pre>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/agentic-system-core/edit/main/features/persona-c-agent-mcp.feature">Propose an edit</a> — opens <code>features/persona-c-agent-mcp.feature</code> in the specification repository; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
 </footer>
 </body>
 </html>

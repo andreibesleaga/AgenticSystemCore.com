@@ -41,7 +41,7 @@ AgenticSystemCore has several doors. Find yourself below and follow that path; e
 
 ## If your content is gated
 
-1. The [boundary section](/specs/11-boundary/) of the specification, AGSC-11-20: a node can say in public that it exists while its content stays behind access control. The discovery document stays public, the facts about the content that a public node shows are left out, and the checker accepts their absence. At 1.0.0 the reference engine still writes the content version, which carries the commit count and a commit hash, into `/llms.txt` (the line `bundle_version:`) and into the NOW page (`content version …`) of a restricted node, and `/llms.txt` is part of the unauthenticated view; leaving it out on a restricted node is planned for 1.1.
+1. The [boundary section](/specs/11-boundary/) of the specification, AGSC-11-20: a node can say in public that it exists while its content stays behind access control. The discovery document stays public, the facts about the content that a public node shows are left out, and the checker accepts their absence. At 1.0.0 the reference engine wrote the content version, which carries the commit count and a commit hash, into `/llms.txt` (the line `bundle_version:`) and into the NOW page (`content version …`) of a restricted node, and `/llms.txt` is part of the unauthenticated view; from 1.1 the engine leaves the content version out of both.
 2. `"visibility": "restricted"` in `agsc.config.json`; the restricted publisher's scenarios are in the source repository's `features/persona-o-restricted.feature`.
 
 ## If you decide whether to depend on it
@@ -77,7 +77,7 @@ AgenticSystemCore has several doors. Find yourself below and follow that path; e
 3. [`/chunks.jsonl`](/chunks.jsonl), the graph dumps and the [ontology](/ns/): for retrieval and for joining with other nodes.
 4. The [agent skill](/docs/agent-skill/): one file to load into a coding agent so it can use the engine in every mode.
 5. [How to use it](/docs/how-to-use/), the section for agents: what to fetch, in which order, and how to propose a change.
-6. On every item page and on `/compose/` of this site, the seven page tools, when your browser offers them; everything from here is marked untrusted, and `propose` returns text for a person to review.
+6. On every item page and on `/compose/` of this site, the ten page tools, when your browser offers them; everything from here is marked untrusted, and `propose` returns text for a person to review.
 
 ## Where a node can live
 

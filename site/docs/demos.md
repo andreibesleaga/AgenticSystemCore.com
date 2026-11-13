@@ -46,7 +46,7 @@ Personas: the drop-in user, the human reader, the human contributor, the maintai
 
 ## An agent on the same wiki
 
-**What it proves.** An assistant gets seven tools over a Bundle — `search`, `read`, `links`, `compose`, `ask`, `propose`, `remember` — with nothing leaving the machine; every answer is marked `untrusted` and carries its licence; `propose` and `remember` hand back text and write nothing; the same seven tools on a published page give the same answers.
+**What it proves.** An assistant gets ten tools over a Bundle — `search`, `read`, `links`, `compose`, `ask`, `propose`, `remember`, `brief`, `explain`, `check` — with nothing leaving the machine; every answer is marked `untrusted` and carries its licence; `propose` and `remember` hand back text and write nothing; the same ten tools on a published page give the same answers.
 
 Two small scripts stand in for an assistant: `mcp-call.js` starts `agsc mcp` and sends the three JSON-RPC lines every Model Context Protocol client sends first; `page-tools.js` loads the three scripts an item page loads and calls a tool the way the page does.
 
@@ -76,7 +76,7 @@ The `search` answer, as printed:
 }
 ```
 
-In a browser whose assistant supports in-page tools, every item page and the `/compose/` page register the same seven tools through `document.modelContext`; nothing is installed and no server runs. Connecting a real assistant is four lines of configuration per assistant, in the engine's [assistant guide](https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md). Personas: the agent reader, the agent proposer, the agent using a node as memory.
+In a browser whose assistant supports in-page tools, every item page and the `/compose/` page register the same ten tools through `document.modelContext`; nothing is installed and no server runs. Connecting a real assistant is four lines of configuration per assistant, in the engine's [assistant guide](https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md). Personas: the agent reader, the agent proposer, the agent using a node as memory.
 
 ## Mode 1 — distributed memory
 

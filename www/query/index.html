@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Query — AgenticSystemCore</title>
+<meta name="description" content="Ask the published graph of this node a question in SPARQL, in this page: no server takes part, and nothing is sent or stored.">
+<link rel="canonical" href="https://agenticsystemcore.com/query/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<link rel="stylesheet" href="/query/agsc-query.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/query/">
+<meta property="og:title" content="Query">
+<meta property="og:description" content="Ask the published graph of this node a question in SPARQL, in this page: no server takes part, and nothing is sent or stored.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Query","url":"https://agenticsystemcore.com/query/","applicationCategory":"DeveloperApplication","author":{"@type":"Person","name":"Andrei N. Besleaga"}}</script>
+<script src="/query/agsc-query.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Query</h1>
+<p class="summary"><strong>Summary</strong>Ask the published graph of this node a question in SPARQL, in this page: no server takes part, and nothing is sent or stored.</p>
+<p>Write a query in SPARQL 1.1 and run it against the published graph of this node, <code>/graph.nq</code>. The query runs in this page, in your browser: no server takes part, nothing you write is sent anywhere and nothing is stored, not even the last query.</p>
+<p id="query-noscript">This page needs JavaScript to run a query. Without it, the examples and the vocabulary below still read, and every query gives the same answer in a SPARQL 1.1 store loaded with <code>/graph.nq</code> that reads the union of its graphs as the default graph (every statement of <code>/graph.nq</code> is in this node's named graph).</p>
+<section id="query" class="query" aria-labelledby="query-heading" data-answers="SELECT ASK CONSTRUCT DESCRIBE" data-refuses="update SERVICE" hidden>
+<h2 id="query-heading">Ask the graph</h2>
+<p>The page answers <code>SELECT</code>, <code>ASK</code>, <code>CONSTRUCT</code> and <code>DESCRIBE</code>. It refuses an update (<code>INSERT</code>, <code>DELETE</code>, <code>LOAD</code> and the others) and a <code>SERVICE</code> clause before anything runs, because it changes nothing and asks no other server. A query runs over every statement of the node, the union of the graphs of <code>/graph.nq</code>, unless it names its own dataset with <code>FROM</code>.</p>
+<p id="query-status" role="status" aria-live="polite"></p>
+<label for="query-text">Query (SPARQL 1.1)</label>
+<div class="query-editor"><pre class="query-mirror" aria-hidden="true"><code id="query-mirror"></code></pre>
+<textarea id="query-text" rows="10" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="query-keys">PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+SELECT ?item ?name WHERE { ?item skos:prefLabel ?name } ORDER BY ?item LIMIT 100
+</textarea></div>
+<p id="query-keys">Ctrl+Enter (Cmd+Enter on a Mac) runs the query; Tab leaves the editor. Stop ends a long query.</p>
+<div class="query-tools">
+<button type="button" id="query-run" disabled>Run</button>
+<button type="button" id="query-stop" disabled>Stop</button>
+<a id="query-share" href="#query=PREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0ASELECT%20%3Fitem%20%3Fname%20WHERE%20%7B%20%3Fitem%20skos%3AprefLabel%20%3Fname%20%7D%20ORDER%20BY%20%3Fitem%20LIMIT%20100%0A">Link to this query</a>
+</div>
+<p>The link holds the query after the <code>#</code> of its address, a part no browser sends to a server. Opening it puts the query into the editor; it runs only when you select Run.</p>
+</section>
+<section id="query-result" aria-labelledby="query-result-heading" hidden>
+<h2 id="query-result-heading">Result</h2>
+<p class="query-downloads"><a id="query-csv" data-format="csv" hidden>Download the result as CSV</a>
+<a id="query-json" data-format="json" hidden>Download the result as JSON</a>
+<span id="query-csv-none" hidden>A yes-or-no answer has no CSV form; the JSON file holds it.</span></p>
+<p>The files follow the W3C Recommendations “SPARQL 1.1 Query Results CSV and TSV Formats” and “SPARQL 1.1 Query Results JSON Format”. A <code>CONSTRUCT</code> or <code>DESCRIBE</code> result is given as its triples, one row each, in the columns subject, predicate and object. The CSV file holds each value as the query gave it: a spreadsheet may run a value that starts with <code>=</code>, <code>+</code>, <code>-</code> or <code>@</code> as a formula, so import the file with its columns as text.</p>
+<div id="query-table" class="table-wrap"></div>
+<figure id="query-picture" class="query-picture" hidden></figure>
+</section>
+<section id="examples" aria-labelledby="examples-heading">
+<h2 id="examples-heading">Examples: the ten questions of the graph</h2>
+<p>The specification names ten questions that the graph of every node must answer. Each comes with the query that defines it, in which <code>?x</code> stands for the item you ask about, <code>&lt;S...&gt;</code> for a selection of items and <code>"T"</code> for an instant. Here they are filled in from this node, and the sentence under each query says with what: put your own in their place to ask about something else.</p>
+<ol class="query-examples">
+<li id="example-1">
+<p class="question" id="example-1-question">1. If I choose X, what else must I take?</p>
+<pre><code id="example-1-query">PREFIX asc: &lt;https://w3id.org/agentic-system-core/ns#&gt;
+PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
+PREFIX prov: &lt;http://www.w3.org/ns/prov#&gt;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+SELECT DISTINCT ?item WHERE { &lt;https://agenticsystemcore.com/concepts/bundle/&gt; dcterms:requires+ ?item } ORDER BY ?item</code></pre>
+<p class="example-note" id="example-1-note">Filled in from this node: ?x is “Bundle” (bundle). No item of this node has what this question asks about, so the answer is empty.</p>
+<button type="button" data-example="example-1-query" aria-describedby="example-1-question example-1-note" hidden>Put this query in the editor</button>
+</li>
+<li id="example-2">
+<p class="question" id="example-2-question">2. What can never go with X?</p>
+<pre><code id="example-2-query">PREFIX asc: &lt;https://w3id.org/agentic-system-core/ns#&gt;
+PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
+PREFIX prov: &lt;http://www.w3.org/ns/prov#&gt;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+SELECT DISTINCT ?item WHERE { &lt;https://agenticsystemcore.com/concepts/bundle/&gt; asc:excludes ?item } ORDER BY ?item</code></pre>
+<p class="example-note" id="example-2-note">Filled in from this node: ?x is “Bundle” (bundle). No item of this node has what this question asks about, so the answer is empty.</p>
+<button type="button" data-example="example-2-query" aria-describedby="example-2-question example-2-note" hidden>Put this query in the editor</button>
+</li>
+<li id="example-3">
+<p class="question" id="example-3-question">3. What replaced X, directly or through a chain?</p>
+<pre><code id="example-3-query">PREFIX asc: &lt;https://w3id.org/agentic-system-core/ns#&gt;
+PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
+PREFIX prov: &lt;http://www.w3.org/ns/prov#&gt;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+SELECT DISTINCT ?item WHERE { &lt;https://agenticsystemcore.com/concepts/bundle/&gt; dcterms:isReplacedBy+ ?item FILTER (?item != &lt;https://agenticsystemcore.com/concepts/bundle/&gt;) } ORDER BY ?item</code></pre>
+<p class="example-note" id="example-3-note">Filled in from this node: ?x is “Bundle” (bundle). No item of this node has what this question asks about, so the answer is empty.</p>
+<button type="button" data-example="example-3-query" aria-describedby="example-3-question example-3-note" hidden>Put this query in the editor</button>
+</li>
+<li id="example-4">
+<p class="question" id="example-4-question">4. What does X need that nobody in my selection provides?</p>
+<pre><code id="example-4-query">PREFIX asc: &lt;https://w3id.org/agentic-system-core/ns#&gt;
+PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
+PREFIX prov: &lt;http://www.w3.org/ns/prov#&gt;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+SELECT DISTINCT ?name WHERE { &lt;https://agenticsystemcore.com/concepts/bundle/&gt; asc:consumes ?name
+  FILTER NOT EXISTS { VALUES ?p { &lt;https://agenticsystemcore.com/concepts/bundle/&gt;  } ?p asc:produces ?name } } ORDER BY ?name</code></pre>
+<p class="example-note" id="example-4-note">Filled in from this node: ?x is “Bundle” (bundle); &lt;S...&gt; is empty. No item of this node has what this question asks about, so the answer is empty.</p>
+<button type="button" data-example="example-4-query" aria-describedby="example-4-question example-4-note" hidden>Put this query in the editor</button>
+</li>
+<li id="example-5">
+<p class="question" id="example-5-question">5. What verifies X, and what does X verify?</p>
+<pre><code id="example-5-query">PREFIX asc: &lt;https://w3id.org/agentic-system-core/ns#&gt;
+PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
+PREFIX prov: &lt;http://www.w3.org/ns/prov#&gt;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+SELECT DISTINCT ?direction ?item WHERE {
+  { &lt;https://agenticsystemcore.com/concepts/bundle/&gt; asc:isVerifiedBy ?item BIND (&quot;verified_by&quot; AS ?direction) }
+  UNION { &lt;https://agenticsystemcore.com/concepts/bundle/&gt; asc:verifies ?item BIND (&quot;verifies&quot; AS ?direction) } } ORDER BY ?direction ?item</code></pre>
+<p class="example-note" id="example-5-note">Filled in from this node: ?x is “Bundle” (bundle). No item of this node has what this question asks about, so the answer is empty.</p>
+<button type="button" data-example="example-5-query" aria-describedby="example-5-question example-5-note" hidden>Put this query in the editor</button>
+</li>
+<li id="example-6">
+<p class="question" id="example-6-question">6. What blocks task T, directly or through a chain?</p>
+<pre><code id="example-6-query">PREFIX asc: &lt;https://w3id.org/agentic-system-core/ns#&gt;
+PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
+PREFIX prov: &lt;http://www.w3.org/ns/prov#&gt;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+SELECT DISTINCT ?item WHERE { &lt;https://agenticsystemcore.com/concepts/bundle/&gt; asc:blockedBy+ ?item FILTER (?item != &lt;https://agenticsystemcore.com/concepts/bundle/&gt;) } ORDER BY ?item</code></pre>
+<p class="example-note" id="example-6-note">Filled in from this node: ?x is “Bundle” (bundle). No item of this node has what this question asks about, so the answer is empty.</p>
+<button type="button" data-example="example-6-query" aria-describedby="example-6-question example-6-note" hidden>Put this query in the editor</button>
+</li>
+<li id="example-7">
+<p class="question" id="example-7-question">7. Where did lesson L come from?</p>
+<pre><code id="example-7-query">PREFIX asc: &lt;https://w3id.org/agentic-system-core/ns#&gt;
+PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
+PREFIX prov: &lt;http://www.w3.org/ns/prov#&gt;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+SELECT DISTINCT ?item ?class WHERE { &lt;https://agenticsystemcore.com/concepts/bundle/&gt; prov:wasDerivedFrom+ ?item . ?item a ?class FILTER (?item != &lt;https://agenticsystemcore.com/concepts/bundle/&gt;) } ORDER BY ?item</code></pre>
+<p class="example-note" id="example-7-note">Filled in from this node: ?x is “Bundle” (bundle). No item of this node has what this question asks about, so the answer is empty.</p>
+<button type="button" data-example="example-7-query" aria-describedby="example-7-question example-7-note" hidden>Put this query in the editor</button>
+</li>
+<li id="example-8">
+<p class="question" id="example-8-question">8. Which items sit under cluster C and its sub-clusters?</p>
+<pre><code id="example-8-query">PREFIX asc: &lt;https://w3id.org/agentic-system-core/ns#&gt;
+PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
+PREFIX prov: &lt;http://www.w3.org/ns/prov#&gt;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+SELECT DISTINCT ?item WHERE { &lt;https://agenticsystemcore.com/clusters/guides/&gt; skos:member+ ?item } ORDER BY ?item</code></pre>
+<p class="example-note" id="example-8-note">Filled in from this node: ?x is “Guides” (guides).</p>
+<button type="button" data-example="example-8-query" aria-describedby="example-8-question example-8-note" hidden>Put this query in the editor</button>
+</li>
+<li id="example-9">
+<p class="question" id="example-9-question">9. Which of my selected items are stale, draft or deprecated?</p>
+<pre><code id="example-9-query">PREFIX asc: &lt;https://w3id.org/agentic-system-core/ns#&gt;
+PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
+PREFIX prov: &lt;http://www.w3.org/ns/prov#&gt;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+SELECT DISTINCT ?item ?reason WHERE { VALUES ?item { &lt;https://agenticsystemcore.com/concepts/bundle/&gt; }
+  { ?item asc:status ?reason FILTER (?reason IN (&quot;draft&quot;, &quot;deprecated&quot;, &quot;retired&quot;)) }
+  UNION { ?item asc:staleAfter ?at FILTER (?at &lt; &quot;2026-11-13T09:14:46Z&quot;^^xsd:dateTime) BIND (&quot;stale&quot; AS ?reason) } }
+  ORDER BY ?item ?reason</code></pre>
+<p class="example-note" id="example-9-note">Filled in from this node: &lt;S...&gt; is “Bundle” (bundle); &quot;T&quot; is 2026-11-13T09:14:46Z, the instant of this build. No item of this node has what this question asks about, so the answer is empty.</p>
+<button type="button" data-example="example-9-query" aria-describedby="example-9-question example-9-note" hidden>Put this query in the editor</button>
+</li>
+<li id="example-10">
+<p class="question" id="example-10-question">10. Which sources back X, and which other items share them?</p>
+<pre><code id="example-10-query">PREFIX asc: &lt;https://w3id.org/agentic-system-core/ns#&gt;
+PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
+PREFIX prov: &lt;http://www.w3.org/ns/prov#&gt;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+SELECT DISTINCT ?resource ?other WHERE { &lt;https://agenticsystemcore.com/concepts/bundle/&gt; asc:source ?a . ?a dcterms:source ?resource
+  OPTIONAL { ?other asc:source ?b . ?b dcterms:source ?resource FILTER (?other != &lt;https://agenticsystemcore.com/concepts/bundle/&gt;) } }
+  ORDER BY ?resource ?other</code></pre>
+<p class="example-note" id="example-10-note">Filled in from this node: ?x is “Bundle” (bundle).</p>
+<button type="button" data-example="example-10-query" aria-describedby="example-10-question example-10-note" hidden>Put this query in the editor</button>
+</li>
+</ol>
+</section>
+<section id="vocabulary" aria-labelledby="vocabulary-heading">
+<h2 id="vocabulary-heading">Vocabulary</h2>
+<p>The classes and the relations of the graph, by the names a query uses. Every item of this node is in <code>/graph.nq</code> under one of these classes, and each link between two items is one of these relations.</p>
+<h3 id="vocabulary-classes">Classes</h3>
+<div class="table-wrap" tabindex="0" role="region" aria-labelledby="vocabulary-class-table-caption"><table id="vocabulary-class-table">
+<caption id="vocabulary-class-table-caption">The 12 classes of the vocabulary.</caption>
+<thead><tr><th scope="col">Class</th><th scope="col">IRI</th></tr></thead>
+<tbody>
+<tr><td><code>asc:Attachment</code></td><td><code>https://w3id.org/agentic-system-core/ns#Attachment</code></td></tr>
+<tr><td><code>asc:Bundle</code></td><td><code>https://w3id.org/agentic-system-core/ns#Bundle</code></td></tr>
+<tr><td><code>asc:Cluster</code></td><td><code>https://w3id.org/agentic-system-core/ns#Cluster</code></td></tr>
+<tr><td><code>asc:Concept</code></td><td><code>https://w3id.org/agentic-system-core/ns#Concept</code></td></tr>
+<tr><td><code>asc:Episode</code></td><td><code>https://w3id.org/agentic-system-core/ns#Episode</code></td></tr>
+<tr><td><code>asc:Gate</code></td><td><code>https://w3id.org/agentic-system-core/ns#Gate</code></td></tr>
+<tr><td><code>asc:Harness</code></td><td><code>https://w3id.org/agentic-system-core/ns#Harness</code></td></tr>
+<tr><td><code>asc:Lesson</code></td><td><code>https://w3id.org/agentic-system-core/ns#Lesson</code></td></tr>
+<tr><td><code>asc:Procedure</code></td><td><code>https://w3id.org/agentic-system-core/ns#Procedure</code></td></tr>
+<tr><td><code>asc:Proposal</code></td><td><code>https://w3id.org/agentic-system-core/ns#Proposal</code></td></tr>
+<tr><td><code>asc:Review</code></td><td><code>https://w3id.org/agentic-system-core/ns#Review</code></td></tr>
+<tr><td><code>asc:Source</code></td><td><code>https://w3id.org/agentic-system-core/ns#Source</code></td></tr>
+</tbody>
+</table></div>
+<h3 id="vocabulary-relations">Relations</h3>
+<div class="table-wrap" tabindex="0" role="region" aria-labelledby="vocabulary-relation-table-caption"><table id="vocabulary-relation-table">
+<caption id="vocabulary-relation-table-caption">The 14 relations an item may name, in the order of the specification.</caption>
+<thead><tr><th scope="col">Key</th><th scope="col">Property</th><th scope="col">Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>related</code></td><td><code>skos:related</code></td><td>The two items are connected in meaning, and neither depends on the other.</td></tr>
+<tr><td><code>broader</code></td><td><code>skos:broader</code></td><td>The target is a wider subject that this item falls under.</td></tr>
+<tr><td><code>narrower</code></td><td><code>skos:narrower</code></td><td>The target is a more specific subject that falls under this item.</td></tr>
+<tr><td><code>uses</code></td><td><code>asc:uses</code></td><td>This item draws on the target and can still be used when the target is absent.</td></tr>
+<tr><td><code>requires</code></td><td><code>dcterms:requires</code></td><td>This item cannot be used without the target, so choosing this item also takes the target.</td></tr>
+<tr><td><code>excludes</code></td><td><code>asc:excludes</code></td><td>This item and the target cannot be used together.</td></tr>
+<tr><td><code>derived-from</code></td><td><code>prov:wasDerivedFrom</code></td><td>This item was produced from the target, which is its origin.</td></tr>
+<tr><td><code>contradicts</code></td><td><code>asc:contradicts</code></td><td>This item and the target make claims that cannot both be true.</td></tr>
+<tr><td><code>supersedes</code></td><td><code>dcterms:replaces</code></td><td>This item replaces the target, which stays published but is no longer the one to use.</td></tr>
+<tr><td><code>implements</code></td><td><code>asc:implements</code></td><td>This item puts the target into practice, as code or a procedure puts a specification into practice.</td></tr>
+<tr><td><code>verifies</code></td><td><code>asc:verifies</code></td><td>This item checks that the target holds.</td></tr>
+<tr><td><code>covers</code></td><td><code>asc:covers</code></td><td>This item covers the target, as a test or a document covers a requirement.</td></tr>
+<tr><td><code>blocked-by</code></td><td><code>asc:blockedBy</code></td><td>This item cannot go ahead until the target is resolved.</td></tr>
+<tr><td><code>decided-by</code></td><td><code>asc:decidedBy</code></td><td>The target is the decision record that settled this item.</td></tr>
+</tbody>
+</table></div>
+<h3 id="vocabulary-prefixes">Prefixes</h3>
+<pre><code>PREFIX asc: &lt;https://w3id.org/agentic-system-core/ns#&gt;
+PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
+PREFIX prov: &lt;http://www.w3.org/ns/prov#&gt;
+PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX schema: &lt;https://schema.org/&gt;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;</code></pre>
+</section>
+<p class="query-engine">The query engine is Oxigraph 0.5.13, under <a href="/query/vendor/oxigraph-0.5.13/LICENSE-MIT.txt">the MIT licence</a> or <a href="/query/vendor/oxigraph-0.5.13/LICENSE-APACHE.txt">the Apache License 2.0</a>, at your option; <a href="/query/vendor/oxigraph-0.5.13/THIRD-PARTY.txt">the crates compiled into it</a> are listed with the licence each is taken under and its licence text.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
+</footer>
+</body>
+</html>

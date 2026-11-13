@@ -22,3 +22,13 @@ its own licence (the licence texts are beside the files):
   (assets/vendor/3d-force-graph-1.80.1.min.js, assets/vendor/3d-force-graph-1.80.1.LICENSE.txt).
 Each file is the library's bundle as published on npm, which includes its own
 dependencies (among them d3, and three.js in the 3D one) under their licences.
+
+Third-party code the site serves as the reference engine writes it, when built
+with an engine of specification 1.1 or later (the build copies it into the
+output; this repository does not hold it):
+- Oxigraph 0.5.13, Copyright (c) 2018 Oxigraph developers, under the MIT licence
+  or the Apache License 2.0, at the user's option: the query engine the /query/
+  page runs, compiled to WebAssembly (/query/vendor/oxigraph-0.5.13/web.js and
+  web_bg.wasm). Its two licence texts and the list of the crates that may be
+  compiled into it, each with its licence expression, are served beside it
+  (LICENSE-MIT.txt, LICENSE-APACHE.txt, THIRD-PARTY.txt).

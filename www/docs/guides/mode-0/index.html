@@ -17,6 +17,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/docs/guides/mode-0/">
 <meta property="og:title" content="Mode 0 guide: a folder of notes becomes a checked site">
 <meta property="og:description" content="Guide to Mode 0 of AgenticSystemCore: a folder of Markdown notes becomes a checked static site, with every command and the lines it prints.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Mode 0 guide: a folder of notes becomes a checked site","description":"Guide to Mode 0 of AgenticSystemCore: a folder of Markdown notes becomes a checked static site, with every command and the lines it prints.","url":"https://agenticsystemcore.com/docs/guides/mode-0/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
@@ -61,7 +65,7 @@ export PATH=&quot;$PWD/node_modules/.bin:$PATH&quot;             # puts agsc and
 export ENGINE=&quot;$PWD/node_modules/agentic-system-core&quot;  # the package: examples, checkers, licence texts</code></pre>
 <p>The two <code>export</code> lines last for this shell only; run them again in a new terminal.
 Every command below was run on the package and printed the lines quoted under it
-(other lines it printed are left out). The engine repository's test <code>tests/docs/guides.test.js</code>
+(other lines it printed are left out). The repository test <code>tests/docs/guides.test.js</code>
 runs them again on every change.</p>
 <h2 id="1-adopt-your-notes">1. Adopt your notes</h2>
 <p>Use your own folder of <code>.md</code> files, or make three notes to follow along:</p>
@@ -115,8 +119,8 @@ warn: AGSC-E408 a concept carries no description (AGSC-02-21) — content/concep
 warn: AGSC-E305 &quot;hydration&quot; has no inbound Link and no clusters[] entry (AGSC-03-10) — content/concepts/hydration.md</code></pre>
 <p>Use your own address in <code>Contact:</code> (<code>mailto:</code> or <code>https:</code>). <code>agsc ci</code> checks every
 note, builds the site twice and compares the bytes, and verifies the result. A
-<strong>warning</strong> does not stop anything: here, notes without a one-line description, and
-notes no other note points at with a <em>typed</em> link (a link in the text is fine for
+<strong>warning</strong> does not stop anything: here, notes without a one-line description, and notes
+no other note points at with a <em>typed</em> link (a link in the text is fine for
 readers but does not count; typed links are explained in the
 <a href="/docs/data-model/">data model</a>). An <strong>error</strong> stops the
 build and names the file and line.</p>
@@ -124,7 +128,7 @@ build and names the file and line.</p>
 <p><code>ci</code> checks; <code>build</code> writes the site into <code>www/</code>:</p>
 <pre tabindex="0" data-lang="bash"><code>agsc build
 ls www www/.well-known</code></pre>
-<pre tabindex="0" data-lang="text"><code>wrote: 47 files under www/
+<pre tabindex="0" data-lang="text"><code>wrote: 59 files under www/
 build: pass (0 error, 4 warn)
 index.html
 llms.txt
@@ -135,11 +139,66 @@ knowledge-linkset
 security.txt</code></pre>
 <p>To read it in a browser, serve the folder (stop with Ctrl-C):</p>
 <pre tabindex="0" data-lang="bash"><code>agsc-host serve</code></pre>
-<pre tabindex="0" data-lang="text"><code>serving …/my-notes/www at http://127.0.0.1:8080/ — read-only; stop with Ctrl-C</code></pre>
-<p>To run the checkers against this address, see the <a href="/docs/guides/publish/#6-check-it-live">publishing guide §6</a> — <code>localhost</code>, not <code>127.0.0.1</code>, in <code>site.base</code> and on the command line.</p>
+<pre tabindex="0" data-lang="text"><code>serving …/my-notes/www at http://localhost:8080/ — read-only; stop with Ctrl-C</code></pre>
+<p>To run the checkers against this address, see the publishing guide §6 — <code>localhost</code>, not
+<code>127.0.0.1</code>, in <code>site.base</code> and on the command line.</p>
 <p>Each note has a page under <code>/concepts/&lt;name&gt;/</code> and a Markdown copy under
 <code>/pages/&lt;name&gt;.md</code>; <code>/.well-known/knowledge-linkset</code> is the discovery document an agent
 reads first.</p>
+<p>A note that has typed links gets a <strong>Relations</strong> section on its page: a small drawing
+of the notes it links to and the notes that link to it, and a table with one row per
+link that gives the relation, its direction, the other note and what the relation
+means. The incoming rows are the note's backlinks. A cluster page also draws its
+members and the links among them. Drafts, retired notes and notes held back from a
+release never appear in either. No new file is written for this; the drawing is part
+of the page. Each arrow in a note's drawing has the class of its relation, such as
+<code>agsc-rel-requires</code>, so your own stylesheet can pick out one relation; the class adds
+no colour, and the cluster drawings do not carry it. In a diagram you write under
+<code>content/diagrams/</code>, <code>rel=requires</code> on an <code>arrow</code>, <code>line</code> or <code>text</code> line adds the same
+class. The three notes above have no typed link yet, so their pages have no Relations
+section; step 6 adds one.</p>
+<p>The <code>/clusters/</code> page lists the clusters, then shows how they connect: a drawing and a
+table count the links from the notes of one cluster to the notes of another. Radio
+buttons above the table show one relation at a time, without JavaScript. A legend
+below names the fourteen relations and what each means. Last comes an explorer: a
+picture of every published note and link, with a list beside it. With the keyboard,
+Tab reaches the list, the arrow keys move through it, Enter selects a note and shows
+its relations, and Escape clears. The explorer needs JavaScript and reads only
+<code>/graph.jsonld</code> of the same site; without JavaScript it does not appear, and the rest
+of the page is unchanged.</p>
+<p>The <code>/query/</code> page lets you ask the graph a question in SPARQL, the query language of
+RDF. Write a query and select Run (or press Ctrl+Enter): it runs in your browser,
+against <code>/graph.nq</code> of the same site, and no server takes part. The answer comes as a
+table; a <code>CONSTRUCT</code> or <code>DESCRIBE</code> query, or any query with three columns, is drawn as
+a picture too. Two links give the result as CSV and as JSON. The page answers
+<code>SELECT</code>, <code>ASK</code>, <code>CONSTRUCT</code> and <code>DESCRIBE</code>, and refuses a query that would change the
+graph or call another server. &quot;Link to this query&quot; gives an address that holds the
+query after its <code>#</code>: whoever opens it finds the query in the editor, and it runs only
+when they select Run. Below the editor, the ten questions every graph must answer come
+with their queries, ready to put in the editor. Each query is filled in with an item of
+your site, one the question has something to say about where there is one, and the
+sentence under it names the item and says when the answer is empty; change the item to
+ask about another. On this guide's three notes, which have no typed links yet, every
+example answers empty; the query already in the editor lists your notes. A
+table lists the classes and the fourteen relations with what each means. A site that
+declares its own questions and vocabulary (the <code>domain</code> object of <code>agsc.config.json</code>)
+has them listed after these. The page stores nothing, not even your last
+query. It needs JavaScript; the engine it runs, Oxigraph, is about 4.4 MB and loads
+only on this page. To leave the page out, set <code>&quot;query_page&quot;: false</code> under <code>site</code> in
+<code>agsc.config.json</code>; the build then writes no <code>/query/</code> and no link to it.</p>
+<p>Search engines and data catalogues find the same files from the home page alone. The
+JSON-LD block of <code>index.html</code> describes the site as a dataset: its licence, who made it
+and one download for each graph file, the chunks and the discovery document. The
+<code>Link</code> header the host sends with <code>/</code> (written into <code>_headers</code>) names the same files
+and the address to cite. To give the dataset a creator and a licence that names a
+version, add them to <code>agsc.config.json</code>, for example
+<code>&quot;bundle&quot;: { &quot;creator&quot;: { &quot;name&quot;: &quot;Josiah Carberry&quot;, &quot;orcid&quot;: &quot;0000-0002-1825-0097&quot; }, &quot;license_prose&quot;: &quot;CC-BY-4.0&quot;, &quot;license_url&quot;: &quot;https://creativecommons.org/licenses/by/4.0/&quot; }</code>
+beside the keys <code>bundle</code> already has. <code>license_url</code> names a version of the licence that
+<code>license_prose</code> names: without <code>license_prose</code> the node's licence is the Content Use Terms,
+and each chunk would then name those terms beside a CC BY address. A description of <code>content/index.md</code> shorter than
+50 characters gets a warning (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E202"><code>AGSC-E202</code></a>): dataset search ignores one that short. The
+one <code>init</code> wrote is long enough; write your own on the <code>description:</code> line of that file
+to say what the node holds.</p>
 <h2 id="4-change-a-note-as-a-proposal">4. Change a note — as a proposal</h2>
 <p>Give <code>hydration</code> a description. A note's header is plain YAML between two <code>---</code> lines;
 this is the whole file after the edit. Before you copy it: the block writes
@@ -184,21 +243,59 @@ merges it.</p>
 text of your notes (by default the Content Use Terms of the package — copy it in, or name
 another licence in <code>bundle.license_prose</code>); and the history checked:</p>
 <pre tabindex="0" data-lang="bash"><code>cp &quot;$ENGINE/LICENSE-CONTENT&quot; .
-node -e 'const f = &quot;agsc.config.json&quot;, fs = require(&quot;node:fs&quot;), c = JSON.parse(fs.readFileSync(f, &quot;utf8&quot;)); c.site.base = &quot;https://notes.example.org/&quot;; fs.writeFileSync(f, JSON.stringify(c, null, 2) + &quot;\n&quot;);'
+node -e 'const fs = require(&quot;node:fs&quot;), base = &quot;https://notes.example.org/&quot;, f = &quot;agsc.config.json&quot;, c = JSON.parse(fs.readFileSync(f, &quot;utf8&quot;)); c.site.base = base; fs.writeFileSync(f, JSON.stringify(c, null, 2) + &quot;\n&quot;); const i = &quot;content/index.md&quot;; fs.writeFileSync(i, fs.readFileSync(i, &quot;utf8&quot;).replace(/^base: .*$/m, &quot;base: &quot; + base));'
 git add -A &amp;&amp; git commit -q -m 'ready to publish'
 agsc ci
 agsc build
 agsc verify --ledger</code></pre>
 <pre tabindex="0" data-lang="text"><code>ci: pass (0 error, 6 warn)
-wrote: 48 files under www/
+wrote: 60 files under www/
 verify: pass (0 error, 0 warn)</code></pre>
-<p>The <code>node -e</code> line only sets <code>site.base</code>; editing the file by hand does the same. The new
+<p>The <code>node -e</code> line sets <code>site.base</code> and the <code>base</code> of the root document <code>content/index.md</code>,
+which must agree (<a class="ref" href="/specs/01-bundle/#AGSC-01-04">AGSC-01-04</a>; from 1.1 <code>lint</code> warns when they differ); editing the two by
+hand does the same. The new
 warning asks for a <code>PRIVACY.md</code> beside <code>LICENSE-CONTENT</code>, which <code>/legal/</code> then shows.
 Upload <code>www/</code> to any host that serves files over HTTPS; <code>agsc-host list</code> names the
 profiles the engine can write host settings for, and the <a href="/docs/guides/publish/">publishing guide</a>
-takes the node from here to a live address and checks it there.</p>
+takes the node from here to a live address and checks it there.
+The site <code>agsc build</code> writes is a Level 2 node, the Level a published node claims (spec/10);
+the publishing guide checks it at its address with <code>validate-wellknown --level 2</code>.</p>
+<h2 id="6-link-two-notes-and-draw-one">6. Link two notes, and draw one</h2>
+<p>A typed link is a line in a note's header. Say that the starter needs the hydration
+note, then build:</p>
+<pre tabindex="0" data-lang="bash"><code>node -e 'const fs = require(&quot;node:fs&quot;), f = &quot;content/concepts/sourdough.md&quot;; fs.writeFileSync(f, fs.readFileSync(f, &quot;utf8&quot;).replace(&quot;kind: explainer\n&quot;, &quot;kind: explainer\nrequires:\n  - hydration\n&quot;));'
+agsc build
+grep -o '&lt;td&gt;requires&lt;/td&gt;&lt;td&gt;outgoing&lt;/td&gt;' www/concepts/sourdough/index.html
+grep -o '&lt;td&gt;requires&lt;/td&gt;&lt;td&gt;incoming&lt;/td&gt;' www/concepts/hydration/index.html</code></pre>
+<pre tabindex="0" data-lang="text"><code>&lt;td&gt;requires&lt;/td&gt;&lt;td&gt;outgoing&lt;/td&gt;
+&lt;td&gt;requires&lt;/td&gt;&lt;td&gt;incoming&lt;/td&gt;</code></pre>
+<p>The sourdough page now has a Relations section with one outgoing <code>requires</code> row, and
+the hydration page shows the same link as a backlink. <code>requires</code> is one of the fourteen
+relations of the <a href="/docs/data-model/">data model</a>; the
+legend on <code>/clusters/</code> names them all.</p>
+<p>A note can also carry a drawing of your own. Write it as a short text file under
+<code>content/diagrams/</code>, named after the note, and name it in the note's header with a text
+alternative; the build turns it into an SVG on the note's page. Each line is one shape,
+and exactly one shape carries <code>acc</code>, the highlighted one:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir -p content/diagrams
+cat &gt; content/diagrams/sourdough.diagram &lt;&lt;'DIAGRAM'
+label &quot;The starter needs the right hydration&quot;
+box starter 40 100 140 50 &quot;starter&quot; acc
+box water 280 100 140 50 &quot;hydration&quot;
+arrow starter water rel=requires
+DIAGRAM
+node -e 'const fs = require(&quot;node:fs&quot;), f = &quot;content/concepts/sourdough.md&quot;; fs.writeFileSync(f, fs.readFileSync(f, &quot;utf8&quot;).replace(&quot;kind: explainer\n&quot;, &quot;kind: explainer\ndiagram:\n  file: sourdough.svg\n  alt: The starter, which requires the right hydration.\n&quot;));'
+agsc build
+grep -c 'class=&quot;agsc-rel-requires&quot;' www/concepts/sourdough/index.html</code></pre>
+<pre tabindex="0" data-lang="text"><code>2</code></pre>
+<p>Two arrows carry the class now: the one in the Relations drawing and the one in yours.
+The whole language (twelve kinds of line, their options and what each draws) is rule
+<a class="ref" href="/specs/01-bundle/page-2/#AGSC-01-42">AGSC-01-42</a> of the
+<a href="/specs/01-bundle/">specification</a>. When the build
+refuses a line of a diagram, it says <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E412"><code>AGSC-E412</code></a> with the file and the line; the
+<a href="/docs/guides/troubleshooting/">troubleshooting</a> page lists the usual causes.</p>
 <h2 id="when-it-says-no">When it says no</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
 <thead><tr><th scope="col">What you see</th><th scope="col">Why</th><th scope="col">What to do</th></tr></thead>
 <tbody>
 <tr><td><code>error: AGSC-E901 no .well-known/security.txt in the Bundle root …</code></td><td>no security contact</td><td>step 2</td></tr>
@@ -220,7 +317,7 @@ page, with its cause and what to do.</p>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/guides/mode-0.md">Propose an edit</a> — opens <code>site/docs/guides/mode-0.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
 </footer>
 </body>
 </html>

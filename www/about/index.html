@@ -17,6 +17,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/about/">
 <meta property="og:title" content="About">
 <meta property="og:description" content="Who writes AgenticSystemCore, how to read this node, the status of the specification and how to get in touch.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"AboutPage","name":"About AgenticSystemCore","url":"https://agenticsystemcore.com/about/","author":{"@type":"Person","name":"Andrei N. Besleaga","sameAs":["https://orcid.org/0009-0001-3464-5283","https://github.com/andreibesleaga","https://andreibesleaga.com/contact/"]}}</script>
 </head>
 <body>
@@ -48,9 +52,10 @@
 <p>All of those files are written by the reference engine from this repository's own content, so they are the same bytes any other node built with the same engine would carry.</p>
 <p>Two more files under <a href="/exports/">/exports/</a> are additive: a tabular index of the passages and a skim view of them. No rule pins their bytes and nothing depends on them; they exist because they are cheaper to read than the files they come from. If what you want is a Harness — the small file set a runtime loads to work on a chosen set of items — <a href="/compose/">the compose page</a> computes one in the browser and offers each file for download; nothing is uploaded, and no key or account is needed.</p>
 <h2 id="tools-for-browser-assistants">Tools for browser assistants</h2>
-<p>Every item page, every guide page and the <a href="/compose/">compose page</a> offer seven named tools — search, read, links, ask, compose, propose and remember — to an assistant running inside the visitor's own browser, so it can ask this node questions instead of scraping the page. The tools run in the page itself. They read only this site's own published files: the search index, each item's Markdown and JSON-LD view, and the discovery document. They contact no other host, they carry no key and need no account, and the two that prepare a change — propose and remember — hand the prepared text back to the caller and write nothing, here or anywhere else; a change to this node still becomes a pull request that a person reviews and merges. Nothing runs unless the browser supports the WebMCP feature, which today means Chrome 149 or later with <code>chrome://flags/#enable-webmcp-testing</code> switched on, or a browser that ships it. In every other browser the page registers nothing, behaves exactly as it did before and shows no error. WebMCP is a draft report of a W3C Community Group; it is not a W3C standard and is not on the W3C standards track.</p>
+<p>Every item page, every guide page and the <a href="/compose/">compose page</a> offer ten named tools — search, read, links, ask, compose, propose, remember, brief, explain and check — to an assistant running inside the visitor's own browser, so it can ask this node questions instead of scraping the page. The tools run in the page itself. They read only this site's own published files: the search index, each item's Markdown and JSON-LD view, the chunk file and the discovery document. They contact no other host, they carry no key and need no account, and the two that prepare a change — propose and remember — hand the prepared text back to the caller and write nothing, here or anywhere else; a change to this node still becomes a pull request that a person reviews and merges. Nothing runs unless the browser supports the WebMCP feature, which today means Chrome 149 or later with <code>chrome://flags/#enable-webmcp-testing</code> switched on, or a browser that ships it. In every other browser the page registers nothing, behaves exactly as it did before and shows no error. WebMCP is a draft report of a W3C Community Group; it is not a W3C standard and is not on the W3C standards track.</p>
 <h2 id="the-graph-explorer">The graph explorer</h2>
 <p>The picture on the front page and <a href="/graph/">the graph explorer</a> draw this node's <a href="/graph.jsonld">graph</a> and the graph of the peer node its discovery document names, in the visitor's browser, in 2D or, on request, in 3D. Hovering a node for a second shows its summary and a link to its page; the explorer lists every node as a button, shows the selected node's relations, provenance, licence and chunks, says whether the digest of each graph file matches the one its discovery document declares, and takes the address of any other node. It reads only published files: the discovery documents, the graphs and the chunk export. The two drawing libraries, force-graph and 3d-force-graph (MIT licence), are served from this site; the 3D one is loaded only when the visitor asks for 3D.</p>
+<p>This explorer is a page of this site only. Every node the reference engine builds, this one included, has the engine's own explorer on its <a href="/clusters/">clusters page</a>: the same graph, drawn with no library, with the fourteen relations and what each means; it links back here. The <a href="/query/">query page</a> asks the same graph a question in SPARQL.</p>
 <h2 id="quickstart">Quickstart</h2>
 <p>One short path per kind of visitor, each of at most ten lines; the commands are the reference engine's (<a class="ref" href="/specs/09-conformance/#AGSC-09-07">AGSC-09-07</a>) and the build checks every verb named here against it (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-24">AGSC-06-24</a>).</p>
 <h3 id="quickstart-p0">P0 &#8212; Drop-in user</h3>
@@ -78,7 +83,7 @@
 <ol>
 <li><code>fetch /.well-known/knowledge-linkset</code></li>
 <li><code>fetch /llms.txt or /graph.jsonld</code></li>
-<li><code>agsc mcp   (a local tool server over stdio)</code></li>
+<li><code>agsc mcp   (a local tool server over stdio, or over HTTP with --http &lt;port&gt;)</code></li>
 </ol>
 <h3 id="quickstart-p4">P4 &#8212; Agent proposer</h3>
 <ol>
@@ -176,7 +181,7 @@
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/about.md">Propose an edit</a> — opens <code>site/about.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
 </footer>
 </body>
 </html>

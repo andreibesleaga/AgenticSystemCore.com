@@ -8,7 +8,7 @@
 //
 //   node scripts/build.js [--out <dir>]      (default: www)
 //   SOURCE_DATE_EPOCH=<seconds> node scripts/build.js
-//   SITE_ENGINE=<path> SITE_SPEC_TAG=<tag>   (defaults: ../agentic-system-core, 1.0.0)
+//   SITE_ENGINE=<path> SITE_SPEC_TAG=<tag>   (defaults: ../agentic-system-core, spec_version of agsc.config.json)
 //   SITE_SPEC_SOURCE=tag|worktree            (default: tag when the tag exists, else worktree)
 'use strict';
 const fs = require('fs'), path = require('path'), crypto = require('crypto'), cp = require('child_process');
@@ -16,10 +16,12 @@ const { compile: compileDiagram } = require('./diagram.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const ENGINE = path.resolve(ROOT, process.env.SITE_ENGINE || '../agentic-system-core');
-const SPEC_TAG = process.env.SITE_SPEC_TAG || '1.0.0';
+const SITE_CONFIG = JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8'));
+// The specification tag defaults to the version agsc.config.json declares (the build refuses a mismatch).
+const SPEC_TAG = process.env.SITE_SPEC_TAG || SITE_CONFIG.spec_version;
 // Output directory: `build.out` of agsc.config.json, `www` — the folder Cloudflare Pages serves,
 // so a push to `main` publishes what this script wrote.
-const CONFIG_OUT = (JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).build || {}).out || 'www';
+const CONFIG_OUT = (SITE_CONFIG.build || {}).out || 'www';
 const OUT = path.resolve(ROOT, (() => { const i = process.argv.indexOf('--out'); return i > 0 ? process.argv[i + 1] : CONFIG_OUT; })());
 
 // Status of the external steps. Update these, rebuild and redeploy after each step (the
@@ -86,7 +88,7 @@ const checkText = (name, s) => {
 const stripH1 = s => s.replace(/^# .*\n+/, '').replace(/^\*\*Who this is for:\*\*.*\n+/, '');
 
 // ------------------------------------------------------------------ the engine's own emitters
-// The seven in-page tools of AGSC-09-13/AGSC-09-16 are the ENGINE's implementation, not a second
+// The in-page tools of AGSC-09-13/AGSC-09-16 (ten from 1.1) are the ENGINE's implementation, not a second
 // one written here. The four scripts this site serves under /compose/ are produced by the engine's
 // own emitters, required from the sibling repository at build time, so their bytes are exactly the
 // bytes the patterns node serves and the two sites cannot drift. The Markdown machine view and the
@@ -103,6 +105,9 @@ const engineWebmcp = engineModule('src/distribution/webmcp.js');
 const engineComposePage = engineModule('src/distribution/compose-page.js');
 const engineTheme = engineModule('src/distribution/theme.js');
 const engineSurfaces = engineModule('src/boundary/surfaces.js');
+// How many tools the engine's tool server and page tools offer, as a word for the prose of the pages:
+// derived from the engine's own list, never typed (ten at specification 1.1).
+const TOOL_COUNT = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'][engineSurfaces.TOOL_NAMES.length] || String(engineSurfaces.TOOL_NAMES.length);
 const engineAdopt = engineModule('src/knowledge/adopt.js');
 const engineFrontmatter = engineModule('src/knowledge/frontmatter.js');
 const engineYaml = engineModule('src/knowledge/yaml.js');
@@ -111,6 +116,8 @@ const engineYaml = engineModule('src/knowledge/yaml.js');
 const engineProvenance = engineModule('src/knowledge/provenance-header.js');
 const engineContentVersion = engineModule('src/knowledge/content-version.js');
 const engineLedger = engineModule('src/governance/ledger.js');
+// The fourteen Link keys and what each means (AGSC-03-01), read from the engine's relation table.
+const { LINK_KEYS, RELATIONS: ENGINE_RELATIONS } = engineModule('src/knowledge/relations.js');
 
 // The body of one "## …" section of a Markdown document, without its heading.
 const sectionOf = (src, start) => {
@@ -375,7 +382,7 @@ function headingId(text, used) {
 // rendered as a separate small line (class trace) so that the rule sentence reads on its own.
 // A rule may close with an italic amendment note after its bracket — "[…] *(Amended
 // <date> for <version>: …)*" — so the note is allowed to follow and is kept where the author put it.
-const TRACE_RE = /\s\[([^\[\]]{3,})\]((?:\s*\*\(.*\)\*)?)\s*$/;
+const TRACE_RE = /(?:^|\s)\[([^\[\]]{3,})\]((?:\s*\*\(.*\)\*)?)\s*$/;
 // Mark the trace record of a rule: the trailing bracket group on the last prose line of the item
 // (never a table row, never a line inside a fenced block). Returns true when one was found.
 function markTrace(c) {
@@ -549,7 +556,7 @@ const FORGE = {
 if (!FORGE.site) die('agsc.config.json: contribute[] needs one entry with mode "pr" (AGSC-11-14)');
 
 // Configuration guards, against schema/config.schema.json at the tag.
-// `build.feed` and `build.rdfxml` are RESERVED names of 1.1 and are rejected (AGSC-06-01, AGSC-01-18).
+// `build.feed` and `build.rdfxml` are names reserved to a later MINOR and are rejected (AGSC-06-01, AGSC-01-18).
 for (const k of Object.keys(config.build || {})) if (k !== 'out') die(`agsc.config.json: build.${k} is a reserved name, AGSC-E004`);
 // THE PATTERNS-NODE SWITCH. One setting turns the second node on or off for this
 // site: `"x-patterns-node": false` in agsc.config.json. It lives in the vendor-extension
@@ -664,7 +671,11 @@ for (const [type, plural] of Object.entries(PLURAL)) {
     const tags = fm.tags || [];
     if (tags.length < 2 || tags.length > 5 || !tags.every(t => TAGS.has(t))) die(`${rel}: 2-5 tags from tags.allowed (AGSC-E203)`);
     for (const s of fm.sources || []) if (!/^https?:\/\/[^\x00-\x20]+$/.test(s.resource || '')) die(`${rel}: sources[].resource (AGSC-02-10)`);
-    for (const k of Object.keys(fm)) if (!['type', 'title', 'description', 'kind', 'tags', 'clusters', 'prov', 'sources', 'when', 'task_state'].includes(k)) die(`${rel}: key ${k} not used by this site`);
+    for (const k of Object.keys(fm)) if (!['type', 'title', 'description', 'kind', 'tags', 'clusters', 'prov', 'sources', 'when', 'task_state', ...LINK_KEYS].includes(k)) die(`${rel}: key ${k} not used by this site`);
+    // A typed Link (AGSC-03-01): one of the fourteen keys, a list of the slugs it points at. The
+    // engine writes its triples into the graph files this site publishes; here each list is checked
+    // to be slugs, and each target to exist once every item is read (below).
+    for (const k of LINK_KEYS) if (fm[k] !== undefined && (!Array.isArray(fm[k]) || fm[k].length === 0 || !fm[k].every(t => typeof t === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(t)))) die(`${rel}: ${k} must be a list of item slugs (AGSC-03-01)`);
     // A task (the project's own board, Mode 5): the state is one of the nine the engine knows (AGSC-02-99).
     if (fm.task_state !== undefined && (fm.kind !== 'task' || !TASK_STATES.includes(fm.task_state))) die(`${rel}: task_state only on a concept of kind task, one of ${TASK_STATES.join(', ')} (AGSC-02-99)`);
     items.push({ type, plural, slug, fm, body, src, rel, iri: `${BASE}${plural}/${slug}/`, url: `/${plural}/${slug}/` });
@@ -676,6 +687,29 @@ const bySlug = new Map(items.map(it => [it.slug, it]));
 const clusters = items.filter(it => it.type === 'cluster');
 for (const it of items) for (const c of it.fm.clusters || []) if (!bySlug.has(c) || bySlug.get(c).type !== 'cluster') die(`${it.rel}: unknown cluster ${c} (AGSC-E301)`);
 const members = c => items.filter(it => (it.fm.clusters || []).includes(c.slug));
+for (const it of items) for (const k of LINK_KEYS) for (const t of it.fm[k] || []) {
+  if (!bySlug.has(t)) die(`${it.rel}: ${k} names ${t}, which is no item of this node (AGSC-E301)`);
+  if (t === it.slug) die(`${it.rel}: ${k} names the item itself (AGSC-03-01)`);
+}
+// Whether the node's items form one connected piece, joined by cluster membership and typed Links
+// read both ways: reported in the build's last line, never a failure, because no rule asks a node to
+// be connected and joining two pieces is a decision about content, made by a person.
+const GRAPH_PIECES = (() => {
+  const next = new Map(items.map(it => [it.slug, new Set()]));
+  const join = (a, b) => { next.get(a).add(b); next.get(b).add(a); };
+  for (const it of items) {
+    for (const c of it.fm.clusters || []) join(it.slug, c);
+    for (const k of LINK_KEYS) for (const t of it.fm[k] || []) join(it.slug, t);
+  }
+  const seen = new Set(); let pieces = 0;
+  for (const it of items) {
+    if (seen.has(it.slug)) continue;
+    pieces++;
+    const stack = [it.slug];
+    while (stack.length) { const s = stack.pop(); if (seen.has(s)) continue; seen.add(s); stack.push(...next.get(s)); }
+  }
+  return pieces;
+})();
 
 // ------------------------------------------------------------------ ontology: Turtle subset -> triples
 function parseTurtle(src) {
@@ -808,11 +842,16 @@ const EXTERNAL = [
   ['dcterms:license', null], ['dcterms:created', XSD + 'dateTime'], ['dcterms:modified', XSD + 'dateTime'],
   ['prov:wasDerivedFrom', '@id'], ['schema:license', null], ['schema:usageInfo', null],
 ];
+// AGSC-06-32: the context is that of the context version (1.0.0); the terms the vocabulary gained
+// later, which the engine lists, are not in it.
+const LATER_TERMS = new Set(engineModule('src/knowledge/jsonld.js').TERMS_AFTER_CONTEXT_VERSION || []);
 const CONTEXT = (() => {
   const c = { '@protected': true, '@version': 1.1, asc: NS, dcterms: 'http://purl.org/dc/terms/', prov: 'http://www.w3.org/ns/prov#', rdfs: RDFS, schema: 'https://schema.org/', skos: 'http://www.w3.org/2004/02/skos/core#', xsd: XSD };
   const ascNames = new Set();
   for (const s of ascSubjects) {
-    const name = s.slice(NS.length); ascNames.add(name);
+    const name = s.slice(NS.length);
+    if (LATER_TERMS.has(name)) continue;
+    ascNames.add(name);
     const k = kindOf(s), def = { '@id': `asc:${name}` };
     if (k === 'object') def['@type'] = '@id';
     if (k === 'datatype') { const r = one(s, RDFS + 'range'); if (r) def['@type'] = r; }
@@ -950,8 +989,14 @@ const withChunkAnchors = (it, html) => {
 const ADOPTED = [
   '/search.json', '/graph.jsonld', '/graph.nq', '/graph.ttl',
   '/ns/context.jsonld', '/chunks.jsonl', '/now.md', '/skills/index.json', '/ledger.jsonl',
+  // specification 1.1: the tabular chunk index (AGSC-06-37) and the two page assets of the graph
+  // explorer on /clusters/ (AGSC-06-38), whose page this generator writes around the engine's view
+  '/chunks-index.toon', '/clusters/agsc-explorer.css', '/clusters/agsc-explorer.js',
 ];
-const ADOPTED_PREFIX = ['/pages/', '/skills/', '/boards/', '/graph/fragments/'];
+// `/query/` (AGSC-06-39, `site.query_page` at its default): every file under it except its page —
+// the page script, the worker, the stylesheet and the engine with its licence texts — is the
+// engine's; the page is this generator's, around the engine's view (see "/query/" below).
+const ADOPTED_PREFIX = ['/pages/', '/skills/', '/boards/', '/graph/fragments/', '/query/'];
 // The routes the engine emits that this generator writes itself, with the reason. An HTML page is
 // here because the engine's page shell has no slot for this site's stylesheet, header or footer
 // (specification item); the rest are named one by one.
@@ -995,7 +1040,7 @@ const LEDGER = (() => {
   if (!GIT_LOG) die('no git history to derive /ledger.jsonl from; this node publishes the Level-2 form, which links it (AGSC-08-20a, AGSC-10-04)');
   const tree = cp.execFileSync('git', ['-C', ROOT, 'rev-parse', 'HEAD:content'], { encoding: 'utf8' }).trim();
   if (!/^[0-9a-f]{40,64}$/.test(tree)) die(`the content tree hash is not a git object id: ${tree}`);
-  const derived = engineLedger.derive(GIT_LOG, tree, ENGINE_BUILD.version, { epoch: EPOCH });
+  const derived = engineLedger.derive(GIT_LOG, tree, { epoch: EPOCH, actors: (config.ledger || {}).actors });
   return { fromEngine: false, bytes: derived.ledger, head: derived.head };
 })();
 
@@ -1013,9 +1058,10 @@ const LEDGER = (() => {
 //                       and the engine rightly does not declare it; THIS node is also the
 //                       namespace document site the w3id negotiation of AGSC-06-06 resolves to,
 //                       so it serves the file and says so.
-//   two `alternate`s  — the `llm-context` adapter's two additive files, which the engine writes
-//                       outside `build.out` and tells its caller to declare exactly this way
-//                       (AGSC-06-35, AGSC-01-26a).
+//   two `alternate`s  — the tabular chunk index the engine writes at `/chunks-index.toon`
+//                       (AGSC-06-37: announced, if at all, by a `related[]` link) and the skim
+//                       view the `llm-context` adapter writes outside `build.out` and tells its
+//                       caller to declare exactly this way (AGSC-06-35, AGSC-01-26a).
 const WELLKNOWN_DOC = (() => {
   const doc = JSON.parse(String(ENGINE_BUILD.files.get('/.well-known/knowledge-linkset')));
   const set = doc.linkset[0];
@@ -1036,7 +1082,7 @@ const WELLKNOWN_DOC = (() => {
     set[`${REL}ledger`] = [{ 'agsc-ledger-head': [LEDGER.head], digest: digest(Buffer.from(LEDGER.bytes, 'utf8')), href: `${BASE}ledger.jsonl`, type: 'application/jsonl' }];
   }
   set.alternate = [...set.alternate,
-    { digest: digest(ENGINE_BUILD.exports.get('chunks-index.toon')), href: `${BASE}exports/chunks-index.toon`, type: 'text/plain' },
+    { digest: digest(ENGINE_BUILD.files.get('/chunks-index.toon') || die('the engine emitted no /chunks-index.toon (AGSC-06-37)')), href: `${BASE}chunks-index.toon`, type: 'text/toon' },
     { digest: digest(ENGINE_BUILD.exports.get('llms-ctx.txt')), href: `${BASE}exports/llms-ctx.txt`, type: 'text/plain' },
   ].sort((a, b) => byCode(a.href, b.href));
   // the patterns-node switch, applied to the emitted document. With the switch off this
@@ -1072,7 +1118,15 @@ for (const p of specPages) {
   for (const m of p.src.matchAll(/^\| `(AGSC-E\d{3})` \|/gm)) if (!RULE_INDEX.has(m[1])) RULE_INDEX.set(m[1], p.slug);
 }
 const DOC = {}; // tagged documents rendered on the guide pages
-for (const [k, f] of Object.entries({ prd: 'docs/PRD.md', glossary: 'docs/GLOSSARY.md', related: 'docs/RELATED-WORK.md', crosswalk: 'docs/COMPLIANCE-CROSSWALK.md', security: 'docs/SECURITY-CONSIDERATIONS.md', specIndex: 'docs/SPEC.md', featuresReadme: 'features/README.md' })) { DOC[k] = engineFile(f); checkText(f, DOC[k]); }
+// A link in an engine document under docs/ that is relative to the engine repository — another
+// document beside it, a section of spec/, the root README — means nothing on this site, and the
+// renderer would leave it as text: it is pointed at the page or the file it names instead.
+const engineDocLinks = src => src.replace(/\]\((\.\.\/)?([A-Za-z0-9_./-]+\.md)(#[^)\s]*)?\)/g, (all, up, file, frag = '') => {
+  if (up && /^spec\/\d\d-[a-z0-9-]+\.md$/.test(file)) return `](/specs/${file.slice(5, -3)}/${frag})`;
+  if (file.includes('/') || file.startsWith('.')) return all;
+  return `](${FORGE.engine}/blob/main/${up ? '' : 'docs/'}${file}${frag})`;
+});
+for (const [k, f] of Object.entries({ prd: 'docs/PRD.md', glossary: 'docs/GLOSSARY.md', related: 'docs/RELATED-WORK.md', crosswalk: 'docs/COMPLIANCE-CROSSWALK.md', security: 'docs/SECURITY-CONSIDERATIONS.md', specIndex: 'docs/SPEC.md', featuresReadme: 'features/README.md' })) { DOC[k] = engineFile(f); checkText(f, DOC[k]); if (f.startsWith('docs/')) DOC[k] = engineDocLinks(DOC[k]); }
 for (const m of DOC.prd.matchAll(/^\| \*{0,2}((?:PRD-\d{3}|NFR-\d{2}))\b/gm)) REQ_IDS.add(m[1]);
 const FEATURES = engineList('features').filter(f => f.endsWith('.feature')).map(f => ({ name: f.slice(0, -8), src: engineFile(`features/${f}`) }));
 const PLAIN = Object.fromEntries(specPages.map(p => [p.slug, engineFile(`docs/plain/${p.slug}.md`)]));
@@ -1081,6 +1135,11 @@ const SPEC_DIAGRAM = { '00-overview': 'spec-00-conformance', '01-bundle': 'spec-
 // ------------------------------------------------------------------ HTML layout
 const NAV = [['/docs/', 'Guide'], ['/specs/', 'Specification'], ['/concepts/', 'Vocabulary'], ['/ns/', 'Ontology'], ['/specs/agentic-knowledge/', 'Discovery'], ['/docs/standards/', 'Standards'], ['/about/', 'About'], ['/search/', 'Search']];
 const summaryOf = url => { const s = SUMMARIES[url]; if (!s) die(`no summary for ${url} (site/summaries.json)`); return s; };
+// The preview card of a shared link (The Open Graph protocol, ogp.me): assets/og-card.png, a plain
+// text card drawn by scripts/og-card.js, whose CARD.alt is the text the image shows. Every page with
+// an address of its own names it, with the site's name, as the engine names a build's card
+// (src/distribution/html.js#openGraph), and asks for the large preview where `twitter:card` is read.
+const OG_CARD = { url: `${ORIGIN}/assets/og-card.png`, alt: require('./og-card.js').CARD.alt };
 function page({ url, title, heading, summary, description, body, jsonld, section, wide, script, scripts, styles, mainClass }) {
   const canonical = ORIGIN + url;
   if (!summary || cp_len(summary) < 20) die(`${url}: summary missing`);
@@ -1111,6 +1170,10 @@ ${css}<script src="/assets/theme.js"></script>
 <meta property="og:url" content="${esc(canonical)}">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
+<meta property="og:site_name" content="${esc(config.site.title)}">
+<meta property="og:image" content="${esc(OG_CARD.url)}">
+<meta property="og:image:alt" content="${esc(OG_CARD.alt)}">
+<meta name="twitter:card" content="summary_large_image">
 ${ld}${js}</head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -1128,7 +1191,7 @@ ${engineTheme.SWITCHER}
 <p class="summary"><strong>Summary</strong>${esc(summary)}</p>
 ${body}</main>
 <footer class="site">
-<p class="copyright">&#169; ${esc(FOOTER_YEAR)} ${esc(config.site.author)}. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="${WELLKNOWN}">Discovery file</a> · <a href="/llms.txt">llms.txt</a>${PATTERNS_NODE ? ' · <a href="https://patterns.agenticsystemcore.com/">Demo node</a>' : ''}</p>
+<p class="copyright">&#169; ${esc(FOOTER_YEAR)} ${esc(config.site.author)}. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="${WELLKNOWN}">Discovery file</a> · <a href="/llms.txt">llms.txt</a>${PATTERNS_NODE ? ' · <a href="https://patterns.agenticsystemcore.com/">Demo node</a>' : ''}</span></p>
 </footer>
 </body>
 </html>
@@ -1142,6 +1205,14 @@ const itemMeta = it => {
   parts.push(`<dt>IRI</dt><dd><code>${esc(it.iri)}</code></dd>`);
   parts.push(`<dt>Provenance</dt><dd>${esc(ORIGIN_TEXT[it.fm.prov.origin])} (origin <code>${esc(it.fm.prov.origin)}</code>, operator <code>${esc(it.fm.prov.operator)}</code>)</dd>`);
   return `<dl class="meta">\n${parts.join('\n')}\n</dl>\n`;
+};
+// The typed Links an item authors, one row per target, with the relation's plain meaning from the
+// engine's relation table; nothing when the item authors none.
+const linksTable = it => {
+  const rows = LINK_KEYS.flatMap(k => (it.fm[k] || []).map(t => [k, bySlug.get(t)]));
+  if (!rows.length) return '';
+  const meaning = k => (ENGINE_RELATIONS.find(r => r.key === k) || {}).meaning || '';
+  return `<h2 id="links">Links</h2>\n<div class="table-wrap" tabindex="0" role="region" aria-label="Links"><table class="relations">\n<thead><tr><th scope="col">Relation</th><th scope="col">Item</th><th scope="col">Meaning</th></tr></thead>\n<tbody>\n${rows.map(([k, t]) => `<tr><td><code>${esc(k)}</code></td><td><a href="${t.url}">${esc(t.fm.title)}</a></td><td>${esc(meaning(k))}</td></tr>`).join('\n')}\n</tbody></table></div>\n`;
 };
 const sourcesList = it => (it.fm.sources || []).length ? `<h2 id="sources">Sources</h2>\n<ol class="sources">\n${it.fm.sources.map((s, k) => `<li id="source-${k + 1}"><a${REF_LABEL.test(String(s.title || '')) ? ' class="ref"' : ''} href="${esc(s.resource.startsWith(BASE) ? '/' + s.resource.slice(BASE.length) : s.resource)}">${esc(s.title || s.resource)}</a></li>`).join('\n')}\n</ol>\n` : '';
 const statusBlock = () => `<section class="status" aria-labelledby="status-heading">
@@ -1166,7 +1237,7 @@ const regText = {
 
 // ------------------------------------------------------------------ the page tools (AGSC-09-16)
 // The three scripts an ITEM, GUIDE or PROFILE page loads, in the engine's own load order: the
-// composition algebra (which the `compose` tool runs), the seven page tools, and the WebMCP
+// composition algebra (which the `compose` tool runs), the page tools, and the WebMCP
 // registration. They are referenced absolutely, so one copy is fetched once for the whole site,
 // and each page pays three elements against the 100 KB budget of AGSC-06-21.
 const PAGE_TOOL_SCRIPTS = engineComposePage.PAGE_TOOL_SCRIPTS;
@@ -1243,7 +1314,7 @@ const NAMES = {
   boards: { 'agsc-board': 'this format\'s own board file', asana: 'Asana', github: 'GitHub issues and projects', gitlab: 'GitLab', jira: 'Jira', linear: 'Linear', markdown: 'plain Markdown', notion: 'Notion', 'obsidian-kanban': 'Obsidian Kanban', todotxt: 'Todo.txt', trello: 'Trello' },
   skills: { agentskills: 'Agent Skills folders', 'claude-plugin': 'Claude Code plugins', marketplace: 'plugin marketplaces', cursor: 'Cursor rules', windsurf: 'Windsurf rules' },
   hosts: { 'cloudflare-pages': 'Cloudflare Pages', 'static-host': 'nginx or Apache', 'github-pages': 'GitHub Pages behind a proxy', local: 'your own machine', 'git-clone': 'a clone of the repository', ipfs: 'IPFS through a gateway', 'ledger-anchor': 'a ledger-anchored record' },
-  adapters: { board: 'project boards', cogx: 'COGX memory archives', gabbe: 'GABBE kits', 'llm-context': 'a compact context file for a model', mermaid: 'Mermaid link diagrams', skills: 'skills repositories' },
+  adapters: { 'basic-memory': 'Basic Memory notes', board: 'project boards', 'claude-code': 'Claude Code memory files', cogx: 'COGX memory archives', csv: 'CSV tables', gabbe: 'GABBE kits', letta: 'Letta', 'llm-context': 'a compact context file for a model', mem0: 'Mem0', mermaid: 'Mermaid link diagrams', skills: 'skills repositories', skos: 'SKOS thesauri in Turtle', zep: 'Zep' },
 };
 for (const [k, list] of Object.entries(REGISTRY)) {
   for (const n of list) if (!NAMES[k][n]) die(`front page: the engine's ${k} registry has "${n}", which the page does not name`);
@@ -1300,7 +1371,7 @@ ${md(index.body)}<h2 id="benefits">What each reader gets</h2>
 <p>What it shares with others' work, and how it differs:</p>
 <ul>
 <li><strong>LLM wikis</strong> (<a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f">Andrej Karpathy's idea</a>, the <a href="https://github.com/decodingai-magazine/llm-wiki-workshop">Decoding AI workshop</a>): the same aim — Markdown pages, sources kept apart, knowledge prepared in advance. There a model writes pages and a link's kind lives in prose; here links are typed, deterministic checks find orphans and stale links, and a model proposes but never merges.</li>
-<li><strong><a href="https://technicspub.com/ontology-pipeline/">The Ontology Pipeline</a></strong> (Jessica Talisman): six stages from controlled vocabulary to knowledge graph. The graph stage works today, the others in part; version 1.1 is planned to follow them. No compatibility is claimed.</li>
+<li><strong><a href="https://technicspub.com/ontology-pipeline/">The Ontology Pipeline</a></strong> (Jessica Talisman): six stages from controlled vocabulary to knowledge graph. Version 1.1 has a part for each stage; <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/ONTOLOGY-PIPELINE.md">which part does what</a>. No compatibility is claimed.</li>
 <li><strong>Google's <a href="https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md">Open Knowledge Format</a></strong>: also Markdown with a header, but link kinds stay in prose; no discovery layer or digests.</li>
 <li><strong><a href="https://llmstxt.org/">llms.txt</a></strong>: a node publishes one, with a fixed grammar, beside a discovery document giving each artefact's digest.</li>
 <li><strong>Agent discovery</strong> (<a href="https://datatracker.ietf.org/doc/draft-jimenez-dawn-discovery-landscape/">IETF survey</a>) finds who can act; this finds what is known. <a href="https://www.rfc-editor.org/info/rfc9727">RFC 9727 (api-catalog)</a> is the design precedent.</li>
@@ -1315,7 +1386,7 @@ ${MODE_CARDS.map(([t, d, h]) => `<li><strong><a href="${h}">${esc(t)}</a></stron
 <h2 id="best-uses">What it is best for</h2>
 <h3 id="for-agents">For agents</h3>
 <ul class="modes">
-<li><strong><a href="/docs/modes/#mode-1-distributed-agentic-memory">Memory for one agent</a></strong>Run <code>agsc mcp</code> in a Bundle: an assistant gets seven tools to search, read, follow links and cite items by address, and nothing leaves the machine.</li>
+<li><strong><a href="/docs/modes/#mode-1-distributed-agentic-memory">Memory for one agent</a></strong>Run <code>agsc mcp</code> in a Bundle: an assistant gets ${TOOL_COUNT} tools to search, read, follow links and cite items by address, and nothing leaves the machine.</li>
 <li><strong><a href="/docs/modes/#mode-1-distributed-agentic-memory">Shared memory for many</a></strong>Every agent reads the same published files and changes them only by proposals a person ratifies.</li>
 <li><strong><a href="/skills/">A source of skills</a></strong>Each cluster becomes one skill pack holding its items, procedures first, with a lockfile of their digests, installable into agent tool folders.</li>
 <li><strong><a href="/compose/">A starting harness</a></strong>Selected Concepts become a harness of seven kinds of file an architect or a runtime starts from; not a running system.</li>
@@ -1336,7 +1407,7 @@ ${MODE_CARDS.map(([t, d, h]) => `<li><strong><a href="${h}">${esc(t)}</a></stron
 <li><strong>Steering files for coding assistants:</strong> ${shown('steer')}.</li>
 <li><strong>Skills, both ways:</strong> ${shown('skills')}.</li>
 <li><strong>Project boards, both ways:</strong> ${shown('boards')}.</li>
-<li><strong>For assistants:</strong> a local MCP server (<code>agsc mcp</code>), and the same seven tools registered on every item page and on <code>/compose/</code> of a built site for a browser's own agent.</li>
+<li><strong>For assistants:</strong> a local MCP server (<code>agsc mcp</code>), and the same ${TOOL_COUNT} tools registered on every item page and on <code>/compose/</code> of a built site for a browser's own agent.</li>
 <li><strong>In your repository:</strong> a GitHub Action that runs <code>agsc ci</code>, and a pre-commit hook that runs <code>agsc lint</code>.</li>
 <li><strong>Where a node can live:</strong> ${shown('hosts')} — any place that serves the files over HTTPS; <code>agsc-host list</code> says what each place can and cannot do.</li>
 </ul>
@@ -1357,7 +1428,7 @@ mkdir -p .well-known &amp;&amp; printf 'Contact: mailto:you@example.org\\n' &gt;
 git init -q &amp;&amp; git add -A &amp;&amp; git commit -q -m 'my notes'   # the build takes its instant from this commit
 agsc ci       # lint, build twice, compare the bytes, verify
 agsc build    # the site, the graph and the agent files in www/
-agsc mcp      # give an assistant seven tools over the same folder</code></pre>
+agsc mcp      # give an assistant ${TOOL_COUNT} tools over the same folder</code></pre>
 <p>Without the security contact, <code>agsc ci</code> stops with <code>AGSC-E901</code>; without a commit (or <code>SOURCE_DATE_EPOCH</code>), with <code>AGSC-E204</code>. The <a href="/docs/guides/mode-0/">Mode 0 guide</a> walks through it with the lines each command prints, and the <a href="/docs/guides/">guides</a> do the same for every mode. The <a href="/docs/demos/">demos</a> run each mode from an empty folder; the <a href="${FORGE.engine}/blob/main/docs/USING-WITH-ASSISTANTS.md">assistant setup guide</a> and the <a href="/docs/start-here/">start page for each kind of reader</a> go further.</p>
 <h2 id="this-site">This site is a node of itself</h2>
 <p>Everything published here follows the rules it publishes: the vocabulary items, the discovery document, the graph and the agent-facing text file are written by the reference engine, and the discovery validator checks this site at Level 2 before every publish. The <a href="/docs/status/">status page</a> says which further parts are live.</p>
@@ -1622,7 +1693,7 @@ ${figure('agentic-knowledge')}`,
 <h2 id="status-heading">Status</h2>
 <dl class="meta">
 <dt>Extension identifier</dt><dd><code>${esc(MCP_EXTENSION)}</code></dd>
-<dt>Protocol revision</dt><dd>Model Context Protocol <code>${esc(MCP_REVISION)}</code>, the revision this text is written against; the reference engine's tool server, <code>agsc mcp</code>, speaks the earlier revision <code>2025-11-25</code></dd>
+<dt>Protocol revision</dt><dd>Model Context Protocol <code>${esc(MCP_REVISION)}</code>, the revision this text is written against; the reference engine's tool server, <code>agsc mcp</code>, speaks <code>${esc(engineSurfaces.MCP_PROTOCOL_VERSION)}</code>${engineSurfaces.MCP_STDIO_REVISIONS.length > 1 ? `, and over standard input and output also ${engineSurfaces.MCP_STDIO_REVISIONS.filter(r => r !== engineSurfaces.MCP_PROTOCOL_VERSION).map(r => `<code>${esc(r)}</code>`).join(', ')}` : ''} (${R('AGSC-09-19')})</dd>
 <dt>Standing</dt><dd>An unofficial extension under MCP SEP-2133, which says that "Unofficial extensions are not recognized by MCP governance and may be introduced and governed by developers outside the MCP organization". It needs no permission and has no registry entry, and it has not been submitted as an MCP SEP.</dd>
 <dt>Specification</dt><dd><code>${esc(SPEC_VERSION)}</code>, ${specState(SPEC_VERSION)}. It is an independent specification, not a standard of the IETF, the W3C or any other body.</dd>
 <dt>This node</dt><dd>Does not declare the <code>mcp</code> surface: no tool server is published yet (${R('AGSC-11-16')}).</dd>
@@ -1733,17 +1804,63 @@ const itemPage = it => addPage(it.url, {
   jsonld: it.type === 'concept'
     ? { '@context': 'https://schema.org', '@type': 'DefinedTerm', name: it.fm.title, description: it.fm.description, url: it.iri, inDefinedTermSet: `${BASE}concepts/` }
     : { '@context': 'https://schema.org', '@type': 'TechArticle', headline: it.fm.title, description: it.fm.description, url: it.iri, author: { '@type': 'Person', name: config.site.author } },
-  body: `${itemMeta(it)}${it.fm.when ? `<p><strong>When:</strong> ${esc(it.fm.when)}</p>\n` : ''}${withChunkAnchors(it, itemBodyHtml(it))}${it.type === 'cluster' ? `<h2 id="members">Members</h2>\n<ul>\n${members(it).map(m => `<li><a href="${m.url}">${esc(m.fm.title)}</a>: ${esc(m.fm.description || '')}</li>`).join('\n')}\n</ul>\n` : ''}${sourcesList(it)}${editLink('site', it.rel)}`,
+  body: `${itemMeta(it)}${it.fm.when ? `<p><strong>When:</strong> ${esc(it.fm.when)}</p>\n` : ''}${withChunkAnchors(it, itemBodyHtml(it))}${linksTable(it)}${it.type === 'cluster' ? `<h2 id="members">Members</h2>\n<ul>\n${members(it).map(m => `<li><a href="${m.url}">${esc(m.fm.title)}</a>: ${esc(m.fm.description || '')}</li>`).join('\n')}\n</ul>\n` : ''}${sourcesList(it)}${editLink('site', it.rel)}`,
 });
 items.forEach(itemPage);
-const listPage = (url, title, description, list, section) => addPage(url, {
-  title, summary: summaryOf(url), description, section,
+// `more` adds what follows the list on one index page: its body, its stylesheets and its scripts.
+const listPage = (url, title, description, list, section, more = {}) => addPage(url, {
+  title, summary: summaryOf(url), description, section, styles: more.styles, scripts: more.scripts,
   jsonld: { '@context': 'https://schema.org', '@type': url === '/concepts/' ? 'DefinedTermSet' : 'CollectionPage', name: title, url: ORIGIN + url },
-  body: `<p>${esc(description)}</p>\n<ul class="index">\n${list.map(it => `<li><a href="${it.url}">${esc(it.fm.title)}</a>: ${esc(it.fm.description || '')}</li>`).join('\n')}\n</ul>\n`,
+  body: `<p>${esc(description)}</p>\n<ul class="index">\n${list.map(it => `<li><a href="${it.url}">${esc(it.fm.title)}</a>: ${esc(it.fm.description || '')}</li>`).join('\n')}\n</ul>\n${more.body || ''}`,
 });
 listPage('/concepts/', 'Vocabulary', 'The concepts of this node: the terms of the specification\'s ubiquitous language.', items.filter(it => it.type === 'concept'), '/concepts/');
 listPage('/procedures/', 'Procedures', 'Step-by-step procedures derived from the specification.', items.filter(it => it.type === 'procedure'), null);
-listPage('/clusters/', 'Clusters', 'The navigational groupings of this node.', clusters, null);
+
+// ------------------------------------------------------------------ the engine's views of specification 1.1
+// The query page (AGSC-06-39) and the graph explorer of /clusters/ (AGSC-06-38) are views the
+// ENGINE writes. Their markup carries the ids and attributes the engine's page scripts read, so this
+// site takes that markup from the engine's own page for the same Bundle instead of writing a second
+// copy, and publishes it in this site's page shell (scripts/engine.js says why the engine's shell is
+// not used). The scripts the engine places at the end of <main> are loaded from the head here,
+// deferred, which runs them at the same moment. A page the engine did not emit, or whose <main> has
+// another shape, stops the build.
+const unescEngine = s => unesc(s.replace(/&#39;/g, "'"));
+const engineView = route => {
+  const html = String(ENGINE_BUILD.files.get(route) || die(`the engine emitted no ${route}`));
+  const main = /<main id="main">\n<h1>([^<]*)<\/h1>\n<p class="summary"><strong>Summary<\/strong>([^<]*)<\/p>\n([\s\S]*)<\/main>/.exec(html)
+    || die(`${route}: the engine's page has no <main> of the shape this generator reads (a heading, the summary, the view)`);
+  const description = (/<meta name="description" content="([^"]*)">/.exec(html) || die(`${route}: the engine's page has no description`))[1];
+  const script = /^<script src="([^"]+)"(?: defer)?><\/script>\n/gm;
+  const dir = route.slice(0, route.lastIndexOf('/') + 1);
+  return {
+    title: unescEngine(main[1]), summary: unescEngine(main[2]), description: unescEngine(description),
+    styles: [...html.matchAll(/<link rel="stylesheet" href="([^"]+)">/g)].map(m => m[1]).filter(h => h !== '/assets/site.css'),
+    scripts: [...main[3].matchAll(script)].map(m => (m[1].startsWith('/') ? m[1] : dir + m[1])),
+    body: main[3].replace(script, ''),
+  };
+};
+// /clusters/: this site's list, then the engine's view from its overview on: how the clusters
+// connect, the fourteen relations and the explorer. This site keeps its own explorer at /graph/
+// (it also draws the peers' graphs, in 2D or 3D), and the page says so.
+{
+  const view = engineView('/clusters/index.html');
+  const from = view.body.indexOf('<h2 id="overview">');
+  if (from < 0) die('/clusters/: the engine\'s view has no overview section (AGSC-06-38)');
+  listPage('/clusters/', 'Clusters', 'The navigational groupings of this node.', clusters, null, {
+    styles: view.styles, scripts: view.scripts,
+    body: `${view.body.slice(from)}<p>This site also has an explorer of its own, <a href="/graph/">the graph explorer</a>: it draws the same graph with the graphs of the peer nodes this node names, in 2D or 3D.</p>\n`,
+  });
+}
+// /query/: the engine's page as it is, in this site's shell. It is outside the main navigation; the
+// home page, the guide index and the list of machine-readable files link it.
+{
+  const view = engineView('/query/index.html');
+  addPage('/query/', {
+    title: view.title, summary: view.summary, description: view.description, section: null, styles: view.styles, scripts: view.scripts,
+    jsonld: { '@context': 'https://schema.org', '@type': 'WebApplication', name: view.title, url: `${BASE}query/`, applicationCategory: 'DeveloperApplication', author: { '@type': 'Person', name: config.site.author } },
+    body: view.body,
+  });
+}
 // AGSC-06-01 names the six type routes unconditionally and AGSC-06-02 says an empty type
 // folder is omitted from navigation but still resolves: the three types this site does not
 // author get their index page, out of the navigation, as the engine emits them.
@@ -1777,34 +1894,32 @@ for (const it of items) {
 
 // ------------------------------------------------------------------ /compose/ (AGSC-06-01, AGSC-09-16)
 // The combiner in the browser, and the route the `webmcp` surface declaration points at. The four
-// scripts are the ENGINE's own emitted bytes: the algebra, the seven page tools, this
+// scripts are the ENGINE's own emitted bytes: the algebra, the page tools, this
 // page's controller and the WebMCP registration. No inline script, no third-party origin, no key,
 // no upload — the page fetches only this node's own published routes.
-put('compose/agsc-core.js', engineBrowser.bundle({ specVersion: SPEC_VERSION }));
+// `brief: true`, as the engine's own build does (src/distribution/site.js): the page tools of 1.1 compute
+// the brief of a selection (the `brief` tool, AGSC-07-25) with the functions of this bundle.
+put('compose/agsc-core.js', engineBrowser.bundle({ brief: true, specVersion: SPEC_VERSION }));
 put('compose/agsc-page-tools.js', enginePageTools.bundle({ bundleId: config.bundle.id, specVersion: SPEC_VERSION }));
 put('compose/agsc-compose.js', engineComposePage.controller({ licenseProse: LICENSE_PROSE, specVersion: SPEC_VERSION }));
 put('compose/webmcp.js', engineWebmcp.script());
-addPage('/compose/', {
-  title: 'Compose', summary: summaryOf('/compose/'), description: 'Select items and compute a Harness in this page — no server, no key, no upload; the same seven tools a browser assistant sees.', section: null,
-  scripts: ['/compose/agsc-core.js', '/compose/agsc-page-tools.js', '/compose/agsc-compose.js', '/compose/webmcp.js'],
-  jsonld: { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Compose', url: `${BASE}compose/`, applicationCategory: 'DeveloperApplication', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' }, author: { '@type': 'Person', name: config.site.author } },
-  body: `<p>Tick the items you want. The closure algebra of ${REF('AGSC-07-01')} runs <em>in this page</em>: no request leaves this origin, no key is needed and nothing is uploaded. The Harness files, of seven kinds, are offered one download per file, or all together as one .zip.</p>
-<p>This page also offers the seven tools of ${REF('AGSC-09-13')} to a browser assistant that supports them, as every item and guide page does. See <a href="/about/#tools-for-browser-assistants">Tools for browser assistants</a>.</p>
-<h2 id="items-heading">Items</h2>
-<ul id="items" aria-labelledby="items-heading"><li>Loading the published graph… This page needs JavaScript; without it, <code>agsc compose &lt;slug&gt;…</code> on a copy of this node gives the same Harness.</li></ul>
-<h2 id="verdict-heading">Verdict</h2>
-<p id="validity">Nothing selected.</p>
-<pre id="verdict" tabindex="0"></pre>
-<h3 id="explanations-heading" hidden>Why an item was added</h3>
-<ul id="explanations" hidden></ul>
-<h3 id="conflicts-heading" hidden>Conflicts</h3>
-<ul id="conflicts" hidden></ul>
-<h2 id="harness">Harness</h2>
-<p><button id="download" type="button" disabled>Build the Harness</button></p>
-<ul id="files"></ul>
-<p id="archive" aria-live="polite"></p>
-`,
-});
+// The page itself is the engine's view of 1.1 (the filter, the verdict, the brief of AGSC-07-25 and
+// the Harness), whose ids the controller reads, published in this site's shell like /query/ above,
+// with this site's sentence on the page tools after its first paragraph. Its four scripts are the
+// ones above, in the engine's order.
+{
+  const view = engineView('/compose/index.html');
+  const scripts = ['/compose/agsc-core.js', '/compose/agsc-page-tools.js', '/compose/agsc-compose.js', '/compose/webmcp.js'];
+  if (view.scripts.join(' ') !== scripts.join(' ')) die(`/compose/: the engine's page loads ${view.scripts.join(', ')}, not ${scripts.join(', ')}`);
+  const tools = TOOL_COUNT;
+  const first = view.body.indexOf('</p>\n') + '</p>\n'.length;
+  addPage('/compose/', {
+    title: 'Compose', summary: summaryOf('/compose/'), description: `Select items and compute a Harness and its brief in this page — no server, no key, no upload; the same ${tools} tools a browser assistant sees.`, section: null,
+    scripts,
+    jsonld: { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Compose', url: `${BASE}compose/`, applicationCategory: 'DeveloperApplication', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' }, author: { '@type': 'Person', name: config.site.author } },
+    body: `${view.body.slice(0, first)}<p>This page also offers the ${tools} tools of ${REF('AGSC-09-13')} to a browser assistant that supports them, as every item and guide page does. See <a href="/about/#tools-for-browser-assistants">Tools for browser assistants</a>.</p>\n${view.body.slice(first)}`,
+  });
+}
 
 // the guide (site/docs/*.md, hand-authored, plus the tagged documents rendered through slots)
 // THE STATUS PAGE (/docs/status/). One table, What | State | Detail. Every row is true on the day
@@ -1836,13 +1951,15 @@ const statusRows = [
   ['Preprint', STATUS.preprint ? 'Published' : 'In preparation', regText.preprint],
   ['Reference engine <code>agsc</code>', 'Published', 'The engine is written, and it builds this site: every machine-readable file here is emitted by <code>agsc build</code> over this repository&#39;s own content. Its packages are in the next row.' + (regText.software ? ' ' + regText.software : '')],
   ['Packages on npm and PyPI', 'Published', 'The engine as <a href="https://www.npmjs.com/package/agentic-system-core"><code>agentic-system-core</code></a> on npm, with the short alias <a href="https://www.npmjs.com/package/agsc-cli"><code>agsc-cli</code></a>; the Python checker and reader as <a href="https://pypi.org/project/agentic-system-core/"><code>agentic-system-core</code></a> on PyPI. Each version of the specification is published as the package version of the same number, from its release tag, after this site; a registry&#39;s page shows the latest version published.'],
-  ['Local MCP tool server', 'Published', `<code>agsc mcp</code> serves a Bundle to an assistant on the same machine over stdio, speaking MCP revision <code>${esc(engineSurfaces.MCP_PROTOCOL_VERSION)}</code>: ${WORD[TOOL_NAMES.length]} tools (${TOOL_NAMES.map(n => `<code>${esc(n)}</code>`).join(', ')}), the items, <code>graph.jsonld</code> and <code>llms.txt</code> as read-only resources, and one prompt (${REF('AGSC-09-14b')}). Listed in the MCP Registry as <code>${esc(SERVER_JSON.name)}</code>, and in the Glama MCP directory.`],
+  ['Local MCP tool server', 'Published', `<code>agsc mcp</code> serves a Bundle to an assistant on the same machine, over stdio or, with <code>--http &lt;port&gt;</code>, over Streamable HTTP on the loopback address only, speaking MCP revision <code>${esc(engineSurfaces.MCP_PROTOCOL_VERSION)}</code>${engineSurfaces.MCP_STDIO_REVISIONS.length > 1 ? ` (over stdio also ${engineSurfaces.MCP_STDIO_REVISIONS.filter(r => r !== engineSurfaces.MCP_PROTOCOL_VERSION).map(r => `<code>${esc(r)}</code>`).join(', ')}, the revision most assistants still send, ${REF('AGSC-09-19')})` : ''}: ${WORD[TOOL_NAMES.length]} tools (${TOOL_NAMES.map(n => `<code>${esc(n)}</code>`).join(', ')}), the items, <code>graph.jsonld</code> and <code>llms.txt</code> as read-only resources, and one prompt (${REF('AGSC-09-14b')}). Listed in the MCP Registry as <code>${esc(SERVER_JSON.name)}</code>, and in the Glama MCP directory.`],
   ['WebMCP page tools', 'Experimental', `The same ${WORD[TOOL_NAMES.length]} tools, offered to an assistant running in the visitor&#39;s browser on every item and guide page and on <a href="/compose/">/compose/</a>, declared in the discovery document as the <code>webmcp</code> surface with the access class <code>consent</code> (${REF('AGSC-11-16')}). WebMCP is a draft report of a W3C Community Group, and a browser runs the tools only where it supports that draft: see <a href="/about/#tools-for-browser-assistants">tools for browser assistants</a>.`],
   ['Agent skill', 'Published', 'A <a href="/agent-skill/agentic-system-core/SKILL.md"><code>SKILL.md</code></a> in the Agent Skills format, with two reference files, that teaches a coding agent the six modes; the engine repository ships the same files as a Claude Code plugin with a plugin marketplace file. How to install it: <a href="/docs/agent-skill/">the agent skill page</a>.'],
   ...(PRERELEASE(SPEC_VERSION) ? [] : [['Reference engine conformance claim', 'Published', `The reference engine claims Level 3 against specification <code>${esc(SPEC_VERSION)}</code>, the full engine (${REF('AGSC-10-05')}): the claim, with the cases it passed, is in <a href="${esc(CLAIM_URL)}">its conformance statement</a>.`]]),
-  ['Independent validators', 'Published', `The nine checker contracts of ${REF('AGSC-09-90')} &#8212; seven validators and two generators &#8212; ship in the published npm package beside its artefact counter and its benchmark tool; the maintainer&#39;s own tools stay in the repository. One validator, for the discovery document, checks this site at Level 2 before every publish.`],
+  ['Independent validators', 'Published', `The eleven checker contracts of ${REF('AGSC-09-90')} &#8212; seven validators and four generators &#8212; ship in the published npm package beside its artefact counter and its benchmark tool; the maintainer&#39;s own tools stay in the repository. One validator, for the discovery document, checks this site at Level 2 before every publish.`],
   ['Modes for people and agents', 'Live', 'Six modes over one folder of files, from a wiki that checks itself (Mode 0) to a live board that people and agents work through together (Mode 5). People use the command line and the pages; agents use the discovery document, the tool server, the page tools, the exports and the skill packs. See <a href="/docs/modes/">the six modes</a> and <a href="/docs/guides/">the guides</a>, one for each mode and one for publishing.'],
-  ['Graph explorer', 'Live', 'The knowledge graph of this node, drawn in the browser on the front page and at <a href="/graph/">/graph/</a>: search it, list it, hover a node for its summary, and tick Peers to add the peer node it names. It reads only the published files and stores nothing but the width of its side panel.'],
+  ['Graph explorer', 'Live', 'The knowledge graph of this node, drawn in the browser on the front page and at <a href="/graph/">/graph/</a>: search it, list it, hover a node for its summary, and tick Peers to add the peer node it names. It reads only the published files and stores nothing but the width of its side panel. The explorer the engine writes for every node, with no library, is on <a href="/clusters/">the clusters page</a>.'],
+  ['Query page', 'Live', `<a href="/query/">/query/</a>: a question in SPARQL 1.1 over this node's <code>graph.nq</code>, answered in the visitor's browser by a query engine compiled to WebAssembly; nothing is sent or stored, and the ten questions of the graph are offered as examples (${REF('AGSC-06-39')}).`],
+  ['Blueprints', 'Published', `Three worked designs in the engine repository, each a Bundle that <code>agsc compose --from</code> turns into C4 levels, decision records and a build plan, with a dry run to build it again from a clean folder and no model: <a href="${FORGE.engine}/tree/main/examples/blueprints/engine">the engine itself</a>, <a href="${FORGE.engine}/tree/main/examples/blueprints/linked-sites">two linked knowledge sites</a> and <a href="${FORGE.engine}/tree/main/examples/blueprints/tool-server">the agent tool server with a client</a> (${REF('AGSC-07-29')}).`],
   ['How it compares', 'Live', 'What it shares with llms.txt, the Open Knowledge Format, LLM wikis, agent-discovery work, RFC 9727 and Wikibase, and how it differs: <a href="/#compares">on the front page</a>; the dated comparison is in the <a href="/docs/standards/#related-work">related work</a>.'],
   ['Contribution channel', 'Live', `Declared in the <a href="${WELLKNOWN}">discovery document</a> as a pull-request target (${REF('AGSC-11-14')}), and every page generated from a source file carries a <em>Propose an edit</em> link to that file. Nothing is written without a person merging it.`],
   ...(PATTERNS_NODE ? [['Second node (live demonstration)', 'Live', `A second node, at <code>patterns.agenticsystemcore.com</code>, is online: a live demonstration of the reference engine, running on a small sample of well-known agent-system patterns described from public sources. Its published items are in the repository <a href="https://github.com/andreibesleaga/agsc-demo-node">agsc-demo-node</a>. ${PEERS.length ? `Each names the other as a peer in its discovery document, and the mutual check of ${REF('AGSC-10-12')} passes.` : 'It is not declared as a peer yet.'}`]] : []),
@@ -1885,7 +2002,7 @@ const featuresCoverage = sectionOf(DOC.featuresReadme, '## Scenario-coverage tab
 const featureTitle = f => (/^\s*Feature: (.*)$/m.exec(f.src) || [, f.name])[1];
 const featureUrl = f => `/docs/scenarios/${f.name}/`;
 const featuresHtml = `<ul>\n${FEATURES.map(f => `<li id="${esc(f.name)}"><a href="${esc(featureUrl(f))}"><code>${esc(f.name)}.feature</code></a>: ${esc(featureTitle(f))}</li>`).join('\n')}\n</ul>\n`;
-const relatedWork = ['## 1. One sentence', '## 3. The agent-discovery mechanisms', '## 4. Adjacent work', '## 5. What is new here'].map(h => {
+const relatedWork = ['## 1. One sentence', '## 3. The agent-discovery mechanisms', '## 4. Adjacent work', '## 5. What is new here', '## 6. Standards status'].map(h => {
   const line = DOC.related.split('\n').find(l => l.startsWith(h));
   return `### ${line.replace(/^## /, '')}\n\n${sectionOf(DOC.related, h)}`;
 }).join('\n');
@@ -1894,6 +2011,15 @@ const relatedWork = ['## 1. One sentence', '## 3. The agent-discovery mechanisms
 const pagesOf = dir => fs.readdirSync(path.join(ROOT, 'site/docs', dir)).filter(f => f.endsWith('.md') && f !== 'README.md').sort().map(f => dir ? `${dir}/${f}` : f);
 const DOCS = [...pagesOf(''), ...pagesOf('guides')];
 const WIDE_DOCS = new Set(['architecture', 'requirements', 'scenarios', 'standards', 'compliance', 'glossary', 'how-to-use']);
+// The requirements document grew past the page budget of AGSC-06-21 with the rows of 1.1, so it is
+// published on two pages: the requirements themselves on /docs/requirements/, and the notes the
+// document appends after them (from "The compatibility section and the content version" on) on
+// /docs/requirements/notes/, each page linking the other. Nothing is left out or reworded.
+const PRD_NOTES_FROM = '\n## The compatibility section and the content version\n';
+const PRD_SPLIT = DOC.prd.indexOf(PRD_NOTES_FROM);
+if (PRD_SPLIT < 0) die(`docs/PRD.md: no heading "${PRD_NOTES_FROM.trim()}" to start the notes page at`);
+const PRD_MAIN = DOC.prd.slice(0, PRD_SPLIT + 1), PRD_NOTES = DOC.prd.slice(PRD_SPLIT + 1);
+const PRD_NOTES_URL = '/docs/requirements/notes/';
 // The guides are the engine's docs/guides/*.md with site links; their commands and the lines they
 // quote MUST be the engine's, which tests/docs/guides.test.js runs. Compared block by block with the
 // engine working tree whenever it carries the guides: a guide edited on one side only stops the build.
@@ -1917,7 +2043,7 @@ for (const f of DOCS) {
   const used = new Set(['main']);
   const o = { ruleLinks: true, page: slug, used, tables: { n: 0 } };
   const slots = {
-    requirements: { prd: md(stripH1(DOC.prd), { ...o, page: 'requirements', dropColumns: ['Trace'] }) },
+    requirements: { prd: md(stripH1(PRD_MAIN), { ...o, page: 'requirements', dropColumns: ['Trace'] }) + `<p>The notes the document appends after its requirements are on <a href="${PRD_NOTES_URL}">a page of their own</a>.</p>\n` },
     scenarios: { coverage: md(featuresCoverage, o), features: featuresHtml },
     glossary: { glossary: md(stripH1(DOC.glossary), o) },
     standards: { registrations: registrationsTable, 'building-blocks': md(sectionOf(DOC.related, '## 2. Normative building blocks'), o), 'standards-register': md(sectionOf(DOC.specIndex, '## 4. Standards Register'), o), 'related-work': md(relatedWork, o), publications: publicationsHtml },
@@ -1944,6 +2070,14 @@ FEATURES.forEach((f, k) => {
     body: around + `<pre tabindex="0" class="feature" data-lang="gherkin"><code>${linkIds(f.src.replace(/\n+$/, ''), { ruleLinks: true, page: `scenarios/${f.name}` })}</code></pre>\n` + editLink('engine', `features/${f.name}.feature`),
   });
 });
+// The second page of the requirements document (see PRD_NOTES_FROM above).
+addPage(PRD_NOTES_URL, {
+  title: 'Requirements: notes', summary: 'The notes the requirements document appends after its requirements: how later rows read beside the frozen ones, and what holds at each version.',
+  description: 'The notes of the AgenticSystemCore product requirements document: the compatibility section, notes to further rows and the notes at 1.0.0.', section: '/docs/', wide: true,
+  scripts: PAGE_TOOL_SCRIPTS,
+  jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: 'Requirements: notes', url: ORIGIN + PRD_NOTES_URL, author: { '@type': 'Person', name: config.site.author }, isPartOf: `${BASE}docs/requirements/` },
+  body: `<p>The second page of the <a href="/docs/requirements/">requirements</a>, rendered as the document stands in the engine repository.</p>\n${md(PRD_NOTES, { ruleLinks: true, page: 'requirements/notes', used: new Set(['main']), tables: { n: 0 } })}${editLink('engine', 'docs/PRD.md')}`,
+});
 checkPatternsProse();
 
 // AGSC-06-24: `/about/` carries a Quickstart — one path of at most ten lines per persona,
@@ -1955,7 +2089,7 @@ const QUICKSTART = [
   ['P0', 'Drop-in user', ['agsc init', 'add .well-known/security.txt with a Contact: line (agsc init says so)', 'commit once, or set SOURCE_DATE_EPOCH, so the build has an instant', 'agsc ci', 'agsc build']],
   ['P1', 'Human reader', ['open /docs/ then /specs/', 'search from /search/', 'follow an item\'s links and sources']],
   ['P2', 'Human contributor', ['fork the repository and edit one item file', 'agsc lint --fix', 'agsc propose <slug>', 'open the pull request the proposal describes']],
-  ['P3', 'Agent reader', ['fetch /.well-known/knowledge-linkset', 'fetch /llms.txt or /graph.jsonld', 'agsc mcp   (a local tool server over stdio)']],
+  ['P3', 'Agent reader', ['fetch /.well-known/knowledge-linkset', 'fetch /llms.txt or /graph.jsonld', 'agsc mcp   (a local tool server over stdio, or over HTTP with --http <port>)']],
   ['P4', 'Agent proposer', ['agsc mcp', 'call the propose tool', 'a person reviews and merges the proposal']],
   ['P5', 'Architect', ['open /compose/', 'tick the items you want', 'download the Harness (or: agsc compose <slug>… --zip)']],
   ['P6', 'Integrator', ['agsc skills install', 'agsc export --steer --target <tool>', 'agsc export --to cogx']],
@@ -1964,11 +2098,10 @@ const QUICKSTART = [
   ['P9', 'Maintainer', ['agsc ci', 'agsc verify --ledger', 'agsc refresh --agent <name> --dry-run   (an agent lane declared in agsc.config.json)']],
   ['P10', 'Port implementer', ['read spec/, schema/, ontology/ and tests/vectors/', 'run the vector set against your engine', 'agsc conform --level <n>   to write the claim']],
   ['P11', 'Standards implementer', ['fetch /.well-known/knowledge-linkset', 'validate-wellknown <file> --level 2', 'follow rel="describedby" from any page']],
-  // P12 is a persona of the requirements (Mode 5) that the quickstart rule does not list yet; its
-  // path is this site's content, beyond what AGSC-06-24 asks.
+  // P12, the live board (Mode 5), is in the quickstart rule from 1.1.0 (AGSC-06-24 as amended 2026-11-10).
   ['P12', 'Self-driving team on a live board', ['author task items in a cluster', 'agsc build   (the board renders as a page and a JSON file)', 'agsc mcp', 'call propose with a task_state to claim or move a task', 'a person reviews and merges the proposal']],
-  // P13–P15 are the three personas of the requirements' Amendment 12; like P12, their paths are
-  // this site's content, beyond what AGSC-06-24 asks.
+  // P13–P15 are the three personas of the requirements' Amendment 12; their paths are this
+  // site's content, beyond what AGSC-06-24 asks.
   ['P13', 'Security reviewer or auditor', ['agsc ci   (without .well-known/security.txt it stops with AGSC-E901)', 'agsc verify --ledger   (the ledger re-derives from the history)', 'fetch /.well-known/security.txt and check the headers each file is served with', 'in a clone of the engine: SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer security --scratch <dir>']],
   ['P14', 'Researcher', ['in a clone of the engine at its release tag:', 'SOURCE_DATE_EPOCH=1767225600 node bench/measure.js --layer determinism --scratch <dir>', 'run it again: the same files, the same bytes', 'cite the node, its content version, the specification version, the engine you measured (its software DOI) and the preprint DOI (/docs/standards/#how-to-cite)']],
   ['P15', 'Restricted publisher', ['set "visibility": "restricted" and an "access" URL in agsc.config.json', 'agsc build', 'validate-wellknown <file> --level 0   (the public view: the discovery document, /llms.txt, /graph.jsonld)']],
@@ -2019,6 +2152,49 @@ addPage('/about/', {
   jsonld: { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'About AgenticSystemCore', url: `${BASE}about/`, author: { '@type': 'Person', name: config.site.author, sameAs: ['https://orcid.org/0009-0001-3464-5283', 'https://github.com/andreibesleaga', CONTACT_URL] } },
   body: md(read('site/about.md'), { ruleLinks: true }).replace('<h2 id="status">', quickstartHtml() + '<h2 id="status">') + editLink('site', 'site/about.md'),
 });
+// /conformance/ (AGSC-09-03: a node MAY publish claims at /conformance/, with a table of others'
+// claims): what a claim says, the counts of the specification's cases, the reference engine's claim
+// as its conformance statement words it, and the nodes this project runs with what is checked on
+// each. Every number is counted from the specification's own files by the engine's
+// `tools/count-artifacts`, at the tag in tag mode (an archive of it) and in the working tree
+// otherwise, so the page never states a count by hand (PRD-054).
+const ENGINE_COUNTS = (() => {
+  let root = ENGINE, scratch = null;
+  if (SPEC_SOURCE === 'tag') {
+    scratch = fs.mkdtempSync(path.join(require('os').tmpdir(), 'agsc-site-counts-'));
+    const archive = cp.spawnSync('git', ['-C', ENGINE, 'archive', '--format=tar', SPEC_TAG], { maxBuffer: 512 * 1024 * 1024 });
+    if (archive.status !== 0) die(`cannot archive ${SPEC_TAG} to count its artefacts: ${String(archive.stderr)}`);
+    cp.execFileSync('tar', ['-x', '-C', scratch], { input: archive.stdout });
+    root = scratch;
+  }
+  const r = cp.spawnSync(process.execPath, [path.join(root, 'tools', 'count-artifacts'), '--json', root], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  if (scratch) fs.rmSync(scratch, { recursive: true, force: true });
+  let env = null; try { env = JSON.parse(r.stdout); } catch { /* reported below */ }
+  if (r.status !== 0 || !env || env.ok !== true) die(`tools/count-artifacts did not pass: ${r.stdout}${r.stderr}`);
+  return env.counts;
+})();
+{
+  const c = ENGINE_COUNTS, n = x => num(x);
+  const which = SPEC_SOURCE === 'tag' ? `Specification <code>${esc(SPEC_VERSION)}</code>` : 'The specification text this site is built from, a draft read from the engine&#39;s working tree and not yet tagged,';
+  const counts = `<p>${which} has ${n(c.rules_active)} rules in force, ${n(c.rules_reserved)} more reserved for later versions, and ${n(c.error_codes_registered)} registered error codes. Its test cases, the conformance vectors, number ${n(c.vectors_total)}: ${n(c.vectors_required)} required, ${n(c.vectors_optional)} optional and ${n(c.vectors_withdrawn)} withdrawn, which no claim counts for or against (${REF('AGSC-09-05')}). They fall in ${n(c.vector_areas.length)} areas: ${c.vector_areas.map(a => `<code>${esc(a)}</code>`).join(', ')}; each Level takes the areas section 10 names (${REF('AGSC-10-01')}). The numbers are counted from the specification&#39;s files when this site is built, by the engine&#39;s <code>tools/count-artifacts</code>.</p>\n`;
+  const statement = engineFile('docs/CONFORMANCE-STATEMENTS.md');
+  const section = sectionOf(statement, "## The reference engine's claim");
+  const quote = (/^(?:> .*\n)+/m.exec(section) || die("docs/CONFORMANCE-STATEMENTS.md: the reference engine's claim has no quoted claim"))[0];
+  const claim = md(quote, { ruleLinks: true, page: 'conformance' }) + `<p>That is the claim as the engine repository's <a href="${esc(CLAIM_URL)}">conformance statement</a> words it, with what each part rests on; it is run again for each release, and the engine's own test fails when the claim and the counted cases disagree.</p>\n`;
+  const nodes = `<div class="table-wrap" tabindex="0" role="region" aria-label="Nodes this project runs"><table>
+<thead><tr><th scope="col">Node</th><th scope="col">What is checked</th><th scope="col">Claim</th></tr></thead>
+<tbody>
+<tr><th scope="row"><code>agenticsystemcore.com</code>, this node</th><td>Before every publish: two builds compared byte for byte, the discovery document checked by the engine&#39;s discovery checker at Levels 0 and 2 with every declared digest compared with the bytes served, links, headers, contrast and the page tools (<code>scripts/check.js</code> in <a href="${esc(FORGE.site)}">its repository</a>).</td><td>Level 0 against the specification version on the <a href="/docs/status/">status page</a> (${REF('AGSC-00-12')}).</td></tr>
+${PATTERNS_NODE ? `<tr><th scope="row"><code>patterns.agenticsystemcore.com</code>, the demonstration node</th><td>On every push and pull request of <a href="https://github.com/andreibesleaga/agsc-demo-node">its repository</a>: <code>agsc verify --ledger</code>, <code>agsc ci</code> (two builds compared byte for byte, and the gate&#39;s verdict) and the discovery checker at Level 2 over the built discovery document.</td><td>None published.</td></tr>\n` : ''}</tbody></table></div>
+`;
+  const src = read('site/conformance.md');
+  checkText('site/conformance.md', src);
+  addPage('/conformance/', {
+    title: 'Conformance', summary: summaryOf('/conformance/'), description: 'What an AgenticSystemCore conformance claim says, how many test cases the specification has, the reference engine\'s claim, the nodes this project runs and how to record a claim of your own.', section: null,
+    jsonld: { '@context': 'https://schema.org', '@type': 'WebPage', name: 'Conformance', url: `${BASE}conformance/` },
+    body: md(src, { ruleLinks: true, page: 'conformance', slots: { counts, claim, nodes }, used: new Set(['main']) }) + editLink('site', 'site/conformance.md'),
+  });
+}
 // The day this work was first made public: the oldest release tag (scripts/release-feed.js).
 const FIRST_PUBLIC = RELEASES.length ? RELEASES[RELEASES.length - 1] : null;
 // AGSC-06-18 pins the text the identifier names: the file `LICENSE-CONTENT`
@@ -2155,10 +2331,18 @@ ${list.map(it => `<li><a href="${esc(it.url)}">${esc(it.fm.title)}</a>: ${esc(it
 }
 
 // `/exports/` — the index of everything on this node a program reads, in plain words, plus the
-// two additive files of the `llm-context` adapter, which are declared from the discovery
-// document with a `related[]` link of relation `alternate` (AGSC-06-35).
-const LLM_CONTEXT = [...ENGINE_BUILD.exports.keys()].sort();
+// additive skim view of the `llm-context` adapter, declared from the discovery document with a
+// `related[]` link of relation `alternate` (AGSC-06-35). The adapter also writes the tabular chunk
+// index; from specification 1.1 the engine emits that file itself at `/chunks-index.toon`
+// (AGSC-06-37), which is the copy published, so the adapter's copy is not, and its former address
+// `/exports/chunks-index.toon` redirects there (`_redirects` below).
+const CHUNK_INDEX = 'chunks-index.toon';
+const LLM_CONTEXT = [...ENGINE_BUILD.exports.keys()].filter(f => f !== CHUNK_INDEX).sort();
 for (const f of LLM_CONTEXT) put(`exports/${f}`, ENGINE_BUILD.exports.get(f));
+putEngine(`/${CHUNK_INDEX}`);
+// The page assets of the two views of 1.1 (see "the engine's views of specification 1.1"): the
+// explorer's script and stylesheet, and every file under /query/ but its page, the engine's bytes.
+for (const r of [...ENGINE_BUILD.files.keys()].filter(r => /^\/clusters\/agsc-explorer\./.test(r) || (r.startsWith('/query/') && r !== '/query/index.html')).sort()) putEngine(r);
 {
   const rows = [
     ['/.well-known/knowledge-linkset', 'application/linkset+json', 'The one file to fetch first: it says what this node is, where its graph, ontology, skills and NOW page are, which nodes it peers with, and how to propose a change.'],
@@ -2176,7 +2360,7 @@ for (const f of LLM_CONTEXT) put(`exports/${f}`, ENGINE_BUILD.exports.get(f));
     ['/now.md', 'text/markdown', 'The state of this node at the last build.'],
     ['/ledger.jsonl', 'application/jsonl', 'The derived ledger: one hash-chained line per commit of this site\'s history and one for the build, re-verifiable offline. Its head is on the ledger link of the discovery document.'],
     ['/ns/context.jsonld', 'application/ld+json', 'The JSON-LD context the graph files use.'],
-    ['/exports/chunks-index.toon', 'text/plain', 'The metadata of every passage in TOON tabular form &#8212; the same rows as <code>/chunks.jsonl</code> without the bodies, in about a quarter fewer tokens. Additive and non-normative.'],
+    ['/chunks-index.toon', 'text/toon', `The metadata of every passage in TOON tabular form &#8212; the same rows as <code>/chunks.jsonl</code> without the bodies, in about a quarter fewer tokens; its digest column is cut to 16 characters, so a reader that cites checks the full digest in <code>/chunks.jsonl</code> (${REF('AGSC-06-37')}). Optional.`],
     ['/exports/llms-ctx.txt', 'text/plain', 'A skim view: one labelled section per passage. It drops the digests, the licence and the IRIs on purpose, so anything that needs to cite goes back to <code>/chunks.jsonl</code>. Additive and non-normative.'],
     ['/robots.txt', 'text/plain', 'Who may crawl, and the text-and-data-mining reservation, in the crawler dialect.'],
     ['/.well-known/tdmrep.json', 'application/json', 'The same reservation, in the TDM dialect.'],
@@ -2186,14 +2370,16 @@ for (const f of LLM_CONTEXT) put(`exports/${f}`, ENGINE_BUILD.exports.get(f));
     title: 'Machine-readable files', summary: summaryOf('/exports/'), description: 'Every machine-readable file this node publishes, what each is for, and which are additive.', section: null,
     jsonld: { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Machine-readable files', url: `${BASE}exports/` },
     wide: true,
-    body: `<p>Everything a program needs from this node is a static file it can fetch without a key, an account or a request to anyone. Start at the discovery document; everything else is reachable from it. The two files under <code>/exports/</code> are <strong>additive</strong>: no rule pins their bytes, nothing depends on them, and they exist because they are cheaper to read than the files they are derived from.</p>
+    body: `<p>Everything a program needs from this node is a static file it can fetch without a key, an account or a request to anyone. Start at the discovery document; everything else is reachable from it. The file under <code>/exports/</code> is <strong>additive</strong>: no rule pins its bytes, nothing depends on it, and it exists because it is cheaper to read than the files it is derived from.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Machine-readable files"><table>
 <thead><tr><th scope="col">File</th><th scope="col">Media type</th><th scope="col">What it is</th></tr></thead>
 <tbody>
 ${rows.map(([r, t, w]) => `<tr><td><a href="${r.replace(/&lt;slug&gt;/, 'bundle')}"><code>${r}</code></a></td><td><code>${t}</code></td><td>${w}</td></tr>`).join('\n')}
 </tbody></table></div>
+<h2 id="query">Questions in SPARQL</h2>
+<p>The graph above can be asked a question in SPARQL 1.1 on <a href="/query/">the query page</a>, in the visitor's browser: the page loads <code>/graph.nq</code> into a query engine compiled to WebAssembly, sends nothing anywhere and stores nothing; it offers the ten questions of the graph as examples (${REF('AGSC-06-39')}, ${REF('AGSC-05-34')}). The same answers come from any SPARQL 1.1 store loaded with <code>/graph.nq</code>.</p>
 <h2 id="in-the-page">Tools inside the page</h2>
-<p>Every item page and every guide page of this site also offers seven tools to an assistant running in the visitor's browser: search, read, links, ask, compose, propose and remember. They read only the files above, contact no other host, carry no key and write nothing. <a href="/about/#tools-for-browser-assistants">How they work</a>, and <a href="/compose/">the page that uses them</a>.</p>
+<p>Every item page and every guide page of this site also offers ${TOOL_COUNT} tools to an assistant running in the visitor's browser: ${engineSurfaces.TOOL_NAMES.slice(0, -1).join(', ')} and ${engineSurfaces.TOOL_NAMES[engineSurfaces.TOOL_NAMES.length - 1]}. They read only the files above, contact no other host, carry no key and write nothing. <a href="/about/#tools-for-browser-assistants">How they work</a>, and <a href="/compose/">the page that uses them</a>.</p>
 `,
   });
 }
@@ -2369,7 +2555,7 @@ put('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http:
 // `propose` page tools return (AGSC-06-02, AGSC-09-16). The files under `/exports/` are named
 // one by one: a pattern `/exports/*` would also match the index page `/exports/`.
 const EXPORT_FILES = LLM_CONTEXT.map(f => `/exports/${f}`);
-const PUBLIC_ARTEFACT = ['/.well-known/knowledge-linkset', '/graph.jsonld', '/graph.nq', '/graph.ttl', '/llms.txt', '/llms-full.txt', '/search.json', '/pages/*.md', '/pages/*.jsonld', '/ns/*', '/chunks.jsonl', '/ledger.jsonl', '/now.md', '/skills/*', '/boards/*', ...EXPORT_FILES];
+const PUBLIC_ARTEFACT = ['/.well-known/knowledge-linkset', '/graph.jsonld', '/graph.nq', '/graph.ttl', '/llms.txt', '/llms-full.txt', '/search.json', '/pages/*.md', '/pages/*.jsonld', '/ns/*', '/chunks.jsonl', `/${CHUNK_INDEX}`, '/ledger.jsonl', '/now.md', '/skills/*', '/boards/*', ...EXPORT_FILES];
 // The releases feed (scripts/release-feed.js): RSS 2.0, one item per release tag, newest first,
 // named by every page head and linked from /changelog/ and /docs/status/. A file of this site
 // only: the engine's per-node feed is the reserved name `build.feed` of a later version.
@@ -2391,6 +2577,16 @@ addHeaders('/', `Link: <${WELLKNOWN}>; rel="describedby"; type="application/link
 const cspConnect = sources => CSP.replace("connect-src 'self'", `connect-src ${sources}`);
 if (PEER_ORIGINS.length) addHeaders('/', '! Content-Security-Policy', `Content-Security-Policy: ${cspConnect(["'self'", ...PEER_ORIGINS].join(' '))}`);
 addHeaders('/graph/', '! Content-Security-Policy', `Content-Security-Policy: ${cspConnect("'self' https:")}`);
+// The query page runs its engine, compiled to WebAssembly, in the visitor's browser (AGSC-06-39):
+// one block for `/query/*`, whose splat also matches the page `/query/` itself, replaces the policy
+// with the same one plus 'wasm-unsafe-eval' in script-src, as the engine's own `_headers` does
+// (AGSC-06-17); nothing else is widened.
+addHeaders('/query/*', '! Content-Security-Policy', `Content-Security-Policy: ${CSP.replace("script-src 'self'", "script-src 'self' 'wasm-unsafe-eval'")}`);
+{
+  const engineHeaders = String(ENGINE_BUILD.files.get('/_headers'));
+  const want = `/query/*\n  ! Content-Security-Policy\n  Content-Security-Policy: ${CSP.replace("script-src 'self'", "script-src 'self' 'wasm-unsafe-eval'")}\n`;
+  if (!engineHeaders.includes(want)) die('the engine\'s _headers block for /query/* is not the one this site writes (AGSC-06-39, AGSC-06-17): compare them');
+}
 addHeaders('/.well-known/knowledge-linkset', `Content-Type: application/linkset+json; profile="${PROFILE}"`, `Link: <${PROFILE}>; rel="profile"`, 'Cache-Control: no-cache');
 for (const [route, type, ...rest] of [
   ['/.well-known/tdmrep.json', 'application/json; charset=utf-8'],
@@ -2403,6 +2599,7 @@ for (const [route, type, ...rest] of [
   ['/graph.nq', 'application/n-quads; charset=utf-8'],
   ['/graph.ttl', 'text/turtle; charset=utf-8'],
   ['/chunks.jsonl', 'application/jsonl; charset=utf-8'],
+  [`/${CHUNK_INDEX}`, 'text/toon; charset=utf-8'],
   ['/ledger.jsonl', 'application/jsonl', 'Cache-Control: no-cache'],
   ['/boards/*.json', 'application/json; charset=utf-8'],
   ['/now.md', 'text/markdown; charset=utf-8; variant=GFM', 'Cache-Control: no-cache'],
@@ -2418,6 +2615,14 @@ for (const [route, type, ...rest] of [
   ['/ns/schema/*.json', 'application/json; charset=utf-8'],
 ]) addHeaders(route, `Content-Type: ${type}`, ...rest);
 for (const route of PUBLIC_ARTEFACT) addHeaders(route, 'Access-Control-Allow-Origin: *', 'Access-Control-Expose-Headers: Link, ETag, Content-Type');
+// AGSC-06-06 (1.1.0 amendment): every file under a version directory /ns/<x.y.z>/ is immutable. The
+// blocks are the engine's own (headerSets reads the version directories from the routes), so the
+// directive and the pre-release copy /ns/1.0.0-draft.1/, which gets none, have one source.
+for (const { route, headers } of engineModule('src/distribution/headers.js').headerSets({}, SERVED_NS.map(v => `/ns/${v}/agsc.ttl`))) {
+  // Only the version directories' blocks: the site writes /ns/* and /ns/*.<ext> itself above,
+  // and a second copy of those would repeat each header (the host joins repeats with a comma).
+  if (/^\/ns\/\d+\.\d+\.\d+\/\*$/.test(route)) addHeaders(route, ...headers.map(([name, value]) => `${name}: ${value}`));
+}
 // The signed monthly sustainability report (draft-besleaga-sustainability-wellknown), written into
 // static/ by the operator's report tool and republished byte for byte (static/README.md): a
 // rebuild keeps it, and its header block is part of this file instead of being appended later.
@@ -2459,6 +2664,8 @@ put('_headers', `# Generated by scripts/build.js — do not hand-edit (AGSC-06-0
 put('_redirects', `# Generated by scripts/build.js — do not hand-edit (AGSC-06-04).
 # The 0.0.x discovery path (AGSC-06-17).
 /.well-known/agentic-knowledge ${WELLKNOWN} 301
+# The tabular chunk index moved from the llm-context export to the route specification 1.1 names (AGSC-06-37).
+/exports/chunks-index.toon /chunks-index.toon 301
 # Browsers and tools that ask for the classic icon address get the site's icon.
 /favicon.ico /favicon.svg 301
 # The folder of the three JSON Schemas has no page of its own; /ns/ lists them.
@@ -2478,6 +2685,8 @@ for (const v of GX_VENDOR) { put(v.file, v.bytes); put(v.licence, fs.readFileSyn
 // rendered once with a headless Chromium screenshot and stripped of its date chunks. Its bytes are
 // an input, copied as they are.
 put('apple-touch-icon.png', fs.readFileSync(path.join(ROOT, 'assets', 'apple-touch-icon.png')));
+// The preview card every page names (OG_CARD above): an input too, written by scripts/og-card.js.
+put('assets/og-card.png', fs.readFileSync(path.join(ROOT, 'assets', 'og-card.png')));
 // The stylesheet is also the engine's default theme (src/distribution/theme.js), so every
 // engine-built node looks like this site; the two copies must be the same bytes.
 if (read('assets/site.css') !== engineTheme.stylesheet()) die('assets/site.css differs from the engine default theme (src/distribution/theme.js): change both together');
@@ -2486,7 +2695,10 @@ for (const id of DIAGRAMS.keys()) if (!usedDiagrams.has(id)) die(`diagram ${id} 
 
 // ------------------------------------------------------------------ budgets and final checks, then write
 // Quoted requirement text that names a forbidden framing in order to forbid it (rendered from the tagged PRD).
-const ALLOWED_QUOTES = ['no Web4/crypto framing, book or &quot;companion&quot; strings', 'no Web4/crypto framing, book or \\"companion\\" strings', 'with no reading order imposed', 'no &quot;start here&quot; link and no imposed reading order', 'no \\"start here\\" link and no imposed reading order'];
+// The specification's own term for the folder beside a Harness that holds its brief, the "companion
+// directory" (AGSC-07-25), and the engine's name for it (`<harness>.companion`), as the guides and the
+// scenarios quote them: a folder of the composition, not a framing.
+const ALLOWED_QUOTES = ['<code>.companion</code>', '/*.companion)', '`<dir>.companion/', 'companion director', 'no Web4/crypto framing, book or &quot;companion&quot; strings', 'no Web4/crypto framing, book or \\"companion\\" strings', 'with no reading order imposed', 'no &quot;start here&quot; link and no imposed reading order', 'no \\"start here\\" link and no imposed reading order'];
 for (const [p, c] of files) {
   const s = typeof c === 'string' ? c : null;
   if (s !== null) {
@@ -2516,4 +2728,5 @@ for (const [p, c] of [...files].sort((a, b) => byCode(a[0], b[0]))) {
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.renameSync(tmp, OUT);
 if (RULES_WITHOUT_TRACE.length) process.stdout.write(`build: rules without a trailing trace bracket in the source: ${RULES_WITHOUT_TRACE.join(', ')}\n`);
-process.stdout.write(`build: ${files.size} files, ${routes.length} pages, ${items.length} items, ${DIAGRAMS.size} diagrams, spec ${SPEC_VERSION} from ${SPEC_SOURCE === 'tag' ? `tag ${SPEC_TAG}` : `the WORKING TREE of ${path.basename(ENGINE)} (${SPEC_TAG} is not tagged yet)`}, generated_at ${GENERATED_AT} -> ${path.relative(ROOT, OUT) || '.'}\n`);
+process.stdout.write(`build: the items form ${GRAPH_PIECES === 1 ? 'one connected piece' : `${GRAPH_PIECES} pieces not joined by any cluster membership or typed Link`}\n`);
+process.stdout.write(`build: ${files.size} files, ${routes.length} pages, ${items.length} items, ${DIAGRAMS.size} diagrams, spec ${SPEC_VERSION} from ${SPEC_SOURCE === 'tag' ? `tag ${SPEC_TAG}` : `the WORKING TREE of ${path.basename(ENGINE)} (${tagExists ? 'SITE_SPEC_SOURCE=worktree' : `${SPEC_TAG} is not tagged yet`})`}, generated_at ${GENERATED_AT} -> ${path.relative(ROOT, OUT) || '.'}\n`);

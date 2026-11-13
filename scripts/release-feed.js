@@ -17,6 +17,16 @@ const RELEASE_TAG = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
 
 /** Five to ten plain lines per release, newest release first. */
 const SUMMARIES = {
+  '1.1.0': [
+    'A MINOR release: it adds keys, rules, conformance cases and output and removes nothing, so a Bundle valid at 1.0 stays valid; the three tool-server answers a 1.0 client sees change are named in the change log.',
+    'Link meanings: each relation key states its transitive reading and expected targets, lint --suggest proposes Links with their evidence, and the ten questions of the graph come with their SPARQL texts.',
+    'An optional domain layer: a site vocabulary in Turtle, typed items and bounded contexts, SHACL Core rules and competency questions that verify and ci check.',
+    'compose --brief writes why each member is in the Harness, the relations around it, the dependency order and the gaps, beside the Harness and never in it; for an architecture item it also writes a C4 blueprint, decision records and a build plan.',
+    '/query/: SPARQL over the node\'s own graph in the browser, with no server; item and cluster pages show their relations as a figure and a table, and /clusters/ has an explorer.',
+    'Exports and imports: SKOS, an OWL 2 RL closure, a digest manifest, and files for six memory tools; items from a source the node does not own come in as drafts.',
+    'Ten tools on the tool server, which is built on the official MCP SDK v2 and also speaks MCP revision 2026-07-28 and Streamable HTTP on a loopback address.',
+    'The vocabulary is version 1.1.0, served as the fixed copy /ns/1.1.0/ beside /ns/1.0.0/, which stays unchanged.',
+  ],
   '1.0.0': [
     'Version 1.0.0 adds one section, §0.7, which lists the documents the rules already cite normatively, and adds, renumbers and removes no rule: a Bundle that conforms to the last release candidate conforms to it, unless it breaks one of the rules the change log lists as now reported.',
     'Defect fixes against rules that already stood, in the engine and in both discovery checkers, each proved by a test written first.',

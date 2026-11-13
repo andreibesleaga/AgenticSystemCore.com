@@ -30,6 +30,10 @@ Needs Node 22.13 or later and the engine repository at `../agentic-system-core` 
 `SITE_ENGINE=<path>`), with its `npm ci` done. `SOURCE_DATE_EPOCH` fixes the build
 instant; without it the instant is the commit instant of the specification tag in the engine
 repository (the engine's last commit when `SITE_SPEC_SOURCE=worktree`).
+Until the engine carries the tag `SITE_SPEC_TAG` names (by default the `spec_version` of `agsc.config.json`, 1.1.0), the build reads the
+specification from the engine's working tree, and its last line says so. Once the tag exists, a
+build against a later engine needs `SITE_SPEC_SOURCE=worktree`: that tag's registries lack the
+adapters a later engine adds, so the front-page check stops the build.
 
 Run both commands with the same `SITE_ENGINE` and `SOURCE_DATE_EPOCH`: the gate rebuilds
 the site and compares the result with `www/`, so a variable set on one line only makes the
@@ -40,7 +44,7 @@ Optional lanes. The first needs a browser, with `playwright-core` and `axe-core`
 
 ```bash
 NODE_PATH=<dir>/node_modules CHROME_EXE=<chromium> node scripts/a11y.js   # both colour schemes at 390, 768 and 1280 px, 0 violations expected
-node scripts/page-tools-check.js                                        # the seven page tools, no browser needed
+node scripts/page-tools-check.js                                        # the ten page tools, no browser needed
 node scripts/live-check.mjs                                             # read-only check of both live nodes (weekly in .github/workflows/live.yml)
 ```
 
@@ -51,7 +55,7 @@ node scripts/live-check.mjs                                             # read-o
 | [content/](content/README.md) | the Bundle's items: vocabulary Concepts, Clusters, a procedure, the project board |
 | [site/](site/README.md) | the authored pages that are not items: the guide, about, privacy, the profile page, diagrams, summaries |
 | [scripts/](scripts/README.md) | the generator, the gate and the optional lanes |
-| [assets/](assets/README.md) | the stylesheet (the engine's default theme, byte for byte), this site's layout stylesheet, the search script, the graph explorer with the two libraries it vendors, the icon, as SVG and as the 180-pixel PNG touch icon |
+| [assets/](assets/README.md) | the stylesheet (the engine's default theme, byte for byte), this site's layout stylesheet, the search script, the graph explorer with the two libraries it vendors, the icon, as SVG and as the 180-pixel PNG touch icon, and the preview card a shared link shows |
 | [static/](static/README.md) | files another tool writes and the site republishes byte for byte: the signed sustainability report and the frozen copies of the vocabulary |
 | [docs/](docs/README.md) | how the site is built, with a diagram, and the system around it with what CI runs |
 | `www/` | the built site, committed; Cloudflare Pages serves it as is |

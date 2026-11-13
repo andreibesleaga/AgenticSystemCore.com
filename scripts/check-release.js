@@ -57,7 +57,7 @@ function check(www, opts = {}) {
   const fails = [];
   const ok = (c, m) => { if (!c) fails.push(m); };
   const ENGINE = path.resolve(ROOT, opts.engine || process.env.SITE_ENGINE || '../agentic-system-core');
-  const SPEC_TAG = opts.specTag || process.env.SITE_SPEC_TAG || '1.0.0';
+  const SPEC_TAG = opts.specTag || process.env.SITE_SPEC_TAG || JSON.parse(fs.readFileSync(path.join(ROOT, 'agsc.config.json'), 'utf8')).spec_version;
   const git = (...a) => cp.execFileSync('git', ['-C', ENGINE, ...a], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   const tagExists = cp.spawnSync('git', ['-C', ENGINE, 'rev-parse', '-q', '--verify', `${SPEC_TAG}^{commit}`], { stdio: 'ignore' }).status === 0;
   const SPEC_SOURCE = opts.specSource || process.env.SITE_SPEC_SOURCE || (tagExists ? 'tag' : 'worktree');
@@ -161,6 +161,16 @@ function check(www, opts = {}) {
     ok(c > 0 && vocab.text.includes(`${c + o + d} terms (${c} classes, ${o} object properties and ${d} datatype properties)`), `/docs/status/ vocabulary row does not give the counts of /ns/agsc.nt: ${c + o + d} terms (${c} classes, ${o} object properties and ${d} datatype properties)`);
     for (const name of ['OWL 2 RL', 'SKOS', 'PROV-O', 'Dublin Core']) ok(vocab.text.includes(name), `/docs/status/ vocabulary row does not name ${name}`);
   }
+  // Specification 1.1: the query page is served, and the three blueprints live in the engine repository.
+  const query = row('Query page', 'Live');
+  ok(query.html.includes('href="/query/"') && exists('query/index.html'), '/docs/status/ query-page row does not link /query/, or /query/ is not built');
+  const blueprints = row('Blueprints', 'Published');
+  for (const name of ['engine', 'linked-sites', 'tool-server']) {
+    ok(blueprints.html.includes(`href="${ENGINE_REPO}/tree/main/examples/blueprints/${name}"`), `/docs/status/ blueprints row does not link examples/blueprints/${name}`);
+    ok(fs.existsSync(path.join(ENGINE, 'examples', 'blueprints', name, 'agsc.config.json')), `the engine has no blueprint examples/blueprints/${name}, which the status page links`);
+  }
+  if (Array.isArray(surfaces.MCP_STDIO_REVISIONS)) for (const r of surfaces.MCP_STDIO_REVISIONS) ok(mcp.text.includes(r), `/docs/status/ tool-server row does not name the MCP revision ${r} the engine speaks over stdio`);
+  ok(/--http/.test(mcp.text), '/docs/status/ tool-server row does not say that the server also runs over HTTP (--http)');
   const modes = row('Modes for people and agents', 'Live');
   ok(modes.html.includes('href="/docs/modes/"') && modes.html.includes('href="/docs/guides/"'), '/docs/status/ modes row does not link the modes and the guides');
   const compares = row('How it compares', 'Live');

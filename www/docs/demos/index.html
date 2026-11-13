@@ -17,6 +17,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/docs/demos/">
 <meta property="og:title" content="Demos">
 <meta property="og:description" content="Runnable demos of AgenticSystemCore: the six modes and the personas of the scenarios, each with the exact commands, the printed lines and what it proves; the full form in the engine repository is kept true by a test.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Demos","description":"Runnable demos of AgenticSystemCore: the six modes and the personas of the scenarios, each with the exact commands, the printed lines and what it proves; the full form in the engine repository is kept true by a test.","url":"https://agenticsystemcore.com/docs/demos/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
@@ -71,7 +75,7 @@ agsc review                                        # lane: review is lint-only �
 agsc ci &amp;&amp; agsc verify --ledger                    # ci: pass … verify: pass</code></pre>
 <p>Personas: the drop-in user, the human reader, the human contributor, the maintainer.</p>
 <h2 id="an-agent-on-the-same-wiki">An agent on the same wiki</h2>
-<p><strong>What it proves.</strong> An assistant gets seven tools over a Bundle — <code>search</code>, <code>read</code>, <code>links</code>, <code>compose</code>, <code>ask</code>, <code>propose</code>, <code>remember</code> — with nothing leaving the machine; every answer is marked <code>untrusted</code> and carries its licence; <code>propose</code> and <code>remember</code> hand back text and write nothing; the same seven tools on a published page give the same answers.</p>
+<p><strong>What it proves.</strong> An assistant gets ten tools over a Bundle — <code>search</code>, <code>read</code>, <code>links</code>, <code>compose</code>, <code>ask</code>, <code>propose</code>, <code>remember</code>, <code>brief</code>, <code>explain</code>, <code>check</code> — with nothing leaving the machine; every answer is marked <code>untrusted</code> and carries its licence; <code>propose</code> and <code>remember</code> hand back text and write nothing; the same ten tools on a published page give the same answers.</p>
 <p>Two small scripts stand in for an assistant: <code>mcp-call.js</code> starts <code>agsc mcp</code> and sends the three JSON-RPC lines every Model Context Protocol client sends first; <code>page-tools.js</code> loads the three scripts an item page loads and calls a tool the way the page does.</p>
 <pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-1-memory/a&quot; wiki &amp;&amp; cd wiki &amp;&amp; agsc build
 node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; search '{&quot;query&quot;:&quot;handoff&quot;}'
@@ -92,7 +96,7 @@ cmp ask.json page-ask.json &amp;&amp; echo &quot;the page tools and the tool ser
   &quot;trust&quot;: &quot;untrusted&quot;,
   &quot;type&quot;: &quot;items&quot;
 }</code></pre>
-<p>In a browser whose assistant supports in-page tools, every item page and the <code>/compose/</code> page register the same seven tools through <code>document.modelContext</code>; nothing is installed and no server runs. Connecting a real assistant is four lines of configuration per assistant, in the engine's <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md">assistant guide</a>. Personas: the agent reader, the agent proposer, the agent using a node as memory.</p>
+<p>In a browser whose assistant supports in-page tools, every item page and the <code>/compose/</code> page register the same ten tools through <code>document.modelContext</code>; nothing is installed and no server runs. Connecting a real assistant is four lines of configuration per assistant, in the engine's <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md">assistant guide</a>. Personas: the agent reader, the agent proposer, the agent using a node as memory.</p>
 <h2 id="mode-1-distributed-memory">Mode 1 — distributed memory</h2>
 <p><strong>What it proves.</strong> Two nodes that name each other pass the mutual check with no server between them; a one-sided claim fails; every link in a discovery document carries a digest; the memory exports and re-imports without loss; a node written without the engine passes the shipped checker.</p>
 <pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-1-memory&quot; . &amp;&amp; cd mode-1-memory &amp;&amp; cp &quot;$ENGINE/LICENSE-CONTENT&quot; b/
@@ -161,7 +165,7 @@ agsc refresh --agent worker --dry-run                # writes dist/proposal/1.pa
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/demos.md">Propose an edit</a> — opens <code>site/docs/demos.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
 </footer>
 </body>
 </html>

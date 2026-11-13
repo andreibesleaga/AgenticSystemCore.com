@@ -57,7 +57,7 @@ if (!CSP) { console.error('a11y: _headers gives no Content-Security-Policy for /
 const typeProblems = [];
 const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
 const pages = walk(WWW).filter(f => f.endsWith('index.html')).map(f => '/' + path.relative(WWW, path.dirname(f)).split(path.sep).join('/') + '/').map(p => p === '//' ? '/' : p).sort();
-const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.txt': 'text/plain' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.txt': 'text/plain', '.wasm': 'application/wasm', '.png': 'image/png', '.toon': 'text/toon' };
 // The reading measures (they run inside the page; layout does not depend on the colour scheme,
 // so they run once per width, in the light scheme).
 const MAX_LINE = 130; // characters in one rendered line of prose: the full 60rem container (since 15 Oct 2026); WCAG 1.4.8 (80, AAA) is not a bar here
@@ -186,8 +186,21 @@ srv.listen(0, async () => {
         }
       }
       if (scheme === 'light' && width === 1280) {
-        const sw = await page.evaluate(() => { const b = document.getElementById('theme'); const s = b && b.querySelector('select'); const n = s && s.getAttribute('aria-label'); const ul = document.querySelector('header.site ul'); const same = !ul || innerWidth < 1000 || Math.abs(s.getBoundingClientRect().top - ul.getBoundingClientRect().top) < 12; return !!(b && !b.hidden && s && n && same); });
-        if (!sw) problems.push(`${p}: theme switcher missing, hidden, unnamed or not on the navigation line`);
+        // The switcher: present, shown, named, and on the navigation line: the header centres its items
+        // (site.css, `align-items: center`), so the switcher's vertical centre is the list's, within 12 px,
+        // whether the list takes one row or, under a wider font, wraps inside its 18rem minimum (the GitHub
+        // runner's fonts wrap it at 1280 px; the design allows that). A failure says what was measured:
+        // the geometry, how many rows the list took and which font the links resolved to.
+        const sw = await page.evaluate(() => {
+          const b = document.getElementById('theme'); const s = b && b.querySelector('select');
+          if (!b) return 'missing'; if (b.hidden) return 'hidden'; if (!s) return 'has no select'; if (!s.getAttribute('aria-label')) return 'unnamed';
+          const ul = document.querySelector('header.site ul'); if (!ul || innerWidth < 1000) return '';
+          const sr = s.getBoundingClientRect(), ur = ul.getBoundingClientRect();
+          if (Math.abs((sr.top + sr.height / 2) - (ur.top + ur.height / 2)) < 12) return '';
+          const rows = new Set([...ul.querySelectorAll('li')].map(li => Math.round(li.getBoundingClientRect().top))).size;
+          return `not on the navigation line: select top ${sr.top.toFixed(1)} height ${sr.height.toFixed(1)}; list top ${ur.top.toFixed(1)} height ${ur.height.toFixed(1)} width ${ur.width.toFixed(0)} on ${rows} row(s); link font ${getComputedStyle(ul.querySelector('a')).fontFamily}`;
+        });
+        if (sw) problems.push(`${p}: theme switcher ${sw}`);
         await page.keyboard.press('Tab');
         const first = await page.evaluate(() => { const a = document.activeElement; return a && a.className === 'skip' && getComputedStyle(a).top !== '-48px'; });
         if (!first) problems.push(`${p}: first Tab does not reveal the skip link`);

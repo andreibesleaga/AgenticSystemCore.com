@@ -17,6 +17,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/docs/guides/mode-2/">
 <meta property="og:title" content="Mode 2 guide: a project's decisions, specifications, tasks and gates">
 <meta property="og:description" content="Guide to Mode 2 of AgenticSystemCore: a project's decisions, specifications, tasks and gates as checked files, with every command and the lines it prints.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Mode 2 guide: a project's decisions, specifications, tasks and gates","description":"Guide to Mode 2 of AgenticSystemCore: a project's decisions, specifications, tasks and gates as checked files, with every command and the lines it prints.","url":"https://agenticsystemcore.com/docs/guides/mode-2/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
@@ -65,19 +69,19 @@ export ENGINE=&quot;$PWD/node_modules/agentic-system-core&quot;</code></pre>
 Write <code>human:&lt;your-id&gt;</code> wherever the files say <code>human:you</code>.</p>
 <h2 id="1-the-files-to-write">1. The files to write</h2>
 <p>Six files, one per thing. Each is a header between <code>---</code> lines and a short Markdown body.</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
 <thead><tr><th scope="col">File</th><th scope="col"><code>type</code> / <code>kind</code></th><th scope="col">What makes it that thing</th></tr></thead>
 <tbody>
 <tr><td><code>content/clusters/&lt;board&gt;.md</code></td><td><code>type: cluster</code></td><td>a group of items; the tasks in it form a board</td></tr>
 <tr><td><code>content/concepts/&lt;name&gt;.md</code></td><td><code>kind: decision</code></td><td>by convention, a <code>## Decision</code> section</td></tr>
-<tr><td><code>content/concepts/&lt;name&gt;.md</code></td><td><code>kind: spec</code></td><td>by convention, a <code>## Specification</code> section; <code>implements:</code> the decision</td></tr>
+<tr><td><code>content/concepts/&lt;name&gt;.md</code></td><td><code>kind: spec</code></td><td>by convention, a <code>## Specification</code> section; <code>decided-by:</code> the decision</td></tr>
 <tr><td><code>content/concepts/&lt;name&gt;.md</code></td><td><code>kind: task</code></td><td><code>task_state:</code> — <code>TASK_STATE_</code> followed by <code>SUBMITTED</code> (new), <code>WORKING</code>, <code>INPUT_REQUIRED</code>, <code>AUTH_REQUIRED</code>, <code>COMPLETED</code>, <code>FAILED</code>, <code>CANCELED</code> or <code>REJECTED</code>; <code>clusters:</code> names its board; <code>blocked-by:</code> other tasks</td></tr>
 <tr><td><code>content/gates/&lt;name&gt;.md</code></td><td><code>type: gate</code></td><td><code>level:</code> <code>L1</code> (schema and links) or <code>L2</code> (adds provenance, determinism, review); <code>checks:</code>, when given, exactly the set the level implies (<a class="ref" href="/specs/02-item/#AGSC-02-18">AGSC-02-18</a>); <code>enforce:</code> (<code>status-check</code>, <code>ruleset</code>, <code>hook</code>, <code>codeowner</code>)</td></tr>
 </tbody></table></div>
 <p>Nothing checks the <code>## Decision</code> and <code>## Specification</code> sections; they are the
-convention readers and the pages expect. At 1.0.0 <code>lint</code> does not yet report a gate
-whose <code>checks:</code> differ from its level, so keep the two in step by hand, or leave
-<code>checks:</code> out.</p>
+convention readers and the pages expect. From 1.1 <code>lint</code> reports a gate whose <code>checks:</code>
+differ from its level as a warning (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E203"><code>AGSC-E203</code></a>, <a class="ref" href="/specs/02-item/#AGSC-02-18">AGSC-02-18</a>; at 1.0 it did not), so keep
+the two in step by hand, or leave <code>checks:</code> out.</p>
 <p>The board and the decision:</p>
 <pre tabindex="0" data-lang="bash"><code>mkdir -p my-project/content/clusters my-project/content/concepts my-project/content/gates &amp;&amp; cd my-project
 cat &gt; content/clusters/login.md &lt;&lt;'ITEM'
@@ -123,7 +127,7 @@ prov:
   origin: human
   operator: human:you
 kind: spec
-implements:
+decided-by:
   - decide-the-login
 ---
 
@@ -200,7 +204,7 @@ enforce:
 Every change passes these checks before it merges.
 ITEM</code></pre>
 <p>Then the configuration, the security contact and a first commit, as in <a href="/docs/guides/mode-0/">Mode 0</a>:</p>
-<pre tabindex="0" data-lang="bash"><code>agsc init &gt; /dev/null
+<pre tabindex="0" data-lang="bash"><code>agsc init &gt; /dev/null 2&gt;&amp;1
 find content -name '*.md' | sort
 mkdir -p .well-known &amp;&amp; printf 'Contact: mailto:security@example.org\n' &gt; .well-known/security.txt
 git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'the login project'
@@ -219,20 +223,18 @@ how to set the real one. A wrong value is an error with its file and line, for e
 <h2 id="2-the-gate-compiled-for-a-forge">2. The gate, compiled for a forge</h2>
 <pre tabindex="0" data-lang="bash"><code>agsc ci
 cat dist/forge/status-checks.json
-node -e 'console.log(JSON.stringify(require(&quot;./dist/forge/ruleset.json&quot;).rules.required_status_checks))'</code></pre>
+node -e 'console.log(JSON.stringify(require(&quot;./dist/forge/ruleset.json&quot;).rules.map((r) =&gt; r.type)))'</code></pre>
 <pre tabindex="0" data-lang="text"><code>ci: pass (0 error, 1 warn)
 [&quot;determinism&quot;,&quot;links&quot;,&quot;provenance&quot;,&quot;review&quot;,&quot;schema&quot;]
-[&quot;agsc ci&quot;]</code></pre>
-<p><code>dist/forge/status-checks.json</code> lists the gate's checks; <code>dist/forge/ruleset.json</code>
-requires one status, <code>agsc ci</code>, because that is the one job a forge runs and its verdict
-(<code>dist/gate.json</code>) covers every check. On GitHub, the action in the root
-<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/README.md#connecting-agents-and-repositories">README</a> runs that job.
-<code>dist/forge/ruleset.json</code> is a description of the rule, not the shape GitHub's ruleset
-import takes: transcribe it by hand, as a branch ruleset in the repository's settings
-that requires the status check <code>agsc ci</code>. <code>agsc ci</code> does not enforce the check
-<code>review</code>; it means turning on the forge's own required review, on GitHub the rule
-&quot;Require a pull request before merging&quot; with at least one required approval, in the
-same ruleset.</p>
+[&quot;pull_request&quot;,&quot;required_status_checks&quot;]</code></pre>
+<p><code>dist/forge/status-checks.json</code> lists the gate's checks; <code>dist/forge/ruleset.json</code> is a
+GitHub repository ruleset in the shape its &quot;Import a ruleset&quot; takes (Settings, Rules,
+Rulesets, New ruleset, Import a ruleset). It requires one status, <code>agsc ci</code>, because that
+is the one job a forge runs and its verdict (<code>dist/gate.json</code>) covers every check. On
+GitHub, the action in the root <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/README.md#connecting-agents-and-repositories">README</a>
+runs that job. <code>agsc ci</code> does not enforce the check <code>review</code> itself; the ruleset does, as
+the forge's own rule &quot;Require a pull request before merging&quot; with one approval and the
+Code Owners' review.</p>
 <h2 id="3-one-steering-file-for-every-assistant">3. One steering file for every assistant</h2>
 <pre tabindex="0" data-lang="bash"><code>agsc export --steer --target agents,claude,cursor
 head -1 dist/export/steer/AGENTS.md</code></pre>
@@ -241,7 +243,7 @@ head -1 dist/export/steer/AGENTS.md</code></pre>
 <p>Copy <code>dist/export/steer/AGENTS.md</code>, <code>CLAUDE.md</code> and <code>.cursor/rules/agsc.mdc</code> into the
 repository the assistants work in. The file states the current state of the project and
 quotes the items as data, not as instructions; run the command again after a change.
-At 1.0.0 the Cursor rule carries no front matter (it is planned for 1.1, <a class="ref" href="/specs/01-bundle/#AGSC-01-28">AGSC-01-28</a>),
+The Cursor rule carries no front matter (it is planned for a later MINOR, <a class="ref" href="/specs/01-bundle/#AGSC-01-28">AGSC-01-28</a>),
 so Cursor may not apply it to every chat on its own; mention the rule where you need it.</p>
 <h2 id="4-the-board">4. The board</h2>
 <pre tabindex="0" data-lang="bash"><code>agsc build
@@ -265,7 +267,7 @@ comes in with <code>agsc import --from board --format &lt;name&gt; &lt;folder&gt
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/guides/mode-2.md">Propose an edit</a> — opens <code>site/docs/guides/mode-2.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
 </footer>
 </body>
 </html>

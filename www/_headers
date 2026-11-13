@@ -15,6 +15,10 @@
   ! Content-Security-Policy
   Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self' https:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
 
+/query/*
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
 /.well-known/knowledge-linkset
   Content-Type: application/linkset+json; profile="https://w3id.org/agentic-system-core/profile/agentic-knowledge"
   Link: <https://w3id.org/agentic-system-core/profile/agentic-knowledge>; rel="profile"
@@ -68,6 +72,11 @@
   Access-Control-Allow-Origin: *
   Access-Control-Expose-Headers: Link, ETag, Content-Type
 
+/chunks-index.toon
+  Content-Type: text/toon; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Access-Control-Expose-Headers: Link, ETag, Content-Type
+
 /ledger.jsonl
   Content-Type: application/jsonl
   Cache-Control: no-cache
@@ -88,11 +97,6 @@
 
 /skills/*.md
   Content-Type: text/markdown; charset=utf-8; variant=GFM
-
-/exports/chunks-index.toon
-  Content-Type: text/plain; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Expose-Headers: Link, ETag, Content-Type
 
 /exports/llms-ctx.txt
   Content-Type: text/plain; charset=utf-8
@@ -135,6 +139,12 @@
 /boards/*
   Access-Control-Allow-Origin: *
   Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/ns/1.0.0/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/ns/1.1.0/*
+  Cache-Control: public, max-age=31536000, immutable
 
 /.well-known/sustainability-data
   Content-Type: application/sustainability-data+json

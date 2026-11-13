@@ -1,0 +1,55 @@
+/* AgenticSystemCore /query/: the editor, the result and its picture (AGSC-06-39). Same origin, no inline style (AGSC-06-17). */
+:root { --q-keyword: #7a3fb0; --q-variable: #a8326e; --q-iri: #2b6a33; --q-prefixed: #245a9c; --q-blank: #245a9c; --q-string: #8a4a00; --q-number: #8a4a00; --q-comment: #5c5c5c; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --q-keyword: #c9a4f2; --q-variable: #f48fb1; --q-iri: #81c995; --q-prefixed: #8ab4f8; --q-blank: #8ab4f8; --q-string: #f2b872; --q-number: #f2b872; --q-comment: #a3a3a0; }
+}
+:root[data-theme="dark"] { --q-keyword: #c9a4f2; --q-variable: #f48fb1; --q-iri: #81c995; --q-prefixed: #8ab4f8; --q-blank: #8ab4f8; --q-string: #f2b872; --q-number: #f2b872; --q-comment: #a3a3a0; }
+.query[hidden], #query-result[hidden], .query-picture[hidden], .query-downloads [hidden], button[data-example][hidden] { display: none; }
+main > .query, main > #query-result { max-width: none; }
+/* The editor: a text area over a coloured copy of its text; the copy shows only once the script colours it. */
+.query-editor { position: relative; margin: 0 0 0.75rem; }
+.query-editor textarea, .query-mirror { display: block; box-sizing: border-box; width: 100%; min-height: 12rem; margin: 0; padding: 0.6rem 0.75rem;
+  font-family: ui-monospace, "SF Mono", Consolas, "Liberation Mono", monospace; font-size: 0.9rem; line-height: 1.5; tab-size: 2;
+  white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid var(--control); border-radius: 4px; }
+.query-editor textarea { color: var(--fg); background: var(--bg); resize: vertical; }
+.query-mirror { position: absolute; inset: 0; overflow: hidden; color: var(--fg); background: var(--bg); pointer-events: none; }
+.query-mirror code { font: inherit; background: none; padding: 0; }
+.query-editor:not(.is-coloured) .query-mirror { display: none; }
+.query-editor.is-coloured textarea { position: relative; color: transparent; background: transparent; caret-color: var(--fg); }
+.query-editor.is-coloured textarea::selection { color: var(--bg); background: var(--accent); }
+.query-editor textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.query-mirror .q-keyword { color: var(--q-keyword); }
+.query-mirror .q-variable { color: var(--q-variable); }
+.query-mirror .q-iri { color: var(--q-iri); }
+.query-mirror .q-prefixed { color: var(--q-prefixed); }
+.query-mirror .q-blank { color: var(--q-blank); }
+.query-mirror .q-string { color: var(--q-string); }
+.query-mirror .q-number { color: var(--q-number); }
+.query-mirror .q-comment { color: var(--q-comment); }
+.query-mirror .q-keyword { font-weight: 650; }
+.query-mirror .q-comment { font-style: italic; }
+.query-tools, .query-downloads { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; margin: 0 0 1rem; }
+.query button { font: inherit; color: var(--fg); background: var(--bg-alt); border: 1px solid var(--control); border-radius: 4px; padding: 0.2rem 0.75rem; min-height: 24px; cursor: pointer; }
+.query button:disabled { color: var(--muted); cursor: not-allowed; }
+.query-examples button { font: inherit; color: var(--fg); background: var(--bg-alt); border: 1px solid var(--control); border-radius: 4px; padding: 0.15rem 0.6rem; min-height: 24px; cursor: pointer; }
+button:focus-visible, .query-downloads a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.query-examples > li { margin: 0 0 1.25rem; }
+/* A long line of an example or of the prefixes wraps, so no block scrolls out of reach of the keyboard. */
+.query-examples pre, #vocabulary pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.query-examples .question { margin: 0 0 0.35rem; font-weight: 600; }
+.query-table caption { text-align: left; caption-side: top; padding: 0 0 0.5rem; color: var(--muted); }
+.query-table td { font-family: ui-monospace, "SF Mono", Consolas, "Liberation Mono", monospace; font-size: 0.85rem; overflow-wrap: anywhere; }
+#vocabulary .table-wrap:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.query-boolean { font-size: 1.1rem; font-weight: 600; }
+/* The picture of a graph result: the explorer's scene writer, drawn with these rules. */
+.query-picture { border: 1px solid var(--rule); border-radius: 4px; background: var(--bg-alt); padding: 0.5rem; }
+.query-picture figcaption { color: var(--muted); font-size: 0.9rem; margin: 0.5rem 0 0; }
+.query-svg { display: block; width: 100%; height: auto; }
+.query-svg .link { stroke: var(--muted); stroke-width: 1.2; }
+.query-svg .node { fill: var(--q-prefixed); stroke: var(--bg-alt); stroke-width: 1.5; }
+.query-svg .t-literal { fill: var(--q-string); }
+.query-svg .t-blank { fill: var(--q-comment); }
+.query-svg .label { fill: var(--fg); font-size: 12px; }
+@media (pointer: coarse) {
+  .query button, .query-examples button { min-height: 44px; }
+}

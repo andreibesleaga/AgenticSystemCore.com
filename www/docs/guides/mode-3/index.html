@@ -17,6 +17,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/docs/guides/mode-3/">
 <meta property="og:title" content="Mode 3 guide: procedures as installable skills">
 <meta property="og:description" content="Guide to Mode 3 of AgenticSystemCore: procedures as installable skill packs with a lockfile, with every command and the lines it prints.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Mode 3 guide: procedures as installable skills","description":"Guide to Mode 3 of AgenticSystemCore: procedures as installable skill packs with a lockfile, with every command and the lines it prints.","url":"https://agenticsystemcore.com/docs/guides/mode-3/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
@@ -127,7 +131,7 @@ kind: explainer
 
 Major for a breaking change, minor for a new feature, patch for a fix.
 ITEM
-agsc init &gt; /dev/null
+agsc init &gt; /dev/null 2&gt;&amp;1
 mkdir -p .well-known &amp;&amp; printf 'Contact: mailto:security@example.org\n' &gt; .well-known/security.txt
 git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'release skills'
 agsc lint</code></pre>
@@ -166,17 +170,22 @@ collections are) comes in as procedures in a cluster you name. The package carri
 one-skill example; use your own folder the same way:</p>
 <pre tabindex="0" data-lang="bash"><code>agsc import --from skills --list &quot;$ENGINE/examples/demos/mode-3-skills/foreign&quot;
 agsc import &quot;$ENGINE/examples/demos/mode-3-skills/foreign&quot; --from skills --cluster releasing
-agsc skills &gt; /dev/null
+sed -i.bak 's/^status: draft$/status: stable/' content/procedures/plain-notes.md &amp;&amp; rm content/procedures/plain-notes.md.bak
+agsc skills &gt; /dev/null 2&gt;&amp;1
 grep '^- item:' dist/skills/releasing/SKILL.md</code></pre>
-<pre tabindex="0" data-lang="text"><code>skills: [agentskills] skill plain-notes plain-notes/SKILL.md licence Apache-2.0 (license key) -&gt; importable
+<pre tabindex="0" data-lang="text"><code>skills: [agentskills] skill plain-notes plain-notes/SKILL.md licence Apache-2.0 (license key) -&gt; draft (open licence; published when a person changes the status)
 import: 1 written, 0 replaced, 0 unchanged
 - item: http://localhost/procedures/plain-notes/</code></pre>
-<p><code>--list</code> shows what would come in and under which licence, and writes nothing. The
+<p><code>--list</code> shows what would come in and under which licence, and writes nothing. Every
+skill that comes in is a <strong>draft</strong>, even one with an open licence, so no pack carries it
+and no page shows it: the <code>sed</code> line is you reading the skill and publishing it. The
 imported file keeps its own licence (<code>x-skills-license</code>) and is marked
-<code>origin: imported</code>; read it before you commit it. Its title is the skill's name
+<code>origin: imported</code>; once published, the pack that lists it states that licence and the
+skill's source file in a &quot;Notices&quot; section. Read the file before you commit it. Its title is the skill's name
 (<code>plain-notes</code>), and until you give it <code>## When</code>, <code>## Steps</code> and <code>## Checks</code> sections,
 <code>agsc lint</code> warns three times with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E406"><code>AGSC-E406</code></a>. A pack this format emitted goes back
-into its items with <code>agsc skills import &lt;file&gt;</code>
+into its items with <code>agsc skills import &lt;file&gt;</code> (the file must lie inside the Bundle; for a
+collection kept elsewhere use <code>agsc import --from skills &lt;clone&gt;</code>)
 (<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/DEMOS.md#mode-3--the-evolving-skills-library">DEMOS.md</a> shows it).</p>
 <p>At 1.0.0 that works into another Bundle, or for a procedure the Bundle does not hold yet.
 Into the pack's own Bundle the import is refused with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E206"><code>AGSC-E206</code></a> (<code>… already exists with other bytes</code>) for every procedure the Bundle already holds, even when the pack has not
@@ -200,7 +209,7 @@ a later version.</p>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/guides/mode-3.md">Propose an edit</a> — opens <code>site/docs/guides/mode-3.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
 </footer>
 </body>
 </html>

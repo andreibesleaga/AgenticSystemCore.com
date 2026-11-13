@@ -49,6 +49,9 @@
   <rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#ConceptScheme">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
   </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#definition">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
   <rdf:Description rdf:about="http://www.w3.org/ns/prov#Activity">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
   </rdf:Description>
@@ -63,7 +66,7 @@
     <dcterms:description>Vocabulary for AgenticSystemCore Bundles: six item types plus Bundle, Source, Proposal, Review, Harness and Attachment, aligned to SKOS, PROV-O and DCTerms.</dcterms:description>
     <dcterms:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-09-29</dcterms:issued>
     <dcterms:license rdf:resource="https://creativecommons.org/publicdomain/zero/1.0/"/>
-    <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-10-14</dcterms:modified>
+    <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-11-13</dcterms:modified>
     <dcterms:publisher rdf:resource="https://orcid.org/0009-0001-3464-5283"/>
     <dcterms:title>AgenticSystemCore vocabulary</dcterms:title>
     <vann:preferredNamespacePrefix>asc</vann:preferredNamespacePrefix>
@@ -71,8 +74,8 @@
     <rdf:type rdf:resource="http://purl.org/vocommons/voaf#Vocabulary"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
     <rdfs:label>AgenticSystemCore vocabulary</rdfs:label>
-    <owl:versionIRI rdf:resource="https://w3id.org/agentic-system-core/ns/1.0.0"/>
-    <owl:versionInfo>1.0.0</owl:versionInfo>
+    <owl:versionIRI rdf:resource="https://w3id.org/agentic-system-core/ns/1.1.0"/>
+    <owl:versionInfo>1.1.0</owl:versionInfo>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#Attachment">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
@@ -164,6 +167,7 @@
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>blocked by</rdfs:label>
     <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#blocks"/>
+    <skos:definition xml:lang="en">This item cannot go ahead until the target is resolved.</skos:definition>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#blocks">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
@@ -181,11 +185,13 @@
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#contradicts">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#SymmetricProperty"/>
     <rdfs:comment>Asserts that two items cannot both be true. A pair of them in the result of a composition is a warning (AGSC-E803), never a failure (AGSC-07-07). No domain or range is declared: any item type may author this key, and declaring asc:Concept would entail a Concept typing for Procedures, Episodes and Gates.</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>contradicts</rdfs:label>
+    <skos:definition xml:lang="en">This item and the target make claims that cannot both be true.</skos:definition>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#coveredBy">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
@@ -200,6 +206,7 @@
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>covers</rdfs:label>
     <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#coveredBy"/>
+    <skos:definition xml:lang="en">This item covers the target, as a test or a document covers a requirement.</skos:definition>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#decidedBy">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
@@ -207,6 +214,7 @@
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>decided by</rdfs:label>
     <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#decides"/>
+    <skos:definition xml:lang="en">The target is the decision record that settled this item.</skos:definition>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#decides">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
@@ -216,11 +224,13 @@
     <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#decidedBy"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#excludes">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#SymmetricProperty"/>
     <rdfs:comment>Asserts mutual exclusion. Evaluated after the requires closure; a surviving pair invalidates a composition. No domain or range is declared, for the reason given on asc:contradicts.</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>excludes</rdfs:label>
+    <skos:definition xml:lang="en">This item and the target cannot be used together.</skos:definition>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#generatedAt">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
@@ -264,6 +274,7 @@
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>implements</rdfs:label>
     <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#implementedBy"/>
+    <skos:definition xml:lang="en">This item puts the target into practice, as code or a procedure puts a specification into practice.</skos:definition>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#isVerifiedBy">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
@@ -417,6 +428,7 @@
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>uses</rdfs:label>
     <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#usedBy"/>
+    <skos:definition xml:lang="en">This item draws on the target and can still be used when the target is absent.</skos:definition>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#verifiedAt">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
@@ -448,5 +460,14 @@
     <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
     <rdfs:label>verifies</rdfs:label>
     <owl:inverseOf rdf:resource="https://w3id.org/agentic-system-core/ns#isVerifiedBy"/>
+    <skos:definition xml:lang="en">This item checks that the target holds.</skos:definition>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/agentic-system-core/ns#warrant">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>The kind of ground of an item's warrant (AGSC-05-40): literary, user or organisational, the three warrants of ANSI/NISO Z39.19-2005 (R2010). The ground itself is the item's dcterms:source. No domain is declared, for the reason given on asc:contradicts (AGSC-05-13: no asc:Item superclass).</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="https://w3id.org/agentic-system-core/ns"/>
+    <rdfs:label>warrant</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <skos:definition xml:lang="en">The kind of ground on which this term belongs to the vocabulary.</skos:definition>
   </rdf:Description>
 </rdf:RDF>

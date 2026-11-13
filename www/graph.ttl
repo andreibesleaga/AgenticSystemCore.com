@@ -9,7 +9,7 @@
 <https://agenticsystemcore.com/> a asc:Bundle ;
     schema:license "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
     schema:usageInfo "LicenseRef-AgenticSystemCore-Content-Use-1.0" ;
-    asc:specVersion "1.0.0" .
+    asc:specVersion "1.1.0" .
 
 <https://agenticsystemcore.com/clusters/guides/> a asc:Cluster ;
     skos:definition "Procedures for publishing and reading a node, each step naming the rule or the check that proves it."@en ;

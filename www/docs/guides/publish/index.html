@@ -17,6 +17,10 @@
 <meta property="og:url" content="https://agenticsystemcore.com/docs/guides/publish/">
 <meta property="og:title" content="Publishing guide: put a node online and check it live">
 <meta property="og:description" content="Guide to publishing an AgenticSystemCore node: from the www/ folder to a live HTTPS address checked at Level 2, with every command and the lines it prints.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Publishing guide: put a node online and check it live","description":"Guide to publishing an AgenticSystemCore node: from the www/ folder to a live HTTPS address checked at Level 2, with every command and the lines it prints.","url":"https://agenticsystemcore.com/docs/guides/publish/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
 <script src="/compose/agsc-core.js" defer></script>
 <script src="/compose/agsc-page-tools.js" defer></script>
@@ -58,7 +62,7 @@ published nodes name and check each other.</p>
 <p>You need the package installed as in <a href="/docs/guides/#before-any-guide">the guides</a> (Node.js
 22.13 or later, <code>git</code>, a POSIX shell, the two <code>export</code> lines), a host that serves files
 over HTTPS at an address you control, and a way to upload a folder to it. The steps up to
-the upload run offline; the engine repository's test <code>tests/docs/guides.test.js</code> runs them again
+the upload run offline; the repository test the engine repository's test <code>tests/docs/guides.test.js</code> runs them again
 on every change. The upload and the live check need the network and are shown, not run.</p>
 <h2 id="1-a-node-ready-to-publish">1. A node ready to publish</h2>
 <p>If you followed the Mode 0 guide, use your own notes and skip to step 2. Otherwise make a
@@ -69,7 +73,7 @@ printf '# Sourdough starter\n\nFlour and water, fed once a day.\n' &gt; sourdoug
 agsc init &gt; /dev/null 2&gt;&amp;1
 mkdir -p .well-known &amp;&amp; printf 'Contact: mailto:security@example.org\n' &gt; .well-known/security.txt
 cp &quot;$ENGINE/LICENSE-CONTENT&quot; .
-node -e 'const f = &quot;agsc.config.json&quot;, fs = require(&quot;node:fs&quot;), c = JSON.parse(fs.readFileSync(f, &quot;utf8&quot;)); c.site.base = &quot;https://notes.example.org/&quot;; fs.writeFileSync(f, JSON.stringify(c, null, 2) + &quot;\n&quot;);'
+node -e 'const fs = require(&quot;node:fs&quot;), base = &quot;https://notes.example.org/&quot;, f = &quot;agsc.config.json&quot;, c = JSON.parse(fs.readFileSync(f, &quot;utf8&quot;)); c.site.base = base; fs.writeFileSync(f, JSON.stringify(c, null, 2) + &quot;\n&quot;); const i = &quot;content/index.md&quot;; fs.writeFileSync(i, fs.readFileSync(i, &quot;utf8&quot;).replace(/^base: .*$/m, &quot;base: &quot; + base));'
 git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'ready to publish'
 agsc ci
 agsc build</code></pre>
@@ -78,19 +82,64 @@ build: pass (0 error, 2 warn)</code></pre>
 <p><code>site.base</code> must be the address you will publish at, ending in <code>/</code>: every page and every
 link of the discovery document is written for that address, and a checker that fetches
 the document from another address refuses it (see <a href="#when-it-says-no">When it says no</a>).</p>
-<p>Run <code>agsc ci</code> before every publish, not <code>agsc build</code> alone. At 1.0.0 <code>build</code> passes a
-typed link whose target does not exist and leaves that link out of the graph, while
-<code>lint</code> and <code>ci</code> refuse it with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E301"><code>AGSC-E301</code></a>; <code>build</code> refuses only a broken link in the
-text of a note (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E310"><code>AGSC-E310</code></a>).</p>
+<p>Run <code>agsc ci</code> before every publish, not <code>agsc build</code> alone. A typed link whose target
+does not exist is left out of the graph: <code>lint</code> and <code>ci</code> refuse it with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E301"><code>AGSC-E301</code></a>, and
+from 1.1 <code>build</code> reports it as a warning with the same code, where at 1.0.0 it said
+nothing; <code>build</code> refuses only a broken link in the text of a note (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-E310"><code>AGSC-E310</code></a>).</p>
 <h2 id="2-check-the-build-as-a-reader-will">2. Check the build as a reader will</h2>
 <p>Before anything leaves your machine, run the shipped checker on the discovery document
 in <code>www/</code>. Given a file, it finds every file the document lists on disk and compares each
 one's SHA-256 digest with the bytes:</p>
 <pre tabindex="0" data-lang="bash"><code>node &quot;$ENGINE/tools/validate-wellknown&quot; www/.well-known/knowledge-linkset --level 2</code></pre>
-<pre tabindex="0" data-lang="text"><code>validate-wellknown pass (level 2): 11 input file(s) read, 0 error(s), 0 warning(s)</code></pre>
+<pre tabindex="0" data-lang="text"><code>validate-wellknown pass (level 2): 13 input file(s) read, 0 error(s), 0 warning(s)</code></pre>
 <p>Level 2 is the level a published node claims: every link carries its digest, the graph
 link carries the node's facts, and the ledger is linked. If the checker fails here, it
 will fail on the live address too; fix the build first.</p>
+<h3 id="what-a-page-and-robots-txt-tell-an-agent">What a page and <code>robots.txt</code> tell an agent</h3>
+<p>An agent that lands on one page can find the rest of the node from that page's <code>&lt;head&gt;</code>.
+From 1.1 every page names the discovery document and <code>/llms.txt</code>, both with the relation
+<code>describedby</code> and told apart by their type, and an item page also names its Markdown copy
+with the relation <code>alternate</code> and the type <code>text/markdown</code>. These are the two page-level
+relations of llms.txt v2 (llmstxt.org, modified 10 August 2026), <a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-46">AGSC-06-46</a>:</p>
+<pre tabindex="0" data-lang="bash"><code>grep -o '&lt;link rel=&quot;[a-z]*&quot; href=&quot;[^&quot;]*&quot; type=&quot;[^&quot;]*&quot;&gt;' www/concepts/sourdough/index.html</code></pre>
+<pre tabindex="0" data-lang="text"><code>&lt;link rel=&quot;describedby&quot; href=&quot;/.well-known/knowledge-linkset&quot; type=&quot;application/linkset+json&quot;&gt;
+&lt;link rel=&quot;describedby&quot; href=&quot;/llms.txt&quot; type=&quot;text/plain&quot;&gt;
+&lt;link rel=&quot;alternate&quot; href=&quot;/pages/sourdough.md&quot; type=&quot;text/markdown&quot;&gt;</code></pre>
+<p>From 1.1 a page also tells a person, or a site that shows a preview of a shared link, what
+it is. Its <code>&lt;title&gt;</code> is the page's name followed by the node's name (<code>Sourdough — &lt;site title&gt;</code>; the home page carries the node's name alone), and every page with an address of its
+own carries the Open Graph properties <code>og:type</code>, <code>og:url</code>, <code>og:title</code>, <code>og:site_name</code> and,
+when the page has a description, <code>og:description</code>. Two things are yours to add:</p>
+<ul>
+<li><strong>An icon.</strong> Put <code>favicon.svg</code> (or <code>favicon.png</code>) in <code>content/assets/</code> and show it as an
+image in the body of a published item (the image's address is <code>../assets/favicon.svg</code> from
+an item file). Only a file a published body references is published (<a class="ref" href="/specs/06-surfaces/#AGSC-06-01">AGSC-06-01</a>), and
+every page then links it as its icon.</li>
+<li><strong>A preview image.</strong> <code>og:image</code> is written only when the build is given one, through the
+<code>ogImage</code> option of the engine's build function (<code>src/REFERENCE.md</code>, section 9); the
+configuration file has no key for it, so <code>agsc build</code> writes none.</li>
+</ul>
+<p><code>robots.txt</code> invites every crawler with <code>Allow: /</code>, keeps out the training crawlers that
+<code>site.tdm_crawlers</code> names (one group each, before this one) and repeats the same use
+policy in a <code>Content-Signal</code> line of every group. The line follows the Content Signals
+Policy (contentsignals.org): search yes, use as input to an answer yes, training no. It is
+an extra record that a crawler may read or ignore (RFC 9309 §2.2.4), not one of the three
+licence dialects of <a class="ref" href="/specs/06-surfaces/#AGSC-06-18">AGSC-06-18</a>. The last group of the file:</p>
+<pre tabindex="0" data-lang="bash"><code>sed -n '/^User-agent: \*$/,$p' www/robots.txt</code></pre>
+<pre tabindex="0" data-lang="text"><code>User-agent: *
+# Content Signals Policy: the same policy as /.well-known/tdmrep.json and /legal/
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Allow: /
+Sitemap: https://notes.example.org/sitemap.xml</code></pre>
+<p>A node whose prose carries another licence (<code>bundle.license_prose</code>) writes
+<code>Content-Signal: search=yes, ai-input=yes</code> and no training groups.</p>
+<p>The IETF AI Preferences working group is drafting a similar field, <code>Content-Usage</code>, for
+<code>robots.txt</code> and HTTP. It is still a draft (<code>draft-ietf-aipref-vocab-08</code> and
+<code>draft-ietf-aipref-attach-05</code>, read 7 November 2026, both &quot;work in progress&quot;), and the
+engine does not write it at 1.x (<a class="ref" href="/specs/06-surfaces/#AGSC-06-18">AGSC-06-18</a>). For comparison only, the draft's form of the
+training reservation is:</p>
+<pre tabindex="0" data-lang="text"><code>Content-Usage: train-ai=n</code></pre>
+<p>Do not add it by hand to the built <code>robots.txt</code> or <code>_headers</code>: the next build writes both
+files again, and at 1.x no file of a node may state the field (<a class="ref" href="/specs/06-surfaces/#AGSC-06-18">AGSC-06-18</a>).</p>
 <h2 id="3-choose-a-host">3. Choose a host</h2>
 <p><code>agsc-host list</code> names the hosting profiles the engine can write settings for, with what
 each one claims and its limits:</p>
@@ -138,20 +187,31 @@ bytes, and the digests in the discovery document then no longer match what is se
 <h2 id="6-check-it-live">6. Check it live</h2>
 <p>Run the same checker on the live address. Given a URL, it fetches the discovery document
 and every file it lists from the host, compares each digest with the bytes served, and
-checks the response headers as well:</p>
+checks the response headers as well.</p>
+<p><strong>On your own machine first.</strong> <code>agsc-host serve</code> prints <code>http://localhost:8080/</code> (before 1.1 it
+printed <code>http://127.0.0.1:8080/</code>), and both checkers compare the discovery document's anchor with the origin they fetched it from, and
+the configuration admits <code>http://localhost(:port)/</code> as the one non-HTTPS <code>site.base</code>. To
+check a node served locally at Level 2, set <code>site.base</code> to <code>http://localhost:8080/</code>,
+rebuild, serve, and run each checker on
+<code>http://localhost:8080/.well-known/knowledge-linkset --level 2 --dev</code> (the Python checker
+also needs <code>--allow-network</code>); use <code>localhost</code>, not <code>127.0.0.1</code>, in both places. <code>--dev</code>
+admits plain <code>http</code> to a loopback address and nothing else (<a class="ref" href="/specs/09-conformance/page-3/#AGSC-09-93">AGSC-09-93</a>). The Node checker
+accepts <code>--allow-network</code> too, and says so once when a URL is given without it (from 2.0 the
+flag is required); <code>--max-requests &lt;n&gt;</code> (1 to 2000, default 500) stops a run that would
+fetch more files than that, with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E906"><code>AGSC-E906</code></a>.</p>
+<p>On the live address:</p>
 <pre tabindex="0" data-lang="bash"><code>node &quot;$ENGINE/tools/validate-wellknown&quot; https://notes.example.org/.well-known/knowledge-linkset --level 2</code></pre>
 <pre tabindex="0" data-lang="text"><code>validate-wellknown pass (level 2): … input file(s) read, 0 error(s), 0 warning(s)</code></pre>
 <p>For a second opinion, the Python checker (<code>pip install agentic-system-core</code>, Python 3.9
 or later, no other dependency) runs the same rules from another code base. It opens a
 connection only when the command line says so:</p>
 <pre tabindex="0" data-lang="bash"><code>python3 -m agentic_system_core.cli validate-wellknown https://notes.example.org/.well-known/knowledge-linkset --level 2 --allow-network</code></pre>
-<p><strong>On your own machine first.</strong> <code>agsc-host serve</code> prints <code>http://127.0.0.1:8080/</code>, but both checkers compare the discovery document's anchor with the origin they fetched it from, and the configuration admits <code>http://localhost(:port)/</code> as the one non-HTTPS <code>site.base</code>. To check a node served locally at Level 2, set <code>site.base</code> to <code>http://localhost:8080/</code>, rebuild, serve, and run each checker on <code>http://localhost:8080/.well-known/knowledge-linkset --level 2 --dev</code> (the Python checker also needs <code>--allow-network</code>); use <code>localhost</code>, not <code>127.0.0.1</code>, in both places. <code>--dev</code> admits plain <code>http</code> to a loopback address and nothing else (<a class="ref" href="/specs/09-conformance/page-2/#AGSC-09-93">AGSC-09-93</a>).</p>
 <p>Both checkers print one line per finding and exit 0 on a pass, 1 on a finding. Run the
 check again after every upload; a scheduled run (once a week, say) tells you when a host
 setting has changed under you.</p>
 <h2 id="when-it-says-no">When it says no</h2>
 <p>The live check names what is wrong. The usual causes:</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table 29"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
 <thead><tr><th scope="col">What you see</th><th scope="col">Why</th><th scope="col">What to do</th></tr></thead>
 <tbody>
 <tr><td><code>error AGSC-E907 … HTTP 404 for https://…</code></td><td>the file is not at that address</td><td>upload the contents of <code>www/</code>, not the folder itself; check the address</td></tr>
@@ -179,7 +239,7 @@ checker exit 1</code></pre>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/guides/publish.md">Propose an edit</a> — opens <code>site/docs/guides/publish.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
-<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></p>
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">Demo node</a></span></p>
 </footer>
 </body>
 </html>
