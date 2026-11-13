@@ -7,6 +7,13 @@
 <language>en</language>
 <atom:link href="https://agenticsystemcore.com/changelog.xml" rel="self" type="application/rss+xml"/>
 <item>
+<title>1.1.0</title>
+<link>https://github.com/andreibesleaga/agentic-system-core/blob/1.1.0/CHANGELOG.md#110---2026-11-13</link>
+<guid isPermaLink="false">1.1.0</guid>
+<pubDate>Fri, 13 Nov 2026 10:49:15 GMT</pubDate>
+<description>&lt;ul&gt;&lt;li&gt;A MINOR release: it adds keys, rules, conformance cases and output and removes nothing, so a Bundle valid at 1.0 stays valid; the three tool-server answers a 1.0 client sees change are named in the change log.&lt;/li&gt;&lt;li&gt;Link meanings: each relation key states its transitive reading and expected targets, lint --suggest proposes Links with their evidence, and the ten questions of the graph come with their SPARQL texts.&lt;/li&gt;&lt;li&gt;An optional domain layer: a site vocabulary in Turtle, typed items and bounded contexts, SHACL Core rules and competency questions that verify and ci check.&lt;/li&gt;&lt;li&gt;compose --brief writes why each member is in the Harness, the relations around it, the dependency order and the gaps, beside the Harness and never in it; for an architecture item it also writes a C4 blueprint, decision records and a build plan.&lt;/li&gt;&lt;li&gt;/query/: SPARQL over the node's own graph in the browser, with no server; item and cluster pages show their relations as a figure and a table, and /clusters/ has an explorer.&lt;/li&gt;&lt;li&gt;Exports and imports: SKOS, an OWL 2 RL closure, a digest manifest, and files for six memory tools; items from a source the node does not own come in as drafts.&lt;/li&gt;&lt;li&gt;Ten tools on the tool server, which is built on the official MCP SDK v2 and also speaks MCP revision 2026-07-28 and Streamable HTTP on a loopback address.&lt;/li&gt;&lt;li&gt;The vocabulary is version 1.1.0, served as the fixed copy /ns/1.1.0/ beside /ns/1.0.0/, which stays unchanged.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/andreibesleaga/agentic-system-core/blob/1.1.0/CHANGELOG.md#110---2026-11-13&quot;&gt;The change log of 1.1.0&lt;/a&gt;, every change in full. &lt;a href=&quot;https://agenticsystemcore.com/changelog/&quot;&gt;The content versions of this site&lt;/a&gt;.&lt;/p&gt;</description>
+</item>
+<item>
 <title>1.0.0</title>
 <link>https://github.com/andreibesleaga/agentic-system-core/blob/1.0.0/CHANGELOG.md#100---2026-10-14</link>
 <guid isPermaLink="false">1.0.0</guid>
