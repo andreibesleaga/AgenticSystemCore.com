@@ -1,6 +1,6 @@
 # Now
 
-content version vsite-2026-11-13+3.g731952d2eb0f, built at 2026-11-13T09:14:46Z, fingerprint eb6adfb2197ac758eb76a241606cb9ac4365fef521ae4c352c2c470aa784be08, specification 1.1.0
+content version v1.0.1+2.gbed96edca0cb, built at 2026-11-13T09:14:46Z, fingerprint eb6adfb2197ac758eb76a241606cb9ac4365fef521ae4c352c2c470aa784be08, specification 1.1.0
 
 ## Counts
 
