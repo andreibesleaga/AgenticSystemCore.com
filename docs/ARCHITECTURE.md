@@ -20,7 +20,7 @@ flowchart LR
   end
   ENG["Engine repository<br/>andreibesleaga/agentic-system-core"]
   CF["Cloudflare Pages<br/>agenticsystemcore.com"]
-  PEER["Demonstration node<br/>patterns.agenticsystemcore.com"]
+  PEER["AgenticSystemCore Graph<br/>patterns.agenticsystemcore.com"]
   REL["Engine releases on npm and PyPI,<br/>w3id redirects"]
   GHA["GitHub Actions<br/>test.yml, live.yml"]
   M -->|"edits, pull requests"| SRC
