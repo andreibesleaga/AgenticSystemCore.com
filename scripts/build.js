@@ -293,6 +293,8 @@ const ruleHref = id => {
   if (!RULE_INDEX.has(id)) die(`no rule or error code ${id} in the specification`);
   return `/specs/${RULE_INDEX.get(id)}/#${id}`;
 };
+// A section page's heading reads as its name; the section's identifier follows as a small label.
+const specHeading = h1 => { const m = /^(AGSC-\d{2}) — (.+)$/.exec(h1); return m ? `${esc(m[2])} <span class="id">${m[1]}</span>` : esc(h1); };
 const REF = id => `<a class="ref" href="${ruleHref(id)}">${id}</a>`;
 function linkIds(text, o) {
   let out = '', last = 0;
@@ -1293,7 +1295,7 @@ ${gxStage(`A picture of this node's graph. The explorer page lists the same node
 
 // home
 const MODE_CARDS = [
-  ['Auto-wiki', 'Markdown in, a checked and linked website out; no model needed.', '/docs/modes/#mode-0-the-automatic-self-correcting-wiki'],
+  ['Auto-wiki', 'Plain text notes (Markdown) in, a checked and linked website out; no model needed.', '/docs/modes/#mode-0-the-automatic-self-correcting-wiki'],
   ['Distributed agentic memory', 'Agents read, cite and propose; people ratify; nodes peer with each other.', '/docs/modes/#mode-1-distributed-agentic-memory'],
   ['Live specifications', 'A project\'s decisions, specs, tasks and gates as one governed memory.', '/docs/modes/#mode-2-live-specifications-and-the-memory-of-a-software-project'],
   ['Evolving skills', 'Each cluster becomes a skill pack of its published items; improved skills come back as Procedures.', '/docs/modes/#mode-3-the-evolving-skills-library'],
@@ -1348,9 +1350,9 @@ addPage('/', {
   title: config.site.title, summary: summaryOf('/'), description: index.fm.description, section: null,
   scripts: GX_SCRIPTS, styles: GX_STYLES,
   jsonld: { '@context': 'https://schema.org', '@type': 'WebSite', name: config.site.title, url: BASE, description: index.fm.description, author: { '@type': 'Person', name: config.site.author, sameAs: ['https://orcid.org/0009-0001-3464-5283'] } },
-  body: `<p class="tagline">${esc(config.site.tagline)}</p>
-<p class="lead">AgenticSystemCore turns one folder of Markdown into a website, a knowledge graph and a local tool server for AI assistants at once — every link typed, every published artefact carrying a digest a reader can check, every change merged by a person or by a rule that person recorded — so people, search engines and AI agents read the same checked knowledge, with no server, database or language model needed to build, check or publish it.</p>
+  body: `<p class="lead">AgenticSystemCore turns a folder of plain text notes (Markdown text files) into a website, a knowledge graph and a set of tools for AI assistants, all at once. Every link says what kind of link it is, every published file carries a fingerprint (a digest) that anyone can check, and every change is approved by a person or by a rule that person wrote down. People, search engines and AI agents read the same checked knowledge, and no server, database or language model is needed to build, check or publish it.</p>
 ${GX_EMBED}<ul>
+<li><a href="/docs/start-here/">Start here</a>: one reading path for each kind of reader.</li>
 <li><a href="/docs/demos/">Try it in five minutes</a>: install the package and run each mode from an empty folder.</li>
 <li><a href="/docs/guides/">Use it on your own files</a>: seven short guides, one per mode and one for publishing, every command with the lines it prints.</li>
 <li><a href="/docs/modes/">The six ways to use it</a>: one folder of files, six modes.</li>
@@ -1363,45 +1365,25 @@ ${md(index.body)}<h2 id="benefits">What each reader gets</h2>
 <tr><th scope="row">A person with notes</th><td>a wiki that checks and links itself, and a project's living memory</td><td><a href="/docs/guides/mode-0/">the Mode 0 guide</a>: <code>agsc init</code>, a security contact, one commit, <code>agsc ci</code>, <code>agsc build</code></td></tr>
 <tr><th scope="row">A team</th><td>a live board and shared skills</td><td><a href="/docs/modes/">the six modes</a>, <a href="/skills/">skill packs</a>, <a href="/boards/project-board/">this site's own board</a></td></tr>
 <tr><th scope="row">An agent or an assistant</th><td>memory it can find, verify and cite; tools on every item page</td><td><a href="${WELLKNOWN}">the discovery document</a>, <a href="/llms.txt">llms.txt</a>, <a href="/chunks.jsonl">the chunk export</a></td></tr>
-<tr><th scope="row">An implementer</th><td>a specification with vectors and standalone checkers, in any language</td><td><a href="/specs/">the specification</a>, <a href="/docs/reading-the-specification/">how to read it</a></td></tr>
+<tr><th scope="row">An implementer</th><td>a specification with vectors and standalone checkers, in any language</td><td><a href="/specs/">the specification</a>, <a href="/docs/reading-the-specification/">how to read it</a>, <a href="/docs/architecture/">the architecture</a>, <a href="/docs/requirements/">the requirements</a>, <a href="/specs/agentic-knowledge/">the discovery profile</a>, <a href="/ns/">the ontology</a></td></tr>
 <tr><th scope="row">A publisher</th><td>static files, no server to run and nothing to pay for beyond hosting</td><td><a href="/procedures/publish-a-level-0-node/">publish a Level-0 node</a></td></tr>
 </tbody></table></div>
-<h2 id="different">What is different about it</h2>
-<p class="lead">Other systems have some of these. To the author's knowledge none has them together: a knowledge base a machine can find through registered web mechanisms, a digest on every artefact its discovery document links, a typed graph with a published vocabulary, bytes pinned by conformance vectors, a person on every merge — directly, or by a standing rule that person recorded — and a starting harness out of the same files, with no server.</p>
-<p>These are claims about the specification's text and its test vectors, not performance claims. The dated comparison with other systems is in the <a href="/docs/standards/#related-work">related work</a>, and the full sentence in the <a href="/docs/introduction/">introduction</a>.</p>
-<h2 id="compares">How it compares</h2>
-<p>What it shares with others' work, and how it differs:</p>
+<h2 id="compares">What is different, and how it compares</h2>
+<p>Other systems have some of these parts. To the author's knowledge none has them together: knowledge that a machine finds through registered web addresses, a digest on every file the node publishes, a graph whose links have published meanings, output pinned by test cases, a person on every merge (directly, or through a standing rule that person recorded), and a starting harness built from the same files, with no server. These are claims about the specification and its test cases, not about speed. What it shares with others' work, and how it differs:</p>
 <ul>
-<li><strong>LLM wikis</strong> (<a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f">Andrej Karpathy's idea</a>, the <a href="https://github.com/decodingai-magazine/llm-wiki-workshop">Decoding AI workshop</a>): the same aim — Markdown pages, sources kept apart, knowledge prepared in advance. There a model writes pages and a link's kind lives in prose; here links are typed, deterministic checks find orphans and stale links, and a model proposes but never merges.</li>
+<li><strong>LLM wikis</strong> (<a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f">Andrej Karpathy's idea</a>, the <a href="https://github.com/decodingai-magazine/llm-wiki-workshop">Decoding AI workshop</a>): the same aim — pages of Markdown text, sources kept apart, knowledge prepared in advance. There a model writes pages and a link's kind lives in prose; here links are typed, deterministic checks find orphans and stale links, and a model proposes but never merges.</li>
 <li><strong><a href="https://technicspub.com/ontology-pipeline/">The Ontology Pipeline</a></strong> (Jessica Talisman): six stages from controlled vocabulary to knowledge graph. Version 1.1 has a part for each stage; <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/ONTOLOGY-PIPELINE.md">which part does what</a>. No compatibility is claimed.</li>
 <li><strong>Google's <a href="https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md">Open Knowledge Format</a></strong>: also Markdown with a header, but link kinds stay in prose; no discovery layer or digests.</li>
 <li><strong><a href="https://llmstxt.org/">llms.txt</a></strong>: a node publishes one, with a fixed grammar, beside a discovery document giving each artefact's digest.</li>
 <li><strong>Agent discovery</strong> (<a href="https://datatracker.ietf.org/doc/draft-jimenez-dawn-discovery-landscape/">IETF survey</a>) finds who can act; this finds what is known. <a href="https://www.rfc-editor.org/info/rfc9727">RFC 9727 (api-catalog)</a> is the design precedent.</li>
 <li><strong><a href="https://wikiba.se/">Wikibase and Wikidata</a></strong>: a typed graph in a served wiki with live writes; here, static files under version control.</li>
 </ul>
-<p>${STATUS.preprint ? `Details in <a href="https://doi.org/${esc(STATUS.preprint.doi)}">the paper</a>` : 'Details in the <a href="/docs/standards/#related-work">related work</a>'}; source on <a href="https://github.com/andreibesleaga/agentic-system-core">GitHub</a>.</p>
+<p>The dated comparison is in the <a href="/docs/standards/#related-work">related work</a>${STATUS.preprint ? `, the details in <a href="https://doi.org/${esc(STATUS.preprint.doi)}">the paper</a>` : ''}; the source is on <a href="https://github.com/andreibesleaga/agentic-system-core">GitHub</a>.</p>
 <h2 id="what-you-can-do">Six ways to use it</h2>
 <ul class="modes">
 ${MODE_CARDS.map(([t, d, h]) => `<li><strong><a href="${h}">${esc(t)}</a></strong>${esc(d)}</li>`).join('\n')}
 </ul>
 <p>One folder of files, one format, six ways of using it. The <a href="/docs/modes/">six modes</a> explain each.</p>
-<h2 id="best-uses">What it is best for</h2>
-<h3 id="for-agents">For agents</h3>
-<ul class="modes">
-<li><strong><a href="/docs/modes/#mode-1-distributed-agentic-memory">Memory for one agent</a></strong>Run <code>agsc mcp</code> in a Bundle: an assistant gets ${TOOL_COUNT} tools to search, read, follow links and cite items by address, and nothing leaves the machine.</li>
-<li><strong><a href="/docs/modes/#mode-1-distributed-agentic-memory">Shared memory for many</a></strong>Every agent reads the same published files and changes them only by proposals a person ratifies.</li>
-<li><strong><a href="/skills/">A source of skills</a></strong>Each cluster becomes one skill pack holding its items, procedures first, with a lockfile of their digests, installable into agent tool folders.</li>
-<li><strong><a href="/compose/">A starting harness</a></strong>Selected Concepts become a harness of seven kinds of file an architect or a runtime starts from; not a running system.</li>
-<li><strong><a href="/docs/modes/#mode-5-the-live-board-self-driving-product-and-project-management">A live board for a team of agents</a></strong>Agents claim and finish tasks until a board is done; decisions stay with people.</li>
-<li><strong><a href="/docs/how-it-works/">Knowledge across nodes</a></strong>A client reads several nodes' graph dumps and joins them on its own side, every foreign result marked with its origin.</li>
-</ul>
-<h3 id="for-people">For people</h3>
-<ul class="modes">
-<li><strong><a href="/docs/modes/#mode-0-the-automatic-self-correcting-wiki">A wiki that corrects itself</a></strong>Markdown in; a checked, linked, searchable site out, with every change reviewed.</li>
-<li><strong><a href="/docs/modes/#mode-2-live-specifications-and-the-memory-of-a-software-project">A project's living specifications</a></strong>Decisions, specifications, tasks and gates as one governed memory.</li>
-<li><strong><a href="/concepts/">A library of patterns</a></strong>Concepts with sources and provenance, readable without JavaScript, composable into a starting architecture.</li>
-<li><strong><a href="/docs/modes/#mode-5-the-live-board-self-driving-product-and-project-management">A team board</a></strong>A board exported from a project tool becomes a live board and goes back again: ${REGISTRY.boards.length} board formats, listed below.</li>
-</ul>
 <h2 id="works-with">Works with the tools you already use</h2>
 <p>Every name below is read from the reference engine's own registries when this page is built.</p>
 <ul>
@@ -1423,7 +1405,7 @@ ${figure('system-overview')}<h2 id="measured">Measured, reproducible</h2>
 ${MEASURES.map(([w, r, c]) => `<tr><th scope="row">${esc(w)}</th><td>${esc(r)}</td><td><code>${esc(runnable(c))}</code></td></tr>`).join('\n')}
 </tbody></table></div>
 <h2 id="get-started">Get started</h2>
-<p>Install the command line (Node.js 22.13 or later, <code>git</code>), then, in a folder of Markdown notes:</p>
+<p>Install the command line (Node.js 22.13 or later, <code>git</code>), then, in a folder of notes written as Markdown text files:</p>
 <pre tabindex="0"><code>npm install --global agentic-system-core   # puts agsc on the PATH
 agsc init     # each note gets a type, a title and its provenance
 mkdir -p .well-known &amp;&amp; printf 'Contact: mailto:you@example.org\\n' &gt; .well-known/security.txt
@@ -1434,14 +1416,6 @@ agsc mcp      # give an assistant ${TOOL_COUNT} tools over the same folder</code
 <p>Without the security contact, <code>agsc ci</code> stops with <code>AGSC-E901</code>; without a commit (or <code>SOURCE_DATE_EPOCH</code>), with <code>AGSC-E204</code>. The <a href="/docs/guides/mode-0/">Mode 0 guide</a> walks through it with the lines each command prints, and the <a href="/docs/guides/">guides</a> do the same for every mode. The <a href="/docs/demos/">demos</a> run each mode from an empty folder; the <a href="${FORGE.engine}/blob/main/docs/USING-WITH-ASSISTANTS.md">assistant setup guide</a> and the <a href="/docs/start-here/">start page for each kind of reader</a> go further.</p>
 <h2 id="this-site">This site is a node of itself</h2>
 <p>Everything published here follows the rules it publishes: the vocabulary items, the discovery document, the graph and the agent-facing text file are written by the reference engine, and the discovery validator checks this site at Level 2 before every publish. The <a href="/docs/status/">status page</a> says which further parts are live.</p>
-<h2 id="start">Where to start</h2>
-<ul>
-<li><strong>Everyone:</strong> <a href="/docs/start-here/">start here</a> — one path for each kind of reader.</li>
-<li><strong>People:</strong> the <a href="/docs/">guide</a>, then the <a href="/specs/">specification</a> and the <a href="/concepts/">vocabulary</a>.</li>
-<li><strong>Architects and implementers:</strong> the <a href="/docs/architecture/">architecture</a>, the <a href="/docs/requirements/">requirements</a>, the <a href="/specs/agentic-knowledge/">discovery profile</a> and the <a href="/ns/">ontology</a>.</li>
-<li><strong>Agents:</strong> <a href="${WELLKNOWN}"><code>${WELLKNOWN}</code></a> or <a href="/llms.txt"><code>/llms.txt</code></a>.</li>
-<li><strong>Publishers:</strong> <a href="/procedures/publish-a-level-0-node/">publish a Level-0 node</a> from any CMS or wiki export.</li>
-</ul>
 ${editLink('site', 'content/index.md')}`,
 });
 
@@ -1521,7 +1495,7 @@ function specSectionPages(p, parts) {
     const partLine = m === 1 ? '' : `<nav class="toc" aria-label="Parts of this section"><p><strong>Part ${part.n} of ${m}</strong>, ${part.range}. This section is published in ${PART_WORDS[m] || m} parts so that each page stays within the budget of ${REF('AGSC-06-21')}; a rule's link names the part that carries it. ${parts.filter(x => x !== part).map(x => `<a href="${x.url}"${x === prev ? ' rel="prev"' : x === next ? ' rel="next"' : ''}>Part ${x.n}</a> carries ${x.range}`).join('; ')}.</p></nav>\n`;
     const endLine = m === 1 ? '' : `<p class="parts">${next ? `End of part ${part.n} of ${m}; <a href="${next.url}" rel="next">part ${next.n}</a> continues with ${next.range}.` : `End of part ${part.n} of ${m}, the last part of this section; ${partLink(parts[0])} begins it${prev && prev !== parts[0] ? ` and ${partLink(prev)} precedes this one` : ''}.`}</p>\n`;
     return { url: part.url, opts: {
-      title: m === 1 ? p.h1 : `${p.h1} (part ${part.n} of ${m})`, heading: esc(p.h1), summary: summaryOf(p.url),
+      title: m === 1 ? p.h1 : `${p.h1} (part ${part.n} of ${m})`, heading: specHeading(p.h1), summary: summaryOf(p.url),
       description: `${p.h1} — section ${p.slug.slice(0, 2)} of the AgenticSystemCore specification ${SPEC_VERSION}${m === 1 ? '' : `, part ${part.n} of ${m} (${part.range})`}.`, section: '/specs/', wide: true,
       jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: p.h1, url: `${BASE}specs/${part.page}/`, version: SPEC_VERSION, license: 'https://www.apache.org/licenses/LICENSE-2.0', author: { '@type': 'Person', name: config.site.author }, isPartOf: `${BASE}specs/`, ...(m === 1 ? {} : { pagination: `Part ${part.n} of ${m}` }) },
       body: statusBlock()
