@@ -1133,7 +1133,7 @@ const PLAIN = Object.fromEntries(specPages.map(p => [p.slug, engineFile(`docs/pl
 const SPEC_DIAGRAM = { '00-overview': 'spec-00-conformance', '01-bundle': 'spec-01-bundle', '02-item': 'spec-02-item', '03-links': 'spec-03-links', '04-canonicalization': 'spec-04-canonicalization', '05-graph': 'spec-05-graph', '06-surfaces': 'spec-06-surfaces', '07-composition': 'spec-07-composition', '08-governance': 'spec-08-governance', '09-conformance': 'spec-09-conformance', '10-implementation-profiles': 'spec-10-profiles', '11-boundary': 'spec-11-boundary' };
 
 // ------------------------------------------------------------------ HTML layout
-const NAV = [['/docs/', 'Guide'], ['/specs/', 'Specification'], ['/concepts/', 'Vocabulary'], ['/ns/', 'Ontology'], ['/specs/agentic-knowledge/', 'Discovery'], ['/docs/standards/', 'Standards'], ['/about/', 'About'], ['/search/', 'Search']];
+const NAV = [['/docs/', 'Guide'], ['/specs/', 'Specification'], ['/concepts/', 'Vocabulary'], ['/ns/', 'Ontology'], ['/specs/agentic-knowledge/', 'Discovery'], ['/query/', 'Query'], ['/docs/standards/', 'Standards'], ['/docs/status/', 'Status'], ['/about/', 'About'], ['/search/', 'Search']];
 const summaryOf = url => { const s = SUMMARIES[url]; if (!s) die(`no summary for ${url} (site/summaries.json)`); return s; };
 // The preview card of a shared link (The Open Graph protocol, ogp.me): assets/og-card.png, a plain
 // text card drawn by scripts/og-card.js, whose CARD.alt is the text the image shows. Every page with
@@ -1856,7 +1856,7 @@ const engineView = route => {
 {
   const view = engineView('/query/index.html');
   addPage('/query/', {
-    title: view.title, summary: view.summary, description: view.description, section: null, styles: view.styles, scripts: view.scripts,
+    title: view.title, summary: view.summary, description: view.description, section: '/query/', styles: view.styles, scripts: view.scripts,
     jsonld: { '@context': 'https://schema.org', '@type': 'WebApplication', name: view.title, url: `${BASE}query/`, applicationCategory: 'DeveloperApplication', author: { '@type': 'Person', name: config.site.author } },
     body: view.body,
   });
@@ -2051,7 +2051,7 @@ for (const f of DOCS) {
     status: { 'status-table': statusTable },
   }[slug] || {};
   addPage(url, {
-    title: fm.title, summary: fm.summary, description: fm.description, section: slug === 'standards' ? '/docs/standards/' : '/docs/', wide: WIDE_DOCS.has(slug),
+    title: fm.title, summary: fm.summary, description: fm.description, section: slug === 'standards' ? '/docs/standards/' : slug === 'status' ? '/docs/status/' : '/docs/', wide: WIDE_DOCS.has(slug),
     scripts: PAGE_TOOL_SCRIPTS,
     jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: fm.title, description: fm.description, url: ORIGIN + url, author: { '@type': 'Person', name: config.site.author }, isPartOf: `${BASE}docs/` },
     body: md(body, { ...o, slots }) + editLink('site', `site/docs/${f}`),
