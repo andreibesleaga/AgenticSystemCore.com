@@ -68,7 +68,7 @@ permissions:
   contents: read
 
 env:
-  ENGINE_REF: main
+  ENGINE_REF: '1.1.0'
 
 jobs:
   site:
