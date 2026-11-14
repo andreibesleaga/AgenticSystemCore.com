@@ -127,9 +127,9 @@ main:has(> #workspace) { min-height: 100vh; }
    and in the muted colour, so a sentence reads past them; each reference is still a link to the
    rule it names, and keeps its 24 px target (44 px on touch screens, above). An identifier is never
    broken across two lines. The trace line's references keep the trace line's size. */
-a.ref, a.ref code, a.rule, .id { font-family: inherit; }
+a.ref, a.ref code, a.rule, span.id { font-family: inherit; }
 a.ref { font-size: 0.75em; white-space: nowrap; }
 a.ref code { background: none; padding: 0; }
 a.rule { font-size: 0.75rem; border-color: transparent; padding-left: 0; padding-right: 0.15em; }
-.id { font-size: 0.75em; white-space: nowrap; }
+span.id { font-size: 0.75em; white-space: nowrap; }
 h1 .id { font-weight: 400; vertical-align: middle; margin-left: 0.25em; }
