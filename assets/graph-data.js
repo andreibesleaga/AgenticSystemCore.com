@@ -57,6 +57,14 @@
     }
     return '';
   }
+  // The types of a vocabulary's own terms: a node's graph may publish the classes and properties of
+  // its domain vocabulary beside its items. They describe the items; they are not items, carry no
+  // page and no relation to one, and drawn as nodes they float apart from the graph. A node whose
+  // every type is one of these is left out of the picture (the vocabulary has its own page, /ns/).
+  const OWL = 'http://www.w3.org/2002/07/owl#', RDFS = 'http://www.w3.org/2000/01/rdf-schema#', RDF = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+  const TERM_TYPES = new Set(['Class', 'ObjectProperty', 'DatatypeProperty', 'AnnotationProperty', 'Ontology'].flatMap(t => [`${OWL}${t}`, `owl:${t}`])
+    .concat([`${RDFS}Class`, 'rdfs:Class', `${RDF}Property`, 'rdf:Property']));
+  const isTerm = raw => { const ts = asArray(raw['@type']); return ts.length > 0 && ts.every(t => TERM_TYPES.has(String(t))); };
   const typeOf = raw => String(asArray(raw['@type'])[0] || 'Thing').replace(/^.*[#/]/, '') || 'Thing';
   function labelOf(raw, lang) {
     for (const k of ['prefLabel', 'skos:prefLabel', 'title', 'name', 'schema:name', 'rdfs:label', 'label']) {
@@ -143,7 +151,7 @@
     for (const raw of g) {
       if (!raw || typeof raw !== 'object') continue;
       const id = iriOf(raw);
-      if (!id || byId.has(id)) continue;
+      if (!id || byId.has(id) || isTerm(raw)) continue;
       const n = { id, type: typeOf(raw), label: labelOf(raw, lang), raw, src, deg: 0, ext: [] };
       byId.set(id, n); nodes.push(n);
     }

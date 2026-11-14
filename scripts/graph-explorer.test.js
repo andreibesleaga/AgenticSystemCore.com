@@ -57,6 +57,23 @@ test('a graph.jsonld becomes nodes and links; external addresses stay out-links'
   assert.equal(G.parseGraph({ '@graph': [null, 3, { '@type': 'Concept' }] }, 0).nodes.length, 0, 'entries without @id are skipped');
 });
 
+test('vocabulary terms (OWL and RDFS classes and properties) are not drawn as knowledge nodes', () => {
+  const OWL = 'http://www.w3.org/2002/07/owl#';
+  const doc = { '@graph': [
+    { '@id': `${A}/concepts/item/`, '@type': ['https://example.org/ns#FailureMode', 'Concept'], prefLabel: 'Item', related: { '@id': `${A}/concepts/other/` } },
+    { '@id': `${A}/concepts/other/`, '@type': 'Concept', prefLabel: 'Other' },
+    { '@id': 'https://example.org/ns#FailureMode', '@type': `${OWL}Class`, 'rdfs:subClassOf': { '@id': 'asc:Concept' } },
+    { '@id': 'asc:Concept', '@type': `${OWL}Class` },
+    { '@id': 'skos:definition', '@type': `${OWL}AnnotationProperty` },
+    { '@id': 'https://example.org/ns#guards', '@type': 'owl:ObjectProperty', 'rdfs:subPropertyOf': { '@id': 'skos:related' } },
+    { '@id': 'https://example.org/ns', '@type': `${OWL}Ontology` },
+    { '@id': 'https://example.org/ns#p', '@type': 'rdf:Property' },
+  ] };
+  const p = G.parseGraph(doc, 0, 'en');
+  assert.deepEqual(p.nodes.map(n => n.label), ['Item', 'Other'], 'only the items are nodes');
+  assert.deepEqual(p.links.map(l => l.rel), ['related'], 'no link reaches a vocabulary term');
+});
+
 test('the address field: a site root, a discovery document or a graph file, http(s) only', () => {
   assert.deepEqual(G.resolveAddress('https://b.example.net/'), { origin: B, linkset: `${B}/.well-known/knowledge-linkset`, graph: null });
   assert.deepEqual(G.resolveAddress('https://b.example.net/concepts/x/?q=1#f'), { origin: B, linkset: `${B}/.well-known/knowledge-linkset`, graph: null });
