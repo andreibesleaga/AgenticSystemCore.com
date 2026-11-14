@@ -1356,6 +1356,8 @@ ${GX_EMBED}<ul>
 <li><a href="/docs/demos/">Try it in five minutes</a>: install the package and run each mode from an empty folder.</li>
 <li><a href="/docs/guides/">Use it on your own files</a>: seven short guides, one per mode and one for publishing, every command with the lines it prints.</li>
 <li><a href="/docs/modes/">The six ways to use it</a>: one folder of files, six modes.</li>
+<li><a href="/docs/introduction/">Read the introduction</a>: what it is, what it is for and how it works, in plain words; <a href="/docs/how-it-works/">how it works</a> shows how nodes find and read each other.</li>
+<li><a href="/compose/">Compose a starting harness</a>: tick the concepts you need and get seven starting files, computed in your browser.</li>
 <li><a href="/specs/">Read the specification</a>: the rules, the schemas and the test cases.</li>
 </ul>
 ${md(index.body)}<h2 id="benefits">What each reader gets</h2>
