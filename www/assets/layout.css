@@ -47,6 +47,25 @@ figure.diagram figcaption { max-width: none; }
    still takes its own row. */
 header.site ul { flex: 1 1 18rem; }
 
+/* ONE LINE. The menu has ten links. At the body's text size they need more than the 60rem
+   container beside the logo and the theme switcher, and the last link dropped to a second row of
+   its own. The links are set a step smaller and a little closer, so on a laptop the logo, all ten
+   links and the switcher share one row. The links keep their words, their order and their target
+   height; below the laptop width they wrap inside their box as before. */
+header.site ul { font-size: 0.875rem; column-gap: 0.8rem; }
+header.site nav { column-gap: 1rem; }
+/* Below the laptop width the ten links cannot share a row with the logo. There the logo and the
+   theme switcher take the first row and the links take the full width under them, as text that the
+   browser balances into rows of about the same length (`text-wrap: balance`; a browser without it
+   wraps them as ordinary text), so no link is left on a row of its own. The switcher is drawn
+   before the links and stays after them in the markup: the tab order is still logo, links,
+   switcher. */
+@media (max-width: 63.99rem) {
+  header.site ul { display: block; flex: 0 0 100%; order: 1; text-wrap: balance; }
+  header.site li { display: inline-block; margin-right: 0.8rem; }
+  header.site li:last-child { margin-right: 0; }
+}
+
 /* TOUCH TARGETS. The theme makes the header links and the theme switcher at least 24 px tall (WCAG
    2.5.8). On a touch screen, and at every width below 64rem (phones and tablets), each control of
    the header, each rule chip and each line of a contents list is at least 44 px tall (WCAG 2.5.5).
@@ -102,3 +121,15 @@ footer.site .footer-links { display: inline-block; }
    reader looks at the page (a layout shift above 0.1 at 1280 px). The page is given the screen's
    height from the start, so the footer starts below the fold and nothing visible moves. */
 main:has(> #workspace) { min-height: 100vh; }
+
+/* RULE AND SECTION LABELS. A rule's identifier (AGSC-00-06), a section's (AGSC-00) and a reference
+   to either are for looking things up, not for reading. They are set in the reading font, smaller
+   and in the muted colour, so a sentence reads past them; each reference is still a link to the
+   rule it names, and keeps its 24 px target (44 px on touch screens, above). An identifier is never
+   broken across two lines. The trace line's references keep the trace line's size. */
+a.ref, a.ref code, a.rule, span.id { font-family: inherit; }
+a.ref { font-size: 0.75em; white-space: nowrap; }
+a.ref code { background: none; padding: 0; }
+a.rule { font-size: 0.75rem; border-color: transparent; padding-left: 0; padding-right: 0.15em; }
+span.id { font-size: 0.75em; white-space: nowrap; }
+h1 .id { font-weight: 400; vertical-align: middle; margin-left: 0.25em; }

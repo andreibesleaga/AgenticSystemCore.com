@@ -7,6 +7,4 @@ base: "https://agenticsystemcore.com/"
 license: "LicenseRef-AgenticSystemCore-Content-Use-1.0"
 ---
 
-AgenticSystemCore is an open specification and reference implementation for knowledge that people and software agents can both read, verify and build on: a memory substrate that is deterministic, auditable, and governed by published conformance rules rather than by convention.
-
-This site publishes the specification and is itself a node of it: its vocabulary items, its discovery document, its graph and its agent-facing text file follow the rules they describe, and the discovery validator checks the site at Level 2 before every publish.
+AgenticSystemCore is an open specification, with a free reference implementation, for knowledge that people and software agents can both read, check and build on: a shared memory that gives the same result on every build, keeps a record of every change, and follows published rules rather than habit.

@@ -87,11 +87,13 @@
     const tip = { node: null, showTimer: 0, hideTimer: 0, pointer: null, suppressClickUntil: 0, byFocus: false, over: false };
     // The summary the page shows; for a Source or a Bundle, which carry none, what the graph and the link set say of it.
     const summaryOf = (n, max) => G.summaryText(n.raw, LANG, max) || G.fallbackSummary(n, LANG, st.net && st.net.nodes[n.src]);
+    // Fills an element; a part that is null or false is left out (replaceChildren would print "null").
+    const fill = (el, ...kids) => el.replaceChildren(...kids.flat().filter(c => c !== null && c !== undefined && c !== false));
     function tipContent(n) {
       const net = st.net && st.net.nodes[n.src];
       const summary = summaryOf(n, G.SUMMARY_MAX);
       const href = G.pageHref(n, st.known);
-      tipEl.replaceChildren(
+      fill(tipEl,
         h('p', { class: 'gx-tip-title' }, dot(n.type, n.src), h('strong', null, n.label)),
         h('p', { class: 'gx-tip-meta' }, `${n.type} · ${hostOf(n.src)}${net && net.depth ? ' (peer node)' : ''}`),
         summary ? h('p', { class: 'gx-tip-sum' }, summary) : h('p', { class: 'gx-tip-sum gx-muted' }, 'This node carries no summary in its graph.'),
@@ -341,11 +343,12 @@
       const prov = [G.textOf(n.raw.origin, LANG), G.textOf(n.raw.operator, LANG), G.textOf(n.raw.model, LANG)].filter(Boolean);
       const lic = G.textOf(n.raw['schema:license'] || n.raw.usageInfo, LANG);
       const summary = summaryOf(n, 2000);
-      detailEl.replaceChildren(
+      const pageLinks = [href ? link(href, 'Open the page') : null].concat(isItem ? [link(`${base}/pages/${slug}.md`, 'source text'), link(`${base}/pages/${slug}.jsonld`, 'JSON-LD')] : []).filter(Boolean);
+      fill(detailEl,
         h('h2', null, dot(n.type, n.src), ' ', n.label, ' ', h('span', { class: 'gx-badge' }, n.type)),
         h('p', { class: 'gx-muted' }, `${hostOf(n.src)} · ${n.deg} link${n.deg === 1 ? '' : 's'}`),
         summary ? h('p', null, summary) : null,
-        h('p', { class: 'gx-links' }, href ? link(href, 'Open the page') : null, isItem ? [' · ', link(`${base}/pages/${slug}.md`, 'source text'), ' · ', link(`${base}/pages/${slug}.jsonld`, 'JSON-LD')] : null),
+        pageLinks.length ? h('p', { class: 'gx-links' }, pageLinks.flatMap((l, i) => (i ? [' · ', l] : [l]))) : null,
         h('dl', { class: 'gx-dl' },
           prov.length ? [h('dt', null, 'Provenance'), h('dd', null, prov.join(' · '))] : null,
           lic ? [h('dt', null, 'Licence'), h('dd', null, lic)] : null,
