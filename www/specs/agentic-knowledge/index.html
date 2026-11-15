@@ -181,14 +181,14 @@
         },
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:vaAf9Gpl61PFPz1kyNplkWqWN9X84lHNp/LRaH9Fh88=:&quot;
+            &quot;sha-256=:tCO5a5U2r98twoqEb7GekmMrKwk6BGqfrhANucKClV8=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/exports/llms-ctx.txt&quot;,
           &quot;type&quot;: &quot;text/plain&quot;
         },
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:bQYciR9q2sU6T8wIFUDeqTWklQ2qHMLq0GZyoSKC8AE=:&quot;
+            &quot;sha-256=:u0ri4vzN/wIMXz2MXti6Hxx4oZ3EQLNjzjBJ4ZbV7lY=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/llms.txt&quot;,
           &quot;type&quot;: &quot;text/plain&quot;
@@ -201,7 +201,7 @@
             &quot;sha-256=:62rfshl6x1jrdqJBYGy5rENl/vUhrkw1LCxHCqeEvgg=:&quot;
           ],
           &quot;agsc-bundle-version&quot;: [
-            &quot;v1.1.0+10.g4c203fda4b04&quot;
+            &quot;v1.1.0+2.g152733b50412&quot;
           ],
           &quot;agsc-counts&quot;: [
             &quot;clusters=3&quot;,
@@ -269,10 +269,10 @@
       &quot;https://w3id.org/agentic-system-core/rel#ledger&quot;: [
         {
           &quot;agsc-ledger-head&quot;: [
-            &quot;5c479da3a33bb4869b14ed4846843b0eae922b684ad591aac70561c71cae21e3&quot;
+            &quot;d159bc04b50576869f25f596b0007b2fa5d9313a26fc660626cdb7903fd343e6&quot;
           ],
           &quot;digest&quot;: [
-            &quot;sha-256=:IyCl/OsVpP4Y008srqm7IcaUttMjFr0LU20wOSi92Ys=:&quot;
+            &quot;sha-256=:ktIA8AioIoNcp79xXa0jzI0eyqXivetuGMFWxfp8cSo=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/ledger.jsonl&quot;,
           &quot;type&quot;: &quot;application/jsonl&quot;
@@ -281,7 +281,7 @@
       &quot;https://w3id.org/agentic-system-core/rel#now&quot;: [
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:Cfmiv1CFG8wNo/Eiah1UK57JI/KXvzCDpr2rUIn0DrY=:&quot;
+            &quot;sha-256=:O+R0cNH77K7efpkkUsrp6KNbmNfj9U+ztg+nGBlKAMs=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/now.md&quot;,
           &quot;type&quot;: &quot;text/markdown&quot;
@@ -305,7 +305,7 @@
       &quot;https://w3id.org/agentic-system-core/rel#skills&quot;: [
         {
           &quot;digest&quot;: [
-            &quot;sha-256=:hsPS9ifcYDQfBTqxhDPrkKSLk3QixFbRAdCiyxF5+qA=:&quot;
+            &quot;sha-256=:L6X3nm+EOvBHvMl+eO2czxyND5/S63xiCHKjlpkDapQ=:&quot;
           ],
           &quot;href&quot;: &quot;https://agenticsystemcore.com/skills/index.json&quot;,
           &quot;type&quot;: &quot;application/json&quot;
@@ -445,12 +445,29 @@
 <p>These lints prove neither safety nor the absence of novel injection; hashes and attestations prove only that an artefact is what was published. An implementation MUST NOT claim more.</p>
 </blockquote>
 <h2 id="relationship-to-other-work">Relationship to other work</h2>
+<p>What a node publishes, and may link:</p>
 <ul>
 <li><strong>VoID</strong> describes linked datasets at <code>/.well-known/void</code>. A node that publishes a VoID description links it as a second <code>describedby</code> target (<a class="ref" href="/specs/06-surfaces/#AGSC-06-12">AGSC-06-12</a>).</li>
-<li><strong>The API catalog</strong> (RFC 9727) uses the link-set format to list the APIs of a publisher. This profile applies the same pattern to knowledge artefacts.</li>
-<li><strong>llms.txt</strong> gives agents a curated text entry point. A node's <code>/llms.txt</code> follows a fixed byte layout and is declared as a surface (<a class="ref" href="/specs/06-surfaces/#AGSC-06-13a">AGSC-06-13a</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-16">AGSC-11-16</a>).</li>
 <li><strong>DCAT</strong> catalogues may describe a Bundle as a dataset. No DCAT emission is required.</li>
+<li><strong>llms.txt</strong> gives agents a curated text entry point. A node's <code>/llms.txt</code> follows a fixed byte layout and is declared as a surface (<a class="ref" href="/specs/06-surfaces/#AGSC-06-13a">AGSC-06-13a</a>, <a class="ref" href="/specs/11-boundary/#AGSC-11-16">AGSC-11-16</a>).</li>
 </ul>
+<p>The design precedent:</p>
+<ul>
+<li><strong>The API catalog</strong> (RFC 9727) uses the link-set format to list the APIs of a publisher, at <code>/.well-known/api-catalog</code>. This profile applies the same pattern to knowledge artefacts.</li>
+</ul>
+<p>Other discovery documents. Each describes a different object, and a node may point at any of them with a <a href="#related-system-links">related-system link</a> (<a class="ref" href="/specs/06-surfaces/#AGSC-06-35">AGSC-06-35</a>):</p>
+<ul>
+<li><strong>Agent2Agent Agent Cards</strong>, at <code>/.well-known/agent-card.json</code>, describe an agent: what it can do and how to reach it. A node declares one as the <code>a2a-card</code> surface only beside a responder that answers (<a class="ref" href="/specs/06-surfaces/page-2/#AGSC-06-34">AGSC-06-34</a>).</li>
+<li><strong>MCP server discovery</strong> describes MCP servers. A node's own tool server is local and is declared as the <code>mcp</code> surface (<a class="ref" href="/specs/11-boundary/#AGSC-11-18">AGSC-11-18</a>).</li>
+<li><strong>The Agent Skills well-known index</strong>, at <code>/.well-known/agent-skills/index.json</code>, lists Agent Skills with a SHA-256 digest for each. It is the nearest neighbour of the digests here, for skills only, with no link set and no graph. A Bundle that exports skill packs can be listed in such an index.</li>
+<li><strong>Agentic Resource Discovery</strong> and the <strong>AI Catalog</strong> list agents, tools, services and other AI artefacts of a publisher. A node's link set could be one entry in such a list.</li>
+<li><strong>The IETF DAWN working group</strong> works on the first discovery of agents and AI resources, by name. This profile needs no naming layer: it finds a published set of documents on an origin that is already known.</li>
+</ul>
+<p>Content formats:</p>
+<ul>
+<li><strong>The Open Knowledge Format</strong> is the nearest content model: Markdown files with YAML front matter. It defines no discovery and no integrity check, and the engine imports it (<a class="ref" href="/specs/01-bundle/#AGSC-01-26">AGSC-01-26</a>). Its &quot;Knowledge Bundle&quot; is a different object from the Bundle of this specification.</li>
+</ul>
+<p>The <a href="/docs/standards/#related-work">related work</a> section of the standards page has the full comparison, with the version and the date each document was read.</p>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/profile.md">Propose an edit</a> — opens <code>site/profile.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
 <footer class="site">
