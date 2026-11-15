@@ -61,7 +61,26 @@ The specification states its own limit (AGSC-08-19):
 
 ## Relationship to other work
 
+What a node publishes, and may link:
+
 - **VoID** describes linked datasets at `/.well-known/void`. A node that publishes a VoID description links it as a second `describedby` target (AGSC-06-12).
-- **The API catalog** (RFC 9727) uses the link-set format to list the APIs of a publisher. This profile applies the same pattern to knowledge artefacts.
-- **llms.txt** gives agents a curated text entry point. A node's `/llms.txt` follows a fixed byte layout and is declared as a surface (AGSC-06-13a, AGSC-11-16).
 - **DCAT** catalogues may describe a Bundle as a dataset. No DCAT emission is required.
+- **llms.txt** gives agents a curated text entry point. A node's `/llms.txt` follows a fixed byte layout and is declared as a surface (AGSC-06-13a, AGSC-11-16).
+
+The design precedent:
+
+- **The API catalog** (RFC 9727) uses the link-set format to list the APIs of a publisher, at `/.well-known/api-catalog`. This profile applies the same pattern to knowledge artefacts.
+
+Other discovery documents. Each describes a different object, and a node may point at any of them with a [related-system link](#related-system-links) (AGSC-06-35):
+
+- **Agent2Agent Agent Cards**, at `/.well-known/agent-card.json`, describe an agent: what it can do and how to reach it. A node declares one as the `a2a-card` surface only beside a responder that answers (AGSC-06-34).
+- **MCP server discovery** describes MCP servers. A node's own tool server is local and is declared as the `mcp` surface (AGSC-11-18).
+- **The Agent Skills well-known index**, at `/.well-known/agent-skills/index.json`, lists Agent Skills with a SHA-256 digest for each. It is the nearest neighbour of the digests here, for skills only, with no link set and no graph. A Bundle that exports skill packs can be listed in such an index.
+- **Agentic Resource Discovery** and the **AI Catalog** list agents, tools, services and other AI artefacts of a publisher. A node's link set could be one entry in such a list.
+- **The IETF DAWN working group** works on the first discovery of agents and AI resources, by name. This profile needs no naming layer: it finds a published set of documents on an origin that is already known.
+
+Content formats:
+
+- **The Open Knowledge Format** is the nearest content model: Markdown files with YAML front matter. It defines no discovery and no integrity check, and the engine imports it (AGSC-01-26). Its "Knowledge Bundle" is a different object from the Bundle of this specification.
+
+The [related work](/docs/standards/#related-work) section of the standards page has the full comparison, with the version and the date each document was read.

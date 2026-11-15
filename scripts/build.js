@@ -38,7 +38,13 @@ const STATUS = {
   // the preprint of the version this site publishes; `concept` is the DOI that names every version of it
   preprint: { doi: '10.5281/zenodo.23365416', concept: '10.5281/zenodo.23052709', title: 'AgenticSystemCore: Distributed Knowledge Bundles and Runnable Systems, for People and Agents', date: '2026-10-14', version: '1.0.0' },               // e.g. { doi: '10.5281/zenodo.NNNNNNN', title: '…', date: 'YYYY-MM-DD' } once published
   // the reference engine's source archive of the same version, deposited as software
-  software: { doi: '10.5281/zenodo.23588053', version: '1.0.1' },
+  software: { doi: '10.5281/zenodo.24216775', concept: '10.5281/zenodo.23233817', version: '1.1.0' },
+  // What else is published about this work, oldest first. Add an entry only once its address
+  // resolves; `where` is the place that published it, `date` the day it shows.
+  explained: { doi: '10.20944/preprints202610.2444.v1', title: 'AgenticSystemCore and the Agentic Knowledge Web, Explained', where: 'Preprints.org', date: '2026-10-26' },
+  articles: [
+    { title: 'AgenticSystemCore: a folder of Markdown texts that people and agents can use in multiple ways', date: '2026-09-30', at: [['Substack', 'https://andreibesleaga.substack.com/p/agenticsystemcore-a-folder-of-markdown'], ['Towards AI, on Medium', 'https://pub.towardsai.net/agenticsystemcore-a-folder-of-markdown-texts-that-people-and-agents-can-use-in-multiple-ways-bc21360b61ab']] },
+  ],
 };
 
 // ------------------------------------------------------------------ basics
@@ -1236,7 +1242,9 @@ const regText = {
   draft: STATUS.draft ? `<a href="https://datatracker.ietf.org/doc/${esc(STATUS.draft)}/"><code>${esc(STATUS.draft)}</code></a>, an individual Internet-Draft, first posted on ${esc(STATUS.draftFirstPosted)}; the Datatracker page shows the latest revision, its date and its expiry.` : 'Not yet posted.',
   w3id: STATUS.w3id ? 'The namespace <code>https://w3id.org/agentic-system-core/</code> resolves to this site. Its permanent addresses redirect (HTTP 303) to the pages and files they name: the vocabulary at <code>/ns</code> and its versioned copies, by content negotiation to the vocabulary file in the format asked for; the two specification pages at <code>/specs/mcp/</code> and <code>/specs/agentic-knowledge/</code>; and the profile URI at <code>/profile/agentic-knowledge</code>.' : 'The namespace <code>https://w3id.org/agentic-system-core/</code> does not resolve yet; the pull request to w3id.org is open and not yet merged.',
   preprint: STATUS.preprint ? `Published: <a href="https://doi.org/${esc(STATUS.preprint.doi)}">${esc(STATUS.preprint.title)}</a>${STATUS.preprint.version ? `, version ${esc(STATUS.preprint.version)}` : ''} (${esc(STATUS.preprint.date)}), DOI <code>${esc(STATUS.preprint.doi)}</code>.${STATUS.preprint.concept ? ` The DOI <a href="https://doi.org/${esc(STATUS.preprint.concept)}"><code>${esc(STATUS.preprint.concept)}</code></a> names every version of the preprint.` : ''}` : 'In preparation; not yet published.',
-  software: STATUS.software ? `The reference engine ${esc(STATUS.software.version)} is archived as software on Zenodo, DOI <a href="https://doi.org/${esc(STATUS.software.doi)}"><code>${esc(STATUS.software.doi)}</code></a>.` : '',
+  software: STATUS.software ? `The reference engine ${esc(STATUS.software.version)} is archived as software on Zenodo, DOI <a href="https://doi.org/${esc(STATUS.software.doi)}"><code>${esc(STATUS.software.doi)}</code></a>.${STATUS.software.concept ? ` The DOI <a href="https://doi.org/${esc(STATUS.software.concept)}"><code>${esc(STATUS.software.concept)}</code></a> names every archived version of it.` : ''}` : '',
+  explained: STATUS.explained ? `<a href="https://doi.org/${esc(STATUS.explained.doi)}">${esc(STATUS.explained.title)}</a>, a plain-language paper on the whole system, posted on ${esc(STATUS.explained.where)} on ${esc(STATUS.explained.date)}, DOI <code>${esc(STATUS.explained.doi)}</code>. A preprint: it has not been peer reviewed.` : '',
+  articles: STATUS.articles.map(a => `<a href="${esc(a.at[0][1])}">${esc(a.title)}</a> (${esc(a.date)}), on ${a.at.map(([w, u], i) => i ? `<a href="${esc(u)}">${esc(w)}</a>` : esc(w)).join(' and on ')}.`).join(' '),
 };
 
 // ------------------------------------------------------------------ the page tools (AGSC-09-16)
@@ -1927,6 +1935,8 @@ const statusRows = [
   ['Profile URI', { 'not-filed': 'Not filed', filed: 'Filed', registered: 'Registered' }[STATUS.profile], regText.profile],
   ['Internet-Draft', STATUS.draft ? 'Posted' : 'Not yet posted', regText.draft + (STATUS.draft ? '' : ' It will describe the discovery layer only, request the registration of the well-known suffix <code>knowledge-linkset</code>, and record the fields of the profile URI, which is registered separately in the Profile URIs registry.')],
   ['Preprint', STATUS.preprint ? 'Published' : 'In preparation', regText.preprint],
+  ...(regText.explained ? [['Explanatory paper', 'Published', regText.explained]] : []),
+  ...(regText.articles ? [['Articles', 'Published', `${regText.articles} Every publication is listed under <a href="/docs/standards/#publications">publications</a>.`]] : []),
   ['Reference engine <code>agsc</code>', 'Published', 'The engine is written, and it builds this site: every machine-readable file here is emitted by <code>agsc build</code> over this repository&#39;s own content. Its packages are in the next row.' + (regText.software ? ' ' + regText.software : '')],
   ['Packages on npm and PyPI', 'Published', 'The engine as <a href="https://www.npmjs.com/package/agentic-system-core"><code>agentic-system-core</code></a> on npm, with the short alias <a href="https://www.npmjs.com/package/agsc-cli"><code>agsc-cli</code></a>; the Python checker and reader as <a href="https://pypi.org/project/agentic-system-core/"><code>agentic-system-core</code></a> on PyPI. Each version of the specification is published as the package version of the same number, from its release tag, after this site; a registry&#39;s page shows the latest version published.'],
   ['Local MCP tool server', 'Published', `<code>agsc mcp</code> serves a Bundle to an assistant on the same machine, over stdio or, with <code>--http &lt;port&gt;</code>, over Streamable HTTP on the loopback address only, speaking MCP revision <code>${esc(engineSurfaces.MCP_PROTOCOL_VERSION)}</code>${engineSurfaces.MCP_STDIO_REVISIONS.length > 1 ? ` (over stdio also ${engineSurfaces.MCP_STDIO_REVISIONS.filter(r => r !== engineSurfaces.MCP_PROTOCOL_VERSION).map(r => `<code>${esc(r)}</code>`).join(', ')}, the revision most assistants still send, ${REF('AGSC-09-19')})` : ''}: ${WORD[TOOL_NAMES.length]} tools (${TOOL_NAMES.map(n => `<code>${esc(n)}</code>`).join(', ')}), the items, <code>graph.jsonld</code> and <code>llms.txt</code> as read-only resources, and one prompt (${REF('AGSC-09-14b')}). Listed in the MCP Registry as <code>${esc(SERVER_JSON.name)}</code>, and in the Glama MCP directory.`],
@@ -1942,10 +1952,8 @@ const statusRows = [
   ['Contribution channel', 'Live', `Declared in the <a href="${WELLKNOWN}">discovery document</a> as a pull-request target (${REF('AGSC-11-14')}), and every page generated from a source file carries a <em>Propose an edit</em> link to that file. Nothing is written without a person merging it.`],
   ...(PATTERNS_NODE ? [['Second node (AgenticSystemCore Graph)', 'Live', `A second node, AgenticSystemCore Graph at <code>patterns.agenticsystemcore.com</code>, is online: the reference engine running on short cards about well-known agent-system designs, each written from the public sources it cites. Its published items are in the repository <a href="https://github.com/andreibesleaga/agsc-demo-node">agsc-demo-node</a>. ${PEERS.length ? `Each names the other as a peer in its discovery document, and the mutual check of ${REF('AGSC-10-12')} passes.` : 'It is not declared as a peer yet.'}`]] : []),
   ['Releases feed', 'Live', '<a href="/changelog.xml"><code>/changelog.xml</code></a>, RSS 2.0: one entry per release of the specification, newest first, each with a short summary and a link to its section of the change log.'],
-  ['Papers', 'Submitted', 'Papers based on this work have been submitted for review; none is published yet. This page names a paper once it is published.'],
   ['Hosted tool server', 'Planned', 'A remote MCP responder a node can run, so that agents connect to it over the network instead of starting a local process; planned for a later version.'],
   ['Messages into a node', 'Planned', 'Channel ingest: notes sent from a chat or e-mail channel arrive as proposals for a person to review; planned for a later version.'],
-  ['A change feed on every node', 'Planned', 'Each node publishes a feed of what changed between its releases; planned for a later version. This site&#39;s own releases feed is in the row above.'],
 ];
 const statusTable = `<div class="table-wrap" tabindex="0" role="region" aria-label="Status"><table>
 <thead><tr><th scope="col">What</th><th scope="col">State</th><th scope="col">Detail</th></tr></thead>
@@ -1967,8 +1975,7 @@ const registrationsTable = `<div class="table-wrap" tabindex="0" role="region" a
 const publicationsHtml = `<ul>
 <li><strong>Preprint.</strong> ${regText.preprint}${STATUS.preprint ? '' : ' It will establish the specification, its vectors and its discovery layer as of the tagged release, with a persistent identifier.'}</li>
 ${regText.software ? `<li><strong>Software.</strong> ${regText.software}</li>\n` : ''}<li><strong>Internet-Draft.</strong> ${regText.draft}</li>
-<li><strong>Papers.</strong> Papers based on this work have been submitted for review; none is published yet. This page names a paper once it is published.</li>
-</ul>
+${regText.explained ? `<li><strong>Explanatory paper.</strong> ${regText.explained}</li>\n` : ''}${regText.articles ? `<li><strong>Articles.</strong> ${regText.articles}</li>\n` : ''}</ul>
 <h3 id="how-to-cite">How to cite</h3>
 <p>${STATUS.preprint ? `Cite the preprint by its DOI, <code>${esc(STATUS.preprint.doi)}</code>${STATUS.preprint.version ? ` (version ${esc(STATUS.preprint.version)})` : ''}, and the specification by version.${STATUS.preprint.concept ? ` To cite the preprint without naming a version, use <code>${esc(STATUS.preprint.concept)}</code>.` : ''}${STATUS.software ? ` To cite the reference engine itself, use its software DOI, <code>${esc(STATUS.software.doi)}</code>.` : ''}` : 'Until the preprint is published, cite the specification by version and tag:'}</p>
 <pre tabindex="0"><code>${esc(config.site.author)}. AgenticSystemCore specification ${esc(SPEC_VERSION)}, ${esc(SPEC_DATE)}. ${esc(BASE)}specs/</code></pre>
