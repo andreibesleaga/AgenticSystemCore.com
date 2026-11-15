@@ -177,9 +177,9 @@ function check(www, opts = {}) {
   ok(compares.html.includes('href="/#compares"') && read('index.html').includes('<h2 id="compares">'), '/docs/status/ comparison row does not link the front page\'s comparison');
   const feedRow = row('Releases feed', 'Live');
   ok(feedRow.html.includes('href="/changelog.xml"'), '/docs/status/ releases-feed row does not link /changelog.xml');
-  // Planned: exactly the three rows the owner chose, with no date and no version promised.
+  // Planned: exactly the two rows the owner chose, with no date and no version promised.
   const planned = [...rows].filter(([, r]) => r.state === 'Planned').map(([w]) => w);
-  ok(planned.join(' | ') === ['Hosted tool server', 'Messages into a node', 'A change feed on every node'].join(' | '), `/docs/status/ planned rows are ${planned.join(' | ') || 'none'}`);
+  ok(planned.join(' | ') === ['Hosted tool server', 'Messages into a node'].join(' | '), `/docs/status/ planned rows are ${planned.join(' | ') || 'none'}`);
   for (const w of planned) ok(!/\b20\d\d\b|\b\d+\.\d+\b/.test(rows.get(w).text), `/docs/status/ planned row "${w}" names a date or a version`);
 
   // (3) The releases feed: RSS 2.0, one item per release tag, newest first, each linking its
