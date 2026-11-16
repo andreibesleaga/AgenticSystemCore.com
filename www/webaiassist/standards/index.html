@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Standards and formats WebAIAssist reads — AgenticSystemCore</title>
+<meta name="description" content="The standards table of WebAIAssist: standard, draft or the project's own profile, and what the extension does with each.">
+<link rel="canonical" href="https://agenticsystemcore.com/webaiassist/standards/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/webaiassist/standards/">
+<meta property="og:title" content="Standards and formats WebAIAssist reads">
+<meta property="og:description" content="The standards table of WebAIAssist: standard, draft or the project's own profile, and what the extension does with each.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Standards and formats WebAIAssist reads","description":"The standards table of WebAIAssist: standard, draft or the project's own profile, and what the extension does with each.","url":"https://agenticsystemcore.com/webaiassist/standards/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/webaiassist/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/" aria-current="page">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main" class="wide">
+<h1>Standards and formats WebAIAssist reads</h1>
+<p class="summary"><strong>Summary</strong>Every standard, draft and profile WebAIAssist reads or uses, with its status, what the extension does with it and what it does not do.</p>
+<blockquote>
+<p><strong>In short</strong></p>
+<ul>
+<li>This page lists every standard, draft and profile the extension reads or uses, and what it does with each. Status was read on 14 Nov 2026.</li>
+<li>The extension reads these files. It does not claim to support, conform to or certify any of them.</li>
+<li>WebMCP is a draft (Draft Community Group Report, 13 Nov 2026). It is not a W3C Standard and not on the W3C Standards Track.</li>
+<li>Status words: standard (an RFC or a W3C Recommendation), draft, the AgenticSystemCore project's own profile, and convention.</li>
+<li>It deliberately does not read VoID and DCAT files, an MCP server card or the skills index: no fixed path exists, or the address would come from a file.</li>
+</ul>
+</blockquote>
+<p>This page lists every standard, draft and profile that WebAIAssist reads or uses, what it does
+with each one, where in the code, and what it does not do. Status was read on 14 Nov 2026; the
+sources and dates are in SOURCES.md. The plain-words pages are
+<a href="/webaiassist/what-is-webmcp/">What is WebMCP</a> and <a href="/webaiassist/what-the-extension-reads/">What the extension reads</a>.</p>
+<p>WebAIAssist reads these files. It does not claim to support, conform to or certify any of them.</p>
+<h2 id="how-to-read-the-status-column">How to read the Status column</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 1"><table>
+<thead><tr><th scope="col">Status</th><th scope="col">Meaning</th></tr></thead>
+<tbody>
+<tr><td>standard</td><td>An RFC (the IETF's number is given, with its own level: Proposed Standard or Informational) or a W3C Recommendation.</td></tr>
+<tr><td>draft</td><td>Not final. The body and the date of the draft are given. A Community Group draft is not a W3C Standard and is not on the W3C Standards Track; the document says so itself.</td></tr>
+<tr><td>the AgenticSystemCore project's own profile</td><td>A format of the AgenticSystemCore project, by the same author as this extension. Not a standard of any body.</td></tr>
+<tr><td>convention</td><td>A format that many sites use but no standards body owns.</td></tr>
+</tbody></table></div>
+<h2 id="what-the-extension-reads-from-a-site">What the extension reads from a site</h2>
+<p>Every address is the open tab's own site plus a fixed path. A path that comes from a file is used
+only in the two cases marked &quot;named by the link set&quot; (see the end of this page). All text read is
+untrusted data. The nine fixed files are in <code>src/core/site-files.ts</code>.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 2"><table>
+<thead><tr><th scope="col">What</th><th scope="col">Status</th><th scope="col">What the extension does with it</th><th scope="col">Where in the code</th><th scope="col">What it does NOT do</th></tr></thead>
+<tbody>
+<tr><td>WebMCP: <code>document.modelContext</code> (tools a page registers)</td><td>draft: Web Machine Learning Community Group, Draft Community Group Report, 13 Nov 2026</td><td>Lists the page's tools with <code>getTools()</code>, shows name, title, description, schema type and the hints <code>readOnlyHint</code>, <code>consequentialHint</code>, <code>untrustedContentHint</code>, runs one with <code>executeTool()</code> after you press Allow once. Listens to <code>toolchange</code>.</td><td><code>src/adapters/page-bridge-main.ts</code>, <code>src/adapters/webmcp-reader.ts</code>, <code>src/core/tool-card.ts</code></td><td>Does not register tools of its own on a page. Does not read <code>navigator.modelContext</code> as the main route (only as an older-name fallback). Does not claim the draft is stable.</td></tr>
+<tr><td>WebMCP polyfill (<code>@w3c/webmcp-polyfill</code> 0.1.0)</td><td>draft: a software library for the draft above; Apache-2.0</td><td>Loaded into one site's page only when you press &quot;Add WebMCP to this site&quot; (compat mode).</td><td><code>src/adapters/compat-mode.ts</code>, <code>src/entries/webmcp-polyfill.ts</code></td><td>Never loaded by itself. Not kept across browser restarts.</td></tr>
+<tr><td>Tool input schema (JSON Schema, dialect 2020-12)</td><td>draft: a specification of the JSON Schema project, not an RFC. The WebMCP draft does not name a dialect; the extension uses 2020-12</td><td>Checks the arguments of a call against the tool's <code>inputSchema</code> before it runs.</td><td><code>src/adapters/cfworker-args-validator.ts</code>, <code>src/adapters/ajv-args-validator.ts</code></td><td>Validates in the browser with a JSON Schema library; no address is fetched for it.</td></tr>
+<tr><td>Knowledge link set <code>/.well-known/knowledge-linkset</code></td><td>standard: RFC 9264 (Linkset), Proposed Standard, July 2022; with RFC 8288 (Web Linking), Proposed Standard; the profile and relation names are the AgenticSystemCore project's own profile</td><td>Reads relations, specification version, counts, bundle version and date, peers, surfaces. Shows them on the card; gives up to 20 same-site rows to the model.</td><td><code>src/core/site-linkset.ts</code>, <code>src/core/site-facts.ts</code></td><td>Does not follow a link in it on its own, except the two cases at the end of this page. A link to another site is shown as text.</td></tr>
+<tr><td>Digest of a file in the link set</td><td>standard: RFC 9530 (Digest Fields), Proposed Standard, Feb 2024; the SHA-256 is computed with the Web Cryptography API</td><td>Compares the SHA-256 of the raw bytes of a file it read with the digest the link set names. Shows &quot;matches the node's own list&quot;. A file that differs is not given to the model.</td><td><code>src/core/site-digest.ts</code>, <code>src/adapters/linkset-digests.ts</code>, <code>src/adapters/sha256.ts</code></td><td>Does not prove who wrote the file: the same site publishes both. Does not check a signature.</td></tr>
+<tr><td><code>/.well-known/</code> as a place (well-known URIs)</td><td>standard: RFC 8615, Proposed Standard, May 2019</td><td>The fixed paths above and below sit under it.</td><td><code>src/core/site-files.ts</code></td><td>Does not read paths it does not list.</td></tr>
+<tr><td>API catalog <code>/.well-known/api-catalog</code></td><td>standard: RFC 9727, Proposed Standard, June 2025</td><td>Reads it as a link set and shows how many APIs it lists.</td><td><code>src/core/site-linkset.ts</code>, <code>src/core/site-files.ts</code></td><td>Does not open or call any API it names.</td></tr>
+<tr><td><code>robots.txt</code>: the <code>Content-Signal</code> line</td><td>standard for the file: RFC 9309 (Robots Exclusion Protocol), Proposed Standard, Sept 2022. The <code>Content-Signal</code> line is a convention (contentsignals.org), not a standard of any body</td><td>Reads only the <code>Content-Signal</code> line of the group for all agents (<code>*</code>). <code>ai-input=no</code> means no site text is sent to the model and &quot;Read this page&quot; is off.</td><td><code>src/core/site-robots.ts</code></td><td>Does not read Allow, Disallow or Sitemap lines. It is not a crawler.</td></tr>
+<tr><td><code>/.well-known/tdmrep.json</code></td><td>convention: W3C Community Group Final Report, 10 May 2024 (TDM Reservation Protocol); not on the W3C Standards Track</td><td>Reads <code>tdm-reservation</code>; shows &quot;training reserved&quot; as a policy line.</td><td><code>src/core/site-small.ts</code></td><td>Does not read other members.</td></tr>
+<tr><td><code>/.well-known/security.txt</code></td><td>standard: RFC 9116, Informational, April 2022</td><td>Shows the first contacts and whether the file has expired. The model does not receive it.</td><td><code>src/core/site-small.ts</code></td><td>Does not send mail or open the contact address.</td></tr>
+<tr><td><code>/.well-known/agent-card.json</code> (A2A Agent Card)</td><td>convention: the A2A Protocol's agent-card file (a2a-protocol.org); its status was not assessed for this page</td><td>Shows name, description, version and up to 10 skill names, as text.</td><td><code>src/core/site-small.ts</code></td><td>Does not speak A2A. Does not open an address from the card.</td></tr>
+<tr><td><code>/.well-known/sustainability-data</code></td><td>draft: draft-besleaga-sustainability-wellknown-12, Internet-Draft, Independent Submission stream, 28 Oct 2026 (same author as this extension)</td><td>Shows provider, method, period, energy and carbon as text. A <code>signed</code> member shows only as &quot;present&quot;.</td><td><code>src/core/site-sustainability.ts</code></td><td>Does not check the signature and says nothing about trust.</td></tr>
+<tr><td><code>/llms.txt</code></td><td>convention: llmstxt.org, &quot;The /llms.txt file, v2&quot;. Not a standard of any body. An AgenticSystemCore node adds a provenance comment (the project's own profile)</td><td>Shows title and counts; gives title, summary and section names with link titles to the model.</td><td><code>src/core/site-llms.ts</code>, <code>src/core/site-context.ts</code></td><td>Does not render Markdown. Keeps only <code>https</code> links, as text.</td></tr>
+<tr><td><code>/llms-full.txt</code></td><td>convention: llms.txt ecosystem; not in the llms.txt specification</td><td>Shows that it exists and its size.</td><td><code>src/core/site-facts.ts</code></td><td>Does not read its content.</td></tr>
+<tr><td>JSON-LD in the page (<code>&lt;script type=&quot;application/ld+json&quot;&gt;</code>)</td><td>standard: JSON-LD 1.1, W3C Recommendation, 16 July 2020. Vocabulary: schema.org (a community vocabulary)</td><td>Reads the first node that has a type and a name: type, name, description, date, licence, language, creator, count of <code>distribution</code>. Shown in the card and the Page data tab.</td><td><code>src/core/site-page.ts</code>, <code>src/adapters/site-page-scripts.ts</code></td><td>Never fetches an <code>@context</code>, <code>@id</code> or <code>url</code>. Does not run a JSON-LD processor.</td></tr>
+<tr><td>Open Graph tags and the <code>description</code> meta tag</td><td>convention: The Open Graph protocol (ogp.me)</td><td>Used for the page title, description and type when the page has no JSON-LD.</td><td><code>src/core/site-page.ts</code></td><td>Does not read Twitter card tags.</td></tr>
+<tr><td>HTML <code>&lt;link rel=...&gt;</code> in the page</td><td>standard: HTML Living Standard (WHATWG) for the element; relation names from RFC 8288 and the IANA link-relation registry</td><td>Collects <code>describedby</code>, <code>alternate</code>, <code>license</code>, <code>api-catalog</code>, <code>service-desc</code>; shows same-site ones as text rows in the Page data tab.</td><td><code>src/adapters/site-page-scripts.ts</code>, <code>src/core/site-page.ts</code></td><td>Never opens one. A link to another site is not shown as a link.</td></tr>
+</tbody></table></div>
+<h2 id="what-the-extension-reads-from-an-agenticsystemcore-node-named-by-the-link-set">What the extension reads from an AgenticSystemCore node (named by the link set)</h2>
+<p>Only for a node whose own link set names the file on the node's own site with a SHA-256 digest, and
+only when the bytes match that digest. A file that is cut, too big, of the wrong type or different from
+its digest is refused whole.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 3"><table>
+<thead><tr><th scope="col">What</th><th scope="col">Status</th><th scope="col">What the extension does with it</th><th scope="col">Where in the code</th><th scope="col">What it does NOT do</th></tr></thead>
+<tbody>
+<tr><td><code>graph.jsonld</code> (the node's knowledge graph, JSON-LD)</td><td>standard: JSON-LD 1.1, W3C Recommendation, 16 July 2020. The graph's content is the AgenticSystemCore project's own profile</td><td>Draws it in the explorer tab (at most 2 MiB).</td><td><code>src/core/graph-files.ts</code>, <code>src/adapters/graph-fetch-shim.ts</code>, <code>src/ui/explorer/</code></td><td>Does not fetch the remote <code>@context</code>. Does not follow a peer node on its own.</td></tr>
+<tr><td><code>graph.nq</code></td><td>standard: RDF 1.1 N-Quads, W3C Recommendation, 25 Feb 2014</td><td>Loads it into the Oxigraph engine for the Query tab and the built-in graph tool (at most 4 MiB).</td><td><code>src/adapters/graph-load.ts</code>, <code>src/adapters/graph-query.ts</code></td><td>Does not store it. Drops it when you move to another site.</td></tr>
+<tr><td>SPARQL queries (SELECT, ASK)</td><td>standard: SPARQL 1.1 Query Language, W3C Recommendation, 21 March 2013; results as a table (JSON and CSV forms are W3C Recommendations of the same date, SPARQL 1.1 Query Results JSON and CSV/TSV)</td><td>Runs your query, or the model's, in your browser with Oxigraph 0.5.13 (WebAssembly, in the package). Up to 200 rows shown.</td><td><code>src/query/worker-core.ts</code>, <code>src/entries/query-worker.ts</code>, <code>third_party/agsc-query/</code></td><td>Refuses updates and <code>SERVICE</code>. A <code>FROM</code> name is only the name of a graph in the store, never an address. Shows a table; there is no export of results.</td></tr>
+<tr><td><code>/ns/agsc.ttl</code> (the node's ontology, shown in Vocabulary)</td><td>standard: RDF 1.1 Turtle, W3C Recommendation, 25 Feb 2014. Classes and properties: the AgenticSystemCore project's own profile</td><td>Lists classes and properties with their labels (at most 1 MiB).</td><td><code>src/core/graph-files.ts</code>, <code>src/adapters/graph-load.ts</code></td><td>Does not reason over the ontology (no OWL reasoning). Does not follow <code>owl:imports</code>.</td></tr>
+<tr><td><code>chunks.jsonl</code></td><td>the AgenticSystemCore project's own profile (one JSON object per line)</td><td>Reads one item's text when you select it in the explorer (at most 2 MiB).</td><td><code>src/core/graph-files.ts</code></td><td>Does not read it unless you select an item.</td></tr>
+<tr><td>Peer nodes named in a link set</td><td>the AgenticSystemCore project's own profile (relation <code>peer</code>)</td><td>After you tick a peer and press Read the ticked nodes: up to three published files of that node (see <a href="/webaiassist/privacy/">PRIVACY.md</a>).</td><td><code>src/adapters/peers.ts</code>, <code>src/adapters/graph-fetch-guard.ts</code></td><td>Only <code>https</code> sites with a public host name: no IP address, local name, other port or user info. Nothing before you tick.</td></tr>
+<tr><td>The AgenticSystemCore link-set profile and relation names</td><td>the AgenticSystemCore project's own profile: profile address <code>https://w3id.org/agentic-system-core/profile/agentic-knowledge</code>, relations under <code>https://w3id.org/agentic-system-core/rel#</code> (<code>surface</code>, <code>graph</code>, <code>ontology</code>, <code>skills</code>, <code>peer</code>, <code>ledger</code> and others), attributes beginning <code>agsc-</code> (version, bundle hash, generated-at, counts). The well-known name is described in draft-besleaga-agentic-knowledge-wellknown-01, Internet-Draft, 14 Oct 2026 (same author; no stream)</td><td>Recognises a node, shows its specification version and counts, and says &quot;AgenticSystemCore node, spec N&quot; on the card.</td><td><code>src/core/site-linkset.ts</code>, <code>src/core/node-mode.ts</code>, <code>src/ui/node-card.ts</code></td><td>Does not decide that a node is correct. &quot;Works with&quot; means it can read what the node publishes, not that the node was checked.</td></tr>
+<tr><td>The ten tools of a node page (<code>ask</code>, <code>brief</code>, <code>check</code>, <code>compose</code>, <code>explain</code>, <code>links</code>, <code>propose</code>, <code>read</code>, <code>remember</code>, <code>search</code>)</td><td>the AgenticSystemCore project's own profile (WebMCP tools registered by the node's page)</td><td>Adds a short hint about their roles to the model's instructions when a page registers them or links to the link set. Four starter questions use them.</td><td><code>src/core/node-mode.ts</code>, <code>src/ui/starter-prompts.ts</code></td><td>A site can register tools with the same names. The extension then treats them like any page tool: every call is confirmed.</td></tr>
+</tbody></table></div>
+<h2 id="what-the-extension-uses-to-run-a-model">What the extension uses to run a model</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 4"><table>
+<thead><tr><th scope="col">What</th><th scope="col">Status</th><th scope="col">What the extension does with it</th><th scope="col">Where in the code</th><th scope="col">What it does NOT do</th></tr></thead>
+<tbody>
+<tr><td>WebGPU</td><td>draft: W3C Candidate Recommendation Draft (not yet a Recommendation)</td><td>Runs the graphics-card models through WebLLM 0.2.86.</td><td><code>src/adapters/webllm-runtime.ts</code>, <code>src/adapters/webgpu-probe.ts</code></td><td>Does not use it for anything else. Checks the <code>shader-f16</code> feature before listing Gemma 4 E2B.</td></tr>
+<tr><td>WebAssembly</td><td>draft: WebAssembly Core Specification 2.0 is a W3C Candidate Recommendation Draft (the 1.0 version is a Recommendation)</td><td>Runs the processor models (llama.cpp through wllama 3.8.1) and Oxigraph. The page needs <code>wasm-unsafe-eval</code>.</td><td><code>src/adapters/wllama-runtime.ts</code>, <code>static/manifest.json</code></td><td>Does not load WebAssembly from the network. All of it is in the package.</td></tr>
+<tr><td>Prompt API (<code>LanguageModel</code>, Chrome's built-in model)</td><td>draft: Web Machine Learning Community Group, Draft Community Group Report, 9 Nov 2026</td><td>Uses Chrome's own model when you choose it; reads whether it is ready.</td><td><code>src/adapters/prompt-api-runtime.ts</code>, <code>src/adapters/prompt-api-probe.ts</code></td><td>Does not download the model by itself. Chrome decides what the model is and how it runs.</td></tr>
+<tr><td>OpenAI-style chat completions over HTTP, with server-sent events</td><td>convention: de facto interface of Ollama, LM Studio, OpenRouter and others; server-sent events are part of the HTML Living Standard (WHATWG)</td><td>Sends the conversation to the address you set in Options and reads the streamed reply, and the token counts and price the service returns.</td><td><code>src/adapters/endpoint-runtime.ts</code></td><td>Follows no redirect. Plain <code>http</code> only for <code>localhost</code> and <code>127.0.0.1</code>.</td></tr>
+<tr><td>Model files: MLC format and GGUF</td><td>convention: formats of the MLC and llama.cpp projects</td><td>Downloads the weights you choose, once, from one fixed commit; GGUF files are checked against a recorded SHA-256.</td><td><code>src/adapters/webllm-app-config.ts</code>, <code>src/adapters/cpu-models.ts</code></td><td>Does not load a model file or address that you type. See MODEL-LICENCES.md.</td></tr>
+<tr><td>Web Cryptography API</td><td>standard: W3C Recommendation (Web Cryptography API)</td><td>SHA-256 of downloaded model files and of site files.</td><td><code>src/adapters/sha256.ts</code></td><td>Nothing else.</td></tr>
+<tr><td>Browser extension APIs (Manifest V3)</td><td>convention: Chrome's extension platform, also used by Chromium browsers</td><td>Side panel, offscreen document, scripting, storage. The five permissions are listed in STORE-LISTING.md.</td><td><code>static/manifest.json</code></td><td>Asks for no access to any site at install.</td></tr>
+</tbody></table></div>
+<h2 id="files-the-extension-can-read-but-does-not-use">Files the extension can read but does not use</h2>
+<p>Neither of the two nodes that were checked (agenticsystemcore.com and patterns.agenticsystemcore.com)
+publishes an API catalog or an agent card; for those two files the card says &quot;not published&quot;.
+The extension does not read, on purpose: VoID and DCAT files, a SPARQL service description, an MCP
+server card, OpenSearch descriptions, the IETF AI-preferences drafts, JSON Schema files of a site, chunk
+and TOON files, the skills index and the ledger. For each, either no fixed path exists, or the address
+would have to come from a file. Next-release candidates are in ../ROADMAP.md.</p>
+<h2 id="statements-this-page-does-not-make">Statements this page does not make</h2>
+<ul>
+<li>It does not say that the extension supports &quot;every standard&quot;. It says which files it reads.</li>
+<li>It does not say that WebMCP is a standard. The specification says it is not a W3C Standard and not
+on the W3C Standards Track.</li>
+<li>It does not say that a site, node or tool was checked against any of these documents.</li>
+</ul>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/webaiassist/standards.md">Propose an edit</a> — opens <code>site/webaiassist/standards.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a></span></p>
+</footer>
+</body>
+</html>

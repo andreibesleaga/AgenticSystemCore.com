@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WebAIAssist privacy — AgenticSystemCore</title>
+<meta name="description" content="The privacy notice of the WebAIAssist browser extension: what leaves the computer, what is stored, every host reached.">
+<link rel="canonical" href="https://agenticsystemcore.com/webaiassist/privacy/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/webaiassist/privacy/">
+<meta property="og:title" content="WebAIAssist privacy">
+<meta property="og:description" content="The privacy notice of the WebAIAssist browser extension: what leaves the computer, what is stored, every host reached.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"WebAIAssist privacy","description":"The privacy notice of the WebAIAssist browser extension: what leaves the computer, what is stored, every host reached.","url":"https://agenticsystemcore.com/webaiassist/privacy/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/webaiassist/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/" aria-current="page">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main" class="wide">
+<h1>WebAIAssist privacy</h1>
+<p class="summary"><strong>Summary</strong>What leaves your computer, every host the extension can reach, what it stores and how to remove it. Last updated 16 November 2026.</p>
+<p>Last updated 16 November 2026. This is the privacy notice of the WebAIAssist extension, version 0.1.0.</p>
+<blockquote>
+<p><strong>In short</strong></p>
+<ul>
+<li>WebAIAssist has no account, no analytics, no crash reports and no server of its own.</li>
+<li>With a model in the browser or Chrome's built-in model, no page text, chat or tool result leaves your computer.</li>
+<li>With a chat endpoint, the whole conversation goes to the address you set, with your API key if set. A remote service may charge; the panel asks once per host.</li>
+<li>Starting a model in the browser requests model files from Hugging Face. Nothing about you or the chat is sent, but the host sees your IP address.</li>
+<li>The activity log stays in this browser, up to 8 MiB. Question text and results are stored just when you switch on Include content (off at the start).</li>
+</ul>
+</blockquote>
+<p>WebAIAssist has no account, no analytics, no crash reports and no server of its own.</p>
+<h2 id="what-leaves-your-computer">What leaves your computer</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 1"><table>
+<thead><tr><th scope="col">When</th><th scope="col">What is sent</th><th scope="col">To</th></tr></thead>
+<tbody>
+<tr><td>You press Start with a model in the browser</td><td>Requests for the model weights and their small configuration files. Nothing about you, the page or the chat; the host sees your IP address and the model asked for. The model library (program code) is inside the extension and is never downloaded.</td><td><code>huggingface.co</code> (the <code>mlc-ai</code> repositories, one fixed revision per model), which redirects the large files to Hugging Face's download network under <code>hf.co</code> (see below). Once per model.</td></tr>
+<tr><td>You press Start with a model on the processor</td><td>The same: requests for one model file (<code>.gguf</code>) from one fixed address (the <code>unsloth</code> repositories, one commit each; size and SHA-256 are checked after the download). Nothing about you, the page or the chat. The engine (program code) is inside the extension.</td><td><code>huggingface.co</code>, which redirects the large file to <code>*.hf.co</code>. Once per model.</td></tr>
+<tr><td>You use Chrome's built-in model</td><td>Nothing from WebAIAssist: no request, to any host. Chrome downloads and runs its own model under Google's terms, and the prompt stays in the browser.</td><td>Chrome</td></tr>
+<tr><td>You choose a chat endpoint in Options</td><td>The whole conversation for each question: the instructions, the page's tool list, tool results, page text you read, the short facts from the site's published files (Options can turn them off), your questions, and the API key if set.</td><td>The endpoint address you set, and nowhere else</td></tr>
+<tr><td>You allow a site and open a page of it, or click the toolbar button on a page</td><td>Up to nine requests to that site only, for its public files: <code>/.well-known/knowledge-linkset</code>, <code>/llms.txt</code>, <code>/robots.txt</code>, <code>/.well-known/tdmrep.json</code>, <code>/.well-known/security.txt</code>, <code>/.well-known/api-catalog</code>, <code>/.well-known/agent-card.json</code>, <code>/llms-full.txt</code>, <code>/.well-known/sustainability-data</code>. GET only, no cookies, no referrer. The card lists what was found. A toolbar click on a page (Chrome's <code>activeTab</code>) starts the same reads for that tab, without Allow, until the tab closes or moves to another site.</td><td>Only that site, and only for the files listed</td></tr>
+<tr><td>A site asks for no AI input (<code>Content-Signal: ai-input=no</code>)</td><td>Nothing of the site's text or files goes to the model. Results of the site's own tools still go to the model you chose, and to an endpoint if that is the model.</td><td>The model you chose</td></tr>
+<tr><td>A tool runs on a page</td><td>Whatever that page's own tool code sends. WebAIAssist passes the arguments you saw and allowed; the page decides what its tool does.</td><td>The page's site</td></tr>
+</tbody></table></div>
+<p>With a model in the browser or Chrome's built-in model, no page text, chat or tool result leaves
+your computer.</p>
+<h2 id="every-host-the-extension-can-reach">Every host the extension can reach</h2>
+<p>The code of the release package can contact these hosts, and no others:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 2"><table>
+<thead><tr><th scope="col">Host</th><th scope="col">When</th><th scope="col">Why</th></tr></thead>
+<tbody>
+<tr><td><code>huggingface.co</code></td><td>Start with a model in the browser or on the processor, until it is cached</td><td>The model's configuration, tokenizer and weights. Small files come from <code>huggingface.co</code> itself (it redirects to its own <code>/api/resolve-cache/</code> address).</td></tr>
+<tr><td>Hugging Face's download network, <code>*.hf.co</code></td><td>The same download</td><td><code>huggingface.co</code> redirects large files (the tokenizer, the weight shards) there. On 12 Nov 2026 the host was <code>us.aws.cdn.hf.co</code>; Hugging Face picks the host by region and may change it (earlier names include <code>cas-bridge.xethub.hf.co</code> and <code>cdn-lfs.hf.co</code>). The request carries no data about you.</td></tr>
+<tr><td>The endpoint address you set (the presets: <code>localhost</code>, <code>127.0.0.1</code>)</td><td>A question, with a chat endpoint chosen in Options</td><td>The conversation, as described above. Redirects are refused, so it goes to that address only.</td></tr>
+<tr><td>Chrome (built-in model)</td><td>You choose Chrome's built-in model and press Start</td><td>Chrome downloads its model itself. WebAIAssist makes no request and has no address for it.</td></tr>
+<tr><td>The open page's own site</td><td>A tool you allowed runs, or you open a page of an allowed site or click the toolbar button on it (the nine files above)</td><td>The page's own tool code decides what it sends.</td></tr>
+<tr><td>A node you tick in the graph explorer</td><td>You press the Graph button, tick a node the open node names as a peer, and press Read the ticked nodes</td><td>Up to three published files of that node (its link set, <code>graph.jsonld</code>, <code>chunks.jsonl</code>), over https, without cookies or a referrer. It sees your IP address and that a browser asked. Nothing is read before the click.</td></tr>
+</tbody></table></div>
+<p>Chrome's built-in model is downloaded by Chrome, not by WebAIAssist. Other web addresses in the
+bundles are never fetched: <code>github.com</code> is a base address the schema validator uses to name
+schemas, <code>webgpureport.org</code> is part of an error message, <code>www.w3.org</code> is in a code comment,
+<code>w3id.org</code> and <code>www.rfc-editor.org</code> are names the extension compares a site's published files
+with (it never requests them), <code>purl.org</code>, <code>schema.org</code> and <code>www.w3.org</code> are identifiers of vocabularies inside the
+graph explorer's code and <code>github.com</code> is the address of force-graph's source in its header, and addresses such as <code>github.com</code> and
+<code>localhost:8080</code> appear in the comments of the model libraries (none of them is
+contacted, they are names, not contact points), <code>agenticsystemcore.com</code> is the address of the links &quot;Open the demo page, which offers tools&quot; and &quot;More at the AgenticSystemCore site&quot; in the panel (the extension never requests it; your browser opens it only when you click the link), and WebLLM's own model list names <code>huggingface.co</code> repositories of models this extension does not
+offer.</p>
+<h2 id="what-is-stored-and-where">What is stored, and where</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 3"><table>
+<thead><tr><th scope="col">What</th><th scope="col">Where</th><th scope="col">How long</th></tr></thead>
+<tbody>
+<tr><td>Options, including the endpoint address, model name and API key</td><td><code>chrome.storage.local</code> in this browser profile</td><td>Until you change them, press Reset to defaults, or remove the extension. The key is not encrypted.</td></tr>
+<tr><td>Sites whose tools you allowed in this session</td><td><code>chrome.storage.session</code></td><td>Until the browser restarts</td></tr>
+<tr><td>Sites you allowed (the list)</td><td><code>chrome.storage.local</code></td><td>Until you press Forget this site (that site) or Forget all sites</td></tr>
+<tr><td>Remote endpoint hosts you agreed to</td><td><code>chrome.storage.local</code></td><td>Until you press Forget all sites or Reset to defaults, or remove the extension</td></tr>
+<tr><td>Chat per site, with the tool results and the page text you read with Read this page (up to 4000 characters per read), and how often each tool worked per site (memory)</td><td>The extension's IndexedDB</td><td>Until you press Clear memory in Options or remove the extension. Nothing is kept when memory is off.</td></tr>
+<tr><td>The activity log: one entry per question (site, model, where it ran, counts of tokens, price when the service reports one, times, the tools called and whether you allowed them, an estimate of the window use). No question text, no argument values (the names are kept), no results and no error text unless you switch on Include content</td><td>The extension's own IndexedDB <code>webaiassist-activity</code></td><td>Until you press Clear in the Activity view, press Forget this site or Forget all sites, or remove the extension. The oldest entries go first above 8 MiB. Nothing is kept when memory is off.</td></tr>
+<tr><td>Model weights</td><td>The extension's Cache Storage (WebLLM's cache)</td><td>Until you remove them in Options (Downloaded models) or remove the extension</td></tr>
+<tr><td>Model file of the processor model</td><td>The extension's private file storage (wllama's cache)</td><td>Until you remove it in Options (Downloaded models) or remove the extension</td></tr>
+<tr><td>Whether the welcome screen was dismissed, and how long the first answer of your graphics card took</td><td><code>chrome.storage.local</code></td><td>Until you remove the extension; the time is a number with the adapter's name, used only to pick the default model</td></tr>
+<tr><td>The last error text the panel showed (addresses and the endpoint key removed, cut to 300 characters), and whether persistent storage was asked for</td><td><code>chrome.storage.local</code></td><td>Until the next error replaces it, or you remove the extension; used only by Copy diagnostics</td></tr>
+<tr><td>Compat mode for a site</td><td>A content script registered for that site</td><td>Until the browser restarts</td></tr>
+<tr><td>Access to a site (compat mode, endpoint)</td><td>Chrome's permission list for the extension</td><td>Until you remove it in <code>chrome://extensions</code>, under the extension's site access</td></tr>
+</tbody></table></div>
+<h2 id="downloaded-models">Downloaded models</h2>
+<p>Before the first download of any model weights the panel shows the size, the host they come from
+and that they are stored in this browser, and downloads nothing until you press Download. The
+Options page lists what is stored, with sizes, and removes one model or all. Chrome's own model is
+managed by Chrome (<code>chrome://on-device-internals</code>).</p>
+<h3 id="persistent-storage-size-and-updates">Persistent storage, size and updates</h3>
+<p>After the first successful download of weights into this browser (never at install) the panel
+calls <code>navigator.storage.persist()</code> once. That asks Chrome not to clear the downloads when disk
+space runs low; Chrome decides, and the panel does not say whether it agreed. Options shows the
+total size of the downloaded models beside <strong>Remove downloaded models</strong>.</p>
+<p>What an update does to the downloads: an update keeps the extension's address
+(<code>chrome-extension://&lt;id&gt;</code>), so its Cache Storage and private file storage are the same ones
+afterwards. Chrome's documentation (storage page, read 14 Nov 2026) does not say in so many words
+that this storage survives an update or an uninstall, and this was not tested here; treat
+removal at uninstall as likely and survival of an update as expected, not guaranteed. What the
+code does decide: the graphics-card models are looked up by the exact files of the pinned
+revision, and the processor models by file address and recorded size. If an update pins a new
+revision of a model, the new files download again (the panel asks first) and the old files stay
+in the cache, not listed by Options, until the extension is removed or its data is cleared. This
+case has not happened yet.</p>
+<h2 id="copy-diagnostics">Copy diagnostics</h2>
+<p><strong>Copy diagnostics</strong> (Options, and &quot;More&quot; in the panel) first shows a preview of exactly what will
+be copied, and copies it only on a second click. It holds: the extension version, the browser
+version, the chosen model and where it runs, the graphics adapter's vendor and architecture and
+whether it has <code>shader-f16</code>, the state of Chrome's built-in model, whether the open tab has WebMCP,
+and the last error text. It holds no page text, no page title, no address (the open site's host
+only if you tick the box), and no key. Nothing is sent anywhere: you paste it yourself.</p>
+<p><strong>Copy details</strong> on an error message copies the extension version and the error text, with web addresses and the
+API key removed.</p>
+<h2 id="forget-all-sites">Forget all sites</h2>
+<p><strong>Forget all sites</strong> in Options removes every saved chat and tool count, every &quot;use the tools of
+this site&quot; answer, the list of sites you allowed, the list of remote endpoint hosts you agreed to, every
+compat script and every site access you granted, except the host access of your chat endpoint. <strong>Reset to
+defaults</strong> also clears the list of remote endpoint hosts and removes the endpoint's host access, unless
+the same host is also a site you allowed.
+<strong>Forget this site</strong> (below) does the same for the open site, except the endpoint lists.</p>
+<h2 id="forget-this-site">Forget this site</h2>
+<p><strong>Forget this site</strong> in the panel removes, for the open site: its chat and tool counts, the
+&quot;use the tools of this site&quot; answer of this session, the site's place in the list of sites you allowed, compat
+mode, and the site access you granted. The panel then neither lists nor calls that site's tools until you
+allow it again, even in tabs already open. Clear memory in Options removes the chat and counts of every site.</p>
+<h2 id="export">Export</h2>
+<p><strong>Export</strong> in the panel saves the conversation as a Markdown file on your computer, only when you
+press it. It starts with a short block that marks the text as AI-generated (<code>ai-generated: true</code>, the extension version, the model and where it ran) and says so in a sentence: a local model, or the endpoint host when an endpoint wrote the answers. It contains your questions, the answers, the tool calls and the tool results (marked as
+untrusted page content). Argument values whose names look like secrets (password, token, API key,
+auth, bearer, private key, session, cookie, credential) are replaced with <code>[redacted]</code>, and so is
+the endpoint API key wherever it appears, even in text you typed.</p>
+<h2 id="a-remote-chat-endpoint-openrouter-and-similar">A remote chat endpoint (OpenRouter and similar)</h2>
+<ul>
+<li><strong>Where the model runs.</strong> The OpenRouter preset is <code>https://openrouter.ai/api/v1</code>; any other
+<code>https</code> address works the same way. An address on this computer (<code>localhost</code>, <code>127.0.0.1</code>) keeps the chat on
+it. Any other address is a remote service: the model runs there, and your questions, the
+page's tool list, tool results and any page text you read go to that host. The service may
+charge for it and may keep what it receives under its own terms; WebAIAssist cannot see or change
+that.</li>
+<li><strong>One question first.</strong> Before a remote host is used for the first time, the panel says so in
+plain words and waits for <strong>Use this service</strong>. Nothing is sent before. The answer is kept per
+host in <code>chrome.storage.local</code> (the list of hosts you agreed to); a different host asks again.
+An address on this computer never asks. A site that asks for no AI input has its page text and site
+files withheld; its tool list and the results of its tools you allow still go to the model you chose,
+including a remote endpoint.</li>
+<li><strong>Access.</strong> Saving a remote address asks Chrome, from the Save click, for access to that one host
+(an optional permission; it is not granted at install). That access is for the chat only: the toolbar
+number, the automatic tool listing and the nine file reads happen only on sites you allowed. A
+first connection that takes longer than 15 seconds fails, and a reply that sends no data for 60 seconds
+stops; an error body is read only up to 2 KB.</li>
+<li><strong>What is sent besides the chat.</strong> Only <code>Authorization: Bearer &lt;key&gt;</code> (when you set a key) and
+<code>Content-Type</code>. No app name, referrer or other identifying header is sent. The request asks the
+service to include token counts (<code>stream_options.include_usage</code>).</li>
+<li><strong>The key</strong> stays in <code>chrome.storage.local</code>, unencrypted. It is never in the export, an error text or the activity log; text you type into the chat is saved as you
+typed it, and so is a key you paste there. A service's error text is cut to 200 characters and has the key
+and bearer-shaped strings removed before it is shown.</li>
+<li><strong>What is read back.</strong> The reply text, and the token counts and price the service reports for
+the call. They are kept in the activity log in this browser and shown in its Activity view; nothing
+is sent anywhere.</li>
+</ul>
+<h2 id="the-graph-explorer-tab-14-nov-2026">The graph explorer tab (14 Nov 2026)</h2>
+<p>The &quot;Graph: N items&quot; button on the card opens <code>explorer.html</code> in a new tab. The tab reads the open
+node's <code>/.well-known/knowledge-linkset</code>, <code>/graph.jsonld</code> and, when you select an item, <code>/chunks.jsonl</code>
+through the tab you opened it from, the same way the panel reads the nine site files: only for an
+allowed site, with no cookie and no referrer, and nothing is sent anywhere else. The explorer keeps one
+thing: the width you give its side list, as <code>agsc-graph-panel</code> in this page's local storage (a number).
+Other nodes are read only after you tick them and press the button (see the host table above); a node is
+checked by its name (a public name, port 443), not by the address the name resolves to; the
+ticked origins are kept in memory for the life of the tab and are never stored.</p>
+<h2 id="query-and-semantic-tools-14-nov-2026">Query and semantic tools (14 Nov 2026)</h2>
+<p>The Query tab and the model's graph tool read two more files of the open node through the same tab, the same way,
+and only for an allowed site: <code>/graph.nq</code> (at most 4 MiB) and, when you open the Vocabulary tab, <code>/ns/agsc.ttl</code>
+(at most 1 MiB). Each is used only when the node's linkset names it with a SHA-256 digest and the bytes match it.
+The questions are answered by a SPARQL engine inside the extension (Oxigraph, WebAssembly, from the package): the
+query text and the rows never leave the computer, and a query cannot ask any address (<code>SERVICE</code> is refused, a
+<code>FROM</code> address is only the name of a graph in the store). Nothing is stored: the graph lives in the memory of the
+query worker and is dropped when the tab or the panel moves to another site. The text of a query, and the rows the
+model reads, go where the model runs: the same rule as every other tool result, including the one-time question
+before a remote chat service gets page content.</p>
+<h2 id="the-activity-log-14-nov-2026">The activity log (14 Nov 2026)</h2>
+<p>Every question you ask in the panel adds one entry to a log that stays in this browser and is sent nowhere. The
+<strong>Activity log</strong> button in the panel's More area opens <code>explorer.html</code> on the Activity view; it works on any page,
+not only on a node.</p>
+<ul>
+<li><strong>What is stored.</strong> The time, the site, the model, where it ran (graphics card, processor, Chrome's model, your
+own server or a remote service, with the host for the last two), the number of model calls, the tokens
+(counted by the runtime when it reports them, otherwise estimated from the text and then marked &quot;estimated&quot;),
+the price when the service reported one, the times, how the answer ended, and for every tool call: its name,
+whether it is a tool of WebAIAssist, whether you were asked and what you answered, how long it took, whether it
+worked, and the sizes of its arguments and result. The context numbers (instructions, tool list, site text, chat,
+reply) are estimates. The text of a page you read is never stored, only counted.</li>
+<li><strong>What is stored whatever the setting.</strong> The names of a tool's arguments, and whether a call worked or failed.</li>
+<li><strong>What is not stored by default.</strong> The question, the argument values, the tool results and the error text of a
+failed call (the entry says only &quot;failed&quot;). They are kept only
+while <strong>Include content</strong> is on (off at the start; the switch is in the Activity view and applies to new
+entries only). Even then the endpoint API key is removed wherever it appears, argument values whose names look like
+secrets become <code>[redacted]</code>, results are cut to 4,000 characters and arguments over 4,000 characters are dropped.</li>
+<li><strong>Where.</strong> An IndexedDB database of the extension, <code>webaiassist-activity</code>. It is a separate database from the
+chat memory, so removing one does not touch the other. It needs no permission beyond the ones the extension has.</li>
+<li><strong>How much.</strong> At most 8 MiB. When a new entry would pass the cap the oldest entries are removed first; the newest
+is never removed.</li>
+<li><strong>How to clear it.</strong> <strong>Clear</strong> in the Activity view (it asks first, inside the page); <strong>Forget this site</strong> in the
+panel removes the entries of that site; <strong>Forget all sites</strong> removes all of them; turning memory off in Options keeps
+nothing new. Removing the extension removes the database.</li>
+<li><strong>Export.</strong> <strong>Export JSON</strong> and <strong>Export CSV</strong> save what the filters show, only when you press them. The CSV puts an
+apostrophe before a cell that starts with <code>=</code>, <code>+</code>, <code>-</code>, <code>@</code>, a tab or a line break, so a spreadsheet does not read
+a model name or tool name as a formula.</li>
+<li><strong>Run again.</strong> The button next to a past tool call asks the same question as the side panel (the full arguments
+with hidden characters shown, review findings, hints, form lines, and a second question for a tool the page
+marks consequential) and runs the tool only after Allow, only when the site is allowed in this session, only in
+the tab the Activity view was opened for and only when the page still lists the same tool. It is offered only
+where the arguments were saved, and never with redacted or removed arguments.</li>
+</ul>
+<h2 id="tool-review-and-the-toolbar-number-14-nov-2026">Tool review and the toolbar number (14 Nov 2026)</h2>
+<p>The tool review (TOOL-REVIEW.md) reads what a page wrote about its tools (name, title,
+description, fields, hints) inside this browser. It makes no request and sends nothing. The first definition of
+each tool, used to notice a later change, is kept in the panel's memory only and is gone when the panel closes.</p>
+<p>The number on the toolbar icon is the count of tools the open page offers. It is read only for a site you
+allowed, uses no new permission, and is stored nowhere.</p>
+<p>A tool you run by hand from its detail view goes through the same questions as a call by the model, and is
+written to the activity log as one entry marked &quot;Run by hand (no model)&quot;, under the same rules as a question.</p>
+<h2 id="chrome-web-store-limited-use">Chrome Web Store: Limited Use</h2>
+<p>The use of information received from Google APIs will adhere to the Chrome Web Store User Data Policy,
+including the Limited Use requirements.</p>
+<p>In plain words: WebAIAssist uses what it reads (the open page's tools, the site's public files, page text
+you ask it to read) only to answer your question. It goes only to the model you chose. Nothing is sent to
+the developer, sold, used for advertising or for credit decisions, and no person reads it.</p>
+<h2 id="conformance-page-and-demo-pages">Conformance page and demo pages</h2>
+<p>The conformance page (<code>conformance/</code>) is not part of the extension and sends nothing. The one host
+<code>googlechromelabs.github.io</code> is an install-time host permission of the evaluation build made with
+<code>--demos</code> only; the released extension has no install-time host and contacts a site only after you
+allow it.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/webaiassist/privacy.md">Propose an edit</a> — opens <code>site/webaiassist/privacy.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a></span></p>
+</footer>
+</body>
+</html>
