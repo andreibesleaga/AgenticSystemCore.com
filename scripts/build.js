@@ -112,6 +112,7 @@ const enginePageTools = engineModule('src/distribution/page-tools.js');
 const engineWebmcp = engineModule('src/distribution/webmcp.js');
 const engineComposePage = engineModule('src/distribution/compose-page.js');
 const engineTheme = engineModule('src/distribution/theme.js');
+const engineHeaders = engineModule('src/distribution/headers.js');
 const engineSurfaces = engineModule('src/boundary/surfaces.js');
 // How many tools the engine's tool server and page tools offer, as a word for the prose of the pages:
 // derived from the engine's own list, never typed (ten at specification 1.1).
@@ -1143,7 +1144,7 @@ const PLAIN = Object.fromEntries(specPages.map(p => [p.slug, engineFile(`docs/pl
 const SPEC_DIAGRAM = { '00-overview': 'spec-00-conformance', '01-bundle': 'spec-01-bundle', '02-item': 'spec-02-item', '03-links': 'spec-03-links', '04-canonicalization': 'spec-04-canonicalization', '05-graph': 'spec-05-graph', '06-surfaces': 'spec-06-surfaces', '07-composition': 'spec-07-composition', '08-governance': 'spec-08-governance', '09-conformance': 'spec-09-conformance', '10-implementation-profiles': 'spec-10-profiles', '11-boundary': 'spec-11-boundary' };
 
 // ------------------------------------------------------------------ HTML layout
-const NAV = [['/docs/', 'Guide'], ['/specs/', 'Specification'], ['/concepts/', 'Vocabulary'], ['/ns/', 'Ontology'], ['/specs/agentic-knowledge/', 'Discovery'], ['/query/', 'Query'], ['/docs/standards/', 'Standards'], ['/about/', 'About'], ['/search/', 'Search']];
+const NAV = [['/docs/', 'Guide'], ['/specs/', 'Specification'], ['/concepts/', 'Vocabulary'], ['/ns/', 'Ontology'], ['/specs/agentic-knowledge/', 'Discovery'], ['/query/', 'Query'], ['/docs/standards/', 'Standards'], ['/webaiassist/', 'WebAIAssist'], ['/about/', 'About'], ['/search/', 'Search']];
 const summaryOf = url => { const s = SUMMARIES[url]; if (!s) die(`no summary for ${url} (site/summaries.json)`); return s; };
 // The preview card of a shared link (The Open Graph protocol, ogp.me): assets/og-card.png, a plain
 // text card drawn by scripts/og-card.js, whose CARD.alt is the text the image shows. Every page with
@@ -1354,9 +1355,11 @@ const MEASURES = [
   ['Build scale', `${num(perfRow(5000).items)} items built in ${(perfRow(5000).ms_median / 1000).toFixed(1)} s, ${num(perfRow(10000).items)} in ${(perfRow(10000).ms_median / 1000).toFixed(1)} s (median of three runs, one machine); ${perfRow(10000).html_over_budget} pages over the 100 KB budget`, ML.perf.command],
   ['Tokens per chunk', `median ${ML.tokens.nodes.main.vocabularies.cl100k_base.chunks_text.median} tokens per chunk of this site's chunk export (cl100k_base)`, ML.tokens.command],
 ];
+// The home page offers the page tools too (as every item and guide page does): it is the page a
+// visitor with a browser assistant opens first.
 addPage('/', {
   title: config.site.title, summary: summaryOf('/'), description: index.fm.description, section: null,
-  scripts: GX_SCRIPTS, styles: GX_STYLES,
+  scripts: [...GX_SCRIPTS, ...PAGE_TOOL_SCRIPTS], styles: GX_STYLES,
   jsonld: { '@context': 'https://schema.org', '@type': 'WebSite', name: config.site.title, url: BASE, description: index.fm.description, author: { '@type': 'Person', name: config.site.author, sameAs: ['https://orcid.org/0009-0001-3464-5283'] } },
   body: `<p class="lead">AgenticSystemCore turns a folder of plain text notes (Markdown text files) into a website, a knowledge graph and a set of tools for AI assistants, all at once. Every link says what kind of link it is, every published file carries a fingerprint (a digest) that anyone can check, and every change is approved by a person or by a rule that person wrote down. People, search engines and AI agents read the same checked knowledge, and no server, database or language model is needed to build, check or publish it.</p>
 ${GX_EMBED}<ul>
@@ -1903,7 +1906,7 @@ put('compose/webmcp.js', engineWebmcp.script());
     title: 'Compose', summary: summaryOf('/compose/'), description: `Select items and compute a Harness and its brief in this page — no server, no key, no upload; the same ${tools} tools a browser assistant sees.`, section: null,
     scripts,
     jsonld: { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Compose', url: `${BASE}compose/`, applicationCategory: 'DeveloperApplication', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' }, author: { '@type': 'Person', name: config.site.author } },
-    body: `${view.body.slice(0, first)}<p>This page also offers the ${tools} tools of ${REF('AGSC-09-13')} to a browser assistant that supports them, as every item and guide page does. See <a href="/about/#tools-for-browser-assistants">Tools for browser assistants</a>.</p>\n${view.body.slice(first)}`,
+    body: `${view.body.slice(0, first)}<p>This page also offers the ${tools} tools of ${REF('AGSC-09-13')} to a browser assistant that supports them, as the home page and every item and guide page do. See <a href="/about/#tools-for-browser-assistants">Tools for browser assistants</a>.</p>\n${view.body.slice(first)}`,
   });
 }
 
@@ -1940,7 +1943,7 @@ const statusRows = [
   ['Reference engine <code>agsc</code>', 'Published', 'The engine is written, and it builds this site: every machine-readable file here is emitted by <code>agsc build</code> over this repository&#39;s own content. Its packages are in the next row.' + (regText.software ? ' ' + regText.software : '')],
   ['Packages on npm and PyPI', 'Published', 'The engine as <a href="https://www.npmjs.com/package/agentic-system-core"><code>agentic-system-core</code></a> on npm, with the short alias <a href="https://www.npmjs.com/package/agsc-cli"><code>agsc-cli</code></a>; the Python checker and reader as <a href="https://pypi.org/project/agentic-system-core/"><code>agentic-system-core</code></a> on PyPI. Each version of the specification is published as the package version of the same number, from its release tag, after this site; a registry&#39;s page shows the latest version published.'],
   ['Local MCP tool server', 'Published', `<code>agsc mcp</code> serves a Bundle to an assistant on the same machine, over stdio or, with <code>--http &lt;port&gt;</code>, over Streamable HTTP on the loopback address only, speaking MCP revision <code>${esc(engineSurfaces.MCP_PROTOCOL_VERSION)}</code>${engineSurfaces.MCP_STDIO_REVISIONS.length > 1 ? ` (over stdio also ${engineSurfaces.MCP_STDIO_REVISIONS.filter(r => r !== engineSurfaces.MCP_PROTOCOL_VERSION).map(r => `<code>${esc(r)}</code>`).join(', ')}, the revision most assistants still send, ${REF('AGSC-09-19')})` : ''}: ${WORD[TOOL_NAMES.length]} tools (${TOOL_NAMES.map(n => `<code>${esc(n)}</code>`).join(', ')}), the items, <code>graph.jsonld</code> and <code>llms.txt</code> as read-only resources, and one prompt (${REF('AGSC-09-14b')}). Listed in the MCP Registry as <code>${esc(SERVER_JSON.name)}</code>, and in the Glama MCP directory.`],
-  ['WebMCP page tools', 'Experimental', `The same ${WORD[TOOL_NAMES.length]} tools, offered to an assistant running in the visitor&#39;s browser on every item and guide page and on <a href="/compose/">/compose/</a>, declared in the discovery document as the <code>webmcp</code> surface with the access class <code>consent</code> (${REF('AGSC-11-16')}). WebMCP is a draft report of a W3C Community Group, and a browser runs the tools only where it supports that draft: see <a href="/about/#tools-for-browser-assistants">tools for browser assistants</a>.`],
+  ['WebMCP page tools', 'Experimental', `The same ${WORD[TOOL_NAMES.length]} tools, offered to an assistant running in the visitor&#39;s browser on the home page, every item and guide page and on <a href="/compose/">/compose/</a>, declared in the discovery document as the <code>webmcp</code> surface with the access class <code>consent</code> (${REF('AGSC-11-16')}). WebMCP is a draft report of a W3C Community Group, and a browser runs the tools only where it supports that draft: see <a href="/about/#tools-for-browser-assistants">tools for browser assistants</a>.`],
   ['Agent skill', 'Published', 'A <a href="/agent-skill/agentic-system-core/SKILL.md"><code>SKILL.md</code></a> in the Agent Skills format, with two reference files, that teaches a coding agent the six modes; the engine repository ships the same files as a Claude Code plugin with a plugin marketplace file. How to install it: <a href="/docs/agent-skill/">the agent skill page</a>.'],
   ...(PRERELEASE(SPEC_VERSION) ? [] : [['Reference engine conformance claim', 'Published', `The reference engine claims Level 3 against specification <code>${esc(SPEC_VERSION)}</code>, the full engine (${REF('AGSC-10-05')}): the claim, with the cases it passed, is in <a href="${esc(CLAIM_URL)}">its conformance statement</a>.`]]),
   ['Independent validators', 'Published', `The eleven checker contracts of ${REF('AGSC-09-90')} &#8212; seven validators and four generators &#8212; ship in the published npm package beside its artefact counter and its benchmark tool; the maintainer&#39;s own tools stay in the repository. One validator, for the discovery document, checks this site at Level 2 before every publish.`],
@@ -2040,6 +2043,40 @@ for (const f of DOCS) {
     scripts: PAGE_TOOL_SCRIPTS,
     jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: fm.title, description: fm.description, url: ORIGIN + url, author: { '@type': 'Person', name: config.site.author }, isPartOf: `${BASE}docs/` },
     body: md(body, { ...o, slots }) + editLink('site', `site/docs/${f}`),
+  });
+}
+// WebAIAssist (site/webaiassist/*.md): the page of the browser extension of this project and the five
+// pages it links, four plain pages and the privacy notice, mirrored from the extension's docs/.
+// The repository address below is the ONE place it is written; the owner confirms it at release.
+// In site/webaiassist/index.md the address is written as https://repo.invalid; the build replaces it with this value.
+const WEBAIASSIST_REPO = 'https://github.com/andreibesleaga/webaiassist';
+const WEBAIASSIST_WIDE = new Set(['standards', 'privacy']);
+// The pictures of the extension page (site/webaiassist/img/*.png), copied from the extension's
+// docs/images/ as they are: taken by its browser tests with a scripted model. They are the only
+// pictures this site publishes besides the icon and the preview card; scripts/check.js accepts
+// exactly this folder, as PNG, each under 150 KB. The page source holds the line
+// WEBAIASSIST-PICTURES where they go. [file, width, height, alt, caption]
+const WEBAIASSIST_SHOTS = [
+  ['panel-tools', 400, 860, 'The side panel lists five tools of the page, each marked reads or changes.', 'The tools a page offers'],
+  ['panel-question', 400, 860, 'A dialog asks whether to run the tool propose, with the site, a warning and the exact arguments.', 'The question before a call'],
+  ['panel-answer', 400, 1180, 'The conversation shows the call, the result marked as from the page, and the answer marked AI.', 'The answer, with the tool result'],
+  ['tool-review', 400, 860, 'Tools with a finding are marked check, with the reason in words.', 'The tool review'],
+  ['explorer-graph', 960, 760, 'The explorer tab draws the knowledge graph of the node.', 'The graph of a node'],
+  ['explorer-query', 960, 760, 'A read-only SPARQL query and its result table.', 'A query over the graph'],
+  ['activity-log', 960, 760, 'One line for each question: tool calls, tokens, price and time.', 'The activity log'],
+];
+const webaiassistShots = () => `<div class="shots">${WEBAIASSIST_SHOTS.map(([f, w, h, alt, cap]) =>
+  `<figure class="shot"><img src="/webaiassist/img/${f}.png" width="${w}" height="${h}" alt="${esc(alt)}" loading="lazy"><figcaption>${esc(cap)}</figcaption></figure>`).join('')}</div>`;
+for (const [f] of WEBAIASSIST_SHOTS) put(`webaiassist/img/${f}.png`, fs.readFileSync(path.join(ROOT, 'site/webaiassist/img', `${f}.png`)));
+for (const f of fs.readdirSync(path.join(ROOT, 'site/webaiassist')).filter(f => f.endsWith('.md') && f !== 'README.md').sort()) {
+  const slug = f === 'index.md' ? '' : f.replace(/\.md$/, ''), url = `/webaiassist/${slug}${slug ? '/' : ''}`;
+  const { fm, body } = splitFrontmatter(read(`site/webaiassist/${f}`), `site/webaiassist/${f}`);
+  for (const k of ['title', 'summary', 'description']) if (!fm[k]) die(`site/webaiassist/${f}: ${k} missing`);
+  addPage(url, {
+    title: fm.title, summary: fm.summary, description: fm.description, section: '/webaiassist/', wide: WEBAIASSIST_WIDE.has(slug),
+    scripts: PAGE_TOOL_SCRIPTS,
+    jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: fm.title, description: fm.description, url: ORIGIN + url, author: { '@type': 'Person', name: config.site.author }, isPartOf: `${BASE}webaiassist/` },
+    body: md(body.split('https://repo.invalid').join(WEBAIASSIST_REPO), { ruleLinks: true, page: `webaiassist/${slug}`, used: new Set(['main']), tables: { n: 0 } }).replace('<p>WEBAIASSIST-PICTURES</p>', webaiassistShots()) + editLink('site', `site/webaiassist/${f}`),
   });
 }
 FEATURES.forEach((f, k) => {
@@ -2364,7 +2401,7 @@ ${rows.map(([r, t, w]) => `<tr><td><a href="${r.replace(/&lt;slug&gt;/, 'bundle'
 <h2 id="query">Questions in SPARQL</h2>
 <p>The graph above can be asked a question in SPARQL 1.1 on <a href="/query/">the query page</a>, in the visitor's browser: the page loads <code>/graph.nq</code> into a query engine compiled to WebAssembly, sends nothing anywhere and stores nothing; it offers the ten questions of the graph as examples (${REF('AGSC-06-39')}, ${REF('AGSC-05-34')}). The same answers come from any SPARQL 1.1 store loaded with <code>/graph.nq</code>.</p>
 <h2 id="in-the-page">Tools inside the page</h2>
-<p>Every item page and every guide page of this site also offers ${TOOL_COUNT} tools to an assistant running in the visitor's browser: ${engineSurfaces.TOOL_NAMES.slice(0, -1).join(', ')} and ${engineSurfaces.TOOL_NAMES[engineSurfaces.TOOL_NAMES.length - 1]}. They read only the files above, contact no other host, carry no key and write nothing. <a href="/about/#tools-for-browser-assistants">How they work</a>, and <a href="/compose/">the page that uses them</a>.</p>
+<p>The home page, every item page and every guide page of this site also offer ${TOOL_COUNT} tools to an assistant running in the visitor's browser: ${engineSurfaces.TOOL_NAMES.slice(0, -1).join(', ')} and ${engineSurfaces.TOOL_NAMES[engineSurfaces.TOOL_NAMES.length - 1]}. They read only the files above, contact no other host, carry no key and write nothing. <a href="/about/#tools-for-browser-assistants">How they work</a>, and <a href="/compose/">the page that uses them</a>.</p>
 `,
   });
 }
@@ -2552,7 +2589,12 @@ const CSP = "default-src 'none'; script-src 'self'; style-src 'self'; img-src 's
 addHeaders('/*', 'X-Content-Type-Options: nosniff', 'X-Frame-Options: DENY', 'Referrer-Policy: strict-origin-when-cross-origin',
   `Content-Security-Policy: ${CSP}`,
   'Permissions-Policy: interest-cohort=()');
-addHeaders('/', `Link: <${WELLKNOWN}>; rel="describedby"; type="application/linkset+json"`);
+// The `Link` field of `/`: the `describedby` link of AGSC-06-25 first, then the FAIR Signposting
+// links a Level 2 node sends (AGSC-06-40): cite-as, type, describedby, item, license, linkset. The
+// value is the ENGINE's (`homeLinkField`), given the routes this site emits, so it is the same
+// field an engine-built node sends; scripts/check.js checks each target against the built files.
+const HOME_LINK_ROUTES = ['/index.html', '/legal/index.html', '/graph.jsonld', '/graph.nq', '/graph.ttl', '/chunks.jsonl'];
+addHeaders('/', `Link: ${engineHeaders.homeLinkField(config, HOME_LINK_ROUTES)}`);
 // The graph explorer's two pages read other nodes' published files, so on those two addresses, and
 // only there, `connect-src` is wider; every other directive, and every other address, keeps the
 // policy above. `! Content-Security-Policy` removes the policy the `/*` block set (the host applies
