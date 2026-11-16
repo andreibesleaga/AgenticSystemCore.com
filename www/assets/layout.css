@@ -134,7 +134,8 @@ a.rule { font-size: 0.75rem; border-color: transparent; padding-left: 0; padding
 span.id { font-size: 0.75em; white-space: nowrap; }
 h1 .id { font-weight: 400; vertical-align: middle; margin-left: 0.25em; }
 /* The pictures of the WebAIAssist page: they shrink with the column and wrap side by side. */
-.shots { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
-.shot { margin: 0; flex: 0 1 18rem; }
-.shot img { max-width: 100%; height: auto; border: 1px solid currentcolor; }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); gap: 1rem; margin: 1rem 0; }
+.shot { margin: 0; }
+.shot a { display: block; }
+.shot img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain; border: 1px solid currentcolor; }
 .shot figcaption { font-size: 0.875em; }
