@@ -82,8 +82,8 @@ What a tool really does is the page's own code. The extension cannot check it.
 
 ## What WebAIAssist does not do
 
-- It is a WebMCP client. It is not an MCP client: it does not speak the Model Context Protocol to
-  servers.
+- It does not speak the Model Context Protocol to servers. It is a client of WebMCP, the tools a page
+  registers in the browser, and not an MCP client.
 - It is not an official WebMCP extension and it is not from Google.
 - It does not register tools on a page, click, fill in forms or navigate by itself.
 - It does not make a tool safe. It makes every call visible and optional.
