@@ -26,6 +26,7 @@ The specification is written for implementers and is exact by design. This guide
 | [How to use it](/docs/how-to-use/) | The first commands for each mode and each kind of user — one person, one agent, many participants — the scenarios, the configuration switches, the hooks for agents and tools, and what the current version does not ship |
 | [Guides](/docs/guides/) | Seven short guides, one per mode and one for publishing, on your own files: who it is for, what you get, the commands and the lines they print — kept true by a test |
 | [Agent skill](/docs/agent-skill/) | One skill file that teaches a coding agent to use the engine in every mode, and how to install it |
+| [WebAIAssist](/webaiassist/) | The browser client of this project: a chat in the side panel with a model on your own computer that uses the tools a page offers through WebMCP; what leaves the computer, the limits and how to install it |
 | [Demos](/docs/demos/) | Every mode as a five-minute demo, with the personas it serves: the commands, the printed lines, what each proves — the short form of the engine's tested demos page |
 | [How it works](/docs/how-it-works/) | The build, the proposal lifecycle, discovery, import and export, determinism, safety |
 | [Data model](/docs/data-model/) | The six item types, the fourteen links, clusters, sources, provenance |

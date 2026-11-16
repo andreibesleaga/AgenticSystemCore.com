@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What the extension reads from a site and why — AgenticSystemCore</title>
+<meta name="description" content="What WebAIAssist reads from a site, why, what stays in the browser and what can leave.">
+<link rel="canonical" href="https://agenticsystemcore.com/webaiassist/what-the-extension-reads/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/webaiassist/what-the-extension-reads/">
+<meta property="og:title" content="What the extension reads from a site and why">
+<meta property="og:description" content="What WebAIAssist reads from a site, why, what stays in the browser and what can leave.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"What the extension reads from a site and why","description":"What WebAIAssist reads from a site, why, what stays in the browser and what can leave.","url":"https://agenticsystemcore.com/webaiassist/what-the-extension-reads/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/webaiassist/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/" aria-current="page">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>What the extension reads from a site and why</h1>
+<p class="summary"><strong>Summary</strong>The public files WebAIAssist reads from a site you allowed, why it reads each, what stays in the browser and what can leave.</p>
+<blockquote>
+<p><strong>In short</strong></p>
+<ul>
+<li>WebAIAssist reads a short, fixed list of things a site publishes about itself, to show you what the site offers and to give the model a few facts.</li>
+<li>It reads them for a site you allowed, or after you click the toolbar button on that page. Nothing is read in the background or from other tabs.</li>
+<li>Requests go to the open site as a plain GET with no cookies and no referrer, and no redirect is followed.</li>
+<li>With a model in the browser or Chrome's built-in model, your questions, page text and tool results stay on your computer. A remote chat endpoint receives them.</li>
+<li>It does not read your cookies, other tabs, your history or files on your computer.</li>
+</ul>
+</blockquote>
+<p>WebAIAssist reads a short, fixed list of things that a site publishes about itself. It reads them to
+show you what the site offers and to give the model a few facts, so the model asks the page's
+tools instead of guessing. Each thing it reads is in the <a href="/webaiassist/standards/">standards table</a>, with its
+status.</p>
+<h2 id="when-it-reads">When it reads</h2>
+<ul>
+<li>Only for a site you allowed. Pressing <strong>Allow</strong> in the panel asks Chrome for access to that one
+site. At install the extension has access to no site.</li>
+<li>Or after you click the toolbar button on a page. Chrome then lets the extension work on that tab
+until it closes or moves to another site.</li>
+<li>Nothing is read in the background, for pages you did not open, or for other tabs.</li>
+</ul>
+<h2 id="what-it-reads">What it reads</h2>
+<p>All requests go to the open site only, as a plain GET with no cookies and no referrer. Each reply is
+size-limited and must have the expected type.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 1"><table>
+<thead><tr><th scope="col">What</th><th scope="col">Why</th><th scope="col">What you see</th><th scope="col">What the model gets</th></tr></thead>
+<tbody>
+<tr><td>The page's WebMCP tools</td><td>These are the only actions the model can ask for.</td><td>Each tool, what it does, read-only or not.</td><td>The tool list, as untrusted data.</td></tr>
+<tr><td><code>/.well-known/knowledge-linkset</code></td><td>A site's own list of its machine-readable files; marks an AgenticSystemCore node.</td><td>Version, counts, relation names, &quot;matches the node's own list&quot; chip.</td><td>Up to 20 same-site rows (relation, path, label).</td></tr>
+<tr><td><code>/llms.txt</code></td><td>The site's own summary for AI tools.</td><td>Title, link counts.</td><td>Title, summary, section names and link titles.</td></tr>
+<tr><td><code>/llms-full.txt</code></td><td>Shows that a longer version exists.</td><td>That it exists, and its size.</td><td>Nothing.</td></tr>
+<tr><td><code>/robots.txt</code></td><td>Honours the site's AI-input choice (<code>Content-Signal</code>).</td><td>The choice.</td><td>Nothing. If <code>ai-input=no</code>, no site text goes to the model.</td></tr>
+<tr><td><code>/.well-known/tdmrep.json</code></td><td>Shows whether the site reserves text-and-data-mining rights.</td><td>A policy line.</td><td>Nothing.</td></tr>
+<tr><td><code>/.well-known/security.txt</code></td><td>Shows the site's security contact.</td><td>The first contact; &quot;expired&quot; when so.</td><td>Nothing.</td></tr>
+<tr><td><code>/.well-known/api-catalog</code>, <code>/.well-known/agent-card.json</code></td><td>Shows what APIs and agent skills the site lists.</td><td>Counts and names. Many sites publish neither.</td><td>Nothing.</td></tr>
+<tr><td><code>/.well-known/sustainability-data</code></td><td>Shows the site's own energy and carbon statement.</td><td>Provider, method, period, values; &quot;signed&quot; shown only as present.</td><td>Nothing.</td></tr>
+<tr><td>The page's own data: JSON-LD, Open Graph, <code>&lt;link rel&gt;</code></td><td>What the page says about itself.</td><td>Type, name, description, date, licence, creator.</td><td>A short line, as untrusted data.</td></tr>
+<tr><td>A node's graph, ontology and chunks (explorer tab)</td><td>Draw and query an AgenticSystemCore node's knowledge graph.</td><td>The graph, a query box, a vocabulary list.</td><td>Answers to the one built-in query tool (rows, as text).</td></tr>
+</tbody></table></div>
+<p>&quot;Nothing&quot; in the last column means the file is shown to you only. What the model does get is given
+in short form, unless you turn that off in Options (&quot;Give the model short facts from what the
+site publishes&quot;). Everything from a site is marked as untrusted data: no file can add a tool,
+change a setting or name an address to fetch.</p>
+<p>The exact paths, size limits and code are in <a href="/webaiassist/standards/">STANDARDS.md</a> and
+<code>src/core/site-files.ts</code>.</p>
+<h2 id="what-stays-in-the-browser">What stays in the browser</h2>
+<ul>
+<li>Your questions, the page text you read, the tool results and the model's answers stay on your
+computer when the model runs in the browser (graphics card or processor) or is Chrome's built-in
+model.</li>
+<li>SPARQL queries over a node's graph run in your browser. The query text and the rows are not sent
+anywhere by the extension.</li>
+<li>Saved chats and tool counts live in the extension's own storage. <strong>Forget this site</strong> and
+<strong>Forget all sites</strong> remove them. There is no account and no analytics.</li>
+</ul>
+<h2 id="what-can-leave-and-when">What can leave, and when</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 2"><table>
+<thead><tr><th scope="col">When</th><th scope="col">What leaves, and where to</th></tr></thead>
+<tbody>
+<tr><td>First start of a model in the browser</td><td>Requests for the model files to <code>huggingface.co</code> and its download network. Nothing about you or the chat. Once per model.</td></tr>
+<tr><td>You set a chat endpoint on this computer</td><td>The conversation goes to <code>localhost</code> or <code>127.0.0.1</code>.</td></tr>
+<tr><td>You set a remote chat endpoint</td><td>Your questions, the page's tool list, tool results and any page text you read go to that host, and your API key as a header. The panel asks first, once per host. The service may charge for it and keeps what it receives under its own terms.</td></tr>
+<tr><td>A tool you allowed runs</td><td>Whatever the page's own tool code sends. The extension passes the arguments you saw.</td></tr>
+<tr><td>You tick another node in the graph explorer</td><td>Up to three published files are read from that node (an <code>https</code> site with a public name).</td></tr>
+<tr><td>A site says <code>ai-input=no</code></td><td>Nothing of the site's page text or files goes to the model. Its tool list and the results of its tools you allow still go to the model you chose, including a remote endpoint.</td></tr>
+</tbody></table></div>
+<p>Results of a site's own tools still go to the model you chose, because you asked for the call.
+The full list of hosts and every stored item is in <a href="/webaiassist/privacy/">PRIVACY.md</a>.</p>
+<h2 id="what-it-does-not-read">What it does not read</h2>
+<p>It does not read your cookies, other tabs, your history, files on your computer or any site you did
+not allow. It does not read the paths it does not list. It follows no redirect for a site file.</p>
+<h2 id="related">Related</h2>
+<ul>
+<li><a href="/webaiassist/what-is-webmcp/">What is WebMCP</a></li>
+<li><a href="/webaiassist/standards/">Standards table</a></li>
+<li>Threat model: what the extension protects against and what it does not</li>
+</ul>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/webaiassist/what-the-extension-reads.md">Propose an edit</a> — opens <code>site/webaiassist/what-the-extension-reads.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a></span></p>
+</footer>
+</body>
+</html>

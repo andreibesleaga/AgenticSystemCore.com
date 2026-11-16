@@ -430,6 +430,8 @@ for (const f of files) {
   // The query page's engine: one release of Oxigraph compiled to WebAssembly, the engine's bytes
   // (AGSC-06-39), with its licence texts; third-party files, published as they are.
   if (/^query\/vendor\//.test(r)) { if (r.endsWith('.wasm')) ok(b.subarray(0, 4).equals(Buffer.from('0061736d', 'hex')), `${r}: not a WebAssembly module`); continue; }
+  // The pictures of the WebAIAssist page (scripts/build.js, WEBAIASSIST_SHOTS): PNG, each under 150 KB.
+  if (/^webaiassist\/img\/[a-z-]+\.png$/.test(r)) { ok(b.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex')) && b.length <= 150 * 1000, `${r}: not a PNG, or over 150 KB`); continue; }
   if (/\.(png|jpe?g|gif|webp|ico|woff2?)$/.test(r)) { fails.push(`${r}: binary asset not expected in site v0`); continue; }
   const s = b.toString('utf8');
   if (!Buffer.from(s, 'utf8').equals(b)) { fails.push(`${r}: not UTF-8`); continue; }
@@ -479,6 +481,16 @@ for (const need of [
   'Access-Control-Allow-Origin: *', 'Access-Control-Expose-Headers: Link, ETag, Content-Type',
   'Link: </.well-known/knowledge-linkset>; rel="describedby"; type="application/linkset+json"',
 ]) ok(headers.includes(need), `_headers lacks: ${need} (AGSC-06-17, AGSC-11-03, AGSC-11-05)`);
+// The FAIR Signposting links of the home page (AGSC-06-40), in the one `Link` field of `/`: each
+// relation is present, and each target on this node is a file the build wrote.
+{
+  const field = (headers.split(/\n\n+/).find(b => b.split('\n')[0] === '/') || '').split('\n').find(l => l.trim().startsWith('Link: ')) || '';
+  const links = [...field.matchAll(/<([^>]+)>; rel="([^"]+)"/g)].map(m => ({ href: m[1], rel: m[2] }));
+  for (const [rel, n] of [['describedby', 2], ['cite-as', 1], ['type', 2], ['item', 3], ['license', 1], ['linkset', 1]]) {
+    ok(links.filter(l => l.rel === rel).length === n, `_headers: the Link field of / carries ${links.filter(l => l.rel === rel).length} rel="${rel}" link(s), expected ${n} (AGSC-06-40)`);
+  }
+  for (const l of links.filter(l => l.href.startsWith('/'))) ok(fs.existsSync(path.join(WWW, l.href)), `_headers: the Link field of / names ${l.href}, which the build did not write (AGSC-06-40)`);
+}
 ok(!/Access-Control-Allow-Credentials/i.test(headers), '_headers must not allow credentials (AGSC-11-03)');
 // One block per address: Cloudflare Pages keeps only the later of two blocks for the same
 // address, so a repeated address silently drops headers (it once dropped AGSC-11-03's).
