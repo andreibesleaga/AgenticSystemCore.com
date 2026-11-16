@@ -119,6 +119,6 @@ There is no account and no analytics. Every host the extension can reach, and wh
 - [Standards table](/webaiassist/standards/): every standard, draft and profile it reads, and what it does with each.
 - [Privacy](/webaiassist/privacy/): what leaves your computer and what is stored.
 
-To report a problem or ask a question, use the GitHub issues of the [repository](https://repo.invalid). To reach the author, use [andreibesleaga.com](https://andreibesleaga.com/contact/).
+To report a problem or ask a question, use the [GitHub issues](https://repo.invalid/issues) of the [repository](https://repo.invalid). To reach the author, use [andreibesleaga.com](https://andreibesleaga.com/contact/).
 
 WebAIAssist is licensed under the Apache License 2.0. AgenticSystemCore is a trademark of Andrei N. Besleaga. WebAIAssist is not from Google and is not an official WebMCP extension.
