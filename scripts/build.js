@@ -2065,9 +2065,17 @@ const WEBAIASSIST_SHOTS = [
   ['explorer-query', 960, 760, 'A read-only SPARQL query and its result table.', 'A query over the graph'],
   ['activity-log', 960, 760, 'One line for each question: tool calls, tokens, price and time.', 'The activity log'],
 ];
-const webaiassistShots = () => `<div class="shots">${WEBAIASSIST_SHOTS.map(([f, w, h, alt, cap]) =>
-  `<figure class="shot"><img src="/webaiassist/img/${f}.png" width="${w}" height="${h}" alt="${esc(alt)}" loading="lazy"><figcaption>${esc(cap)}</figcaption></figure>`).join('')}</div>`;
-for (const [f] of WEBAIASSIST_SHOTS) put(`webaiassist/img/${f}.png`, fs.readFileSync(path.join(ROOT, 'site/webaiassist/img', `${f}.png`)));
+// The three pictures of a real run (the maintainer's hand test of 16 Nov 2026), as in the README.
+const WEBAIASSIST_REAL_SHOTS = [
+  ['real-node-answer', 900, 583, 'The panel names the site as an AgenticSystemCore node with 10 WebMCP tools and shows an answer.', 'A node page: ten tools and an answer'],
+  ['real-question-before-a-call', 900, 583, 'A dialog asks whether to run the tool webaiassist_query_graph, with the site and the exact arguments, Deny and Allow once.', 'The question before a call'],
+  ['real-another-site', 900, 583, 'On a flight search demo page the panel lists 4 WebMCP tools and shows a tool call.', 'Another site\'s tools'],
+];
+// Every picture is one tile of the same size, with the whole picture inside it; the tile links
+// the picture at its full size.
+const webaiassistShots = list => `<div class="shots">${list.map(([f, w, h, alt, cap]) =>
+  `<figure class="shot"><a href="/webaiassist/img/${f}.png"><img src="/webaiassist/img/${f}.png" width="${w}" height="${h}" alt="${esc(alt)}" loading="lazy"></a><figcaption>${esc(cap)}</figcaption></figure>`).join('')}</div>`;
+for (const [f] of [...WEBAIASSIST_REAL_SHOTS, ...WEBAIASSIST_SHOTS]) put(`webaiassist/img/${f}.png`, fs.readFileSync(path.join(ROOT, 'site/webaiassist/img', `${f}.png`)));
 for (const f of fs.readdirSync(path.join(ROOT, 'site/webaiassist')).filter(f => f.endsWith('.md') && f !== 'README.md').sort()) {
   const slug = f === 'index.md' ? '' : f.replace(/\.md$/, ''), url = `/webaiassist/${slug}${slug ? '/' : ''}`;
   const { fm, body } = splitFrontmatter(read(`site/webaiassist/${f}`), `site/webaiassist/${f}`);
@@ -2076,7 +2084,7 @@ for (const f of fs.readdirSync(path.join(ROOT, 'site/webaiassist')).filter(f => 
     title: fm.title, summary: fm.summary, description: fm.description, section: '/webaiassist/', wide: WEBAIASSIST_WIDE.has(slug),
     scripts: PAGE_TOOL_SCRIPTS,
     jsonld: { '@context': 'https://schema.org', '@type': 'TechArticle', headline: fm.title, description: fm.description, url: ORIGIN + url, author: { '@type': 'Person', name: config.site.author }, isPartOf: `${BASE}webaiassist/` },
-    body: md(body.split('https://repo.invalid').join(WEBAIASSIST_REPO), { ruleLinks: true, page: `webaiassist/${slug}`, used: new Set(['main']), tables: { n: 0 } }).replace('<p>WEBAIASSIST-PICTURES</p>', webaiassistShots()) + editLink('site', `site/webaiassist/${f}`),
+    body: md(body.split('https://repo.invalid').join(WEBAIASSIST_REPO), { ruleLinks: true, page: `webaiassist/${slug}`, used: new Set(['main']), tables: { n: 0 } }).replace('<p>WEBAIASSIST-PICTURES-REAL</p>', webaiassistShots(WEBAIASSIST_REAL_SHOTS)).replace('<p>WEBAIASSIST-PICTURES</p>', webaiassistShots(WEBAIASSIST_SHOTS)) + editLink('site', `site/webaiassist/${f}`),
   });
 }
 FEATURES.forEach((f, k) => {

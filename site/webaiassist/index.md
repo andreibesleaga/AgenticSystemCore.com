@@ -48,7 +48,11 @@ On any other page, **Read this page** gives the model the page text to answer fr
 
 ## What it looks like
 
-These pictures come from the extension's automated browser tests: a scripted test model and test pages that stand for a node. They show the interface, not a real model's answers.
+From a real run in Chrome 157 on Windows, 16 November 2026, on this site and on a public WebMCP demo page (Chrome's built-in model in the first picture, a chat endpoint in the other two). Select a picture to see it whole.
+
+WEBAIASSIST-PICTURES-REAL
+
+The next pictures come from the extension's automated browser tests: a scripted test model and test pages that stand for a node. They show the interface, not a real model's answers.
 
 WEBAIASSIST-PICTURES
 
