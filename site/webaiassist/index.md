@@ -4,11 +4,15 @@ summary: "A chat in your browser's side panel, with a small AI model that runs o
 description: "WebAIAssist is the browser client of the AgenticSystemCore project, by the same author: what it does on a node and on any site with WebMCP tools, where the model runs, what leaves the computer, its limits and how to install it."
 ---
 
-**One AI assistant for the websites that offer WebMCP tools, running in your own browser.** It is not tied to one site or one model: the model runs in the browser on your graphics card or processor, or it is Chrome's built-in model, or a chat endpoint you choose. There is no server to install and no account. Every tool call is shown first and waits for your answer.
+WebAIAssist is the browser client of the AgenticSystemCore project, by the same author. [WebMCP](https://webmachinelearning.github.io/webmcp/) is a draft of the W3C Web Machine Learning Community Group.
 
-WebAIAssist is a chat in your browser's side panel, with a small AI model that runs on your own computer. It can use the tools a web page offers through [WebMCP](https://webmachinelearning.github.io/webmcp/), a draft of the W3C Web Machine Learning Community Group, and it asks you before each one runs.
+What you get:
 
-WebAIAssist is the browser client of the AgenticSystemCore project, by the same author. It works with AgenticSystemCore nodes, such as this site, and with any site that offers WebMCP tools.
+- **One assistant for many sites.** It works with AgenticSystemCore nodes, such as this site, and with any site that offers WebMCP tools. On any other page it can read the page text and answer from it, unless the site asks for no AI input.
+- **Your choice of model.** The model runs in the browser on your graphics card or processor, or it is Chrome's built-in model, or a chat endpoint you choose.
+- **No server to install, no account, no analytics.**
+- **You decide every tool call.** Each call is shown first and waits for your answer.
+- **Nothing goes to a model service unless you choose one.** With a model in the browser or Chrome's built-in model, no page text, chat or tool result leaves your computer for the model. A tool you allow still sends whatever its page's own code sends, and the extension reads a few public files of a site you allowed. The [privacy page](/webaiassist/privacy/) lists every case.
 
 ## Install
 

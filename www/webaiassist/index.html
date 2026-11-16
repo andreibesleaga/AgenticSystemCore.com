@@ -49,9 +49,15 @@
 <main id="main">
 <h1>WebAIAssist</h1>
 <p class="summary"><strong>Summary</strong>A chat in your browser's side panel, with a small AI model that runs on your own computer. It can use the tools a web page offers through WebMCP, and asks you before each one runs.</p>
-<p><strong>One AI assistant for the websites that offer WebMCP tools, running in your own browser.</strong> It is not tied to one site or one model: the model runs in the browser on your graphics card or processor, or it is Chrome's built-in model, or a chat endpoint you choose. There is no server to install and no account. Every tool call is shown first and waits for your answer.</p>
-<p>WebAIAssist is a chat in your browser's side panel, with a small AI model that runs on your own computer. It can use the tools a web page offers through <a href="https://webmachinelearning.github.io/webmcp/">WebMCP</a>, a draft of the W3C Web Machine Learning Community Group, and it asks you before each one runs.</p>
-<p>WebAIAssist is the browser client of the AgenticSystemCore project, by the same author. It works with AgenticSystemCore nodes, such as this site, and with any site that offers WebMCP tools.</p>
+<p>WebAIAssist is the browser client of the AgenticSystemCore project, by the same author. <a href="https://webmachinelearning.github.io/webmcp/">WebMCP</a> is a draft of the W3C Web Machine Learning Community Group.</p>
+<p>What you get:</p>
+<ul>
+<li><strong>One assistant for many sites.</strong> It works with AgenticSystemCore nodes, such as this site, and with any site that offers WebMCP tools. On any other page it can read the page text and answer from it, unless the site asks for no AI input.</li>
+<li><strong>Your choice of model.</strong> The model runs in the browser on your graphics card or processor, or it is Chrome's built-in model, or a chat endpoint you choose.</li>
+<li><strong>No server to install, no account, no analytics.</strong></li>
+<li><strong>You decide every tool call.</strong> Each call is shown first and waits for your answer.</li>
+<li><strong>Nothing goes to a model service unless you choose one.</strong> With a model in the browser or Chrome's built-in model, no page text, chat or tool result leaves your computer for the model. A tool you allow still sends whatever its page's own code sends, and the extension reads a few public files of a site you allowed. The <a href="/webaiassist/privacy/">privacy page</a> lists every case.</li>
+</ul>
 <h2 id="install">Install</h2>
 <p>Chrome Web Store listing: not live yet</p>
 <p>The listing has no address yet. The source repository and the release zip open together with the listing; this page will then link both.</p>
