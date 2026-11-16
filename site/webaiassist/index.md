@@ -8,11 +8,11 @@ WebAIAssist is the browser client of the AgenticSystemCore project, by the same 
 
 What you get:
 
-- **One assistant for many sites.** It works with AgenticSystemCore nodes, such as this site, and with any site that offers WebMCP tools. On any other page it can read the page text and answer from it.
+- **One assistant for many sites.** It works with AgenticSystemCore nodes, such as this site, and with any site that offers WebMCP tools. On any other page it can read the page text and answer from it, unless the site asks for no AI input.
 - **Your choice of model.** The model runs in the browser on your graphics card or processor, or it is Chrome's built-in model, or a chat endpoint you choose.
 - **No server to install, no account, no analytics.**
 - **You decide every tool call.** Each call is shown first and waits for your answer.
-- **Your data stays with you.** With a model in the browser, your questions, the page text and the results stay on your computer; only the model files are downloaded, once.
+- **Nothing goes to a model service unless you choose one.** With a model in the browser or Chrome's built-in model, no page text, chat or tool result leaves your computer for the model. A tool you allow still sends whatever its page's own code sends, and the extension reads a few public files of a site you allowed. The [privacy page](/webaiassist/privacy/) lists every case.
 
 ## Install
 
