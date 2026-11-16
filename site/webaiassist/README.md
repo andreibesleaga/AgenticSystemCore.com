@@ -15,8 +15,9 @@ skipped.
 | `standards.md` | `/webaiassist/standards/` | mirror of `docs/STANDARDS.md` |
 | `privacy.md` | `/webaiassist/privacy/` | mirror of `docs/PRIVACY.md`, with a "last updated" line; this is the public privacy address for the store listing |
 
-`img/` holds the seven pictures of the extension page, copied from the extension's `docs/images/` (taken by
-its browser tests with a scripted model); `scripts/build.js` lists them with their alt texts, and
+`img/` holds the ten pictures of the extension page, copied from the extension's `docs/images/`: three
+(`real-*.png`) from the maintainer's real run of 16 Nov 2026, and seven taken by its browser tests with a
+scripted model; `scripts/build.js` lists them with their alt texts, and
 `scripts/check.js` accepts only this folder of pictures.
 
 The mirrors keep the extension's text. Only the title block and the links change: links to
