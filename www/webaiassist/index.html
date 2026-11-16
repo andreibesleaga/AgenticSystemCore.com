@@ -59,8 +59,12 @@
 <li><strong>Nothing goes to a model service unless you choose one.</strong> With a model in the browser or Chrome's built-in model, no page text, chat or tool result leaves your computer for the model. A tool you allow still sends whatever its page's own code sends, and the extension reads a few public files of a site you allowed. The <a href="/webaiassist/privacy/">privacy page</a> lists every case.</li>
 </ul>
 <h2 id="install">Install</h2>
-<p>Chrome Web Store listing: not live yet</p>
-<p>The listing has no address yet. The source repository and the release zip open together with the listing; this page will then link both.</p>
+<p>Chrome Web Store listing: under review since 16 November 2026</p>
+<p>The listing has no public address yet. Until it is live, install from the release zip:</p>
+<p>1. Download <code>webaiassist-0.1.0.zip</code> from the <a href="https://github.com/andreibesleaga/webaiassist/releases">releases page</a> and unzip it.
+2. Open <code>chrome://extensions</code> and turn on <strong>Developer mode</strong>.
+3. Choose <strong>Load unpacked</strong> and pick the unzipped folder.</p>
+<p>The source is in the <a href="https://github.com/andreibesleaga/webaiassist">repository</a>, under the Apache-2.0 licence.</p>
 <h2 id="turn-on-the-chrome-switch">Turn on the Chrome switch</h2>
 <p>WebMCP is off in Chrome until you turn it on. Open <code>chrome://flags/#enable-webmcp-testing</code>, set <strong>WebMCP for testing</strong> to Enabled and relaunch Chrome. Without the switch, sites' tools do not appear in the panel. An extension cannot open that page for you, so the panel shows the address with a Copy button. <a href="/webaiassist/what-is-webmcp/">What is WebMCP</a> explains the switch and the draft.</p>
 <p>Two routes need no switch: <strong>Read this page</strong> gives the model the page text, and <strong>Add WebMCP to this site</strong> loads the WebMCP polyfill on that one site, after you allow access to it.</p>
@@ -138,7 +142,7 @@
 <li><a href="/webaiassist/standards/">Standards table</a>: every standard, draft and profile it reads, and what it does with each.</li>
 <li><a href="/webaiassist/privacy/">Privacy</a>: what leaves your computer and what is stored.</li>
 </ul>
-<p>To report a problem or ask a question, use the GitHub issues of the repository, which opens together with the listing. To reach the author, use <a href="https://andreibesleaga.com/contact/">andreibesleaga.com</a>.</p>
+<p>To report a problem or ask a question, use the <a href="https://github.com/andreibesleaga/webaiassist/issues">GitHub issues</a> of the <a href="https://github.com/andreibesleaga/webaiassist">repository</a>. To reach the author, use <a href="https://andreibesleaga.com/contact/">andreibesleaga.com</a>.</p>
 <p>WebAIAssist is licensed under the Apache License 2.0. AgenticSystemCore is a trademark of Andrei N. Besleaga. WebAIAssist is not from Google and is not an official WebMCP extension.</p>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/webaiassist/index.md">Propose an edit</a> — opens <code>site/webaiassist/index.md</code>; a submitted change becomes a pull request a person reviews.</p>
 </main>
