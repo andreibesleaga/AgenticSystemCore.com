@@ -4,6 +4,8 @@ summary: "A chat in your browser's side panel, with a small AI model that runs o
 description: "WebAIAssist is the browser client of the AgenticSystemCore project, by the same author: what it does on a node and on any site with WebMCP tools, where the model runs, what leaves the computer, its limits and how to install it."
 ---
 
+**One AI assistant for the websites that offer WebMCP tools, running in your own browser.** It is not tied to one site or one model: the model runs in the browser on your graphics card or processor, or it is Chrome's built-in model, or a chat endpoint you choose. There is no server to install and no account. Every tool call is shown first and waits for your answer.
+
 WebAIAssist is a chat in your browser's side panel, with a small AI model that runs on your own computer. It can use the tools a web page offers through [WebMCP](https://webmachinelearning.github.io/webmcp/), a draft of the W3C Web Machine Learning Community Group, and it asks you before each one runs.
 
 WebAIAssist is the browser client of the AgenticSystemCore project, by the same author. It works with AgenticSystemCore nodes, such as this site, and with any site that offers WebMCP tools.
