@@ -16,9 +16,9 @@ What you get:
 
 ## Install
 
-Chrome Web Store listing: under review since 16 November 2026
+From the Chrome Web Store: [WebAIAssist](https://chromewebstore.google.com/detail/webaiassist/mekikidmpikblfalilhckiadncbjfppi).
 
-The listing has no public address yet. Until it is live, install from the release zip:
+Or load the release zip yourself:
 
 1. Download `webaiassist-0.1.0.zip` from the [releases page](https://repo.invalid/releases) and unzip it.
 2. Open `chrome://extensions` and turn on **Developer mode**.

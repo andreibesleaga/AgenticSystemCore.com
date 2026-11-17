@@ -25,5 +25,5 @@ the other mirrored pages point here, and links to documents that are not mirrore
 their link and keep their words. When the extension's document changes, copy it again.
 
 The releases and issues links are written there as https://repo.invalid; the build replaces that with the constant
-`WEBAIASSIST_REPO` in `scripts/build.js`; the owner confirms it at release. No link to a
-Chrome Web Store listing exists until the listing is live.
+`WEBAIASSIST_REPO` in `scripts/build.js`; the owner confirms it at release. The Chrome Web Store link in `index.md` is written in full
+(the listing is live since 17 Nov 2026).
