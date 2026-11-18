@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipe: ask a node's graph a question — AgenticSystemCore</title>
+<meta name="description" content="Load a node's graph.nq into rdflib, run questions in SPARQL, check the graph with the shipped SHACL shapes, and add questions of your own to agsc verify.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/recipe-ask-the-graph/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/recipe-ask-the-graph/">
+<meta property="og:title" content="Recipe: ask a node's graph a question">
+<meta property="og:description" content="Load a node's graph.nq into rdflib, run questions in SPARQL, check the graph with the shipped SHACL shapes, and add questions of your own to agsc verify.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Recipe: ask a node's graph a question","description":"Load a node's graph.nq into rdflib, run questions in SPARQL, check the graph with the shipped SHACL shapes, and add questions of your own to agsc verify.","url":"https://agenticsystemcore.com/docs/recipe-ask-the-graph/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Recipe: ask a node's graph a question</h1>
+<p class="summary"><strong>Summary</strong>For a developer or analyst who wants answers from a node's knowledge graph. You end up with SPARQL questions run on your own machine, the shipped shapes checked, and a question of your own that the engine verifies.</p>
+<p><strong>Who it is for:</strong> a developer or analyst who has a built node and wants to query its graph.</p>
+<p><strong>What you get:</strong> three SPARQL answers on your machine, the shipped shapes run over the graph, and a question of your own that <code>agsc verify</code> checks on every build.</p>
+<p><strong>Time:</strong> about 10 minutes. <strong>Needs:</strong> Node.js 22.13 or later, git, a POSIX shell, Python 3 with <code>venv</code> and <code>pip</code>.</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Install the engine as in <a href="/docs/guides/mode-0/">the Mode 0 guide</a>. Start in an empty folder; the node is the <code>mode-2-project</code> example that ships in the package (<code>$ENGINE</code>).</p>
+<h2 id="1-build-a-node-and-see-what-it-publishes">1. Build a node and see what it publishes</h2>
+<p>Copy the example, add a security contact and the licence text, commit once, then check and build:</p>
+<pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-2-project&quot; my-node &amp;&amp; cd my-node
+mkdir -p .well-known &amp;&amp; printf 'Contact: https://example.org/security\nExpires: 2027-06-01T00:00:00Z\n' &gt; .well-known/security.txt
+cp &quot;$ENGINE/LICENSE-CONTENT&quot; .
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'a node'
+agsc ci --quiet
+agsc build --quiet
+ls www/graph.jsonld www/graph.ttl www/graph.nq www/ns</code></pre>
+<pre tabindex="0" data-lang="text"><code>build: pass (0 error, 1 warn)
+www/graph.jsonld
+www/graph.nq
+www/graph.ttl
+
+www/ns:
+1.0.0
+context.jsonld</code></pre>
+<p>The graph comes in three forms of the same facts: JSON-LD, Turtle and N-Quads (<code>graph.nq</code>, every statement in the node's named graph). Under <code>/ns/</code> a node publishes the JSON-LD context. The vocabulary itself is published once, at <a href="https://agenticsystemcore.com/ns/">agenticsystemcore.com/ns/</a>, and the shapes ship in the package as <code>$ENGINE/schema/item-shapes.ttl</code>.</p>
+<h2 id="2-the-ten-ready-questions">2. The ten ready questions</h2>
+<p>The engine names ten questions the graph answers. Print them:</p>
+<pre tabindex="0" data-lang="bash"><code>node -e 'const q = require(process.argv[1]).questions; for (const x of q) console.log(x.number + &quot;. &quot; + x.question)' &quot;$ENGINE/docs/ontology-questions.json&quot;</code></pre>
+<pre tabindex="0" data-lang="text"><code>1. If I choose X, what else must I take?
+2. What can never go with X?
+3. What replaced X, directly or through a chain?
+4. What does X need that nobody in my selection provides?
+5. What verifies X, and what does X verify?
+6. What blocks task T, directly or through a chain?
+7. Where did lesson L come from?
+8. Which items sit under cluster C and its sub-clusters?
+9. Which of my selected items are stale, draft or deprecated?
+10. Which sources back X, and which other items share them?</code></pre>
+<p>The same file holds the SPARQL of each; <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/ONTOLOGY-QUESTIONS.md">the engine's list</a> prints all ten.</p>
+<h2 id="3-ask-in-sparql-on-your-machine">3. Ask in SPARQL, on your machine</h2>
+<p>Make a Python environment with <code>rdflib</code>. In the script, <code>default_union=True</code> makes the node's named graph the default graph, so a query needs no <code>GRAPH</code> clause.</p>
+<pre tabindex="0" data-lang="bash"><code>python3 -m venv ../venv
+../venv/bin/pip install --quiet rdflib==7.6.0 pyshacl==0.40.2
+cat &gt; ../ask.py &lt;&lt;'PY'
+import sys
+from rdflib import Dataset
+ds = Dataset(default_union=True)      # the node's named graph becomes the default graph
+ds.parse(sys.argv[1], format=&quot;nquads&quot;)
+prefixes = &quot;PREFIX asc: &lt;https://w3id.org/agentic-system-core/ns#&gt; PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; &quot;
+for row in ds.query(prefixes + sys.argv[2]):
+    print(&quot;  &quot;.join(str(cell).replace(&quot;https://project.example/&quot;, &quot;&quot;) for cell in row))
+PY</code></pre>
+<p>Ask question 6 (what blocks what), question 8 (what sits under a cluster), and one of your own (which decision settled which specification):</p>
+<pre tabindex="0" data-lang="bash"><code>../venv/bin/python ../ask.py www/graph.nq 'SELECT DISTINCT ?task ?blocker WHERE { ?task asc:blockedBy+ ?blocker FILTER (?blocker != ?task) }'
+../venv/bin/python ../ask.py www/graph.nq 'SELECT DISTINCT ?item WHERE { &lt;https://project.example/clusters/login/&gt; skos:member+ ?item } ORDER BY ?item'
+../venv/bin/python ../ask.py www/graph.nq 'SELECT ?spec ?decision WHERE { ?s asc:decidedBy ?d . ?s skos:prefLabel ?spec . ?d skos:prefLabel ?decision }'</code></pre>
+<pre tabindex="0" data-lang="text"><code>concepts/task-login-tests/  concepts/task-login-form/
+concepts/decide-the-login/
+concepts/login-spec/
+concepts/task-login-form/
+concepts/task-login-tests/
+procedures/run-the-tests/
+Login specification  Decide the login</code></pre>
+<p>The login tests wait for the login form, five items sit under the login board, and one specification was settled by one decision.</p>
+<h2 id="4-run-the-shipped-shapes-over-the-graph">4. Run the shipped shapes over the graph</h2>
+<p>The shapes state what a well-formed graph looks like. rdflib keeps <code>&quot;x&quot;</code> and <code>&quot;x&quot;^^xsd:string</code> apart, which RDF 1.1 does not, so the script converts the former into the latter.</p>
+<pre tabindex="0" data-lang="bash"><code>cat &gt; ../shapes.py &lt;&lt;'PY'
+import sys
+from rdflib import Dataset, Graph, Literal, XSD, SH
+from pyshacl import validate
+
+def as_xsd_string(triples):               # rdflib keeps &quot;x&quot; and &quot;x&quot;^^xsd:string apart; RDF 1.1 does not
+    g = Graph()
+    for s, p, o in triples:
+        if isinstance(o, Literal) and o.datatype is None and o.language is None:
+            o = Literal(str(o), datatype=XSD.string)
+        g.add((s, p, o))
+    return g
+
+ds = Dataset(default_union=True)
+ds.parse(sys.argv[1], format=&quot;nquads&quot;)
+data = as_xsd_string(ds.triples((None, None, None)))
+shapes = as_xsd_string(Graph().parse(sys.argv[2], format=&quot;turtle&quot;))
+_, report, _ = validate(data, shacl_graph=shapes, inference=&quot;none&quot;)
+for r in report.subjects(SH.resultSeverity, None):
+    print(report.value(r, SH.resultSeverity).split(&quot;#&quot;)[1], &quot;-&quot;, report.value(r, SH.resultMessage))
+print(&quot;violations:&quot;, len(list(report.subjects(SH.resultSeverity, SH.Violation))))
+PY
+../venv/bin/python ../shapes.py www/graph.nq &quot;$ENGINE/schema/item-shapes.ttl&quot;</code></pre>
+<pre tabindex="0" data-lang="text"><code>Warning - AGSC-E305: no item or collection points at this item (AGSC-05-21, missing in-links; AGSC-03-10)
+violations: 0</code></pre>
+<p>No violation. The one warning is the one <code>agsc ci</code> printed in step 1: the gate has no link pointing at it.</p>
+<h2 id="5-questions-and-shapes-of-your-own">5. Questions and shapes of your own</h2>
+<p>Name them in <code>agsc.config.json</code> under <code>domain</code>, and <code>agsc verify</code> and <code>agsc ci</code> run both on every build. A question is a SPARQL <code>ASK</code> or <code>SELECT</code> with its expected answer; a shape is a Turtle file.</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir domain
+cat &gt; domain/questions.json &lt;&lt;'JSON'
+[{&quot;id&quot;: &quot;a-task-is-blocked&quot;, &quot;question&quot;: &quot;Does at least one task wait for another?&quot;, &quot;expected&quot;: true,
+  &quot;query&quot;: &quot;ASK { ?task &lt;https://w3id.org/agentic-system-core/ns#blockedBy&gt; ?other }&quot;}]
+JSON
+cat &gt; domain/shapes.ttl &lt;&lt;'TTL'
+@prefix asc: &lt;https://w3id.org/agentic-system-core/ns#&gt; .
+@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .
+@prefix sh: &lt;http://www.w3.org/ns/shacl#&gt; .
+&lt;https://example.org/ns/shapes#ConceptHasDefinition&gt; a sh:NodeShape ; sh:targetClass asc:Concept ;
+    sh:property [ sh:path skos:definition ; sh:minCount 1 ; sh:message &quot;Every concept has a definition.&quot;@en ] .
+TTL
+node -e 'const fs = require(&quot;fs&quot;); const c = JSON.parse(fs.readFileSync(&quot;agsc.config.json&quot;)); c.domain = { shapes: &quot;domain/shapes.ttl&quot;, questions: &quot;domain/questions.json&quot; }; fs.writeFileSync(&quot;agsc.config.json&quot;, JSON.stringify(c, null, 2) + &quot;\n&quot;)'
+agsc verify --quiet</code></pre>
+<pre tabindex="0" data-lang="text"><code>verify: pass (0 error, 0 warn)</code></pre>
+<p>Now make the expected answer wrong, so the check fails on purpose:</p>
+<pre tabindex="0" data-lang="bash"><code>sed -i.bak 's/&quot;expected&quot;: true/&quot;expected&quot;: false/' domain/questions.json
+agsc verify --quiet || echo &quot;verify exited $?&quot;</code></pre>
+<pre tabindex="0" data-lang="text"><code>verify: fail (1 error, 0 warn)
+error: AGSC-E422 the competency question a-task-is-blocked (&quot;Does at least one task wait for another?&quot;) is answered true, not the expected false (AGSC-05-41) — domain/questions.json
+verify exited 1</code></pre>
+<p><a href="/docs/guides/mode-1/">The Mode 1 guide</a> lists the part of SPARQL and SHACL the engine runs here.</p>
+<h2 id="in-the-browser">In the browser</h2>
+<p><a href="/query/">The query page</a> needs nothing installed: it loads <code>/graph.nq</code> into a query engine compiled to WebAssembly in your browser and sends and stores nothing. It has an editor, the ten questions as examples that fill the editor, a result table with CSV and JSON downloads, and a share link that holds the query.</p>
+<h2 id="check-that-it-worked">Check that it worked</h2>
+<p>Step 3 printed the three answers, step 4 printed <code>violations: 0</code>, and step 5 failed with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E422"><code>AGSC-E422</code></a> and exit code 1 after you flipped the answer.</p>
+<h2 id="what-this-does-not-do">What this does not do</h2>
+<ul>
+<li>The engine does not run your SPARQL. The query page, rdflib or another store does. <code>agsc verify</code> runs the questions of the file at <code>domain.questions</code> and nothing else.</li>
+<li>rdflib 7.6.0 treats a plain string and an <code>xsd:string</code> as different terms, so question 9 answers differently there than in a store that follows RDF 1.1.</li>
+<li><code>agsc lint</code> and <code>agsc build</code> never run your shapes or questions; <code>verify</code> and <code>ci</code> do.</li>
+</ul>
+<h2 id="where-to-go-next">Where to go next</h2>
+<ul>
+<li><a href="/graph/">The graph explorer</a> and <a href="/docs/guides/mode-1/">the domain layer</a>.</li>
+<li><a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/SHACL-SHAPES.md">The shapes in detail</a>.</li>
+<li><a href="/docs/recipe-ci-gate/">Stop a broken change before it is merged</a>.</li>
+</ul>
+<p>Run on 18 November 2026 with engine 1.1.0. The script that repeats every command of this page: <a href="https://github.com/andreibesleaga/AgenticSystemCore.com/blob/main/recipes/ask-the-graph.run.sh">recipes/ask-the-graph.run.sh</a>. More recipes: <a href="/docs/recipes/">the list</a>.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/recipe-ask-the-graph.md">Propose an edit</a> — opens <code>site/docs/recipe-ask-the-graph.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a> · <a href="https://standards.agenticsystemcore.com/">Standards Map</a></span></p>
+</footer>
+</body>
+</html>

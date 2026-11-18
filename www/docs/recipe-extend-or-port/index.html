@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipe: extend the engine or write your own — AgenticSystemCore</title>
+<meta name="description" content="Write a plugin that agsc export loads, see what the engine refuses, then run the conformance vectors with agsc conform and plan a port in another language.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/recipe-extend-or-port/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/recipe-extend-or-port/">
+<meta property="og:title" content="Recipe: extend the engine or write your own">
+<meta property="og:description" content="Write a plugin that agsc export loads, see what the engine refuses, then run the conformance vectors with agsc conform and plan a port in another language.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Recipe: extend the engine or write your own","description":"Write a plugin that agsc export loads, see what the engine refuses, then run the conformance vectors with agsc conform and plan a port in another language.","url":"https://agenticsystemcore.com/docs/recipe-extend-or-port/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Recipe: extend the engine or write your own</h1>
+<p class="summary"><strong>Summary</strong>For a developer who wants to add a capability to the engine, or to implement the format in another language. Part A writes a plugin and shows where 1.1.0 loads one; part B runs the conformance vectors and reads the report.</p>
+<p><strong>Who it is for:</strong> a developer who wants to add to the engine (part A), or to implement the format in another language (part B).</p>
+<p><strong>What you get:</strong> a working plugin and a plain statement of where 1.1.0 loads one; the conformance report of the reference engine and the order the implementers' guide recommends.</p>
+<p><strong>Time:</strong> about 10 minutes. <strong>Needs:</strong> Node.js 22.13 or later, git, a POSIX shell, <code>pip</code> and <code>curl</code> for the last step.</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Install the engine as in <a href="/docs/guides/mode-0/">the Mode 0 guide</a>. The commands work in the <code>mode-2-project</code> example that ships in the package (<code>$ENGINE</code>).</p>
+<pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-2-project&quot; my-node &amp;&amp; cd my-node
+mkdir -p .well-known &amp;&amp; printf 'Contact: https://example.org/security\nExpires: 2027-06-01T00:00:00Z\n' &gt; .well-known/security.txt
+cp &quot;$ENGINE/LICENSE-CONTENT&quot; .
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'a node'</code></pre>
+<h2 id="a1-the-smallest-plugin-that-works">A1. The smallest plugin that works</h2>
+<p>A plugin is a CommonJS module with four declared members and the hook of its kind. This one is a memory adapter: it turns the items into a text file. It reads the items it is given and returns files; it never touches the file system, and the engine writes what it returns.</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir plugins
+cat &gt; plugins/titles.js &lt;&lt;'JS'
+'use strict';
+module.exports = {
+  kind: 'memory-adapter',
+  name: 'titles',
+  agsc_spec_version: '1.0.0',
+  plugin_api_version: '1.0.0',
+  exportFiles(items) {
+    const lines = items.map((item) =&gt; `${item.type}: ${item.title}`);
+    return { files: [{ path: 'titles.txt', text: lines.join('\n') + '\n' }] };
+  },
+};
+JS
+agsc export --to ./plugins/titles.js
+head -3 dist/export/titles/titles.txt</code></pre>
+<pre tabindex="0" data-lang="text"><code>adapter: titles (a plugin; 1 files, outside build.out)
+export: pass (0 error, 0 warn)
+cluster: Agent patterns
+concept: Decide the login
+concept: Handoff</code></pre>
+<p>It loaded and ran. The versions it declares are the ones it was written for: the specification version and the plugin API version. Add <code>importFiles(files)</code> to make <code>agsc import --from ./plugins/titles.js</code> work too.</p>
+<h2 id="a2-what-the-engine-refuses">A2. What the engine refuses</h2>
+<p>A plugin is a file on your machine. A web address is refused, and so is a plugin written for a newer plugin API:</p>
+<pre tabindex="0" data-lang="bash"><code>agsc export --to https://example.org/titles.js || echo &quot;exit $?&quot;
+sed 's/plugin_api_version: .1.0.0./plugin_api_version: &quot;9.0.0&quot;/' plugins/titles.js &gt; plugins/future.js
+agsc export --to ./plugins/future.js || echo &quot;exit $?&quot;</code></pre>
+<pre tabindex="0" data-lang="text"><code>error: AGSC-E905 export --to &quot;https://example.org/titles.js&quot; names a remote plugin; this engine loads a plugin from a local path or an installed package and never from the network (AGSC-04-03, AGSC-00-24)
+exit 1
+error: AGSC-E004 the plugin targets plugin-API version &quot;9.0.0&quot;, which this engine (&quot;1.0.0&quot;) does not implement; the plugin API is additive within 1.x, so a newer MINOR may use a hook this host does not offer
+exit 2</code></pre>
+<p>(The <code>&quot;1.0.0&quot;</code> in that message is the version of the plugin API, not of the engine, which is 1.1.0.)</p>
+<h2 id="a3-where-a-plugin-is-named">A3. Where a plugin is named</h2>
+<p>Not in the configuration. The file <code>agsc.config.json</code> is closed, and a <code>plugins</code> key is refused:</p>
+<pre tabindex="0" data-lang="bash"><code>node -e 'const fs = require(&quot;fs&quot;); const c = JSON.parse(fs.readFileSync(&quot;agsc.config.json&quot;)); c.plugins = [&quot;./plugins/titles.js&quot;]; fs.writeFileSync(&quot;agsc.config.json&quot;, JSON.stringify(c, null, 2) + &quot;\n&quot;)'
+agsc lint --quiet 2&gt;&amp;1 | grep '^error:'
+git checkout -q agsc.config.json</code></pre>
+<pre tabindex="0" data-lang="text"><code>error: AGSC-E004 plugins: must NOT have additional properties — agsc.config.json</code></pre>
+<p>At 1.1.0 the engine loads a plugin you write for three of the eight kinds, each from a command-line flag: <code>export --to</code> and <code>import --from</code> (memory adapter), <code>compose --emit</code> (composition emitter) and <code>agsc-host emit</code> (deployment profile). The package has a sample of each kind in <code>$ENGINE/examples/plugins/</code>. Two of them:</p>
+<pre tabindex="0" data-lang="bash"><code>cp &quot;$ENGINE/examples/plugins/composition-emitter.js&quot; &quot;$ENGINE/examples/plugins/deployment-profile.js&quot; plugins/
+agsc compose handoff supervisor --emit ./plugins/composition-emitter.js | tail -2
+agsc build --quiet 2&gt;/dev/null
+agsc-host emit ./plugins/deployment-profile.js | tail -2</code></pre>
+<pre tabindex="0" data-lang="text"><code>emit: dist/harness/3e6d036859f29f61.index.md (example-index, a plugin)
+compose: pass (0 error, 0 warn)
+agsc-host emit: pass (0 error, 0 warn)
+wrote dist/hosts/example-host/example-host.toml
+claim: deployment profile example-host</code></pre>
+<p>The other five kinds have a registry and a sample, but no flag or configuration key loads one: a channel's <code>adapter</code> in <code>agsc.config.json</code> is a name that the configuration accepts and nothing looks up. <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/PLUGINS.md">The plugin guide</a> lists the three rules every plugin obeys: no network, writes just the outputs its kind names, and no change to the bytes of a published surface.</p>
+<h2 id="b1-the-conformance-vectors">B1. The conformance vectors</h2>
+<p>A second implementation needs two folders: <code>spec/</code> and <code>tests/vectors/</code>. The vectors ship in the package. Count them:</p>
+<pre tabindex="0" data-lang="bash"><code>ls &quot;$ENGINE/tests/vectors&quot; | head -5
+find &quot;$ENGINE/tests/vectors&quot; -name '*.json' | wc -l</code></pre>
+<pre tabindex="0" data-lang="text"><code>README.md
+adopt
+boards
+boundary
+build
+399</code></pre>
+<p>Each file is one JSON case that cites one rule and states the expected result. You read them with your language's own JSON parser.</p>
+<h2 id="b2-run-a-level-and-read-the-report">B2. Run a Level and read the report</h2>
+<p>There are four Levels: 0 publisher, 1 reader, 2 writer, 3 full engine. Each runs more areas of vectors than the last. Run all four on the reference engine and read the report of the last:</p>
+<pre tabindex="0" data-lang="bash"><code>for level in 0 1 2 3; do agsc conform --level &quot;$level&quot; --to &quot;reports/level-$level.json&quot; | head -1; done
+node -e 'const r = require(&quot;./reports/level-3.json&quot;); console.log(Object.keys(r).join(&quot; &quot;)); console.log(r.class, r.impl, r.version, r.spec_version, JSON.stringify(r.summary)); console.log(JSON.stringify(r.results[0]))'</code></pre>
+<pre tabindex="0" data-lang="text"><code>vectors: 35 pass, 0 fail, 2 skip (2 withdrawn, 0 pending) of 37
+vectors: 113 pass, 0 fail, 3 skip (3 withdrawn, 0 pending) of 116
+vectors: 266 pass, 0 fail, 18 skip (18 withdrawn, 0 pending) of 284
+vectors: 376 pass, 0 fail, 23 skip (23 withdrawn, 0 pending) of 399
+class impl results spec_version summary version
+full-engine agentic-system-core 1.1.0 1.1.0 {&quot;fail&quot;:0,&quot;pass&quot;:376,&quot;skip&quot;:23}
+{&quot;id&quot;:&quot;adopt-0001&quot;,&quot;status&quot;:&quot;pass&quot;}</code></pre>
+<p>A withdrawn vector counts in neither direction. The report holds one <code>pass</code>, <code>fail</code> or <code>skip</code> for each vector id, and your own runner writes the same shape. The path after <code>--to</code> must lie inside the folder; an absolute path is refused.</p>
+<h2 id="b3-the-order-to-follow">B3. The order to follow</h2>
+<p><a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/IMPLEMENTERS-GUIDE.md">The implementers' guide</a> says to start at Level 1, the reader, and then go up. It says to read <code>spec/00-overview.md</code> first, then the vector format in <code>tests/vectors/README.md</code>, then <code>spec/01</code> and <code>spec/02</code>, <code>spec/03</code>, <code>spec/04</code>, <code>spec/09</code> and <code>spec/10</code>. Run the vector areas as you read each part: start with <code>frontmatter</code> and <code>slug</code>, then <code>links</code>, <code>jcs</code>, <code>lint</code>. Then say which Level and version you ran, with the sentence in <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONFORMANCE-STATEMENTS.md">How to say you conform</a>.</p>
+<p>The README names a Python package, <code>agentic-system-core</code>, for the checkers and the reading API. Check that it exists:</p>
+<pre tabindex="0" data-lang="bash"><code>pip index versions agentic-system-core 2&gt;/dev/null | head -2
+curl -s -o /dev/null -w '%{http_code}\n' https://pypi.org/project/agentic-system-core/</code></pre>
+<pre tabindex="0" data-lang="text"><code>agentic-system-core (1.1.0)
+Available versions: 1.1.0, 1.0.1, 1.0.0
+200</code></pre>
+<h2 id="check-that-it-worked">Check that it worked</h2>
+<p>A.1 wrote <code>dist/export/titles/titles.txt</code>. B.2 printed <code>376 pass, 0 fail</code> for Level 3 and wrote four report files under <code>reports/</code>.</p>
+<h2 id="what-this-does-not-do">What this does not do</h2>
+<ul>
+<li>A plugin cannot go in the configuration at 1.1.0, and just three kinds load from a flag.</li>
+<li>This recipe did not install or run the Python package; it checked that the name exists.</li>
+<li>A passing run states a Level and a version. Neither is a certification.</li>
+</ul>
+<h2 id="where-to-go-next">Where to go next</h2>
+<ul>
+<li><a href="/docs/guides/mode-1/">Mode 1: your own classes and rules</a>.</li>
+<li><a href="/docs/recipe-ci-gate/">Stop a broken change before it is merged</a>.</li>
+<li><a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/PLUGINS.md">The plugin guide</a>.</li>
+</ul>
+<p>Run on 18 November 2026 with engine 1.1.0. The script that repeats every command of this page: <a href="https://github.com/andreibesleaga/AgenticSystemCore.com/blob/main/recipes/extend-or-port.run.sh">recipes/extend-or-port.run.sh</a>. More recipes: <a href="/docs/recipes/">the list</a>.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/recipe-extend-or-port.md">Propose an edit</a> — opens <code>site/docs/recipe-extend-or-port.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a> · <a href="https://standards.agenticsystemcore.com/">Standards Map</a></span></p>
+</footer>
+</body>
+</html>

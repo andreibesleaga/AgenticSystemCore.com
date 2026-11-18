@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipe: bring notes in from Basic Memory, an Obsidian vault or a Notion export — AgenticSystemCore</title>
+<meta name="description" content="Import Basic Memory notes, an Obsidian vault and a Notion export into an AgenticSystemCore node as drafts, then fix links and lint.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/recipe-notes-apps/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/recipe-notes-apps/">
+<meta property="og:title" content="Recipe: bring notes in from Basic Memory, an Obsidian vault or a Notion export">
+<meta property="og:description" content="Import Basic Memory notes, an Obsidian vault and a Notion export into an AgenticSystemCore node as drafts, then fix links and lint.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Recipe: bring notes in from Basic Memory, an Obsidian vault or a Notion export","description":"Import Basic Memory notes, an Obsidian vault and a Notion export into an AgenticSystemCore node as drafts, then fix links and lint.","url":"https://agenticsystemcore.com/docs/recipe-notes-apps/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Recipe: bring notes in from Basic Memory, an Obsidian vault or a Notion export</h1>
+<p class="summary"><strong>Summary</strong>For someone whose notes live in a notes app and who wants them as items in a node. You learn which importer fits which export, try a dry run, import, and fix what the import leaves.</p>
+<p><strong>Who it is for:</strong> someone with notes in Basic Memory, an Obsidian vault or a Notion export.</p>
+<p><strong>What you get:</strong> the notes as draft items in one node, with typed links where the source had them, and a clean lint.</p>
+<p><strong>Time:</strong> about 10 minutes. <strong>Needs:</strong> Node.js 22.13 or later, git, a POSIX shell with GNU <code>sed</code>.</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Install the engine with the block in <a href="/docs/guides/mode-0/">Mode 0</a>. You start in an empty working folder. Make three small sample exports (use your own folders if you have them), then an empty node:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir -p basic-memory/notes vault/Daily notion
+printf -- '---\ntitle: Espresso\ntype: note\ntags: [coffee]\npermalink: espresso\n---\n# Espresso\n\n## Observations\n- [method] Pull a shot in 25 to 30 seconds #coffee\n\n## Relations\n- uses [[Grind size]]\n- broader [[Coffee]]\n' &gt; basic-memory/notes/espresso.md
+printf -- '---\ntitle: Grind size\ntype: note\npermalink: grind-size\n---\n# Grind size\n\nFiner grind slows the shot.\n' &gt; basic-memory/notes/grind-size.md
+printf -- '---\ntitle: Coffee\ntype: note\npermalink: coffee\n---\n# Coffee\n\nA drink made from roasted beans.\n' &gt; basic-memory/notes/coffee.md
+printf -- '# Sourdough\n\nA loaf needs a lively starter. See [[Hydration]] and [[Daily/2026-11-17]].\n' &gt; vault/Sourdough.md
+printf -- '# Hydration\n\nWater weight divided by flour weight. Back to [[Sourdough|the sourdough note]].\n' &gt; vault/Hydration.md
+printf -- 'Fed the starter at 8.\n' &gt; vault/Daily/2026-11-17.md
+printf -- '# Meeting notes\n\nAgreed to move the rota to Mondays. See [Rota](%s).\n' 'Rota%20fedcba9876543210fedcba9876543210.md' &gt; &quot;notion/Meeting notes 0123456789abcdef0123456789abcdef.md&quot;
+printf -- '# Rota\n\nThe on-call rota changes every Monday.\n' &gt; &quot;notion/Rota fedcba9876543210fedcba9876543210.md&quot;
+printf -- 'Name,Tags,Body\nDesigning Data-Intensive Applications,&quot;books, data&quot;,Read the section on logs.\nThe Pragmatic Programmer,books,Reread yearly.\n' &gt; &quot;notion/Reading list 00112233445566778899aabbccddeeff.csv&quot;
+mkdir my-node &amp;&amp; cd my-node &amp;&amp; git init -q -b main
+agsc init
+mkdir -p .well-known &amp;&amp; printf 'Contact: https://example.org/security\n' &gt; .well-known/security.txt
+cp &quot;$ENGINE/LICENSE-CONTENT&quot; . &amp;&amp; git add -A &amp;&amp; git commit -qm 'empty node'</code></pre>
+<h2 id="which-importer-for-which-source">Which importer for which source</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
+<thead><tr><th scope="col">Source</th><th scope="col">Importer</th><th scope="col">What it reads</th></tr></thead>
+<tbody>
+<tr><td>Basic Memory project</td><td><code>--from basic-memory</code></td><td>its Markdown notes, and relations whose type is a link key</td></tr>
+<tr><td>Obsidian vault of notes</td><td><code>--from okf</code></td><td>any tree of Markdown files; <code>[[wikilinks]]</code> stay text</td></tr>
+<tr><td>Notion export, pages</td><td><code>--from okf</code></td><td>the <code>.md</code> files, after you strip the id Notion adds to each name</td></tr>
+<tr><td>Notion export, database</td><td><code>--from csv</code></td><td>a table: a column <code>Name</code> or <code>title</code>, a column <code>Body</code> or <code>content</code></td></tr>
+<tr><td>Obsidian Kanban board, Notion task database</td><td><code>--from board</code></td><td>see <a href="/docs/recipe-task-boards/">the task boards recipe</a></td></tr>
+</tbody></table></div>
+<p>The 1.1.0 engine has no importer made for an Obsidian vault or for Notion pages. The Markdown reader (<code>okf</code>) takes both, as the steps below show. Every importer accepts <code>--dry-run</code>, and every foreign note arrives as a draft.</p>
+<h2 id="1-basic-memory">1. Basic Memory</h2>
+<pre tabindex="0" data-lang="bash"><code>agsc import ../basic-memory --from basic-memory --dry-run
+agsc import ../basic-memory --from basic-memory
+sed -n 1,16p content/concepts/espresso.md</code></pre>
+<pre tabindex="0" data-lang="text"><code>import: 3 written, 0 replaced, 0 unchanged
+import: foreign_drafts: 3
+import: items: 3
+import: links: 2
+broader:
+  - coffee
+uses:
+  - grind-size
+x-basic-memory-permalink: espresso</code></pre>
+<p>Two of the relations (<code>uses</code>, <code>broader</code>) became typed links, because those are link keys. A relation with another type, such as <code>relates_to</code>, stays in the body as written. The dry run printed the same counts and wrote nothing.</p>
+<h2 id="2-an-obsidian-vault">2. An Obsidian vault</h2>
+<pre tabindex="0" data-lang="bash"><code>agsc import ../vault --from okf --dry-run
+agsc import ../vault --from okf
+grep -n '\[\[' content/concepts/sourdough.md content/concepts/hydration.md</code></pre>
+<pre tabindex="0" data-lang="text"><code>import: 3 written, 0 replaced, 0 unchanged
+import: items: 3
+import: unreadable_frontmatter: 3
+content/concepts/sourdough.md:12:A loaf needs a lively starter. See [[Hydration]] and [[Daily/2026-11-17]].
+content/concepts/hydration.md:12:Water weight divided by flour weight. Back to [[Sourdough|the sourdough note]].</code></pre>
+<p>The titles come from each page's top heading, or the file name. <code>unreadable_frontmatter: 3</code> counts the three notes with no header at all. Wikilinks are not links to the engine, so turn them into Markdown links to the new file names (lower case, <code>.md</code>):</p>
+<pre tabindex="0" data-lang="bash"><code>sed -i -E 's/\[\[([^]|]*\/)?([^]|]+)\|([^]]+)\]\]/[\3](\L\2.md)/g; s/\[\[([^]|]*\/)?([^]|]+)\]\]/[\2](\L\2.md)/g' content/concepts/sourdough.md content/concepts/hydration.md
+grep -n 'md)' content/concepts/sourdough.md content/concepts/hydration.md</code></pre>
+<pre tabindex="0" data-lang="text"><code>content/concepts/sourdough.md:12:A loaf needs a lively starter. See [Hydration](hydration.md) and [2026-11-17](2026-11-17.md).
+content/concepts/hydration.md:12:Water weight divided by flour weight. Back to [the sourdough note](sourdough.md).</code></pre>
+<p>This pattern fits names of one word. A note called <code>Grind size</code> becomes the file <code>grind-size.md</code>, so replace its spaces with hyphens as well.</p>
+<h2 id="3-a-notion-export">3. A Notion export</h2>
+<p>Notion adds a 32-character id to every file name and to every link. Copy the pages without it, then import:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir ../notion-clean
+for f in ../notion/*.md; do n=$(basename &quot;$f&quot; | sed -E 's/ [0-9a-f]{32}\.md$/.md/'); cp &quot;$f&quot; &quot;../notion-clean/$n&quot;; done
+sed -i -E 's/\]\(([A-Za-z0-9]+)%20[0-9a-f]{32}\.md\)/](\L\1.md)/g' ../notion-clean/*.md
+agsc import ../notion-clean --from okf
+agsc import ../notion --from csv --dry-run
+agsc import ../notion --from csv</code></pre>
+<pre tabindex="0" data-lang="text"><code>import: 2 written, 0 replaced, 0 unchanged
+import: --dry-run: 2 file(s) would be written, 0 unchanged
+import: foreign_drafts: 2
+import: 2 written, 0 replaced, 0 unchanged</code></pre>
+<p>The pages arrive from <code>okf</code>; each row of the database table arrives from <code>csv</code> as one item, its <code>Tags</code> kept as <code>x-csv-tags</code> and any other column in <code>x-csv-rest</code>.</p>
+<h2 id="check-that-it-worked">Check that it worked</h2>
+<pre tabindex="0" data-lang="bash"><code>agsc lint | grep '^lint:'</code></pre>
+<pre tabindex="0" data-lang="text"><code>lint: pass (0 error, 19 warn)</code></pre>
+<p>Ten items are in <code>content/concepts/</code>, all with <code>status: draft</code>. Review them, then publish: <a href="/docs/recipe-open-knowledge-format/">the OKF recipe</a> shows the status change and the build.</p>
+<h2 id="what-this-does-not-do">What this does not do</h2>
+<ul>
+<li>It does not read Obsidian's <code>.obsidian</code> settings, plugins, tags or embeds, or Notion's database properties other than through a CSV.</li>
+<li>It does not turn <code>[[wikilinks]]</code> into links for you, and it never publishes: every foreign note is a draft.</li>
+<li>It does not connect to either service. You export from the app, and the engine reads the files.</li>
+</ul>
+<h2 id="where-to-go-next">Where to go next</h2>
+<ul>
+<li><a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONNECTORS.md">CONNECTORS.md</a>, route 10: every memory-tool importer, and the exports back.</li>
+<li><a href="/docs/guides/mode-1/">Mode 1</a>: typed links and the assistant tools.</li>
+</ul>
+<p>Run on 18 November 2026 with engine 1.1.0. The script that repeats every command of this page: <a href="https://github.com/andreibesleaga/AgenticSystemCore.com/blob/main/recipes/notes-apps.run.sh">recipes/notes-apps.run.sh</a>. More recipes: <a href="/docs/recipes/">the list</a>.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/recipe-notes-apps.md">Propose an edit</a> — opens <code>site/docs/recipe-notes-apps.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a> · <a href="https://standards.agenticsystemcore.com/">Standards Map</a></span></p>
+</footer>
+</body>
+</html>

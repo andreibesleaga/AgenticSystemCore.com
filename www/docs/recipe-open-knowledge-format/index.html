@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipe: bring an Open Knowledge Format bundle in, and write a node out as one — AgenticSystemCore</title>
+<meta name="description" content="Import an Open Knowledge Format folder into an AgenticSystemCore node, fix what the check finds, publish, build, and export the node as OKF.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/recipe-open-knowledge-format/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/recipe-open-knowledge-format/">
+<meta property="og:title" content="Recipe: bring an Open Knowledge Format bundle in, and write a node out as one">
+<meta property="og:description" content="Import an Open Knowledge Format folder into an AgenticSystemCore node, fix what the check finds, publish, build, and export the node as OKF.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Recipe: bring an Open Knowledge Format bundle in, and write a node out as one","description":"Import an Open Knowledge Format folder into an AgenticSystemCore node, fix what the check finds, publish, build, and export the node as OKF.","url":"https://agenticsystemcore.com/docs/recipe-open-knowledge-format/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Recipe: bring an Open Knowledge Format bundle in, and write a node out as one</h1>
+<p class="summary"><strong>Summary</strong>For someone who holds a folder in Open Knowledge Format (OKF) and wants it as a checked site with a graph and files for assistants, or who needs a node's notes in that format. You end with the bundle imported, checked, published and built, and an OKF export with a digest for every file.</p>
+<p><strong>Who it is for:</strong> someone with an OKF folder who wants it checked, published and searchable, or who needs a node's notes in OKF.</p>
+<p><strong>What you get:</strong> every page of the bundle as an item with its title, description, tags and sources; a built site with a graph, a discovery file and files for assistants; and an OKF export of the node.</p>
+<p><strong>Time:</strong> about 10 minutes. <strong>Needs:</strong> Node.js 22.13 or later, git, a POSIX shell with GNU <code>sed</code> and <code>perl</code>, and network access to clone one example repository.</p>
+<p>Open Knowledge Format is the format published in the <a href="https://github.com/GoogleCloudPlatform/open-knowledge-format">open-knowledge-format repository</a>: a folder of Markdown files, each with a header that names a <code>type</code>. This page was run against version 0.2 of its <a href="https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/ad30107/SPEC.md">specification</a> and the example bundles of that repository, on 18 November 2026.</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Install the engine with the block in <a href="/docs/guides/mode-0/">Mode 0</a>. Then fetch the example bundles, and make an empty node with a security contact, the content licence and one commit:</p>
+<pre tabindex="0" data-lang="bash"><code>git clone -q https://github.com/GoogleCloudPlatform/open-knowledge-format okf
+git -C okf checkout -q ad30107
+mkdir my-node &amp;&amp; cd my-node &amp;&amp; git init -q -b main
+agsc init
+mkdir -p .well-known &amp;&amp; printf 'Contact: https://example.org/security\n' &gt; .well-known/security.txt
+cp &quot;$ENGINE/LICENSE-CONTENT&quot; . &amp;&amp; git add -A &amp;&amp; git commit -qm 'empty node'</code></pre>
+<p>Use your own link in <code>Contact:</code>, and your own OKF folder in place of <code>../okf/bundles/ga4</code>.</p>
+<h2 id="1-import">1. Import</h2>
+<p><code>--dry-run</code> plans the import and writes nothing. Then run it for real:</p>
+<pre tabindex="0" data-lang="bash"><code>agsc import ../okf/bundles/ga4 --from okf --dry-run 2&gt;&amp;1 | grep -v '^warn'
+agsc import ../okf/bundles/ga4 --from okf 2&gt;&amp;1 | grep -v '^warn'
+sed -n 1,10p content/concepts/purchasers.md
+grep -n 'x-okf-type' content/concepts/purchasers.md</code></pre>
+<pre tabindex="0" data-lang="text"><code>import: --dry-run: 9 file(s) would be written, 0 unchanged
+import: 9 written, 0 replaced, 0 unchanged
+import: items: 9
+import: unreadable_frontmatter: 0
+import: pass (0 error, 36 warn)
+---
+type: concept
+title: Purchasers Audience Metric
+description: Computes the count or list of users who have completed a purchase or in-app purchase.
+status: draft
+tags:
+  - metric
+  - audience
+  - ga4
+  - purchasers
+23:x-okf-type: Reference</code></pre>
+<p>Nine pages came in, each with its title, description, tags and sources. OKF lets a bundle name its own types; the node has six, so the page became a <code>concept</code> and its OKF type is kept as <code>x-okf-type</code>. The 36 warnings say what the import added, one line each. Every page arrives as <code>status: draft</code>: it reaches no published page or file until a person changes that.</p>
+<h2 id="2-let-the-check-find-what-to-fix">2. Let the check find what to fix</h2>
+<pre tabindex="0" data-lang="bash"><code>agsc lint | grep '^lint:'</code></pre>
+<pre tabindex="0" data-lang="text"><code>lint: fail (18 error, 39 warn)</code></pre>
+<p>The check found two kinds of error, nine of each. The bundle writes times as <code>+00:00</code>, and the node wants <code>Z</code>. The bundle links pages across folders (<code>../references/metrics/purchasers.md</code>), and the node keeps its items in one folder, with hyphens in file names. Two commands fix both:</p>
+<pre tabindex="0" data-lang="bash"><code>sed -i -E 's/^(  at: [0-9T:-]+)\+00:00$/\1Z/' content/concepts/*.md
+perl -pi -e 's{\]\((?:\.\./)+(?:[a-z]+/)*([a-z0-9_]+)\.md\)}{ my $s = $1; $s =~ tr/_/-/; $s =~ s/-+$//; &quot;]($s.md)&quot; }ge' content/concepts/*.md
+agsc lint | grep '^lint:'</code></pre>
+<pre tabindex="0" data-lang="text"><code>lint: pass (0 error, 39 warn)</code></pre>
+<p>The warnings left (footnotes, pages nobody links to) do not stop a build.</p>
+<h2 id="3-publish">3. Publish</h2>
+<p>An item is published when its <code>status</code> is not <code>draft</code>. Read the pages, then set the status of the ones you accept; here, all nine:</p>
+<pre tabindex="0" data-lang="bash"><code>sed -i 's/^status: draft$/status: stable/' content/concepts/*.md
+git add -A &amp;&amp; git commit -qm 'import the ga4 bundle'</code></pre>
+<p>A published page may link to published pages alone. If you publish a page that links to a draft, the build stops and names the link.</p>
+<h2 id="4-build-and-see-what-the-build-adds">4. Build, and see what the build adds</h2>
+<pre tabindex="0" data-lang="bash"><code>agsc build | grep '^wrote\|^build:'
+grep -o 'sha-256=' www/.well-known/knowledge-linkset | wc -l
+grep 'Purchasers' www/llms.txt
+ls www/graph.jsonld www/graph.ttl www/graph.nq www/chunks.jsonl www/search.json</code></pre>
+<pre tabindex="0" data-lang="text"><code>wrote: 94 files under www/
+build: pass (0 error, 11 warn)
+11
+- [Purchasers Audience Metric](http://localhost/concepts/purchasers/): Computes the count or list of users who have completed a purchase or in-app purchase.
+www/chunks.jsonl
+www/graph.jsonld
+www/graph.nq
+www/graph.ttl
+www/search.json</code></pre>
+<p>The OKF folder held Markdown files. The node now also holds:</p>
+<ul>
+<li>a website with one page per item and a search page;</li>
+<li>a discovery file, <code>.well-known/knowledge-linkset</code>, that lists the machine files with a SHA-256 digest each;</li>
+<li>the graph in three forms, and <code>llms.txt</code> and <code>chunks.jsonl</code> for assistants and retrieval;</li>
+<li>the ten tools an assistant can call, through <code>agsc mcp</code> (<a href="/docs/recipe-connect-an-assistant/">connect an assistant</a>).</li>
+</ul>
+<h2 id="5-write-the-node-out-as-okf">5. Write the node out as OKF</h2>
+<pre tabindex="0" data-lang="bash"><code>agsc export --okf --manifest 2&gt;&amp;1 | grep '^export'
+ls dist/export/okf</code></pre>
+<pre tabindex="0" data-lang="text"><code>export --okf: 12 files under dist/export/okf/ (AGSC-01-26; the export root carries LICENSE-CONTENT)
+export: pass (0 error, 11 warn)
+LICENSE-CONTENT
+content
+export-manifest.json</code></pre>
+<p>Published items leave; drafts stay. <code>export-manifest.json</code> holds a digest of every exported file, so whoever receives the folder can check the copy.</p>
+<h2 id="check-that-it-worked">Check that it worked</h2>
+<p><code>agsc lint</code> and <code>agsc build</code> print <code>pass</code>, <code>www/concepts/purchasers/index.html</code> exists, and <code>dist/export/okf/content/concepts/</code> holds nine files.</p>
+<h2 id="what-this-does-not-do">What this does not do</h2>
+<ul>
+<li>It does not read a header written with inline maps (<code>generated: { by: …, at: … }</code>). The import then keeps the page's text and writes a new header, so the title comes from the first heading and the tags are not carried over. Of the four example bundles, three import with every header read (<code>ga4</code>, <code>stackoverflow</code>, <code>crypto_bitcoin</code>); <code>acme_retail</code> uses inline maps on all nine pages. Rewrite such headers in block form before importing.</li>
+<li>It does not keep OKF's folders or rewrite links: step 2 is yours.</li>
+<li>It does not copy files that are not Markdown, and it never publishes for you.</li>
+</ul>
+<h2 id="where-to-go-next">Where to go next</h2>
+<ul>
+<li><a href="/docs/recipe-move-a-site-in/">Move an existing wiki or docs folder in</a>: the same importer reads any folder of Markdown.</li>
+<li><a href="/docs/guides/mode-1/">Mode 1</a>, section 5: the other exports.</li>
+<li><a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONNECTORS.md">CONNECTORS.md</a>: every adapter.</li>
+</ul>
+<p>Run on 18 November 2026 with engine 1.1.0. The script that repeats every command of this page: <a href="https://github.com/andreibesleaga/AgenticSystemCore.com/blob/main/recipes/open-knowledge-format.run.sh">recipes/open-knowledge-format.run.sh</a>. More recipes: <a href="/docs/recipes/">the list</a>.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/recipe-open-knowledge-format.md">Propose an edit</a> — opens <code>site/docs/recipe-open-knowledge-format.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a> · <a href="https://standards.agenticsystemcore.com/">Standards Map</a></span></p>
+</footer>
+</body>
+</html>

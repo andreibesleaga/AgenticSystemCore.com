@@ -90,6 +90,6 @@ Each number, its method and its limits are on the [benchmarks page](/docs/benchm
 
 ## Where to go next
 
-- [Try it in five minutes](/docs/demos/), or follow a [guide](/docs/guides/) on your own files.
+- [Try it in five minutes](/docs/demos/), follow a [guide](/docs/guides/) on your own files, or pick a [recipe](/docs/recipes/) for one job.
 - [Start here](/docs/start-here/) for a reading path for each kind of reader.
 - The source is on [GitHub](https://github.com/andreibesleaga/agentic-system-core), under Apache-2.0.
