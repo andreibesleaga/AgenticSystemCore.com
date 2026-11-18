@@ -6,7 +6,7 @@ description: "Measured results for AgenticSystemCore 1.1.0: agent answer accurac
 
 AgenticSystemCore is a knowledge system for people and agents: one folder of Markdown becomes a website, a graph with published meanings, and tools an assistant can call, with every change passing through a person. This page collects what has been measured about engine 1.1.0 and the two public nodes, this site and [patterns.agenticsystemcore.com](https://patterns.agenticsystemcore.com/).
 
-The numbers come from two sources: the engine's own measurement record of 11 November 2026 ([docs/MEASUREMENTS.md](https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/MEASUREMENTS.md), each figure with the command that produced it), and studies the project ran on 17 and 18 November 2026, which compared a node with other ways of offering the same content and read its graph with independent tools. The engine's record is public and each figure in it can be run again. The question set, the harness and the raw answers of the November studies are kept by the project and are not published, so those figures (the answer tables, the citation rates, the graph checks, the typed-link, cross-node, write and change-detection results) rest on the project's word; the last section says how they were made.
+The numbers come from two sources: the engine's own measurement record of 11 November 2026 ([docs/MEASUREMENTS.md](https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/MEASUREMENTS.md), each figure with the command that produced it), and studies the project ran on 17 and 18 November 2026, which compared a node with other ways of offering the same content and read its graph with independent tools. The engine's record is public and each figure in it can be run again. The question set, the harness, the raw answers and the generated reports of the November studies are public at [agentic-system-core-benchmarks](https://github.com/andreibesleaga/agentic-system-core-benchmarks); one command there, `node verify.js`, recomputes the figures of this page from the raw rows and prints each next to the value given here. The last section says how the studies were made.
 
 ## The results in one table
 
@@ -116,4 +116,5 @@ Every size met the specification's budgets: at most 60 seconds of build for each
 - Each answer was limited to eight tool calls, and tool results were cut to 3,500 characters, for every route.
 - The graph checks read the published `graph.ttl` and `graph.nq` files; the JSON-LD form was not parsed in that run.
 - The engine's record states for each figure the command, the machine and what the figure does not establish.
+- The source repository of the demonstration node is not public, so a reader can recompute every figure from the published rows but can run again only the parts that use this site and the engine's example Bundles.
 - These are the project's own measurements. No third party has repeated them.
