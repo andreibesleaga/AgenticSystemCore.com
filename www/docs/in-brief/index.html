@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>In brief — AgenticSystemCore</title>
+<meta name="description" content="A plain-language summary of AgenticSystemCore: short descriptions, every part with its purpose and benefit, benefits for each kind of user, a do-it-yourself integrity check, the limits, and the key measured numbers with links.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/in-brief/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/in-brief/">
+<meta property="og:title" content="In brief">
+<meta property="og:description" content="A plain-language summary of AgenticSystemCore: short descriptions, every part with its purpose and benefit, benefits for each kind of user, a do-it-yourself integrity check, the limits, and the key measured numbers with links.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"In brief","description":"A plain-language summary of AgenticSystemCore: short descriptions, every part with its purpose and benefit, benefits for each kind of user, a do-it-yourself integrity check, the limits, and the key measured numbers with links.","url":"https://agenticsystemcore.com/docs/in-brief/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>In brief</h1>
+<p class="summary"><strong>Summary</strong>The whole system on one page, in plain words: what it is in 25 and in 70 words, each part with what it does and why it matters, what each kind of user gains, how to check a published file yourself, what it does not do, and the measured numbers. Written to be quoted.</p>
+<p>This page is for anyone who needs to describe AgenticSystemCore quickly: a reviewer, a journalist, a judge, a colleague. Every sentence can be quoted, and each links to the page that shows the detail.</p>
+<h2 id="in-25-words">In 25 words</h2>
+<p>Turn a folder of notes into a checked website, a knowledge graph and tools for AI assistants. A person approves every change, and anyone can verify the files.</p>
+<h2 id="in-70-words">In 70 words</h2>
+<p>AgenticSystemCore turns a folder of Markdown notes into a website, a knowledge graph and tools for AI assistants. Each link says what kind of link it is. Each machine file the node lists carries a fingerprint anyone can check. Every change is approved by a person or by a rule a person wrote down. People, search engines and agents read the same checked knowledge, and building it needs no server, database or language model.</p>
+<h2 id="how-it-works-in-one-line">How it works, in one line</h2>
+<p><strong>Markdown folder → one command (<code>agsc build</code>) → a website for people, a graph and text files for agents, and ten tools an assistant can call.</strong> The same folder serves all of them, so there is one place to correct a fact.</p>
+<h2 id="the-parts-and-why-each-matters">The parts, and why each matters</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
+<thead><tr><th scope="col">Part</th><th scope="col">What it does</th><th scope="col">Why it matters</th></tr></thead>
+<tbody>
+<tr><td>Build</td><td>Turns the notes into a site and the files agents read</td><td>One folder serves people and software</td></tr>
+<tr><td>Typed links</td><td>Each link names its kind, one of fourteen: requires, uses, verifies, supersedes, excludes and nine more</td><td>A program can answer &quot;what does this depend on?&quot; without guessing from prose</td></tr>
+<tr><td>Graph and vocabulary</td><td>Publishes the links as RDF under a published vocabulary, with shapes to check them and ten ready questions</td><td>Any linked-data tool can read and query the node; try the <a href="/query/">query page</a></td></tr>
+<tr><td>Discovery file</td><td>One address on the site lists every machine file, with a fingerprint for each</td><td>An agent finds everything from one request and can tell that a file was not altered</td></tr>
+<tr><td>Ledger</td><td>Records each change in a chain built from the version history</td><td>History cannot be rewritten unseen</td></tr>
+<tr><td>Ten tools</td><td>Let an assistant search, read, follow links, ask, cite, check and propose</td><td>Answers come from the node, with their source, and not from the model's memory</td></tr>
+<tr><td>Local tool server</td><td>Serves those tools on your own machine</td><td>Your assistant reads your notes without sending them anywhere</td></tr>
+<tr><td>Tools in the page</td><td>Offer the same tools inside each published page</td><td>An assistant in the browser, such as <a href="/webaiassist/">WebAIAssist</a>, can ask the page itself</td></tr>
+<tr><td>Proposals and review</td><td>Turn every change, by a person or an agent, into a request someone approves</td><td>Agents can help write; a person stays accountable</td></tr>
+<tr><td>Passages for retrieval</td><td>Cuts every item into passages with an address, a fingerprint and a licence</td><td>Anyone can build a search index and cite the exact passage</td></tr>
+<tr><td>Compose</td><td>Turns the items you tick into seven starting files for a project</td><td>An architect starts from sourced material; try it on the <a href="/compose/">compose page</a></td></tr>
+<tr><td>Skill packs and instruction files</td><td>Write the node's procedures and decisions in the form coding assistants read</td><td>Assistants in eleven tools follow the project's own rules</td></tr>
+<tr><td>Shared board</td><td>Lets agents and people pull, claim and finish tasks on one board</td><td>Work is visible, and a person decides what is done</td></tr>
+<tr><td>Import and export</td><td>Reads and writes other formats: the Open Knowledge Format, SKOS, skill packs, the memory formats of Mem0, Letta and Zep, and task boards from GitHub, Jira, Trello and others</td><td>Nothing is locked in</td></tr>
+<tr><td>Test vectors and checkers</td><td>Fix the expected output for 399 cases; a Python package checks a node independently</td><td>Another implementation can be built and compared</td></tr>
+<tr><td>Peers</td><td>A node names other nodes; the reader's program visits them</td><td>Knowledge links across sites with no central service, and nodes never call each other</td></tr>
+</tbody></table></div>
+<p>The <a href="/docs/modes/">six ways to use it</a> group these parts by purpose; the <a href="/graph/">graph explorer</a> shows a node's graph in the browser.</p>
+<h2 id="what-each-kind-of-user-gains">What each kind of user gains</h2>
+<ul>
+<li><strong>A person with notes:</strong> a linked, checked website from existing files in a few commands, with broken links and stale pages flagged.</li>
+<li><strong>A documentation team:</strong> every edit is a reviewed change, and the site, the search and the files for assistants never drift apart.</li>
+<li><strong>A developer who uses coding assistants:</strong> instruction files and skill packs keep the assistants on the project's decisions, and the assistant can query the project's memory locally.</li>
+<li><strong>A company with internal knowledge:</strong> a node can be kept non-public, in your own files, read by assistants on your own machines.</li>
+<li><strong>A researcher:</strong> cite a passage by address and fingerprint, and query the graph with SPARQL.</li>
+<li><strong>A publisher of public knowledge:</strong> static files on any host, 0 USD a month on a free plan, already prepared for agents.</li>
+<li><strong>A builder of AI agents:</strong> one memory with typed links, a tool server, and exports to the common memory tools.</li>
+<li><strong>Someone working on interoperability:</strong> published rules, schemas, a vocabulary and test vectors to build against.</li>
+<li><strong>A security reviewer:</strong> a scored set of refusals, a ledger, and stated limits.</li>
+</ul>
+<h2 id="check-a-published-file-yourself">Check a published file yourself</h2>
+<p>No tool from this project is needed. The discovery file gives a fingerprint (a SHA-256 digest) for each machine file; compute the same fingerprint from the file and compare:</p>
+<pre tabindex="0" data-lang="bash"><code>curl -s https://agenticsystemcore.com/.well-known/knowledge-linkset | grep -o 'sha-256=:[^&quot;]*&quot;\],&quot;href&quot;:&quot;https://agenticsystemcore.com/llms.txt&quot;'
+curl -s https://agenticsystemcore.com/llms.txt | openssl dgst -sha256 -binary | base64</code></pre>
+<p>The two values match when the file is the one the node published. The <a href="/graph/">graph explorer</a> does the same check for the graph before it draws it.</p>
+<h2 id="what-it-does-not-do">What it does not do</h2>
+<ul>
+<li><strong>It does not judge truth.</strong> A fingerprint shows that a file is the published one, not that its content is right. Sources and the name of the accountable person are recorded so that a reader can judge.</li>
+<li><strong>It does not run a model.</strong> Building and checking use none. An assistant brings its own model and uses the node's tools.</li>
+<li><strong>It does not replace a search index</strong> over files you own; it publishes the passages such an index needs.</li>
+<li><strong>It does not run agents for you.</strong> It declares what an agent may do and checks the result; the agent runs elsewhere.</li>
+<li><strong>It is not a standard of any standards body.</strong> It is an independent specification with one reference implementation and a Python checker, maintained by one person.</li>
+</ul>
+<p>The full list is under <a href="/docs/how-to-use/#not-shipped-at-this-version">Not shipped at this version</a>, and the <a href="/docs/status/">status page</a> says what is live.</p>
+<h2 id="the-numbers-most-often-asked-for">The numbers most often asked for</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 32"><table>
+<thead><tr><th scope="col">Question</th><th scope="col">Answer</th></tr></thead>
+<tbody>
+<tr><td>Does an agent answer better from a node than from web pages?</td><td>97–98 % correct against 67–83 %, with 31–56 % fewer tokens, for two hosted models with tools</td></tr>
+<tr><td>Can a citation be checked?</td><td>91 % of a capable model's answers carried a citation whose fingerprint matched the published file</td></tr>
+<tr><td>Do standard linked-data tools read the graph?</td><td>5 of 5 graphs pass the published shapes; 3,648 queries ran with 0 failures</td></tr>
+<tr><td>How long to a first node?</td><td>6 commands and 22 seconds from an empty folder</td></tr>
+<tr><td>How large can it go?</td><td>10,000 items build in 119 seconds</td></tr>
+<tr><td>What does hosting cost?</td><td>0 USD a month for both public nodes on a free plan</td></tr>
+<tr><td>How is it tested?</td><td>399 conformance cases, 0 failing; 108 of 108 seeded security faults stopped</td></tr>
+</tbody></table></div>
+<p>Each number, its method and its limits are on the <a href="/docs/benchmarks/">benchmarks page</a>.</p>
+<h2 id="where-to-go-next">Where to go next</h2>
+<ul>
+<li><a href="/docs/demos/">Try it in five minutes</a>, or follow a <a href="/docs/guides/">guide</a> on your own files.</li>
+<li><a href="/docs/start-here/">Start here</a> for a reading path for each kind of reader.</li>
+<li>The source is on <a href="https://github.com/andreibesleaga/agentic-system-core">GitHub</a>, under Apache-2.0.</li>
+</ul>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/in-brief.md">Propose an edit</a> — opens <code>site/docs/in-brief.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a></span></p>
+</footer>
+</body>
+</html>
