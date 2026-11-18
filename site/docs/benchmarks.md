@@ -116,5 +116,5 @@ Every size met the specification's budgets: at most 60 seconds of build for each
 - Each answer was limited to eight tool calls, and tool results were cut to 3,500 characters, for every route.
 - The graph checks read the published `graph.ttl` and `graph.nq` files; the JSON-LD form was not parsed in that run.
 - The engine's record states for each figure the command, the machine and what the figure does not establish.
-- The source repository of the demonstration node is not public, so a reader can recompute every figure from the published rows but can run again only the parts that use this site and the engine's example Bundles.
+- The published items of the demonstration node are public in the [agsc-demo-node repository](https://github.com/andreibesleaga/agsc-demo-node). The studies used its card text as it stood at commit `6bb5769`; the cards were shortened and corrected on 18 November 2026, after the studies, so the live node now answers some of the study's questions differently. The maintainer's working copy, which also holds unpublished drafts and was used for one case, is not public.
 - These are the project's own measurements. No third party has repeated them.
