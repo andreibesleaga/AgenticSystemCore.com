@@ -9,7 +9,7 @@
 /
   Link: </.well-known/knowledge-linkset>; rel="describedby"; type="application/linkset+json", <https://agenticsystemcore.com/>; rel="cite-as", <https://schema.org/Dataset>; rel="type", <https://schema.org/AboutPage>; rel="type", </graph.jsonld>; rel="describedby"; type="application/ld+json", </graph.nq>; rel="item"; type="application/n-quads", </graph.ttl>; rel="item"; type="text/turtle", </chunks.jsonl>; rel="item"; type="application/jsonl", <https://agenticsystemcore.com/legal/>; rel="license", </.well-known/knowledge-linkset>; rel="linkset"; type="application/linkset+json"
   ! Content-Security-Policy
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self' https://patterns.agenticsystemcore.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self' https://patterns.agenticsystemcore.com https://standards.agenticsystemcore.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
 
 /graph/
   ! Content-Security-Policy
