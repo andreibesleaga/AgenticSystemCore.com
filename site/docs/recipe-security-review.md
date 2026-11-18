@@ -30,7 +30,7 @@ agsc build --quiet 2>/dev/null
 The discovery document, `/.well-known/knowledge-linkset`, lists each file with a SHA-256 digest. Compare one by hand, then run the shipped checker over all of them:
 
 ```bash
-node -e 'const l = JSON.parse(require("fs").readFileSync("www/.well-known/knowledge-linkset")).linkset[0]; console.log(l.alternate[0].href, l.alternate[0].digest[0])'
+node -e 'const l = JSON.parse(require("fs").readFileSync("www/.well-known/knowledge-linkset")).linkset[0]; const a = l.alternate.find((x) => x.href.endsWith("/llms.txt")); console.log(a.href, a.digest[0])'
 node -e 'console.log("sha-256=:" + require("crypto").createHash("sha256").update(require("fs").readFileSync("www/llms.txt")).digest("base64") + ":")'
 node "$ENGINE/tools/validate-wellknown" www/.well-known/knowledge-linkset --level 2
 ```

@@ -22,7 +22,7 @@ GIT_AUTHOR_DATE=2026-11-18T09:00:00Z GIT_COMMITTER_DATE=2026-11-18T09:00:00Z git
 agsc build --quiet 2>/dev/null
 
 # 2. The digests
-node -e 'const l = JSON.parse(require("fs").readFileSync("www/.well-known/knowledge-linkset")).linkset[0]; console.log(l.alternate[0].href, l.alternate[0].digest[0])'
+node -e 'const l = JSON.parse(require("fs").readFileSync("www/.well-known/knowledge-linkset")).linkset[0]; const a = l.alternate.find((x) => x.href.endsWith("/llms.txt")); console.log(a.href, a.digest[0])'
 node -e 'console.log("sha-256=:" + require("crypto").createHash("sha256").update(require("fs").readFileSync("www/llms.txt")).digest("base64") + ":")'
 node "$ENGINE/tools/validate-wellknown" www/.well-known/knowledge-linkset --level 2
 cp -r www www-tampered
