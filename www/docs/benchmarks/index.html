@@ -50,7 +50,7 @@
 <h1>Benchmarks</h1>
 <p class="summary"><strong>Summary</strong>What has been measured, for each kind of reader: how agents answer from a node, what the typed graph and its vocabulary give, what a person, a team and a publisher get from one folder of files, how the checks hold, and how far it scales. The sources and the limits are stated.</p>
 <p>AgenticSystemCore is a knowledge system for people and agents: one folder of Markdown becomes a website, a graph with published meanings, and tools an assistant can call, with every change passing through a person. This page collects what has been measured about engine 1.1.0 and the two public nodes, this site and <a href="https://patterns.agenticsystemcore.com/">patterns.agenticsystemcore.com</a>.</p>
-<p>The numbers come from two sources: the engine's own measurement record of 11 November 2026 (<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/MEASUREMENTS.md">docs/MEASUREMENTS.md</a>, each figure with the command that produced it), and studies the project ran on 17 and 18 November 2026, which compared a node with other ways of offering the same content and read its graph with independent tools. The engine's record is public and each figure in it can be run again. The question set, the harness and the raw answers of the November studies are kept by the project and are not published, so those figures (the answer tables, the citation rates, the graph checks, the typed-link, cross-node, write and change-detection results) rest on the project's word; the last section says how they were made.</p>
+<p>The numbers come from two sources: the engine's own measurement record of 11 November 2026 (<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/MEASUREMENTS.md">docs/MEASUREMENTS.md</a>, each figure with the command that produced it), and studies the project ran on 17 and 18 November 2026, which compared a node with other ways of offering the same content and read its graph with independent tools. The engine's record is public and each figure in it can be run again. The question set, the harness, the raw answers and the generated reports of the November studies are public at <a href="https://github.com/andreibesleaga/agentic-system-core-benchmarks">agentic-system-core-benchmarks</a>; one command there, <code>node verify.js</code>, recomputes the figures of this page from the raw rows and prints each next to the value given here. The last section says how the studies were made.</p>
 <h2 id="the-results-in-one-table">The results in one table</h2>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
 <thead><tr><th scope="col">For</th><th scope="col">What a node gives</th><th scope="col">Measured</th></tr></thead>
@@ -60,7 +60,7 @@
 <tr><td>Anyone who works with linked data</td><td>A graph that standard tools read as it is</td><td>5 graphs, 3,941 statements: two RDF forms equal, all pass the SHACL shapes, 3,648 SPARQL queries run with 0 failures</td></tr>
 <tr><td>An agent asked about relations</td><td>Answers that follow typed links over two and three steps</td><td>30 of 30 through the <code>links</code> tool</td></tr>
 <tr><td>A person with notes</td><td>A checked website, a graph and agent files from one command</td><td>323 files of 14 kinds in 2.4 seconds; a first node in 6 commands and 22 seconds</td></tr>
-<tr><td>A team that lets agents propose</td><td>Changes that pass through a person</td><td>0 source files changed in 20 attempts, ordinary and hostile; each returned a proposal</td></tr>
+<tr><td>A team that lets agents propose</td><td>Changes that pass through a person</td><td>0 source files changed in 20 attempts, ordinary and hostile: 8 returned a proposal, 12 were refused with an error code</td></tr>
 <tr><td>A publisher</td><td>Detection of a changed file, and the same bytes on every build</td><td>33 of 33 changes to the demonstration node's 9 digest-listed files detected; 0 files differing across two builds, time zones and locales</td></tr>
 <tr><td>A security reviewer</td><td>A floor of refusals that is scored</td><td>108 of 108 seeded faults stopped, 14 of 14 valid controls clean</td></tr>
 <tr><td>A reader with assistive technology</td><td>Pages that pass automated accessibility checks</td><td>0 violations on 250 pages in both colour schemes</td></tr>
@@ -120,7 +120,7 @@
 <ul>
 <li><strong>A first node.</strong> From an empty folder: 6 commands, 22 seconds including the package install, and 4 files written by hand.</li>
 <li><strong>One source, many forms.</strong> One build of the demonstration node wrote 323 files of 14 kinds: the website, the graph in three RDF forms, <code>llms.txt</code>, the passages, the discovery document, skill packs and more.</li>
-<li><strong>Agents propose, people decide.</strong> In 20 attempts the writing tools changed no source file; each returned a proposal for a person to merge. The same tools answer the same way in the browser page and in the local server: 530 of 536 calls equal, and the other 6 are the one difference the specification requires.</li>
+<li><strong>Agents propose, people decide.</strong> In 20 attempts, ordinary and hostile, the writing tools changed no source file: 8 returned a proposal for a person to merge, and 12 were refused with an error code (an unknown item, an invalid input, or no accountable person named). The same tools answer the same way in the browser page and in the local server: 530 of 536 calls equal, and the other 6 are the one difference the specification requires.</li>
 <li><strong>Accessible pages.</strong> axe-core found 0 violations on 250 pages of four builds, in the light and the dark colour scheme.</li>
 <li><strong>Offline.</strong> Build, check, search and the tool server all worked with the network switched off: 11 of 11 operations.</li>
 <li><strong>No server.</strong> Both public nodes are static files on a free hosting plan: 0 USD a month.</li>
@@ -155,6 +155,7 @@
 <li>Each answer was limited to eight tool calls, and tool results were cut to 3,500 characters, for every route.</li>
 <li>The graph checks read the published <code>graph.ttl</code> and <code>graph.nq</code> files; the JSON-LD form was not parsed in that run.</li>
 <li>The engine's record states for each figure the command, the machine and what the figure does not establish.</li>
+<li>The source repository of the demonstration node is not public, so a reader can recompute every figure from the published rows but can run again only the parts that use this site and the engine's example Bundles.</li>
 <li>These are the project's own measurements. No third party has repeated them.</li>
 </ul>
 <p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/benchmarks.md">Propose an edit</a> — opens <code>site/docs/benchmarks.md</code>; a submitted change becomes a pull request a person reviews.</p>

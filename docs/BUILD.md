@@ -72,6 +72,13 @@ compares, and it fails when anything outside `www/` has changed since that commi
 2. Run `node scripts/build.js` and commit the changed `www/` on its own, in the same pull
    request or the next; earlier ones are titled "Rebuild www: …" (`git log -- www`).
 3. `node scripts/check.js` passes on that commit.
+4. After the pull request is merged, build once more on `main` and merge that output on its
+   own, in a second pull request that changes only `www/`. The ledger (`/ledger.jsonl`) lists
+   the first-parent history of the commit the build ran on: built on a branch, it lists the
+   branch's commits; built on `main`, it lists the merge. Only an output built on `main`
+   carries the history every later build will repeat, so each published ledger extends the
+   one before. Merge with a merge commit; a squash or a rebase merge gives the source commit
+   a new hash, and the output would then name a commit `main` does not hold.
 
 Until step 2, `node scripts/check.js` alone reports the committed output as stale. The CI
 run does not: on a push it runs `build.js` first, which overwrites `www/` in the runner, so
