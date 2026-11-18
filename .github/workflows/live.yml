@@ -1,4 +1,4 @@
-# The live check of both public nodes, once a week and on request.
+# The live check of the three public nodes, once a week and on request.
 #
 #   What runs  `node scripts/live-check.mjs --require-checkers` (read-only: GET requests and
 #              the released checkers; it writes nothing but its report): the served pages
@@ -6,9 +6,9 @@
 #              `/cdn-cgi/`), the promised response headers (Link, ETag, Content-Type, the
 #              page policy, HSTS), no Network Error Logging or speculation rules header unless
 #              the node's statements name it, `security.txt` expiring more than 60 days ahead,
-#              a sustainability report at most two months old, the w3id redirects, the npm and
-#              PyPI versions, and both released checkers at Level 2 on both nodes with the
-#              mutual check. `scripts/live-check.test.mjs` proves each rule on recorded responses.
+#              a sustainability report at most two months old on the nodes that publish one,
+#              the w3id redirects, the npm and PyPI versions, and both released checkers at
+#              Level 2 on every node with the mutual check of every pair. `scripts/live-check.test.mjs` proves each rule on recorded responses.
 #   Checkers   the latest npm package `agentic-system-core` and the version PyPI names as
 #              its latest, each installed outside the repository in a folder of the runner;
 #              npm runs no install script of the package or its dependencies (--ignore-scripts).

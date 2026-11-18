@@ -20,7 +20,7 @@ flowchart LR
   end
   ENG["Engine repository<br/>andreibesleaga/agentic-system-core"]
   CF["Cloudflare Pages<br/>agenticsystemcore.com"]
-  PEER["AgenticSystemCore Graph<br/>patterns.agenticsystemcore.com"]
+  PEER["Peer nodes<br/>patterns.agenticsystemcore.com,<br/>standards.agenticsystemcore.com"]
   REL["Engine releases on npm and PyPI,<br/>w3id redirects"]
   GHA["GitHub Actions<br/>test.yml, live.yml"]
   M -->|"edits, pull requests"| SRC
@@ -29,7 +29,7 @@ flowchart LR
   GEN -->|"build.js"| OUT
   OUT -->|"served as committed"| CF
   R -->|"HTTPS"| CF
-  CF -.->|"peer link in the discovery document"| PEER
+  CF -.->|"peer links in the discovery document"| PEER
   GHA -->|"build and gate on every push"| SRC
   GHA -->|"weekly read-only GET"| CF
   GHA -->|"weekly read-only GET"| PEER
@@ -64,7 +64,7 @@ monthly, in one pull request (`.github/dependabot.yml`). No workflow uses a secr
 |---|---|---|
 | `test.yml`, job `site (build, gate, page tools, hygiene)` | every push, every pull request, on request | installs the engine (`npm ci`) at `ENGINE_REF` (`main`); runs the helper tests; on a pull request that changes `www/`, `node scripts/check.js` alone; then `node scripts/build.js && node scripts/check.js`, `node scripts/page-tools-check.js` and the engine's `tools/public-hygiene` over this repository |
 | `test.yml`, job `browser lane (on request)` | a manual run with `a11y` ticked, or the repository variable `AGSC_A11Y` set to `true` | `node scripts/a11y.js` over the committed output |
-| `live.yml` | Mondays 06:17 UTC, on request | `node scripts/live-check.mjs --require-checkers`: a read-only check of both live nodes; never blocks a pull request |
+| `live.yml` | Mondays 06:17 UTC, on request | `node scripts/live-check.mjs --require-checkers`: a read-only check of the three live nodes; never blocks a pull request |
 
 The `site` job is the required check on `main`, which takes changes through pull requests
 (GitHub branch protection, read on 29 October 2026). The gate reads the engine's `main`, so

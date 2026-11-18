@@ -45,7 +45,7 @@ Optional lanes. The first needs a browser, with `playwright-core` and `axe-core`
 ```bash
 NODE_PATH=<dir>/node_modules CHROME_EXE=<chromium> node scripts/a11y.js   # both colour schemes at 390, 768 and 1280 px, 0 violations expected
 node scripts/page-tools-check.js                                        # the ten page tools, no browser needed
-node scripts/live-check.mjs                                             # read-only check of both live nodes (weekly in .github/workflows/live.yml)
+node scripts/live-check.mjs                                             # read-only check of the three live nodes (weekly in .github/workflows/live.yml)
 ```
 
 ## Where things are
