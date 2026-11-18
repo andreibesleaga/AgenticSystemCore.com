@@ -77,6 +77,24 @@
       "path": "www/assets/search-site.json",
       "text": "Claude Sonnet",
       "reason": "the benchmark page names the models that were measured; the name is data, not a note about how the page was written"
+    },
+    {
+      "check": "missing-file",
+      "path": "site/docs/recipe-notes-apps.md",
+      "text": "\\L\\2.md",
+      "reason": "a sample command and the lines it printed: the link is the text being converted in the example, not a link of this page"
+    },
+    {
+      "check": "missing-file",
+      "path": "site/docs/recipe-notes-apps.md",
+      "text": "\\L\\1.md",
+      "reason": "a sample command and the lines it printed: the link is the text being converted in the example, not a link of this page"
+    },
+    {
+      "check": "missing-file",
+      "path": "site/docs/recipe-notes-apps.md",
+      "text": "hydration.md",
+      "reason": "a sample command and the lines it printed: the link is the text being converted in the example, not a link of this page"
     }
   ]
 }
