@@ -1,6 +1,6 @@
 // Tests of scripts/live-check.mjs with recorded responses: no network, a fixed instant, and the
-// committed pages of a temporary output folder. Each test starts from a clean recording of both
-// nodes, changes one thing and reads the verdict.
+// committed pages of a temporary output folder. Each test starts from a clean recording of every
+// node, changes one thing and reads the verdict.
 //
 //   node --test scripts/live-check.test.mjs
 import test from 'node:test';
@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { liveCheck, NODES, W3ID, REGISTRIES } from './live-check.mjs';
+import { liveCheck, checkerRuns, NODES, W3ID, REGISTRIES } from './live-check.mjs';
 
 const NOW = new Date('2026-10-10T12:00:00Z');
 const PAGE = '<!doctype html>\n<html lang="en"><head><title>Page</title></head><body><p>Run printf to write a contact line.</p></body></html>\n';
@@ -36,7 +36,7 @@ function recording(t) {
     }, '{"linkset":[]}'));
     map.set(at('/.well-known/security.txt'), response(200, { 'content-type': 'text/plain; charset=utf-8', 'strict-transport-security': 'max-age=15552000' },
       'Contact: https://example.org/contact/\nExpires: 2027-10-07T07:30:56Z\nPreferred-Languages: en\n'));
-    map.set(at('/.well-known/sustainability-data'), response(200, { 'content-type': 'application/sustainability-data+json', 'strict-transport-security': 'max-age=15552000' },
+    if (node.report) map.set(at('/.well-known/sustainability-data'), response(200, { 'content-type': 'application/sustainability-data+json', 'strict-transport-security': 'max-age=15552000' },
       JSON.stringify({ period: { start: '2026-09-01T00:00:00Z', end: '2026-10-01T00:00:00Z' }, target: new URL(node.base).host })));
     for (const [route, file] of Object.entries(node.committed)) {
       fs.mkdirSync(path.dirname(path.join(www, file)), { recursive: true });
@@ -49,14 +49,14 @@ function recording(t) {
   map.set(REGISTRIES.pypi, response(200, { 'content-type': 'application/json' }, JSON.stringify({ info: { version: '1.0.0' }, releases: { '1.0.0': [{}] } })));
   const seen = [];
   const get = async url => { seen.push(url); const r = map.get(url); if (!r) throw new Error(`no recording for ${url}`); return r; };
-  const checkers = async () => [{ name: 'Node checker, Level 2, both nodes and the mutual check', ok: true, detail: 'pass' }, { name: 'Python checker, Level 2, both nodes and the mutual check', ok: true, detail: 'pass' }];
+  const checkers = async () => [{ name: 'Node checker, Level 2, every node and the mutual checks', ok: true, detail: 'pass' }, { name: 'Python checker, Level 2, every node and the mutual checks', ok: true, detail: 'pass' }];
   return { map, get, seen, www, checkers, at: (node, route) => new URL(route.replace(/^\//, ''), node.base).href };
 }
 
 const run = (r, extra = {}) => liveCheck({ get: r.get, now: NOW, committedRoot: r.www, checkers: r.checkers, requireCheckers: true, ...extra });
 const fails = report => report.results.filter(x => x.severity === 'fail');
 const warns = report => report.results.filter(x => x.severity === 'warn');
-const [MAIN, DEMO] = NODES;
+const [MAIN, DEMO, STANDARDS] = NODES;
 
 test('the clean recording passes, and every address it reads is recorded', async t => {
   const r = recording(t);
@@ -66,6 +66,25 @@ test('the clean recording passes, and every address it reads is recorded', async
   assert.ok(report.results.length >= 20, `only ${report.results.length} results`);
   assert.ok(r.seen.includes(r.at(MAIN, '/docs/guides/mode-0/')));
   assert.ok(r.seen.includes(r.at(DEMO, '/.well-known/knowledge-linkset')));
+  assert.ok(r.seen.includes(r.at(STANDARDS, '/.well-known/security.txt')));
+});
+
+test('a node that publishes no sustainability report is not asked for one', async t => {
+  const r = recording(t);
+  await run(r);
+  assert.equal(STANDARDS.report, false);
+  assert.ok(r.seen.includes(r.at(MAIN, '/.well-known/sustainability-data')));
+  assert.ok(r.seen.includes(r.at(DEMO, '/.well-known/sustainability-data')));
+  assert.ok(!r.seen.includes(r.at(STANDARDS, '/.well-known/sustainability-data')));
+});
+
+test('the checkers run once per node, each with the next node as its peer, so every pair is checked', () => {
+  const linkset = node => new URL('.well-known/knowledge-linkset', node.base).href;
+  assert.deepEqual(checkerRuns(NODES), [
+    [linkset(MAIN), linkset(DEMO)],
+    [linkset(DEMO), linkset(STANDARDS)],
+    [linkset(STANDARDS), linkset(MAIN)],
+  ]);
 });
 
 test('a page whose e-mail text the edge rewrote fails, and so does any script from /cdn-cgi/', async t => {

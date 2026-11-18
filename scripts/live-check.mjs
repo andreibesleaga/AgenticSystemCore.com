@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// THE LIVE CHECK of the two public nodes: this site and the demonstration node. Read-only: it
+// THE LIVE CHECK of the three public nodes: this site, the demonstration node and the standards
+// node. Read-only: it
 // sends GET requests and runs the released checkers, and it writes nothing anywhere except its own
 // report. `.github/workflows/live.yml` runs it once a week and on request; it is not a required
 // check, because what it reads (the served bytes, the edge network's headers, the registries,
@@ -21,11 +22,13 @@
 //   - on this site, once its committed output has the query page: one policy on `/query/`, with
 //     'wasm-unsafe-eval', and the query engine served as application/wasm (AGSC-06-39);
 //   - `/.well-known/security.txt` expires more than 60 days ahead (RFC 9116 §2.5.5);
-//   - `/.well-known/sustainability-data` covers a period that ended at most two months ago (the
+//   - on a node that publishes a sustainability report (`report: true` below):
+//     `/.well-known/sustainability-data` covers a period that ended at most two months ago (the
 //     `period` object of draft-besleaga-sustainability-wellknown-10, Section 3.2);
 // and once: the w3id addresses answer 303, npm and PyPI each name a version of
-// `agentic-system-core` with files, and both released checkers pass Level 2 on both nodes with the
-// mutual check (AGSC-10-12).
+// `agentic-system-core` with files, and both released checkers pass Level 2 on every node, each
+// with the mutual check against the next node in the list, so every pair is checked once
+// (AGSC-10-12).
 //
 // Exit 0 when nothing failed (warnings allowed), 1 otherwise. Node >= 22 stdlib only.
 import fs from 'node:fs';
@@ -40,6 +43,7 @@ export const NODES = [
     pages: ['/', '/docs/guides/mode-0/'],
     committed: { '/': 'index.html', '/docs/guides/mode-0/': 'docs/guides/mode-0/index.html' },
     statements: ['/legal/', '/docs/compliance/'],
+    report: true,
   },
   {
     name: 'demonstration node',
@@ -47,8 +51,28 @@ export const NODES = [
     pages: ['/'],
     committed: {},
     statements: ['/legal/'],
+    report: true,
+  },
+  {
+    name: 'standards node',
+    base: 'https://standards.agenticsystemcore.com/',
+    pages: ['/'],
+    committed: {},
+    statements: ['/legal/'],
+    report: false, // it publishes no sustainability report
   },
 ];
+/**
+ * The runs of a released checker: each node's discovery address with the next node's as its
+ * peer, the last with the first. Every node is checked once and every pair of three once.
+ *
+ * @param {Array<{base: string}>} nodes
+ * @returns {Array<[string, string]>}
+ */
+export const checkerRuns = nodes => {
+  const urls = nodes.map(n => new URL('.well-known/knowledge-linkset', n.base).href);
+  return urls.map((url, i) => [url, urls[(i + 1) % urls.length]]);
+};
 export const W3ID = {
   base: 'https://w3id.org/agentic-system-core/',
   paths: ['ns', 'ns/1.0.0', 'ns/1.1.0', 'profile/agentic-knowledge', 'rel', 'specs/mcp/'],
@@ -185,8 +209,8 @@ export async function liveCheck({ get, now, committedRoot, checkers, requireChec
       }
     }
 
-    // The sustainability report.
-    {
+    // The sustainability report, on a node that publishes one.
+    if (node.report) {
       const route = '/.well-known/sustainability-data';
       const r = await fetchRoute(route);
       if (usable(route, r, 'sustainability')) {
@@ -250,7 +274,7 @@ export async function liveCheck({ get, now, committedRoot, checkers, requireChec
     else add('PyPI', 'registries', 'pass', `PyPI: agentic-system-core ${version}, ${files} file(s)`);
   }
 
-  // The released checkers, Level 2 on both nodes with the mutual check.
+  // The released checkers, Level 2 on every node, each with the mutual check against the next.
   const ran = checkers ? await checkers() : null;
   if (!ran || ran.length === 0) add('checkers', 'checkers', requireCheckers ? 'fail' : 'warn', 'the checkers were not run (set SITE_LIVE_NODE_CHECKER and SITE_LIVE_PYTHON)');
   else for (const c of ran) add('checkers', 'checkers', c.ok ? 'pass' : 'fail', `${c.name}: ${c.detail}`);
@@ -289,12 +313,12 @@ async function main(argv) {
   const requireCheckers = argv.includes('--require-checkers');
   const nodeChecker = process.env.SITE_LIVE_NODE_CHECKER || '';
   const python = process.env.SITE_LIVE_PYTHON || '';
-  const [a, b] = NODES.map(n => new URL(DISCOVERY.slice(1), n.base).href);
+  const host = url => new URL(url).host;
   const checkers = nodeChecker || python ? async () => [
-    nodeChecker ? runChecker('Node checker (npm), Level 2, both nodes and the mutual check', process.execPath, [nodeChecker, a, '--level', '2', '--peer', b, '--json'])
-      : { name: 'Node checker (npm)', ok: !requireCheckers, detail: 'not run: SITE_LIVE_NODE_CHECKER is not set' },
-    python ? runChecker('Python checker (PyPI), Level 2, both nodes and the mutual check', python, ['-m', 'agentic_system_core.cli', 'validate-wellknown', a, '--level', '2', '--peer', b, '--allow-network', '--json'])
-      : { name: 'Python checker (PyPI)', ok: !requireCheckers, detail: 'not run: SITE_LIVE_PYTHON is not set' },
+    ...(nodeChecker ? checkerRuns(NODES).map(([a, b]) => runChecker(`Node checker (npm), Level 2, ${host(a)} and the mutual check with ${host(b)}`, process.execPath, [nodeChecker, a, '--level', '2', '--peer', b, '--json']))
+      : [{ name: 'Node checker (npm)', ok: !requireCheckers, detail: 'not run: SITE_LIVE_NODE_CHECKER is not set' }]),
+    ...(python ? checkerRuns(NODES).map(([a, b]) => runChecker(`Python checker (PyPI), Level 2, ${host(a)} and the mutual check with ${host(b)}`, python, ['-m', 'agentic_system_core.cli', 'validate-wellknown', a, '--level', '2', '--peer', b, '--allow-network', '--json']))
+      : [{ name: 'Python checker (PyPI)', ok: !requireCheckers, detail: 'not run: SITE_LIVE_PYTHON is not set' }]),
   ] : null;
   const { results } = await liveCheck({ get: httpGet, now: new Date(), committedRoot: path.resolve(root, out), checkers, requireCheckers });
   const count = s => results.filter(r => r.severity === s).length;
