@@ -8,11 +8,11 @@ This page is for anyone who needs to describe AgenticSystemCore quickly: a revie
 
 ## In 25 words
 
-Turn a folder of notes into a checked website, a knowledge graph and tools for AI assistants. A person approves every change, and anyone can verify the files.
+Turn a folder of notes into a checked website, a knowledge graph and assistant tools. People control every change; anyone can verify the listed files.
 
 ## In 70 words
 
-AgenticSystemCore turns a folder of Markdown notes into a website, a knowledge graph and tools for AI assistants. Each link says what kind of link it is. Each machine file the node lists carries a fingerprint anyone can check. Every change is approved by a person or by a rule a person wrote down. People, search engines and agents read the same checked knowledge, and building it needs no server, database or language model.
+AgenticSystemCore turns a folder of notes into a website, a knowledge graph and assistant tools. Each link says what kind of link it is. Anyone can check the machine files a node lists with a fingerprint. A change to the source is approved by a person, or by a rule that person wrote. People and agents read the same knowledge, and building it needs no server, database or language model.
 
 ## How it works, in one line
 
@@ -25,8 +25,8 @@ AgenticSystemCore turns a folder of Markdown notes into a website, a knowledge g
 | Build | Turns the notes into a site and the files agents read | One folder serves people and software |
 | Typed links | Each link names its kind, one of fourteen: requires, uses, verifies, supersedes, excludes and nine more | A program can answer "what does this depend on?" without guessing from prose |
 | Graph and vocabulary | Publishes the links as RDF under a published vocabulary, with shapes to check them and ten ready questions | Any linked-data tool can read and query the node; try the [query page](/query/) |
-| Discovery file | One address on the site lists every machine file, with a fingerprint for each | An agent finds everything from one request and can tell that a file was not altered |
-| Ledger | Records each change in a chain built from the version history | History cannot be rewritten unseen |
+| Discovery file | One address on the site lists the node's machine files, most with a fingerprint | An agent finds everything from one request and can tell that a file was not altered |
+| Ledger | Records each change with the hash of the entry before it, from the version history | Anyone can recompute the chain and see where a record stops matching |
 | Ten tools | Let an assistant search, read, follow links, ask, cite, check and propose | Answers come from the node, with their source, and not from the model's memory |
 | Local tool server | Serves those tools on your own machine | Your assistant reads your notes without sending them anywhere |
 | Tools in the page | Offer the same tools inside each published page | An assistant in the browser, such as [WebAIAssist](/webaiassist/), can ask the page itself |
@@ -51,18 +51,18 @@ The [six ways to use it](/docs/modes/) group these parts by purpose; the [graph 
 - **A publisher of public knowledge:** static files on any host, 0 USD a month on a free plan, already prepared for agents.
 - **A builder of AI agents:** one memory with typed links, a tool server, and exports to the common memory tools.
 - **Someone working on interoperability:** published rules, schemas, a vocabulary and test vectors to build against.
-- **A security reviewer:** a scored set of refusals, a ledger, and stated limits.
+- **A security reviewer:** a scored set of refusals, a hash-linked ledger, and stated limits.
 
 ## Check a published file yourself
 
-No tool from this project is needed. The discovery file gives a fingerprint (a SHA-256 digest) for each machine file; compute the same fingerprint from the file and compare:
+No tool from this project is needed. The discovery file gives a fingerprint (a SHA-256 digest) for most of the machine files it lists; compute the same fingerprint from the file and compare:
 
 ```bash
-curl -s https://agenticsystemcore.com/.well-known/knowledge-linkset | grep -o 'sha-256=:[^"]*"\],"href":"https://agenticsystemcore.com/llms.txt"'
+curl -s https://agenticsystemcore.com/.well-known/knowledge-linkset | grep -o 'sha-256=:[^:]*:"\],"href":"https://agenticsystemcore.com/llms.txt"' | cut -d: -f2
 curl -s https://agenticsystemcore.com/llms.txt | openssl dgst -sha256 -binary | base64
 ```
 
-The two values match when the file is the one the node published. The [graph explorer](/graph/) does the same check for the graph before it draws it.
+Each command prints one line of Base64 text; the two lines are equal when the file is the one the node published. The [graph explorer](/graph/) does the same check for the graph before it draws it.
 
 ## What it does not do
 
@@ -84,7 +84,7 @@ The full list is under [Not shipped at this version](/docs/how-to-use/#not-shipp
 | How long to a first node? | 6 commands and 22 seconds from an empty folder |
 | How large can it go? | 10,000 items build in 119 seconds |
 | What does hosting cost? | 0 USD a month for both public nodes on a free plan |
-| How is it tested? | 399 conformance cases, 0 failing; 108 of 108 seeded security faults stopped |
+| How is it tested? | 399 conformance cases: 376 pass, 0 fail, 23 withdrawn and kept for the record; 108 of 108 seeded security faults stopped |
 
 Each number, its method and its limits are on the [benchmarks page](/docs/benchmarks/).
 
