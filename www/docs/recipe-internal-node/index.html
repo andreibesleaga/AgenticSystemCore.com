@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipe: keep a node for internal knowledge — AgenticSystemCore</title>
+<meta name="description" content="Set visibility restricted in agsc.config.json, compare the build with the public one, read the node with agsc mcp, and see what access control you still owe.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/recipe-internal-node/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/recipe-internal-node/">
+<meta property="og:title" content="Recipe: keep a node for internal knowledge">
+<meta property="og:description" content="Set visibility restricted in agsc.config.json, compare the build with the public one, read the node with agsc mcp, and see what access control you still owe.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Recipe: keep a node for internal knowledge","description":"Set visibility restricted in agsc.config.json, compare the build with the public one, read the node with agsc mcp, and see what access control you still owe.","url":"https://agenticsystemcore.com/docs/recipe-internal-node/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Recipe: keep a node for internal knowledge</h1>
+<p class="summary"><strong>Summary</strong>For a team that wants a node for knowledge that is not public. You mark the node restricted, see what the build then leaves out of its discovery document, and read it with a local assistant.</p>
+<p><strong>Who it is for:</strong> a team that keeps knowledge for its own use as a node and wants an honest picture of what <code>restricted</code> does.</p>
+<p><strong>What you get:</strong> the same node built twice, public and restricted, a comparison of the two, and a local tool server over the notes.</p>
+<p><strong>Time:</strong> about 10 minutes. <strong>Needs:</strong> Node.js 22.13 or later, git, a POSIX shell.</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Install the engine as in <a href="/docs/guides/mode-0/">the Mode 0 guide</a>. Start in an empty folder; the notes are the <code>mode-2-project</code> example that ships in the package (<code>$ENGINE</code>).</p>
+<h2 id="1-build-the-node-in-the-open">1. Build the node in the open</h2>
+<pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-2-project&quot; my-node &amp;&amp; cd my-node
+mkdir -p .well-known &amp;&amp; printf 'Contact: https://example.org/security\nExpires: 2027-06-01T00:00:00Z\n' &gt; .well-known/security.txt
+cp &quot;$ENGINE/LICENSE-CONTENT&quot; .
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'a node'
+agsc build --quiet 2&gt;/dev/null
+mv www ../www-public</code></pre>
+<pre tabindex="0" data-lang="text"><code>build: pass (0 error, 1 warn)</code></pre>
+<h2 id="2-mark-it-restricted">2. Mark it restricted</h2>
+<p>The key is <code>visibility</code> in <code>agsc.config.json</code>, <code>public</code> by default. A restricted node must also say where a reader gets credentials, in a top-level <code>access</code> key. Try it without:</p>
+<pre tabindex="0" data-lang="bash"><code>node -e 'const fs = require(&quot;fs&quot;); const c = JSON.parse(fs.readFileSync(&quot;agsc.config.json&quot;)); c.visibility = &quot;restricted&quot;; fs.writeFileSync(&quot;agsc.config.json&quot;, JSON.stringify(c, null, 2) + &quot;\n&quot;)'
+agsc lint --quiet 2&gt;&amp;1 | grep -E '^(lint:|error:)'</code></pre>
+<pre tabindex="0" data-lang="text"><code>lint: fail (1 error, 2 warn)
+error: AGSC-E202 visibility is restricted and no access page is named; a restricted node carries exactly one rel#access link, whose target is where a reader obtains credentials: name it in the top-level access key (AGSC-11-20) — agsc.config.json</code></pre>
+<p>Name the page, an absolute <code>https:</code> address, then build the restricted node:</p>
+<pre tabindex="0" data-lang="bash"><code>node -e 'const fs = require(&quot;fs&quot;); const c = JSON.parse(fs.readFileSync(&quot;agsc.config.json&quot;)); c.access = &quot;https://project.example/access/&quot;; fs.writeFileSync(&quot;agsc.config.json&quot;, JSON.stringify(c, null, 2) + &quot;\n&quot;)'
+agsc lint --quiet 2&gt;&amp;1 | grep -E '^lint:'
+agsc build --quiet 2&gt;/dev/null
+mv www ../www-restricted</code></pre>
+<pre tabindex="0" data-lang="text"><code>lint: pass (0 error, 2 warn)
+build: pass (0 error, 1 warn)</code></pre>
+<h2 id="3-compare-the-two-builds">3. Compare the two builds</h2>
+<pre tabindex="0" data-lang="bash"><code>cd ..
+find www-public -type f | wc -l
+find www-restricted -type f | wc -l
+diff -rq www-public www-restricted | sed 's/ and .* differ/ differs/'</code></pre>
+<pre tabindex="0" data-lang="text"><code>89
+89
+Files www-public/.well-known/knowledge-linkset differs
+Files www-public/_headers differs
+Files www-public/index.html differs
+Files www-public/llms-full.txt differs
+Files www-public/llms.txt differs
+Files www-public/now/index.html differs
+Files www-public/now.md differs</code></pre>
+<p>Both builds write the same 89 files. Restricted does not hold content back: every page, <code>graph.nq</code> and <code>chunks.jsonl</code> are still in <code>www-restricted/</code>. What differs is what the node says about itself. Read the discovery document of each:</p>
+<pre tabindex="0" data-lang="bash"><code>cat &gt; compare.js &lt;&lt;'JS'
+const fs = require(&quot;fs&quot;);
+for (const dir of [&quot;www-public&quot;, &quot;www-restricted&quot;]) {
+  const set = JSON.parse(fs.readFileSync(dir + &quot;/.well-known/knowledge-linkset&quot;)).linkset[0];
+  const rel = (k) =&gt; k.replace(&quot;https://w3id.org/agentic-system-core/rel#&quot;, &quot;rel#&quot;);
+  console.log(dir + &quot; links: &quot; + Object.keys(set).filter((k) =&gt; k.startsWith(&quot;http&quot;)).map(rel).join(&quot; &quot;));
+  console.log(dir + &quot; facts: &quot; + Object.keys(set.describedby[0]).filter((k) =&gt; k.startsWith(&quot;agsc-&quot;)).join(&quot; &quot;));
+  const digests = Object.values(set).flat().filter((l) =&gt; l &amp;&amp; l.digest).map((l) =&gt; new URL(l.href).pathname);
+  console.log(dir + &quot; digests: &quot; + digests.join(&quot; &quot;));
+}
+JS
+node compare.js
+diff www-public/llms.txt www-restricted/llms.txt
+grep -c '^- \[' www-restricted/llms.txt
+for d in www-public www-restricted; do echo &quot;$d: $(awk '/^\//{p=$0} /^  Access-Control-Allow-Origin: \*/{print p}' $d/_headers | wc -l) wildcard routes&quot;; done</code></pre>
+<pre tabindex="0" data-lang="text"><code>www-public links: rel#boards rel#context rel#graph rel#ledger rel#now rel#skills rel#surface
+www-public facts: agsc-bundle-hash agsc-bundle-version agsc-counts agsc-generated-at agsc-spec-version
+www-public digests: /llms.txt /graph.jsonld /boards/index.json /ns/context.jsonld /graph.nq /graph.ttl /ledger.jsonl /now.md /skills/index.json /chunks.jsonl
+www-restricted links: rel#access rel#boards rel#context rel#graph rel#now rel#skills rel#surface
+www-restricted facts: agsc-generated-at agsc-spec-version agsc-visibility
+www-restricted digests: /llms.txt /graph.jsonld
+10d9
+&lt; bundle_version: 0.0.0+1.gf2b1f02bb694
+8
+www-public: 20 wildcard routes
+www-restricted: 1 wildcard routes</code></pre>
+<p>The restricted discovery document drops the counts, the bundle hash, the content version and the ledger link, and keeps digests for just the two files meant to be public. It adds one <code>access</code> link and <code>agsc-visibility</code>. <code>/llms.txt</code> loses its <code>bundle_version</code> line, and the wildcard CORS header goes from 20 routes to the discovery document alone.</p>
+<h2 id="4-read-it-with-a-local-assistant">4. Read it with a local assistant</h2>
+<p><code>agsc mcp</code> serves ten tools over your notes on your own machine, with no network. The package has a script that makes one call, the way an assistant does:</p>
+<pre tabindex="0" data-lang="bash"><code>cd my-node
+node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; ask '{&quot;question&quot;:&quot;who splits a task into parts&quot;}'</code></pre>
+<pre tabindex="0" data-lang="text"><code>  &quot;citations&quot;: [
+    &quot;https://project.example/concepts/decide-the-login/&quot;,
+    &quot;https://project.example/procedures/run-the-tests/&quot;,
+    &quot;https://project.example/concepts/supervisor/&quot;
+  ],
+  &quot;trust&quot;: &quot;untrusted&quot;,
+  &quot;type&quot;: &quot;answer&quot;</code></pre>
+<p>To connect Claude Code, Cursor or another assistant to this server, follow <a href="/docs/recipe-connect-an-assistant/">Connect an assistant</a>.</p>
+<h2 id="check-that-it-worked">Check that it worked</h2>
+<p><code>agsc lint</code> failed with <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E202"><code>AGSC-E202</code></a> until you named the access page, and then <code>www-restricted/.well-known/knowledge-linkset</code> listed two digests, not ten.</p>
+<h2 id="what-this-does-not-do">What this does not do</h2>
+<ul>
+<li><strong>It does not control access.</strong> <code>restricted</code> changes the metadata. The build still writes every file, and your host must put authentication in front of them. The wildcard CORS header is withheld, and nothing else is.</li>
+<li><strong>Two files stay public by design.</strong> <code>/llms.txt</code> and <code>/graph.jsonld</code> are served without credentials, and the node's claim of conformance is made on that view (<code>llms.txt</code> still lists 8 items). Keep a secret out of titles and descriptions.</li>
+<li>Credential formats, encrypted bundles and visibility of a single item are not defined at 1.1.</li>
+<li><code>agsc mcp</code> has no login: it serves the folder you start it in, to whoever runs it.</li>
+</ul>
+<h2 id="where-to-go-next">Where to go next</h2>
+<ul>
+<li><a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/SECURITY-CONSIDERATIONS.md">The rule</a> and its threat rows for a restricted node.</li>
+<li><a href="/docs/recipe-security-review/">What a security reviewer can check</a>.</li>
+<li><a href="/docs/guides/publish/">Publish a node and check it live</a>.</li>
+</ul>
+<p>Run on 18 November 2026 with engine 1.1.0. The script that repeats every command of this page: <a href="https://github.com/andreibesleaga/AgenticSystemCore.com/blob/main/recipes/internal-node.run.sh">recipes/internal-node.run.sh</a>. More recipes: <a href="/docs/recipes/">the list</a>.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/recipe-internal-node.md">Propose an edit</a> — opens <code>site/docs/recipe-internal-node.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a> · <a href="https://standards.agenticsystemcore.com/">Standards Map</a></span></p>
+</footer>
+</body>
+</html>

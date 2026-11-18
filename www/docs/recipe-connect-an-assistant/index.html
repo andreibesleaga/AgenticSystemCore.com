@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipe: connect a coding assistant to your notes — AgenticSystemCore</title>
+<meta name="description" content="Start the local tool server of a node with one command, check it by hand, then add it to Claude Code, Cursor, VS Code or Codex.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/recipe-connect-an-assistant/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/recipe-connect-an-assistant/">
+<meta property="og:title" content="Recipe: connect a coding assistant to your notes">
+<meta property="og:description" content="Start the local tool server of a node with one command, check it by hand, then add it to Claude Code, Cursor, VS Code or Codex.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Recipe: connect a coding assistant to your notes","description":"Start the local tool server of a node with one command, check it by hand, then add it to Claude Code, Cursor, VS Code or Codex.","url":"https://agenticsystemcore.com/docs/recipe-connect-an-assistant/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Recipe: connect a coding assistant to your notes</h1>
+<p class="summary"><strong>Summary</strong>For anyone who uses Claude Code, Cursor, VS Code or Codex and wants it to search and read a folder of notes. You end with a local tool server and the setting each tool needs.</p>
+<p><strong>Who it is for:</strong> a developer whose coding assistant should look things up in a node's notes.</p>
+<p><strong>What you get:</strong> a tool server that runs on your machine, checked by hand, and the setting that adds it to four coding tools.</p>
+<p><strong>Time:</strong> about 10 minutes. <strong>Needs:</strong> Node.js 22.13 or later, git, a POSIX shell, and one of the four tools.</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Install the engine as in <a href="/docs/guides/mode-0/#before-you-start">Mode 0</a>. Start in an empty working folder.
+The server side below was run with engine 1.1.0. The four tools were not run: their settings are quoted from the engine's document <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md">USING-WITH-ASSISTANTS.md</a>.</p>
+<h2 id="1-make-a-small-bundle">1. Make a small Bundle</h2>
+<p>A Bundle is a folder of Markdown notes with one <code>agsc.config.json</code>. Make three notes and adopt them, as in <a href="/docs/guides/mode-0/#1-adopt-your-notes">Mode 0</a>:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir my-notes &amp;&amp; cd my-notes
+printf '# Sourdough starter\n\nFlour and water, fed once a day. How runny it is depends on its [hydration](%s).\n' hydration.md &gt; sourdough.md
+printf '# Hydration\n\nThe weight of the water divided by the weight of the flour.\n' &gt; hydration.md
+printf '# Oven spring\n\nThe last rise of a loaf, in the first minutes in a hot oven.\n' &gt; oven-spring.md
+agsc init &gt; /dev/null 2&gt;&amp;1
+mkdir -p .well-known &amp;&amp; printf 'Contact: https://example.org/security\n' &gt; .well-known/security.txt
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'my notes'</code></pre>
+<p>Nothing is printed. <code>agsc mcp</code> serves the Bundle it is started in: the folder that holds <code>agsc.config.json</code>.</p>
+<h2 id="2-ask-the-server-for-its-tools">2. Ask the server for its tools</h2>
+<p>Send two requests to <code>agsc mcp</code> on standard input. The first is the handshake. The second asks for the tool list.</p>
+<pre tabindex="0" data-lang="bash"><code>{
+  echo '{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;method&quot;:&quot;initialize&quot;,&quot;params&quot;:{&quot;protocolVersion&quot;:&quot;2025-11-25&quot;,&quot;capabilities&quot;:{},&quot;clientInfo&quot;:{&quot;name&quot;:&quot;check&quot;,&quot;version&quot;:&quot;0&quot;}}}'
+  echo '{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;notifications/initialized&quot;}'
+  echo '{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:2,&quot;method&quot;:&quot;tools/list&quot;}'
+} | agsc mcp &gt; init-and-list.jsonl
+node -e '
+const lines = require(&quot;fs&quot;).readFileSync(&quot;init-and-list.jsonl&quot;, &quot;utf8&quot;).trim().split(&quot;\n&quot;).map(JSON.parse);
+console.log(&quot;server:&quot;, lines[0].result.serverInfo.name, lines[0].result.serverInfo.version);
+console.log(&quot;tools:&quot;, lines[1].result.tools.map((t) =&gt; t.name).join(&quot; &quot;));'</code></pre>
+<pre tabindex="0" data-lang="text"><code>server: agentic-system-core 1.1.0
+tools: ask brief check compose explain links propose read remember search</code></pre>
+<p>Ten tools, listed in alphabetical order. The server reads files and writes none. <code>propose</code> and <code>remember</code> only return text.</p>
+<h2 id="3-call-two-tools">3. Call two tools</h2>
+<p><code>search</code> finds items by words. <code>read</code> returns one item and a citation record for each of its chunks.</p>
+<pre tabindex="0" data-lang="bash"><code>{
+  echo '{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;method&quot;:&quot;initialize&quot;,&quot;params&quot;:{&quot;protocolVersion&quot;:&quot;2025-11-25&quot;,&quot;capabilities&quot;:{},&quot;clientInfo&quot;:{&quot;name&quot;:&quot;check&quot;,&quot;version&quot;:&quot;0&quot;}}}'
+  echo '{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:3,&quot;method&quot;:&quot;tools/call&quot;,&quot;params&quot;:{&quot;name&quot;:&quot;search&quot;,&quot;arguments&quot;:{&quot;query&quot;:&quot;hydration&quot;}}}'
+  echo '{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:4,&quot;method&quot;:&quot;tools/call&quot;,&quot;params&quot;:{&quot;name&quot;:&quot;read&quot;,&quot;arguments&quot;:{&quot;slug&quot;:&quot;hydration&quot;}}}'
+} | agsc mcp &gt; calls.jsonl
+node -e '
+const lines = require(&quot;fs&quot;).readFileSync(&quot;calls.jsonl&quot;, &quot;utf8&quot;).trim().split(&quot;\n&quot;).map(JSON.parse);
+const search = lines[1].result.structuredContent;
+for (const h of search.body.hits) console.log(&quot;hit:&quot;, h.slug, h.iri);
+console.log(&quot;trust:&quot;, search.trust);
+const read = lines[2].result.structuredContent;
+console.log(&quot;read members:&quot;, Object.keys(read.body).join(&quot; &quot;));
+console.log(&quot;chunk record:&quot;, JSON.stringify(read.body.chunks[0]));'</code></pre>
+<pre tabindex="0" data-lang="text"><code>hit: hydration http://localhost/concepts/hydration/
+hit: sourdough http://localhost/concepts/sourdough/
+trust: untrusted
+read members: body chunks frontmatter iri slug
+chunk record: {&quot;algorithm&quot;:&quot;sha-256&quot;,&quot;bundle_version&quot;:&quot;0.0.0+1.gd43d2142952c&quot;,&quot;coverage&quot;:&quot;text&quot;,&quot;digest&quot;:&quot;46dde87aa5ae029a776dcc75b3cfff135db801b14f6708dbee5680f0c8070f6d&quot;,&quot;id&quot;:&quot;395ec28f998bd7f694188d0112cb90c48b4122f5db16d3949b46969939868c5e&quot;,&quot;iri&quot;:&quot;http://localhost/concepts/hydration/&quot;,&quot;item&quot;:&quot;hydration&quot;,&quot;license&quot;:&quot;LicenseRef-AgenticSystemCore-Content-Use-1.0&quot;,&quot;ordinal&quot;:0,&quot;section&quot;:&quot;&quot;,&quot;terms&quot;:&quot;LicenseRef-AgenticSystemCore-Content-Use-1.0&quot;}</code></pre>
+<p>Every result is marked <code>trust: &quot;untrusted&quot;</code>. The assistant reads the text as data, never as instructions. The version in your <code>bundle_version</code> differs: it comes from your commit. To use the <code>digest</code> in a citation, see <a href="/docs/recipe-cite-a-passage/">Cite one passage</a>.</p>
+<h2 id="4-add-the-server-to-your-tool">4. Add the server to your tool</h2>
+<p>Open the Bundle as the project in the tool. The server starts in that folder and serves it. The engine's document gives these settings:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
+<thead><tr><th scope="col">Tool</th><th scope="col">Setting</th></tr></thead>
+<tbody>
+<tr><td>Claude Code</td><td>run <code>claude mcp add --transport stdio my-knowledge -- npx -y agsc-cli mcp</code> from inside the Bundle. Add <code>--scope project</code> to write a <code>.mcp.json</code> for everyone who clones the repository.</td></tr>
+<tr><td>Cursor</td><td>a file <code>.cursor/mcp.json</code> in the Bundle (or <code>~/.cursor/mcp.json</code> for every project)</td></tr>
+<tr><td>VS Code</td><td>a file <code>.vscode/mcp.json</code> in the Bundle. Its top-level key is <code>servers</code>, not <code>mcpServers</code>.</td></tr>
+<tr><td>Codex</td><td>run <code>codex mcp add my-knowledge -- npx -y agsc-cli mcp</code> from inside the Bundle, or write <code>~/.codex/config.toml</code></td></tr>
+</tbody></table></div>
+<p>The file for Claude Code (with <code>--scope project</code>) and for Cursor:</p>
+<pre tabindex="0" data-lang="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;my-knowledge&quot;: {
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;agsc-cli&quot;, &quot;mcp&quot;]
+    }
+  }
+}</code></pre>
+<p>The file for VS Code:</p>
+<pre tabindex="0" data-lang="json"><code>{
+  &quot;servers&quot;: {
+    &quot;my-knowledge&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;agsc-cli&quot;, &quot;mcp&quot;]
+    }
+  }
+}</code></pre>
+<p>The Codex configuration file:</p>
+<pre tabindex="0" data-lang="toml"><code>[mcp_servers.my-knowledge]
+command = &quot;npx&quot;
+args = [&quot;-y&quot;, &quot;agsc-cli&quot;, &quot;mcp&quot;]</code></pre>
+<p><code>npx -y agsc-cli mcp</code> fetches the command the first time. If the Bundle is a folder inside a larger workspace, <code>agsc mcp /path/to/your-bundle</code> names the folder. Restart the server after you edit a note: it reads the Bundle once, at start.</p>
+<p>Each tool's own page on adding a tool server:
+<a href="https://code.claude.com/docs/en/mcp">Claude Code</a>, <a href="https://cursor.com/docs/context/mcp">Cursor</a>, <a href="https://code.visualstudio.com/docs/copilot/customization/mcp-servers">VS Code</a>, <a href="https://developers.openai.com/codex/mcp">Codex</a>.</p>
+<h2 id="5-option-the-same-server-over-http">5. Option: the same server over HTTP</h2>
+<p>For a tool that reaches servers by a web address, <code>agsc mcp --http &lt;port&gt;</code> serves the same ten tools on the loopback address only. The port <code>0</code> lets the system choose one.</p>
+<pre tabindex="0" data-lang="bash"><code>agsc mcp --http 0 2&gt; http.log &amp;
+sleep 2
+sed -E 's#:[0-9]+/mcp#:PORT/mcp#' http.log</code></pre>
+<pre tabindex="0" data-lang="text"><code>agsc mcp: the ten tools over Streamable HTTP at http://127.0.0.1:PORT/mcp (loopback only, read-only); stop with Ctrl-C</code></pre>
+<p><code>PORT</code> stands for the number the system chose; <code>http.log</code> holds it. Stop the server with <code>kill %1</code>.</p>
+<h2 id="check-that-it-worked">Check that it worked</h2>
+<p>Step 2 printed <code>server: agentic-system-core 1.1.0</code> and ten tool names. If it did and your tool shows no tools, the cause is in the tool's setting. Check that the working folder is the Bundle, and restart the tool after you change its configuration.</p>
+<h2 id="what-this-does-not-do">What this does not do</h2>
+<ul>
+<li>The four tool settings were not run for this page. They are quoted from the engine's document and may change with each product.</li>
+<li>The server never writes. A change a tool proposes comes back as text; you save it and open the pull request (<a href="/docs/guides/mode-1/">Mode 1</a>).</li>
+<li>It serves one Bundle, read at start. It makes no network connection and calls no model.</li>
+</ul>
+<h2 id="where-to-go-next">Where to go next</h2>
+<ul>
+<li><a href="/docs/recipe-steering-files/">Give every assistant the project's decisions</a> as files in the repository.</li>
+<li><a href="/docs/recipe-cite-a-passage/">Cite one passage</a> of a node so a reader can check it.</li>
+<li>The full text: <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md">USING-WITH-ASSISTANTS.md</a>.</li>
+</ul>
+<p>Run on 18 November 2026 with engine 1.1.0. The script that repeats every command of this page: <a href="https://github.com/andreibesleaga/AgenticSystemCore.com/blob/main/recipes/connect-an-assistant.run.sh">recipes/connect-an-assistant.run.sh</a>. More recipes: <a href="/docs/recipes/">the list</a>.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/recipe-connect-an-assistant.md">Propose an edit</a> — opens <code>site/docs/recipe-connect-an-assistant.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a> · <a href="https://standards.agenticsystemcore.com/">Standards Map</a></span></p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipe: move a task board into a node and back out — AgenticSystemCore</title>
+<meta name="description" content="Import a Jira CSV board into an AgenticSystemCore node, publish it as a live board, and export it as a Trello file. All eleven formats listed.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/recipe-task-boards/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/recipe-task-boards/">
+<meta property="og:title" content="Recipe: move a task board into a node and back out">
+<meta property="og:description" content="Import a Jira CSV board into an AgenticSystemCore node, publish it as a live board, and export it as a Trello file. All eleven formats listed.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Recipe: move a task board into a node and back out","description":"Import a Jira CSV board into an AgenticSystemCore node, publish it as a live board, and export it as a Trello file. All eleven formats listed.","url":"https://agenticsystemcore.com/docs/recipe-task-boards/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Recipe: move a task board into a node and back out</h1>
+<p class="summary"><strong>Summary</strong>For a team whose tasks sit in a tracker or a notes app. You import a board export as draft tasks, publish them as a live board, and export the board in another tool's format.</p>
+<p><strong>Who it is for:</strong> someone who keeps tasks in a tracker (GitHub, GitLab, Jira, Trello, Linear, Asana, Notion, Obsidian Kanban, a Markdown list or Todo.txt) and wants them in a node, or the other way round.</p>
+<p><strong>What you get:</strong> a board of tasks in a node, with states, assignees and due dates kept; the same board written as another tool's import file.</p>
+<p><strong>Time:</strong> about 10 minutes. <strong>Needs:</strong> Node.js 22.13 or later, git, a POSIX shell with GNU <code>sed</code>.</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Install the engine with the block in <a href="/docs/guides/mode-0/">Mode 0</a>. You start in an empty working folder. Make a small Jira-style CSV export (use your own export if you have one) and an empty node:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir from-jira
+printf 'Issue key,Summary,Status,Assignee,Project name,Description,Labels,Due date\nWEB-1,Write the FAQ,In Progress,sam,Website,Answer the ten questions people ask most.,docs,2026-12-01\nWEB-2,Check the links,To Do,,Website,Check every link once the FAQ is written.,docs,\n' &gt; from-jira/website.csv
+mkdir my-node &amp;&amp; cd my-node &amp;&amp; git init -q -b main
+agsc init
+mkdir -p .well-known &amp;&amp; printf 'Contact: https://example.org/security\n' &gt; .well-known/security.txt
+cp &quot;$ENGINE/LICENSE-CONTENT&quot; . &amp;&amp; git add -A &amp;&amp; git commit -qm 'empty node'</code></pre>
+<h2 id="the-formats-the-engine-reads-and-writes">The formats the engine reads and writes</h2>
+<p>The board importer and exporter share one table of eleven formats, and each format works in both directions:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
+<thead><tr><th scope="col"><code>--format</code></th><th scope="col">File</th><th scope="col">Direction</th></tr></thead>
+<tbody>
+<tr><td><code>github</code>, <code>gitlab</code>, <code>trello</code>, <code>agsc-board</code></td><td><code>.json</code></td><td>both</td></tr>
+<tr><td><code>asana</code>, <code>jira</code>, <code>linear</code>, <code>notion</code></td><td><code>.csv</code></td><td>both</td></tr>
+<tr><td><code>markdown</code>, <code>obsidian-kanban</code></td><td><code>.md</code></td><td>both</td></tr>
+<tr><td><code>todotxt</code></td><td><code>.txt</code></td><td>both</td></tr>
+</tbody></table></div>
+<p><code>agsc-board</code> is the node's own format. For the steps that get each file out of each tool, see Route 7 of <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CONNECTORS.md">CONNECTORS.md</a>.</p>
+<h2 id="1-import-the-board">1. Import the board</h2>
+<pre tabindex="0" data-lang="bash"><code>agsc import --from board --format jira ../from-jira --dry-run
+agsc import --from board --format jira ../from-jira
+sed -n 1,12p content/concepts/write-the-faq.md</code></pre>
+<pre tabindex="0" data-lang="text"><code>import: 3 written, 0 replaced, 0 unchanged
+import: boards_new: 1
+import: items: 3
+---
+type: concept
+title: Write the FAQ
+status: draft
+clusters:
+  - website
+prov:
+  origin: imported
+  operator: human:demo
+kind: task
+task_state: TASK_STATE_WORKING
+x-board-assignee: sam</code></pre>
+<p>Three items came in: two tasks and the board, which is a cluster named <code>Website</code>. The Jira word <code>In Progress</code> became the state <code>TASK_STATE_WORKING</code>; the word itself, the assignee, the due date and the Jira key are kept in <code>x-board-*</code> keys. Everything arrives as a draft.</p>
+<h2 id="2-publish-the-board-and-read-it">2. Publish the board and read it</h2>
+<p>Review the drafts, then set their status. The board and its tasks must all be published:</p>
+<pre tabindex="0" data-lang="bash"><code>sed -i 's/^status: draft$/status: stable/' content/clusters/website.md content/concepts/*.md
+git add -A &amp;&amp; git commit -qm 'the board'
+agsc build | grep -v '^skipped\|^warn'
+node -e 'const b = require(&quot;./www/boards/website.json&quot;); for (const t of b.tasks) console.log(t.slug, t.state, t.claimed_by || &quot;(unclaimed)&quot;);'</code></pre>
+<pre tabindex="0" data-lang="text"><code>wrote: 65 files under www/
+build: pass (0 error, 4 warn)
+check-the-links TASK_STATE_SUBMITTED (unclaimed)
+write-the-faq TASK_STATE_WORKING (unclaimed)</code></pre>
+<p>The assignee <code>sam</code> is not a claim: who holds a task comes from the history of the node (<a href="/docs/guides/mode-5/">Mode 5</a>).</p>
+<h2 id="3-export-the-board-for-another-tool">3. Export the board for another tool</h2>
+<pre tabindex="0" data-lang="bash"><code>agsc export --to board --format trello
+node -e 'const b = JSON.parse(require(&quot;fs&quot;).readFileSync(&quot;dist/export/board/trello/website.json&quot;, &quot;utf8&quot;)); const lists = new Map(b.lists.map((l) =&gt; [l.id, l.name])); for (const c of b.cards) console.log(lists.get(c.idList) + &quot;: &quot; + c.name);'</code></pre>
+<pre tabindex="0" data-lang="text"><code>export: pass (0 error, 0 warn)
+To Do: Check the links
+In Progress: Write the FAQ</code></pre>
+<p>The tool sees lists named after the states. Each card also carries a comment line with the whole item, which the tool ignores and a return import reads.</p>
+<h2 id="4-check-that-every-format-reads-its-own-file">4. Check that every format reads its own file</h2>
+<p>Write the board in all eleven formats, then dry-run each one into a second, empty node. <code>own: 2</code> means the node recognised its own two tasks:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir ../check-node &amp;&amp; git -C ../check-node init -q -b main &amp;&amp; (cd ../check-node &amp;&amp; agsc init &gt; /dev/null)
+for f in agsc-board asana github gitlab jira linear markdown notion obsidian-kanban todotxt trello; do agsc export --to board --format $f &gt; /dev/null 2&gt;&amp;1; (cd ../check-node &amp;&amp; agsc import --from board --format $f ../my-node/dist/export/board/$f --dry-run 2&gt;&amp;1 | grep &quot;^import: own&quot;); done | sort | uniq -c</code></pre>
+<pre tabindex="0" data-lang="text"><code>     11 import: own: 2</code></pre>
+<h2 id="check-that-it-worked">Check that it worked</h2>
+<p><code>www/boards/website.json</code> lists both tasks, and <code>dist/export/board/trello/website.json</code> exists.</p>
+<h2 id="what-this-does-not-do">What this does not do</h2>
+<ul>
+<li>It does not talk to any tracker: you move the files, in and out.</li>
+<li>It does not publish an import: every foreign task is a draft until you change its status.</li>
+<li>It does not keep every field: each tool loses some on the way out (Route 7 of CONNECTORS.md has the table).</li>
+</ul>
+<h2 id="where-to-go-next">Where to go next</h2>
+<ul>
+<li><a href="/docs/guides/mode-5/">Mode 5</a>: agent lanes that claim and finish tasks.</li>
+</ul>
+<p>Run on 18 November 2026 with engine 1.1.0. The script that repeats every command of this page: <a href="https://github.com/andreibesleaga/AgenticSystemCore.com/blob/main/recipes/task-boards.run.sh">recipes/task-boards.run.sh</a>. More recipes: <a href="/docs/recipes/">the list</a>.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/recipe-task-boards.md">Propose an edit</a> — opens <code>site/docs/recipe-task-boards.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a> · <a href="https://standards.agenticsystemcore.com/">Standards Map</a></span></p>
+</footer>
+</body>
+</html>

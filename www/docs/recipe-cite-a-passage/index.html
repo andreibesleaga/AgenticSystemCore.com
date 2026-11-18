@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipe: cite one passage of a node and let a reader check it — AgenticSystemCore</title>
+<meta name="description" content="Cite one passage of a node by its address and SHA-256 digest from chunks.jsonl, and check the citation again with curl, jq and sha256sum.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/recipe-cite-a-passage/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/recipe-cite-a-passage/">
+<meta property="og:title" content="Recipe: cite one passage of a node and let a reader check it">
+<meta property="og:description" content="Cite one passage of a node by its address and SHA-256 digest from chunks.jsonl, and check the citation again with curl, jq and sha256sum.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Recipe: cite one passage of a node and let a reader check it","description":"Cite one passage of a node by its address and SHA-256 digest from chunks.jsonl, and check the citation again with curl, jq and sha256sum.","url":"https://agenticsystemcore.com/docs/recipe-cite-a-passage/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Recipe: cite one passage of a node and let a reader check it</h1>
+<p class="summary"><strong>Summary</strong>For anyone who quotes a node's text in a paper, a post or a prompt. You end with a citation that holds an address and a digest, and the steps a reader takes to check it.</p>
+<p><strong>Who it is for:</strong> a writer, researcher or tool builder who quotes the text of a node and wants the quote to be checkable.</p>
+<p><strong>What you get:</strong> a citation with the passage's address, its digest and the content version, and a three-line check a reader runs later.</p>
+<p><strong>Time:</strong> about 10 minutes. <strong>Needs:</strong> Node.js 22.13 or later, git, a POSIX shell, <code>jq</code>, <code>sha256sum</code> and <code>curl</code>.</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Install the engine as in <a href="/docs/guides/mode-0/#before-you-start">Mode 0</a>. Start in an empty working folder. Step 5 fetches one file from the live node <code>https://agenticsystemcore.com/</code>; the other steps use no network.</p>
+<h2 id="1-a-small-bundle-with-sections">1. A small Bundle with sections</h2>
+<p>A node publishes its text cut into passages, called chunks, in <code>/chunks.jsonl</code>. A note is cut at its second-level and third-level headings. Make a note with two sections and build the site:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir my-notes &amp;&amp; cd my-notes
+cat &gt; sourdough.md &lt;&lt;'NOTE'
+# Sourdough starter
+
+Flour and water, fed once a day.
+
+## Feeding
+
+Feed it the same weight of flour and water, once a day, at the same hour.
+
+## Hydration
+
+How runny it is depends on the share of water to flour.
+NOTE
+printf '# Oven spring\n\nThe last rise of a loaf, in the first minutes in a hot oven.\n' &gt; oven-spring.md
+agsc init &gt; /dev/null 2&gt;&amp;1
+mkdir -p .well-known &amp;&amp; printf 'Contact: https://example.org/security\n' &gt; .well-known/security.txt
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'my notes'
+agsc build &gt; /dev/null 2&gt;&amp;1</code></pre>
+<p>Nothing is printed. The build wrote <code>www/chunks.jsonl</code>: one JSON line for each passage.</p>
+<h2 id="2-find-the-passage">2. Find the passage</h2>
+<p>Print the leading 16 characters of each passage's <code>id</code>, its section, its position, the start of its digest and its item address:</p>
+<pre tabindex="0" data-lang="bash"><code>jq -r '[.id[0:16], .section, .ordinal, .digest[0:16], .iri] | @tsv' www/chunks.jsonl</code></pre>
+<pre tabindex="0" data-lang="text"><code>c3ec3371e1c73453		0	40f8ebfe8afd12ee	http://localhost/concepts/oven-spring/
+9e1cde0e30d14e79		0	eb24d2819625bf9b	http://localhost/concepts/sourdough/
+17000c45cc2f2a8b	feeding	0	9501246ffdd31760	http://localhost/concepts/sourdough/
+fb3436843c817b3e	hydration	0	f578f2565e1117ad	http://localhost/concepts/sourdough/</code></pre>
+<p>The <code>id</code> is the SHA-256 of the item address, the section and the position. It does not depend on the text. The <code>digest</code> is the SHA-256 of the passage's text. A passage with an empty section is the text before the note's first heading.</p>
+<h2 id="3-write-the-citation">3. Write the citation</h2>
+<p>The address of a passage is the item address, then <code>#chunk-</code>, then the first 16 characters of the <code>id</code>. Print the facts for the &quot;Feeding&quot; passage:</p>
+<pre tabindex="0" data-lang="bash"><code>jq -c 'select(.section == &quot;feeding&quot;) | {chunk: (.iri + &quot;#chunk-&quot; + .id[0:16]), item: .iri, digest: .digest, license: .license}' www/chunks.jsonl</code></pre>
+<pre tabindex="0" data-lang="text"><code>{&quot;chunk&quot;:&quot;http://localhost/concepts/sourdough/#chunk-17000c45cc2f2a8b&quot;,&quot;item&quot;:&quot;http://localhost/concepts/sourdough/&quot;,&quot;digest&quot;:&quot;9501246ffdd31760cd42757bfa40a84a28fe7e50d18ff584b32ede703052f8d4&quot;,&quot;license&quot;:&quot;LicenseRef-AgenticSystemCore-Content-Use-1.0&quot;}</code></pre>
+<p>A full citation also names the algorithm (SHA-256), the content version (the <code>bundle_version</code> that <code>read</code> returns, see <a href="/docs/recipe-connect-an-assistant/">Connect an assistant</a>) and the time you fetched it, in UTC. The engine's document (<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CITING-A-CHUNK.md">CITING-A-CHUNK.md</a>) lists these six facts and gives one way to write them down. The node does not supply the retrieval time.</p>
+<h2 id="4-a-reader-checks-it">4. A reader checks it</h2>
+<p>The reader finds the line whose <code>id</code> starts with the 16 characters, hashes the bytes of its <code>text</code>, and compares. <code>jq -j</code> prints the text with no newline added.</p>
+<pre tabindex="0" data-lang="bash"><code>ID16=17000c45cc2f2a8b
+jq -j --arg id &quot;$ID16&quot; 'select(.id | startswith($id)) | .text' www/chunks.jsonl | sha256sum</code></pre>
+<pre tabindex="0" data-lang="text"><code>9501246ffdd31760cd42757bfa40a84a28fe7e50d18ff584b32ede703052f8d4  -</code></pre>
+<p>That equals the cited digest, so the node still serves the cited text. Now reword the passage, commit and build again. The same check gives a different digest:</p>
+<pre tabindex="0" data-lang="bash"><code>sed -i 's/same weight/same mass/' content/concepts/sourdough.md
+git commit -qam 'reword' &amp;&amp; agsc build &gt; /dev/null 2&gt;&amp;1
+jq -j --arg id &quot;$ID16&quot; 'select(.id | startswith($id)) | .text' www/chunks.jsonl | sha256sum</code></pre>
+<pre tabindex="0" data-lang="text"><code>6b4c102ea5a5921f486e7d4646b82348ec987731e6f3d322e5acfd37cafc2bd0  -</code></pre>
+<p>The <code>id</code> is still found, but the digest differs: the text is no longer the cited text. If the <code>id</code> were not found, the item was removed or held back, or its section was renamed.</p>
+<h2 id="5-the-same-check-on-a-live-node">5. The same check on a live node</h2>
+<p>Take one passage of the node <code>https://agenticsystemcore.com/</code>, the item &quot;Bundle&quot;. Print its facts, then recompute its digest and its <code>id</code> with Node.js:</p>
+<pre tabindex="0" data-lang="bash"><code>curl -s https://agenticsystemcore.com/chunks.jsonl \
+  | jq -r 'select(.id | startswith(&quot;3bb4f25f4fb8a70b&quot;)) | &quot;item:   &quot; + .iri, &quot;title:  &quot; + .title, &quot;digest: &quot; + .digest'
+curl -s https://agenticsystemcore.com/chunks.jsonl \
+  | grep '&quot;id&quot;:&quot;3bb4f25f4fb8a70b' \
+  | node -e '
+let s = &quot;&quot;; process.stdin.on(&quot;data&quot;, (d) =&gt; { s += d; }).on(&quot;end&quot;, () =&gt; {
+  const r = JSON.parse(s), { createHash } = require(&quot;node:crypto&quot;);
+  const sha = (b) =&gt; createHash(&quot;sha256&quot;).update(b).digest(&quot;hex&quot;);
+  console.log(&quot;digest&quot;, sha(Buffer.from(r.text, &quot;utf8&quot;)) === r.digest ? &quot;matches&quot; : &quot;DIFFERS&quot;, r.digest);
+  console.log(&quot;id    &quot;, sha(Buffer.from(`${r.iri}\0${r.section}\0${r.ordinal}`, &quot;utf8&quot;)) === r.id ? &quot;matches&quot; : &quot;DIFFERS&quot;, r.id);
+});'</code></pre>
+<pre tabindex="0" data-lang="text"><code>item:   https://agenticsystemcore.com/concepts/bundle/
+title:  Bundle
+digest: 304f1cbcef40c2c4d18439e1fe36518158422b1857e37874c2a6a15d759b6d83
+digest matches 304f1cbcef40c2c4d18439e1fe36518158422b1857e37874c2a6a15d759b6d83
+id     matches 3bb4f25f4fb8a70ba578e4c5ca207bf13fae7e9cb726c8ab12c7a16cc3170056</code></pre>
+<p>The digest holds while the item's text is unchanged. When the node publishes a changed text, the check prints <code>DIFFERS</code>; the table in the engine's document says how to read the difference.</p>
+<h2 id="check-that-it-worked">Check that it worked</h2>
+<p>In step 4 the first digest equals the cited one, and the second differs. In step 5 both lines start with <code>matches</code>.</p>
+<h2 id="what-this-does-not-do">What this does not do</h2>
+<ul>
+<li>A matching digest shows that the text you hold is the text that was cited. It does not show who published it. The engine's document says a signature does.</li>
+<li>The same version label does not prove the text is unchanged. The digest is the proof; the version tells you where to look.</li>
+<li>The <code>trust: &quot;untrusted&quot;</code> mark stays on quoted text. Treat a quoted passage as data.</li>
+</ul>
+<h2 id="where-to-go-next">Where to go next</h2>
+<ul>
+<li><a href="/docs/recipe-ask-the-graph/">Ask the graph</a> to find the passage to cite.</li>
+<li><a href="/docs/recipe-connect-an-assistant/">Connect an assistant</a>: its <code>read</code> tool returns the same citation records.</li>
+<li>The full text: <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/CITING-A-CHUNK.md">CITING-A-CHUNK.md</a>.</li>
+</ul>
+<p>Run on 18 November 2026 with engine 1.1.0. The script that repeats every command of this page: <a href="https://github.com/andreibesleaga/AgenticSystemCore.com/blob/main/recipes/cite-a-passage.run.sh">recipes/cite-a-passage.run.sh</a>. More recipes: <a href="/docs/recipes/">the list</a>.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/recipe-cite-a-passage.md">Propose an edit</a> — opens <code>site/docs/recipe-cite-a-passage.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a> · <a href="https://standards.agenticsystemcore.com/">Standards Map</a></span></p>
+</footer>
+</body>
+</html>

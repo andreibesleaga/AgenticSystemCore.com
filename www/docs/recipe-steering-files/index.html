@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipe: give every coding assistant the project's decisions — AgenticSystemCore</title>
+<meta name="description" content="Write AGENTS.md, CLAUDE.md, a Cursor rule and other steering files from your project's notes with one command, and check they stay current.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/recipe-steering-files/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/recipe-steering-files/">
+<meta property="og:title" content="Recipe: give every coding assistant the project's decisions">
+<meta property="og:description" content="Write AGENTS.md, CLAUDE.md, a Cursor rule and other steering files from your project's notes with one command, and check they stay current.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Recipe: give every coding assistant the project's decisions","description":"Write AGENTS.md, CLAUDE.md, a Cursor rule and other steering files from your project's notes with one command, and check they stay current.","url":"https://agenticsystemcore.com/docs/recipe-steering-files/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Recipe: give every coding assistant the project's decisions</h1>
+<p class="summary"><strong>Summary</strong>For a team whose repository is worked on by more than one coding assistant. You end with one set of instructions, written to the file each tool reads, and a way to keep it current.</p>
+<p><strong>Who it is for:</strong> a developer or team that uses several coding assistants on one repository.</p>
+<p><strong>What you get:</strong> the project's current state, its decisions, lessons and procedures written once into the file each assistant reads, and a check that the files are current.</p>
+<p><strong>Time:</strong> about 10 minutes. <strong>Needs:</strong> Node.js 22.13 or later, git, a POSIX shell.</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Install the engine as in <a href="/docs/guides/mode-0/#before-you-start">Mode 0</a>. Start in an empty working folder. The long version of this recipe, with a board and a gate, is <a href="/docs/guides/mode-2/#3-one-steering-file-for-every-assistant">Mode 2</a>.</p>
+<h2 id="1-a-project-with-three-notes">1. A project with three notes</h2>
+<p>A steering file is built from four kinds of item: concept, procedure, gate and lesson. Make one concept, one lesson and one procedure, adopt them and commit once:</p>
+<pre tabindex="0" data-lang="bash"><code>mkdir -p my-project/content/concepts my-project/content/lessons my-project/content/procedures &amp;&amp; cd my-project
+cat &gt; content/concepts/decide-the-login.md &lt;&lt;'ITEM'
+---
+type: concept
+title: Decide the login
+description: Build a plain password form first; add single sign-on later.
+prov:
+  origin: human
+  operator: human:you
+kind: decision
+---
+
+Build a plain password form first; single sign-on comes later.
+ITEM
+cat &gt; content/lessons/never-log-passwords.md &lt;&lt;'ITEM'
+---
+type: lesson
+title: Never log passwords
+description: A debug line once wrote a password to the log.
+date: &quot;2026-11-01&quot;
+severity: warn
+prov:
+  origin: human
+  operator: human:you
+---
+
+## What happened
+
+A debug line printed the whole login request, password included.
+
+## Lesson
+
+Log the user name and the outcome, never the password.
+ITEM
+cat &gt; content/procedures/run-the-tests.md &lt;&lt;'ITEM'
+---
+type: procedure
+title: Run the tests
+description: Run the project's tests before every change.
+prov:
+  origin: human
+  operator: human:you
+when: A change is ready to be proposed
+---
+
+## Steps
+
+1. Run `npm test`.
+2. Fix every failure.
+ITEM
+agsc init &gt; /dev/null 2&gt;&amp;1
+mkdir -p .well-known &amp;&amp; printf 'Contact: https://example.org/security\n' &gt; .well-known/security.txt
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'the login project'</code></pre>
+<p>Nothing is printed. Write <code>human:&lt;your-id&gt;</code> where the files say <code>human:you</code>.</p>
+<h2 id="2-write-the-steering-files">2. Write the steering files</h2>
+<pre tabindex="0" data-lang="bash"><code>agsc export --steer
+ls dist/export/steer</code></pre>
+<pre tabindex="0" data-lang="text"><code>export --steer: 2 targets (agents, claude), identical bytes at each path (AGSC-01-28)
+AGENTS.md
+CLAUDE.md</code></pre>
+<p>The default targets are <code>agents</code> and <code>claude</code>. Both files have the same bytes. Other lines the command printed are left out.</p>
+<h2 id="3-choose-the-targets">3. Choose the targets</h2>
+<p><code>--target</code> takes a comma-separated list. The engine names eleven targets and writes one path for each:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
+<thead><tr><th scope="col">Target</th><th scope="col">File written</th></tr></thead>
+<tbody>
+<tr><td><code>agents</code></td><td><code>AGENTS.md</code></td></tr>
+<tr><td><code>claude</code></td><td><code>CLAUDE.md</code></td></tr>
+<tr><td><code>codex</code></td><td><code>AGENTS.override.md</code></td></tr>
+<tr><td><code>cursor</code></td><td><code>.cursor/rules/agsc.mdc</code></td></tr>
+<tr><td><code>copilot</code></td><td><code>.github/copilot-instructions.md</code></td></tr>
+<tr><td><code>gemini</code></td><td><code>GEMINI.md</code></td></tr>
+<tr><td><code>windsurf</code></td><td><code>.windsurf/rules/agsc.md</code></td></tr>
+<tr><td><code>cline</code></td><td><code>.clinerules/agsc.md</code></td></tr>
+<tr><td><code>kiro</code></td><td><code>.kiro/steering/agsc.md</code></td></tr>
+<tr><td><code>aider</code></td><td><code>CONVENTIONS.md</code></td></tr>
+<tr><td><code>gabbe</code></td><td><code>GABBE/agents/AGENTS.md</code></td></tr>
+</tbody></table></div>
+<p>Write five targets, copy them into the repository and commit:</p>
+<pre tabindex="0" data-lang="bash"><code>agsc export --steer --target agents,claude,cursor,copilot,gemini
+cp -r dist/export/steer/. .
+git add -A &amp;&amp; git commit -q -m 'steering files'</code></pre>
+<pre tabindex="0" data-lang="text"><code>export --steer: 5 targets (agents, claude, cursor, copilot, gemini), identical bytes at each path (AGSC-01-28)</code></pre>
+<p>Which tool reads which file is that tool's matter; see its own documentation. The engine states one limit: the Cursor rule has no front matter, so Cursor may not apply it to every chat.</p>
+<h2 id="4-what-is-inside">4. What is inside</h2>
+<pre tabindex="0" data-lang="bash"><code>sed -n '/^## Lessons/,/^## Procedures/p' AGENTS.md</code></pre>
+<pre tabindex="0" data-lang="text"><code>## Lessons
+
+### Never log passwords
+
+- item: http://localhost/lessons/never-log-passwords/
+
+```text agsc-content
+
+## What happened
+
+A debug line printed the whole login request, password included.
+
+## Lesson
+
+Log the user name and the outcome, never the password.
+```
+
+## Procedures</code></pre>
+<p>The file has the project's state, an index line for each concept, and the full text of each procedure, gate and lesson. The text is fenced and marked as data the assistant reads, not as instructions. Only these four kinds of item are used; an episode or the git log is never a source. A concept appears as one line: its title, address and description.</p>
+<h2 id="5-keep-the-files-current">5. Keep the files current</h2>
+<p>Run the export again after a decision, lesson or procedure changes, and copy the files in. A check for CI is a comparison of the written files with the committed ones. Every commit changes the version and time lines in the header, so the comparison skips those three lines:</p>
+<pre tabindex="0" data-lang="bash"><code>agsc export --steer --target agents,claude,cursor,copilot,gemini &gt; /dev/null
+strip() { grep -v -e '^bundle_version:' -e '^generated_at:' -e '^- last build:' &quot;$1&quot;; }
+for f in AGENTS.md CLAUDE.md GEMINI.md .cursor/rules/agsc.mdc .github/copilot-instructions.md; do
+  diff &lt;(strip &quot;dist/export/steer/$f&quot;) &lt;(strip &quot;$f&quot;) &gt; /dev/null &amp;&amp; echo &quot;current: $f&quot;
+done</code></pre>
+<pre tabindex="0" data-lang="text"><code>current: AGENTS.md
+current: CLAUDE.md
+current: GEMINI.md
+current: .cursor/rules/agsc.mdc
+current: .github/copilot-instructions.md</code></pre>
+<p>Now change a lesson, commit, write the files again and compare:</p>
+<pre tabindex="0" data-lang="bash"><code>sed -i 's/never the password\./never the password or the session token./' content/lessons/never-log-passwords.md
+git commit -qam 'lesson: session token'
+agsc export --steer --target agents,claude,cursor,copilot,gemini &gt; /dev/null
+diff &lt;(strip dist/export/steer/AGENTS.md) &lt;(strip AGENTS.md) || echo &quot;AGENTS.md is out of date (diff exit code $?)&quot;</code></pre>
+<pre tabindex="0" data-lang="text"><code>43c43
+&lt; Log the user name and the outcome, never the password or the session token.
+---
+&gt; Log the user name and the outcome, never the password.
+AGENTS.md is out of date (diff exit code 1)</code></pre>
+<p>In CI, make that <code>diff</code> fail the job. The engine has no command of its own for this comparison.</p>
+<h2 id="check-that-it-worked">Check that it worked</h2>
+<p>Step 5 printed the changed line and an exit code of 1. After you copy the new files in, the same comparison prints nothing.</p>
+<h2 id="what-this-does-not-do">What this does not do</h2>
+<ul>
+<li>It writes files; it does not copy them for you. You commit them.</li>
+<li>The engine does not check that a tool reads its file. That is the tool's behaviour.</li>
+<li>Editing the body of a concept changes nothing here: a concept shows as one line. Put an instruction in a procedure, a gate or a lesson.</li>
+<li>The quoted prose is the project's own text. Read it before you commit it.</li>
+</ul>
+<h2 id="where-to-go-next">Where to go next</h2>
+<ul>
+<li><a href="/docs/guides/mode-2/">Mode 2</a>: the board, the decision and the gate that go with these files.</li>
+<li><a href="/docs/recipe-connect-an-assistant/">Connect an assistant</a> so it can search the notes directly.</li>
+<li><a href="/docs/recipe-ci-gate/">Gate a repository in CI</a>.</li>
+</ul>
+<p>Run on 18 November 2026 with engine 1.1.0. The script that repeats every command of this page: <a href="https://github.com/andreibesleaga/AgenticSystemCore.com/blob/main/recipes/steering-files.run.sh">recipes/steering-files.run.sh</a>. More recipes: <a href="/docs/recipes/">the list</a>.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/recipe-steering-files.md">Propose an edit</a> — opens <code>site/docs/recipe-steering-files.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a> · <a href="https://standards.agenticsystemcore.com/">Standards Map</a></span></p>
+</footer>
+</body>
+</html>

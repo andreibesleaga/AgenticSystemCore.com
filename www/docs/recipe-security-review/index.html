@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipe: review what a node proves about itself — AgenticSystemCore</title>
+<meta name="description" content="What a reviewer can check on an AgenticSystemCore node: digests, the ledger chain, what the tool server refuses, the stated limits and the threat model.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/recipe-security-review/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/recipe-security-review/">
+<meta property="og:title" content="Recipe: review what a node proves about itself">
+<meta property="og:description" content="What a reviewer can check on an AgenticSystemCore node: digests, the ledger chain, what the tool server refuses, the stated limits and the threat model.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Recipe: review what a node proves about itself","description":"What a reviewer can check on an AgenticSystemCore node: digests, the ledger chain, what the tool server refuses, the stated limits and the threat model.","url":"https://agenticsystemcore.com/docs/recipe-security-review/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Recipe: review what a node proves about itself</h1>
+<p class="summary"><strong>Summary</strong>For a security reviewer, an operator or a procurement team. Each claim a node makes is tied to a command, the line it prints and the document to read.</p>
+<p><strong>Who it is for:</strong> a security reviewer or operator who has to say what a built node does and does not guarantee.</p>
+<p><strong>What you get:</strong> for each claim, the command that tests it, the line it prints, and the engine document that states it.</p>
+<p><strong>Time:</strong> about 10 minutes. <strong>Needs:</strong> Node.js 22.13 or later, git, a POSIX shell, curl.</p>
+<h2 id="before-you-start">Before you start</h2>
+<p>Install the engine as in <a href="/docs/guides/mode-0/">the Mode 0 guide</a>. The commands build the <code>mode-2-project</code> example (<code>$ENGINE</code>) with two commits and work inside that folder, so the ledger has history to check.</p>
+<pre tabindex="0" data-lang="bash"><code>cp -r &quot;$ENGINE/examples/demos/mode-2-project&quot; my-node &amp;&amp; cd my-node
+mkdir -p .well-known &amp;&amp; printf 'Contact: https://example.org/security\nExpires: 2027-06-01T00:00:00Z\n' &gt; .well-known/security.txt
+cp &quot;$ENGINE/LICENSE-CONTENT&quot; .
+git init -q -b main &amp;&amp; git add -A &amp;&amp; git commit -q -m 'a node'
+printf '\nIt keeps the plan.\n' &gt;&gt; content/concepts/handoff.md
+git add -A &amp;&amp; git commit -q -m 'a second commit'
+agsc build --quiet 2&gt;/dev/null</code></pre>
+<h2 id="1-every-file-matches-its-digest">1. Every file matches its digest</h2>
+<p>The discovery document, <code>/.well-known/knowledge-linkset</code>, lists each file with a SHA-256 digest. Compare one by hand, then run the shipped checker over all of them:</p>
+<pre tabindex="0" data-lang="bash"><code>node -e 'const l = JSON.parse(require(&quot;fs&quot;).readFileSync(&quot;www/.well-known/knowledge-linkset&quot;)).linkset[0]; console.log(l.alternate[0].href, l.alternate[0].digest[0])'
+node -e 'console.log(&quot;sha-256=:&quot; + require(&quot;crypto&quot;).createHash(&quot;sha256&quot;).update(require(&quot;fs&quot;).readFileSync(&quot;www/llms.txt&quot;)).digest(&quot;base64&quot;) + &quot;:&quot;)'
+node &quot;$ENGINE/tools/validate-wellknown&quot; www/.well-known/knowledge-linkset --level 2</code></pre>
+<pre tabindex="0" data-lang="text"><code>https://project.example/llms.txt sha-256=:DA37Xt2R3bYSJRoc2OmOlZOsNLnDcmnnTOE1BlyeN4c=:
+sha-256=:DA37Xt2R3bYSJRoc2OmOlZOsNLnDcmnnTOE1BlyeN4c=:
+validate-wellknown pass (level 2): 14 input file(s) read, 0 error(s), 0 warning(s)</code></pre>
+<p>Change one byte of a copy and the checker refuses it:</p>
+<pre tabindex="0" data-lang="bash"><code>cp -r www www-tampered
+echo 'one more line' &gt;&gt; www-tampered/llms.txt
+node &quot;$ENGINE/tools/validate-wellknown&quot; www-tampered/.well-known/knowledge-linkset --level 2 || echo &quot;exit $?&quot;</code></pre>
+<pre tabindex="0" data-lang="text"><code>www-tampered/.well-known/knowledge-linkset:1:1 error AGSC-E201 relation alternate: digest does not match the bytes of https://project.example/llms.txt
+validate-wellknown fail (level 2): 14 input file(s) read, 1 error(s), 0 warning(s)
+exit 1</code></pre>
+<p>Read: <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/SECURITY-CONSIDERATIONS.md">Security considerations</a>, section 2. A digest shows which bytes were hashed. It does not show who published them: that rests on the origin's TLS certificate and DNS name.</p>
+<h2 id="2-the-history-was-not-rewritten">2. The history was not rewritten</h2>
+<p><code>ledger.jsonl</code> is a hash chain derived from the git history, and the discovery document publishes its head. <code>agsc verify --ledger</code> recomputes both. Run it, then rewrite the last commit message in this scratch repository and run it again:</p>
+<pre tabindex="0" data-lang="bash"><code>agsc verify --ledger --quiet
+git commit -q --amend -m 'a second commit, reworded'
+agsc verify --ledger --quiet &gt; ledger.out 2&gt;&amp;1 || echo &quot;exit $?&quot;
+cut -c1-330 ledger.out</code></pre>
+<pre tabindex="0" data-lang="text"><code>verify: pass (0 error, 0 warn)
+verify: fail (2 error, 0 warn)
+error: AGSC-E701 the published agsc-ledger-head &quot;88b666937d686dddc8390ddeea736c3fe60058612f331d1cc805ca9922036bab&quot; is not the recomputed head &quot;100a5d92b16f8c209b8f14d410113bd1d63fc7c9d19f42e7078007f044952546&quot; — the tail has been truncated (AGSC-08-23) — /ledger.jsonl
+error: AGSC-E702 the published ledger differs from the recomputation of the same history at line 2 (AGSC-08-23) — www/ledger.jsonl:2
+exit 1</code></pre>
+<p>Your two hashes will differ from these, because they come from your commit dates. The second error names the earliest line where the chain differs. Read: section 3 of the same document. The chain proves a published history was not changed; it does not prove that what a commit says is true.</p>
+<h2 id="3-what-an-assistant-cannot-do-through-the-tool-server">3. What an assistant cannot do through the tool server</h2>
+<p><code>agsc mcp</code> serves ten tools. List them with the hint each one declares:</p>
+<pre tabindex="0" data-lang="bash"><code>printf '%s\n' '{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;method&quot;:&quot;initialize&quot;,&quot;params&quot;:{&quot;protocolVersion&quot;:&quot;2025-11-25&quot;,&quot;capabilities&quot;:{},&quot;clientInfo&quot;:{&quot;name&quot;:&quot;check&quot;,&quot;version&quot;:&quot;0&quot;}}}' '{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;notifications/initialized&quot;}' '{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:2,&quot;method&quot;:&quot;tools/list&quot;}' | agsc mcp | tail -1 | node -e 'for (const t of JSON.parse(require(&quot;fs&quot;).readFileSync(0)).result.tools) console.log(t.name.padEnd(9), &quot;readOnly=&quot; + t.annotations.readOnlyHint)'</code></pre>
+<pre tabindex="0" data-lang="text"><code>ask       readOnly=true
+brief     readOnly=true
+check     readOnly=true
+compose   readOnly=true
+explain   readOnly=true
+links     readOnly=true
+propose   readOnly=false
+read      readOnly=true
+remember  readOnly=false
+search    readOnly=true</code></pre>
+<p><code>propose</code> and <code>remember</code> are the two that are not read-only, and they return prepared text; they write nothing. Each call below is refused, and the last shows that a proposal changes no file:</p>
+<pre tabindex="0" data-lang="bash"><code>node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; remember '{&quot;title&quot;:&quot;A new task&quot;,&quot;body&quot;:&quot;Write the test plan.&quot;,&quot;kind&quot;:&quot;task&quot;,&quot;cluster&quot;:&quot;login&quot;}'
+node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; propose '{&quot;slug&quot;:&quot;handoff&quot;,&quot;task_state&quot;:&quot;TASK_STATE_WORKING&quot;}'
+node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; read '{&quot;slug&quot;:&quot;../../etc/passwd&quot;}'
+node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; delete '{&quot;slug&quot;:&quot;handoff&quot;}'
+node &quot;$ENGINE/examples/demos/agents/mcp-call.js&quot; propose '{&quot;slug&quot;:&quot;task-login-tests&quot;,&quot;task_state&quot;:&quot;TASK_STATE_COMPLETED&quot;}' | grep -E '&quot;(type|from|task_state)&quot;'
+git status --short -- content agsc.config.json | wc -l</code></pre>
+<pre tabindex="0" data-lang="text"><code>    &quot;code&quot;: &quot;AGSC-E003&quot;,
+    &quot;message&quot;: &quot;remember needs the declared human operator, `operator`, or the `agent` of a declared lane (AGSC-09-14b)&quot;
+    &quot;code&quot;: &quot;AGSC-E207&quot;,
+    &quot;message&quot;: &quot;only a concept of kind task has a task_state (AGSC-02-99)&quot;
+    &quot;code&quot;: &quot;AGSC-E301&quot;,
+    &quot;message&quot;: &quot;no item with that slug in this Bundle&quot;
+mcp-call: no answer to tools/call: {&quot;code&quot;:-32602,&quot;message&quot;:&quot;Unknown tool: delete&quot;,&quot;data&quot;:{&quot;name&quot;:&quot;delete&quot;}}
+    &quot;from&quot;: &quot;TASK_STATE_WORKING&quot;,
+    &quot;task_state&quot;: &quot;TASK_STATE_COMPLETED&quot;
+  &quot;type&quot;: &quot;proposal&quot;
+0</code></pre>
+<p>The server also refuses to listen anywhere but the loopback address, and refuses a web page of another site:</p>
+<pre tabindex="0" data-lang="bash"><code>agsc mcp --bind 0.0.0.0 --http 0 || echo &quot;exit $?&quot;
+agsc mcp --http 8799 &gt; mcp.log 2&gt;&amp;1 &amp;
+sleep 2
+curl -s -o /dev/null -w '%{http_code}\n' -X POST http://127.0.0.1:8799/mcp -H 'Origin: https://evil.example' -H 'Content-Type: application/json' -d '{}'
+kill $!</code></pre>
+<pre tabindex="0" data-lang="text"><code>{&quot;code&quot;:&quot;AGSC-E003&quot;,&quot;severity&quot;:&quot;error&quot;,&quot;message&quot;:&quot;mcp: --bind \&quot;0.0.0.0\&quot; is not a loopback address: one in 127.0.0.0/8, or ::1 (AGSC-09-18)&quot;}
+exit 2
+403</code></pre>
+<p>Read: <a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/USING-WITH-ASSISTANTS.md">Using the engine with assistants</a>. Every answer carries <code>&quot;trust&quot;: &quot;untrusted&quot;</code>: the text of a node is data for an assistant, never an instruction.</p>
+<h2 id="4-the-stated-limits-and-the-threat-model">4. The stated limits and the threat model</h2>
+<p>The threat rows, with what closes each and what stays open, are in <code>docs/SECURITY-CONSIDERATIONS.md</code>. List its sections and the open items it names:</p>
+<pre tabindex="0" data-lang="bash"><code>grep -n '^## ' &quot;$ENGINE/docs/SECURITY-CONSIDERATIONS.md&quot;
+sed -n '/^## 5\./,$p' &quot;$ENGINE/docs/SECURITY-CONSIDERATIONS.md&quot; | grep -o '^- \*\*[^*]*\*\*'</code></pre>
+<pre tabindex="0" data-lang="text"><code>12:## 1. Boundary threat rows (continuing the STRIDE table of PLAN §12, T1–T10)
+47:## 2. Digests versus signatures — what 1.0 proves and what it does not
+67:## 3. The ledger's bounds, stated honestly
+75:## 5. What remains open at 1.0, by name
+- **Authorship**
+- **Truth**
+- **A verified but malicious contributor**
+- **Restricted visibility**
+- **A responder's runtime**
+- **`prov.operator` is a published identifier of a natural person**</code></pre>
+<p>To report a problem, <code>SECURITY.md</code> in the package and the node's own <code>security.txt</code> name the route. A node needs a <code>Contact:</code> line there or <code>agsc ci</code> refuses to build.</p>
+<h2 id="check-that-it-worked">Check that it worked</h2>
+<p>Step 1 ended in <code>pass</code> and then <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E201"><code>AGSC-E201</code></a>; step 2 in <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E701"><code>AGSC-E701</code></a> and <a class="ref" href="/specs/09-conformance/page-2/#AGSC-E702"><code>AGSC-E702</code></a>; step 3 in four refusals and a count of 0.</p>
+<h2 id="what-this-does-not-do">What this does not do</h2>
+<ul>
+<li>It does not show who wrote the node, or that its statements are true. Digests and the ledger cover bytes and history, nothing more.</li>
+<li>It tests the engine's refusals on one example node, not every tool or every input.</li>
+<li><code>restricted</code> visibility is metadata, not access control: see <a href="/docs/recipe-internal-node/">Keep a node for internal knowledge</a>.</li>
+</ul>
+<h2 id="where-to-go-next">Where to go next</h2>
+<ul>
+<li><a href="/docs/recipe-ci-gate/">Stop a broken change before it is merged</a>.</li>
+<li><a href="/docs/guides/publish/">Publish a node and check it live</a>.</li>
+</ul>
+<p>Run on 18 November 2026 with engine 1.1.0. The script that repeats every command of this page: <a href="https://github.com/andreibesleaga/AgenticSystemCore.com/blob/main/recipes/security-review.run.sh">recipes/security-review.run.sh</a>. More recipes: <a href="/docs/recipes/">the list</a>.</p>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/recipe-security-review.md">Propose an edit</a> — opens <code>site/docs/recipe-security-review.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a> · <a href="https://standards.agenticsystemcore.com/">Standards Map</a></span></p>
+</footer>
+</body>
+</html>
