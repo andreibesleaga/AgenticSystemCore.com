@@ -95,6 +95,36 @@
       "path": "site/docs/recipe-notes-apps.md",
       "text": "hydration.md",
       "reason": "a sample command and the lines it printed: the link is the text being converted in the example, not a link of this page"
+    },
+    {
+      "check": "missing-file",
+      "path": "www/docs/recipe-notes-apps/index.html",
+      "text": "2026-11-17.md",
+      "reason": "a sample command and the lines it printed: the link is the text being converted in the example, not a link of this page"
+    },
+    {
+      "check": "missing-file",
+      "path": "www/docs/recipe-notes-apps/index.html",
+      "text": "\\L\\1.md",
+      "reason": "a sample command and the lines it printed: the link is the text being converted in the example, not a link of this page"
+    },
+    {
+      "check": "missing-file",
+      "path": "www/docs/recipe-notes-apps/index.html",
+      "text": "\\L\\2.md",
+      "reason": "a sample command and the lines it printed: the link is the text being converted in the example, not a link of this page"
+    },
+    {
+      "check": "missing-file",
+      "path": "www/docs/recipe-notes-apps/index.html",
+      "text": "hydration.md",
+      "reason": "a sample command and the lines it printed: the link is the text being converted in the example, not a link of this page"
+    },
+    {
+      "check": "missing-file",
+      "path": "www/docs/recipe-notes-apps/index.html",
+      "text": "sourdough.md",
+      "reason": "a sample command and the lines it printed: the link is the text being converted in the example, not a link of this page"
     }
   ]
 }
