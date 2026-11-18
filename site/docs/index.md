@@ -21,6 +21,7 @@ The specification is written for implementers and is exact by design. This guide
 | Page | What it answers |
 |---|---|
 | [Start here](/docs/start-here/) | One reading path per kind of reader |
+| [In brief](/docs/in-brief/) | The whole system on one page, in plain words: 25-word and 70-word descriptions, each part with what it does and why it matters, what each kind of user gains, how to check a file yourself, what it does not do, the key numbers |
 | [Introduction](/docs/introduction/) | What is this, what is new about it, who is it for |
 | [The six modes](/docs/modes/) | Auto-wiki with an optional agent lane, distributed agentic memory, live specifications, evolving skills, runnable knowledge, the live board — a self-driving shared board |
 | [How to use it](/docs/how-to-use/) | The first commands for each mode and each kind of user — one person, one agent, many participants — the scenarios, the configuration switches, the hooks for agents and tools, and what the current version does not ship |
