@@ -1,12 +1,12 @@
 ---
 title: "Benchmarks"
-summary: "What has been measured, for each kind of reader: how agents answer from a node, what the typed graph and its vocabulary give, what a person, a team and a publisher get from one folder of files, how the checks hold, and how far it scales. Every number names its source, and the limits are at the end."
+summary: "What has been measured, for each kind of reader: how agents answer from a node, what the typed graph and its vocabulary give, what a person, a team and a publisher get from one folder of files, how the checks hold, and how far it scales. The sources and the limits are stated."
 description: "Measured results for AgenticSystemCore 1.1.0: agent answer accuracy and token cost against plain pages, llms.txt and retrieval; checkable citations; the graph read by standard RDF, SHACL and SPARQL tools; typed-link questions; governed writes; determinism; security floor; accessibility; scale; hosting cost; and the limits of the measurements."
 ---
 
 AgenticSystemCore is a knowledge system for people and agents: one folder of Markdown becomes a website, a graph with published meanings, and tools an assistant can call, with every change passing through a person. This page collects what has been measured about engine 1.1.0 and the two public nodes, this site and [patterns.agenticsystemcore.com](https://patterns.agenticsystemcore.com/).
 
-The numbers come from two sources: the engine's own measurement record of 11 November 2026 ([docs/MEASUREMENTS.md](https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/MEASUREMENTS.md), each figure with the command that produced it), and studies run on 17 and 18 November 2026 that compared a node with other ways of offering the same content and read its graph with independent tools.
+The numbers come from two sources: the engine's own measurement record of 11 November 2026 ([docs/MEASUREMENTS.md](https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/MEASUREMENTS.md), each figure with the command that produced it), and studies the project ran on 17 and 18 November 2026, which compared a node with other ways of offering the same content and read its graph with independent tools. The engine's record is public and each figure in it can be run again. The question set, the harness and the raw answers of the November studies are kept by the project and are not published, so those figures (the answer tables, the citation rates, the graph checks, the typed-link, cross-node, write and change-detection results) rest on the project's word; the last section says how they were made.
 
 ## The results in one table
 
@@ -18,7 +18,7 @@ The numbers come from two sources: the engine's own measurement record of 11 Nov
 | An agent asked about relations | Answers that follow typed links over two and three steps | 30 of 30 through the `links` tool |
 | A person with notes | A checked website, a graph and agent files from one command | 323 files of 14 kinds in 2.4 seconds; a first node in 6 commands and 22 seconds |
 | A team that lets agents propose | Changes that pass through a person | 0 source files changed in 20 attempts, ordinary and hostile; each returned a proposal |
-| A publisher | Detection of a changed file, and the same bytes on every build | every change to the 9 digest-listed files detected; 0 files differing across two builds, time zones and locales |
+| A publisher | Detection of a changed file, and the same bytes on every build | 33 of 33 changes to the demonstration node's 9 digest-listed files detected; 0 files differing across two builds, time zones and locales |
 | A security reviewer | A floor of refusals that is scored | 108 of 108 seeded faults stopped, 14 of 14 valid controls clean |
 | A reader with assistive technology | Pages that pass automated accessibility checks | 0 violations on 250 pages in both colour schemes |
 | An implementer | A specification that can be tested | 376 vectors pass, 0 fail; a second checker in Python agrees |
@@ -42,13 +42,13 @@ Correct answers on the answerable questions, with 95 % intervals, and the median
 | Model | Plain pages | Pages and `llms.txt` | Node tools | Retrieval |
 |---|---|---|---|---|
 | Claude Haiku 5.5 | 67.3 % [55.0, 79.0], 29,559 tokens | 73.3 % [61.7, 84.0], 22,589 tokens | 98.0 % [95.3, 100], 12,983 tokens | 97.3 % [94.7, 99.3], 1,311 tokens |
-| Claude Sonnet 5.5 | 82.5 % [70.0, 92.5], 20,513 tokens | 82.5 % [70.0, 92.5], 15,918 tokens | 97.4 % [92.3, 100], 10,939 tokens | 39 of 39, 1,205 tokens |
+| Claude Sonnet 5.5 | 82.5 % [70.0, 92.5], 20,513 tokens | 82.5 % [70.0, 92.5], 15,918 tokens | 97.4 % [92.3, 100], 10,939 tokens | 39 of 39 correct, 1,205 tokens |
 
 - **A node against web pages.** With either model, the node's tools gave 15 to 31 points more correct answers than the page routes, with 31 to 56 % fewer tokens. This is the comparison that matters for an agent that visits a site it has never seen.
 - **A node and retrieval.** Retrieval over the source files was as accurate and cheaper per answer. The two fit together: a publisher who has the files can index them, and a node publishes those same files, already cut into passages with digests (`chunks.jsonl`), for anyone who wants to build that index.
 - **Small local models.** A 7-billion-parameter model on a laptop could not run a tool loop by any route. Given the node's results in its prompt in one step, it answered 84.0 % correctly; given retrieved passages, 94.0 %. For such models, put the content in the prompt.
 
-The Haiku row covers two full passes and part of a third; the Sonnet row covers one pass over 40 of the 50 answerable questions.
+The Haiku row covers two full passes and part of a third. The Sonnet row covers one pass that stopped at its token limit: 40 of the 50 answerable questions for the two page routes and 39 for node tools and retrieval. Where every answer was correct the cell gives the count, since an interval computed from 39 identical outcomes has no width.
 
 ## For meaning: a graph that standard tools read
 
@@ -73,7 +73,7 @@ What this gives in use:
 ## For trust: citations and files that can be checked
 
 - **Checkable citations.** Asked to cite each passage with its digest, Claude Haiku 5.5 gave a citation whose digest matched the published `chunks.jsonl` in 91.0 % of its answers, and the small local model in 54.7 %. The node's `read` tool returned matching digests for 50 of 50 items. Web pages and a search index give a model nothing to cite that a program can verify.
-- **A changed file is detected.** Every change made to the nine files the discovery document gives digests for was detected, including a one-byte change, by the engine and by the Python package independently. One of the nine is `chunks.jsonl`, which holds the text of every item.
+- **A changed file is detected.** The demonstration node's discovery document gives digests for nine files (this site's gives them for thirteen). All 33 changes made to those nine, from one byte to a swapped or shortened file, were detected by the engine and by the Python package independently. One of the nine is `chunks.jsonl`, which holds the text of every item.
 - **The same bytes on every build.** Two clean builds of each public node were identical file for file (323 of 323 and 237 of 237). The engine's record adds a build under another time zone and locale: 61 files compared, 0 differing.
 
 ## For people and teams: little to learn, nothing to run
@@ -103,7 +103,7 @@ Every size met the specification's budgets: at most 60 seconds of build for each
 ## What to keep in mind
 
 - **Use retrieval where you own the files.** It is the cheapest route to an answer; a node is for content that others, and their agents, will read.
-- **Digests are on the machine files.** The nine files the discovery document lists are covered; HTML pages are not. An agent that needs the check should read the machine files.
+- **Digests are on the machine files.** The files the discovery document lists with a digest are covered; HTML pages are not. An agent that needs the check should read the machine files.
 - **The local tool server reads your source folder**, drafts included, because it is the author's own tool. To offer tools to others, run it on an export of the published items, or use the tools on the published pages.
 - **The injection check is a floor.** It stops the listed patterns; a paraphrase written to avoid them passes, as the specification says. Treat every tool result as untrusted text.
 - **Large nodes start slowly.** At 5,000 items the local tool server took 35 seconds to start.
