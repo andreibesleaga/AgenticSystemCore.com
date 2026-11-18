@@ -63,7 +63,7 @@ git add -A &amp;&amp; git commit -q -m 'a second commit'
 agsc build --quiet 2&gt;/dev/null</code></pre>
 <h2 id="1-every-file-matches-its-digest">1. Every file matches its digest</h2>
 <p>The discovery document, <code>/.well-known/knowledge-linkset</code>, lists each file with a SHA-256 digest. Compare one by hand, then run the shipped checker over all of them:</p>
-<pre tabindex="0" data-lang="bash"><code>node -e 'const l = JSON.parse(require(&quot;fs&quot;).readFileSync(&quot;www/.well-known/knowledge-linkset&quot;)).linkset[0]; console.log(l.alternate[0].href, l.alternate[0].digest[0])'
+<pre tabindex="0" data-lang="bash"><code>node -e 'const l = JSON.parse(require(&quot;fs&quot;).readFileSync(&quot;www/.well-known/knowledge-linkset&quot;)).linkset[0]; const a = l.alternate.find((x) =&gt; x.href.endsWith(&quot;/llms.txt&quot;)); console.log(a.href, a.digest[0])'
 node -e 'console.log(&quot;sha-256=:&quot; + require(&quot;crypto&quot;).createHash(&quot;sha256&quot;).update(require(&quot;fs&quot;).readFileSync(&quot;www/llms.txt&quot;)).digest(&quot;base64&quot;) + &quot;:&quot;)'
 node &quot;$ENGINE/tools/validate-wellknown&quot; www/.well-known/knowledge-linkset --level 2</code></pre>
 <pre tabindex="0" data-lang="text"><code>https://project.example/llms.txt sha-256=:DA37Xt2R3bYSJRoc2OmOlZOsNLnDcmnnTOE1BlyeN4c=:
