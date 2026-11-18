@@ -41,6 +41,42 @@
       "path": "static/.well-known/sustainability-data",
       "text": "\"signed\":",
       "reason": "the signed member is a public JSON Web Signature over this document (EdDSA, its public key embedded; draft-besleaga-sustainability-wellknown), placed by the operator's monthly report tool; it is a signature anyone can verify, not a credential"
+    },
+    {
+      "check": "process",
+      "path": "site/docs/benchmarks.md",
+      "text": "Claude Haiku",
+      "reason": "the benchmark page names the models that were measured; the name is data, not a note about how the page was written"
+    },
+    {
+      "check": "process",
+      "path": "site/docs/benchmarks.md",
+      "text": "Claude Sonnet",
+      "reason": "the benchmark page names the models that were measured; the name is data, not a note about how the page was written"
+    },
+    {
+      "check": "process",
+      "path": "www/docs/benchmarks/index.html",
+      "text": "Claude Haiku",
+      "reason": "the benchmark page names the models that were measured; the name is data, not a note about how the page was written"
+    },
+    {
+      "check": "process",
+      "path": "www/docs/benchmarks/index.html",
+      "text": "Claude Sonnet",
+      "reason": "the benchmark page names the models that were measured; the name is data, not a note about how the page was written"
+    },
+    {
+      "check": "process",
+      "path": "www/assets/search-site.json",
+      "text": "Claude Haiku",
+      "reason": "the benchmark page names the models that were measured; the name is data, not a note about how the page was written"
+    },
+    {
+      "check": "process",
+      "path": "www/assets/search-site.json",
+      "text": "Claude Sonnet",
+      "reason": "the benchmark page names the models that were measured; the name is data, not a note about how the page was written"
     }
   ]
 }
