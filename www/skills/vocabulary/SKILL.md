@@ -11,7 +11,7 @@ bundle: https://agenticsystemcore.com/
 license: LicenseRef-AgenticSystemCore-Content-Use-1.0
 terms: LicenseRef-AgenticSystemCore-Content-Use-1.0
 spec_version: 1.1.0
-bundle_version: v1.1.0+9.gd1299e43f717
+bundle_version: v1.1.0+12.g7da74c6b8569
 generated_at: 2026-11-13T09:14:46Z
 assistance: content may be AI-assisted; each item states its origin in prov.origin and each accepted contribution carries an Assisted-by: trailer
 -->

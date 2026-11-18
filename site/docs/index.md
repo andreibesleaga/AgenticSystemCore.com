@@ -28,6 +28,7 @@ The specification is written for implementers and is exact by design. This guide
 | [Agent skill](/docs/agent-skill/) | One skill file that teaches a coding agent to use the engine in every mode, and how to install it |
 | [WebAIAssist](/webaiassist/) | The browser client of this project: a chat in the side panel with a model on your own computer that uses the tools a page offers through WebMCP; what leaves the computer, the limits and how to install it |
 | [Demos](/docs/demos/) | Every mode as a five-minute demo, with the personas it serves: the commands, the printed lines, what each proves — the short form of the engine's tested demos page |
+| [Benchmarks](/docs/benchmarks/) | What has been measured, for each kind of reader: agents answering from a node against web pages and retrieval, checkable citations, typed links, governed writes, the safety floor, accessibility, scale and cost, with the limits |
 | [How it works](/docs/how-it-works/) | The build, the proposal lifecycle, discovery, import and export, determinism, safety |
 | [Data model](/docs/data-model/) | The six item types, the fourteen links, clusters, sources, provenance |
 | [Architecture](/docs/architecture/) | arc42 and C4 views, bounded contexts, ports, deployment, decisions, threat model |

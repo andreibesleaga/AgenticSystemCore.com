@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Benchmarks — AgenticSystemCore</title>
+<meta name="description" content="Measured results for AgenticSystemCore 1.1.0: agent answer accuracy and token cost against plain pages, llms.txt and retrieval; checkable citations; the graph read by standard RDF, SHACL and SPARQL tools; typed-link questions; governed writes; determinism; security floor; accessibility; scale; hosting cost; and the limits of the measurements.">
+<link rel="canonical" href="https://agenticsystemcore.com/docs/benchmarks/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/docs/benchmarks/">
+<meta property="og:title" content="Benchmarks">
+<meta property="og:description" content="Measured results for AgenticSystemCore 1.1.0: agent answer accuracy and token cost against plain pages, llms.txt and retrieval; checkable citations; the graph read by standard RDF, SHACL and SPARQL tools; typed-link questions; governed writes; determinism; security floor; accessibility; scale; hosting cost; and the limits of the measurements.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Benchmarks","description":"Measured results for AgenticSystemCore 1.1.0: agent answer accuracy and token cost against plain pages, llms.txt and retrieval; checkable citations; the graph read by standard RDF, SHACL and SPARQL tools; typed-link questions; governed writes; determinism; security floor; accessibility; scale; hosting cost; and the limits of the measurements.","url":"https://agenticsystemcore.com/docs/benchmarks/","author":{"@type":"Person","name":"Andrei N. Besleaga"},"isPartOf":"https://agenticsystemcore.com/docs/"}</script>
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/" aria-current="page">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Benchmarks</h1>
+<p class="summary"><strong>Summary</strong>What has been measured, for each kind of reader: how agents answer from a node, what the typed graph and its vocabulary give, what a person, a team and a publisher get from one folder of files, how the checks hold, and how far it scales. The sources and the limits are stated.</p>
+<p>AgenticSystemCore is a knowledge system for people and agents: one folder of Markdown becomes a website, a graph with published meanings, and tools an assistant can call, with every change passing through a person. This page collects what has been measured about engine 1.1.0 and the two public nodes, this site and <a href="https://patterns.agenticsystemcore.com/">patterns.agenticsystemcore.com</a>.</p>
+<p>The numbers come from two sources: the engine's own measurement record of 11 November 2026 (<a href="https://github.com/andreibesleaga/agentic-system-core/blob/main/docs/MEASUREMENTS.md">docs/MEASUREMENTS.md</a>, each figure with the command that produced it), and studies the project ran on 17 and 18 November 2026, which compared a node with other ways of offering the same content and read its graph with independent tools. The engine's record is public and each figure in it can be run again. The question set, the harness and the raw answers of the November studies are kept by the project and are not published, so those figures (the answer tables, the citation rates, the graph checks, the typed-link, cross-node, write and change-detection results) rest on the project's word; the last section says how they were made.</p>
+<h2 id="the-results-in-one-table">The results in one table</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 31"><table>
+<thead><tr><th scope="col">For</th><th scope="col">What a node gives</th><th scope="col">Measured</th></tr></thead>
+<tbody>
+<tr><td>An AI agent on the open web</td><td>Better answers for less reading than the same content as web pages</td><td>97–98 % correct against 67–83 %, with 31–56 % fewer tokens</td></tr>
+<tr><td>Anyone who reads an agent's answer</td><td>Citations a program can check</td><td>91 % of a capable model's answers carried a citation whose digest matched the published file</td></tr>
+<tr><td>Anyone who works with linked data</td><td>A graph that standard tools read as it is</td><td>5 graphs, 3,941 statements: two RDF forms equal, all pass the SHACL shapes, 3,648 SPARQL queries run with 0 failures</td></tr>
+<tr><td>An agent asked about relations</td><td>Answers that follow typed links over two and three steps</td><td>30 of 30 through the <code>links</code> tool</td></tr>
+<tr><td>A person with notes</td><td>A checked website, a graph and agent files from one command</td><td>323 files of 14 kinds in 2.4 seconds; a first node in 6 commands and 22 seconds</td></tr>
+<tr><td>A team that lets agents propose</td><td>Changes that pass through a person</td><td>0 source files changed in 20 attempts, ordinary and hostile; each returned a proposal</td></tr>
+<tr><td>A publisher</td><td>Detection of a changed file, and the same bytes on every build</td><td>33 of 33 changes to the demonstration node's 9 digest-listed files detected; 0 files differing across two builds, time zones and locales</td></tr>
+<tr><td>A security reviewer</td><td>A floor of refusals that is scored</td><td>108 of 108 seeded faults stopped, 14 of 14 valid controls clean</td></tr>
+<tr><td>A reader with assistive technology</td><td>Pages that pass automated accessibility checks</td><td>0 violations on 250 pages in both colour schemes</td></tr>
+<tr><td>An implementer</td><td>A specification that can be tested</td><td>376 vectors pass, 0 fail; a second checker in Python agrees</td></tr>
+<tr><td>Whoever pays for hosting</td><td>Static files and no server</td><td>0 USD a month for both public nodes on a free plan</td></tr>
+</tbody></table></div>
+<p>The sections below give each result with its method.</p>
+<h2 id="for-agents-better-answers-than-from-web-pages">For agents: better answers than from web pages</h2>
+<p>Sixty questions were asked about the two nodes: 40 answered by one item, 10 that need two items, and 10 whose answer is not in the node. A program scored each answer against facts written down before any run. The same content reached the model by four routes.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 32"><table>
+<thead><tr><th scope="col">Route</th><th scope="col">What the model gets</th></tr></thead>
+<tbody>
+<tr><td>Plain pages</td><td>a tool that fetches the site's HTML pages, starting from the home page</td></tr>
+<tr><td>Pages and <code>llms.txt</code></td><td>the same, with the site's <code>llms.txt</code></td></tr>
+<tr><td>Node tools</td><td>the node's <code>search</code>, <code>read</code>, <code>links</code> and <code>ask</code> tools</td></tr>
+<tr><td>Retrieval</td><td>the five best passages from a word-matching (BM25) index of the same Markdown, put in the prompt</td></tr>
+</tbody></table></div>
+<p>Correct answers on the answerable questions, with 95 % intervals, and the median number of tokens for one answer:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 33"><table>
+<thead><tr><th scope="col">Model</th><th scope="col">Plain pages</th><th scope="col">Pages and <code>llms.txt</code></th><th scope="col">Node tools</th><th scope="col">Retrieval</th></tr></thead>
+<tbody>
+<tr><td>Claude Haiku 5.5</td><td>67.3 % [55.0, 79.0], 29,559 tokens</td><td>73.3 % [61.7, 84.0], 22,589 tokens</td><td>98.0 % [95.3, 100], 12,983 tokens</td><td>97.3 % [94.7, 99.3], 1,311 tokens</td></tr>
+<tr><td>Claude Sonnet 5.5</td><td>82.5 % [70.0, 92.5], 20,513 tokens</td><td>82.5 % [70.0, 92.5], 15,918 tokens</td><td>97.4 % [92.3, 100], 10,939 tokens</td><td>39 of 39 correct, 1,205 tokens</td></tr>
+</tbody></table></div>
+<ul>
+<li><strong>A node against web pages.</strong> With either model, the node's tools gave 15 to 31 points more correct answers than the page routes, with 31 to 56 % fewer tokens. This is the comparison that matters for an agent that visits a site it has never seen.</li>
+<li><strong>A node and retrieval.</strong> Retrieval over the source files was as accurate and cheaper per answer. The two fit together: a publisher who has the files can index them, and a node publishes those same files, already cut into passages with digests (<code>chunks.jsonl</code>), for anyone who wants to build that index.</li>
+<li><strong>Small local models.</strong> A 7-billion-parameter model on a laptop could not run a tool loop by any route. Given the node's results in its prompt in one step, it answered 84.0 % correctly; given retrieved passages, 94.0 %. For such models, put the content in the prompt.</li>
+</ul>
+<p>The Haiku row covers two full passes and part of a third. The Sonnet row covers one pass that stopped at its token limit: 40 of the 50 answerable questions for the two page routes and 39 for node tools and retrieval. Where every answer was correct the cell gives the count, since an interval computed from 39 identical outcomes has no width.</p>
+<h2 id="for-meaning-a-graph-that-standard-tools-read">For meaning: a graph that standard tools read</h2>
+<p>Every link in a node says what kind of link it is, and the build publishes the result as RDF under a published vocabulary (an OWL ontology of 19 classes, 19 object properties and 22 datatype properties, built on the classes of SKOS and PROV, with Dublin Core and schema.org properties). The graphs of the two public nodes and of the engine's three example Bundles, 3,941 statements in all, were read with two independent open-source libraries, rdflib 7.6.0 and pySHACL 0.40.2, which share no code with the engine.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 34"><table>
+<thead><tr><th scope="col">Check</th><th scope="col">Result</th></tr></thead>
+<tbody>
+<tr><td>The Turtle form and the N-Quads form parse and hold the same statements</td><td>5 of 5 graphs</td></tr>
+<tr><td>The graph passes the published SHACL shapes (609 shape statements)</td><td>5 of 5 graphs, 0 violations, 0 warnings</td></tr>
+<tr><td>The published SPARQL questions run in an independent SPARQL engine as written</td><td>8 of 10; the other two take a selection of items as input</td></tr>
+<tr><td>Queries run, one for each question and each subject</td><td>3,648, with 0 failures</td></tr>
+<tr><td>Statements whose property comes from a shared vocabulary (Dublin Core, SKOS, schema.org, RDF)</td><td>68 %; the rest use the project's own published terms</td></tr>
+</tbody></table></div>
+<p>What this gives in use:</p>
+<ul>
+<li><strong>Questions with exact answers.</strong> The ten questions the specification names (&quot;if I choose X, what else must I take?&quot;, &quot;what replaced X?&quot;, &quot;what verifies X?&quot;) are each stated as a SPARQL query over the published graph, so any RDF store can answer them without the engine.</li>
+<li><strong>Typed links an agent can follow.</strong> On the example Bundles (71 items linked by <code>requires</code>, <code>uses</code>, <code>verifies</code> and <code>decided-by</code>), a program using the <code>links</code> tool answered 30 of 30 questions about relations and two- or three-step paths. The best route that gave a local model retrieved text answered 16 of 30, and almost none of the multi-step ones. The expected answers come from the published graph, so this shows that the relations are published and usable by a program.</li>
+<li><strong>A vocabulary others already know.</strong> A SKOS tool sees a concept scheme, a Dublin Core tool sees titles, sources and requirements, and the node's own terms resolve at a permanent address.</li>
+<li><strong>In and out without loss.</strong> 11 of 11 documented export and import pairs returned every item, body and field unchanged, among them the Open Knowledge Format, skill packs, and the memory formats of Mem0, Letta and Zep.</li>
+<li><strong>From one node to its peer.</strong> Starting from either public node, a client found the other through the discovery document in 4 requests, and attributed each fact to the right node in 8 of 8 answers.</li>
+</ul>
+<h2 id="for-trust-citations-and-files-that-can-be-checked">For trust: citations and files that can be checked</h2>
+<ul>
+<li><strong>Checkable citations.</strong> Asked to cite each passage with its digest, Claude Haiku 5.5 gave a citation whose digest matched the published <code>chunks.jsonl</code> in 91.0 % of its answers, and the small local model in 54.7 %. The node's <code>read</code> tool returned matching digests for 50 of 50 items. Web pages and a search index give a model nothing to cite that a program can verify.</li>
+<li><strong>A changed file is detected.</strong> The demonstration node's discovery document gives digests for nine files (this site's gives them for thirteen). All 33 changes made to those nine, from one byte to a swapped or shortened file, were detected by the engine and by the Python package independently. One of the nine is <code>chunks.jsonl</code>, which holds the text of every item.</li>
+<li><strong>The same bytes on every build.</strong> Two clean builds of each public node were identical file for file (323 of 323 and 237 of 237). The engine's record adds a build under another time zone and locale: 61 files compared, 0 differing.</li>
+</ul>
+<h2 id="for-people-and-teams-little-to-learn-nothing-to-run">For people and teams: little to learn, nothing to run</h2>
+<ul>
+<li><strong>A first node.</strong> From an empty folder: 6 commands, 22 seconds including the package install, and 4 files written by hand.</li>
+<li><strong>One source, many forms.</strong> One build of the demonstration node wrote 323 files of 14 kinds: the website, the graph in three RDF forms, <code>llms.txt</code>, the passages, the discovery document, skill packs and more.</li>
+<li><strong>Agents propose, people decide.</strong> In 20 attempts the writing tools changed no source file; each returned a proposal for a person to merge. The same tools answer the same way in the browser page and in the local server: 530 of 536 calls equal, and the other 6 are the one difference the specification requires.</li>
+<li><strong>Accessible pages.</strong> axe-core found 0 violations on 250 pages of four builds, in the light and the dark colour scheme.</li>
+<li><strong>Offline.</strong> Build, check, search and the tool server all worked with the network switched off: 11 of 11 operations.</li>
+<li><strong>No server.</strong> Both public nodes are static files on a free hosting plan: 0 USD a month.</li>
+</ul>
+<h2 id="for-reviewers-a-scored-safety-floor-and-a-tested-specification">For reviewers: a scored safety floor and a tested specification</h2>
+<ul>
+<li><strong>Security floor.</strong> A seeded corpus of 108 faults the rules name, from path escapes to hidden instructions in text, was stopped in full, each under the error code its rule names; 14 of 14 valid controls passed clean, and 16 of 16 hostile discovery documents were refused.</li>
+<li><strong>Conformance.</strong> 376 of the 399 vectors pass and none fails (the other 23 are withdrawn cases kept for the record). A separate Python package runs the vectors of 7 areas, 115 pass and 0 fail, and agreed with the engine on 40 of 40 damaged discovery documents.</li>
+</ul>
+<h2 id="scale">Scale</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table 35"><table>
+<thead><tr><th scope="col">Items</th><th scope="col">Build</th><th scope="col">Peak memory</th></tr></thead>
+<tbody>
+<tr><td>500</td><td>5.9 s</td><td>304 MiB</td></tr>
+<tr><td>5,000</td><td>49.9 s</td><td>1,057 MiB</td></tr>
+<tr><td>10,000</td><td>119.1 s</td><td>1,692 MiB</td></tr>
+</tbody></table></div>
+<p>Every size met the specification's budgets: at most 60 seconds of build for each 500 items, index files under 1 MB, HTML pages under 100 KB. On 5,000 items one <code>search</code> call took 80 ms, <code>ask</code> 8 ms and <code>links</code> 2 ms.</p>
+<h2 id="what-to-keep-in-mind">What to keep in mind</h2>
+<ul>
+<li><strong>Use retrieval where you own the files.</strong> It is the cheapest route to an answer; a node is for content that others, and their agents, will read.</li>
+<li><strong>Digests are on the machine files.</strong> The files the discovery document lists with a digest are covered; HTML pages are not. An agent that needs the check should read the machine files.</li>
+<li><strong>The local tool server reads your source folder</strong>, drafts included, because it is the author's own tool. To offer tools to others, run it on an export of the published items, or use the tools on the published pages.</li>
+<li><strong>The injection check is a floor.</strong> It stops the listed patterns; a paraphrase written to avoid them passes, as the specification says. Treat every tool result as untrusted text.</li>
+<li><strong>Large nodes start slowly.</strong> At 5,000 items the local tool server took 35 seconds to start.</li>
+<li><strong>The two public nodes use few link types.</strong> The typed-link results come from the engine's example Bundles, which use more of them.</li>
+</ul>
+<h2 id="how-it-was-measured">How it was measured</h2>
+<ul>
+<li>The comparison studies scored answers by program against facts fixed before any run; a hand reading of 30 answers agreed with the program on all 30.</li>
+<li>The project wrote the questions, from the items' own text, which favours word-matching retrieval. The two nodes are small (50 and 14 items). Retrieval was BM25; no embedding search was tested.</li>
+<li>Each answer was limited to eight tool calls, and tool results were cut to 3,500 characters, for every route.</li>
+<li>The graph checks read the published <code>graph.ttl</code> and <code>graph.nq</code> files; the JSON-LD form was not parsed in that run.</li>
+<li>The engine's record states for each figure the command, the machine and what the figure does not establish.</li>
+<li>These are the project's own measurements. No third party has repeated them.</li>
+</ul>
+<p class="edit"><a rel="noopener" href="https://github.com/andreibesleaga/AgenticSystemCore.com/edit/main/site/docs/benchmarks.md">Propose an edit</a> — opens <code>site/docs/benchmarks.md</code>; a submitted change becomes a pull request a person reviews.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a></span></p>
+</footer>
+</body>
+</html>
