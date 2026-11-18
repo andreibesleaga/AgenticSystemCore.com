@@ -15,7 +15,8 @@
     }
   ],
   "peers": [
-    "https://patterns.agenticsystemcore.com/.well-known/knowledge-linkset"
+    "https://patterns.agenticsystemcore.com/.well-known/knowledge-linkset",
+    "https://standards.agenticsystemcore.com/.well-known/knowledge-linkset"
   ],
   "related": [
     {
