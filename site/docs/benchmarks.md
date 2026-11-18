@@ -17,7 +17,7 @@ The numbers come from two sources: the engine's own measurement record of 11 Nov
 | Anyone who works with linked data | A graph that standard tools read as it is | 5 graphs, 3,941 statements: two RDF forms equal, all pass the SHACL shapes, 3,648 SPARQL queries run with 0 failures |
 | An agent asked about relations | Answers that follow typed links over two and three steps | 30 of 30 through the `links` tool |
 | A person with notes | A checked website, a graph and agent files from one command | 323 files of 14 kinds in 2.4 seconds; a first node in 6 commands and 22 seconds |
-| A team that lets agents propose | Changes that pass through a person | 0 source files changed in 20 attempts, ordinary and hostile; each returned a proposal |
+| A team that lets agents propose | Changes that pass through a person | 0 source files changed in 20 attempts, ordinary and hostile: 8 returned a proposal, 12 were refused with an error code |
 | A publisher | Detection of a changed file, and the same bytes on every build | 33 of 33 changes to the demonstration node's 9 digest-listed files detected; 0 files differing across two builds, time zones and locales |
 | A security reviewer | A floor of refusals that is scored | 108 of 108 seeded faults stopped, 14 of 14 valid controls clean |
 | A reader with assistive technology | Pages that pass automated accessibility checks | 0 violations on 250 pages in both colour schemes |
@@ -80,7 +80,7 @@ What this gives in use:
 
 - **A first node.** From an empty folder: 6 commands, 22 seconds including the package install, and 4 files written by hand.
 - **One source, many forms.** One build of the demonstration node wrote 323 files of 14 kinds: the website, the graph in three RDF forms, `llms.txt`, the passages, the discovery document, skill packs and more.
-- **Agents propose, people decide.** In 20 attempts the writing tools changed no source file; each returned a proposal for a person to merge. The same tools answer the same way in the browser page and in the local server: 530 of 536 calls equal, and the other 6 are the one difference the specification requires.
+- **Agents propose, people decide.** In 20 attempts, ordinary and hostile, the writing tools changed no source file: 8 returned a proposal for a person to merge, and 12 were refused with an error code (an unknown item, an invalid input, or no accountable person named). The same tools answer the same way in the browser page and in the local server: 530 of 536 calls equal, and the other 6 are the one difference the specification requires.
 - **Accessible pages.** axe-core found 0 violations on 250 pages of four builds, in the light and the dark colour scheme.
 - **Offline.** Build, check, search and the tool server all worked with the network switched off: 11 of 11 operations.
 - **No server.** Both public nodes are static files on a free hosting plan: 0 USD a month.
