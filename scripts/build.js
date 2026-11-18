@@ -1364,6 +1364,7 @@ addPage('/', {
   body: `<p class="lead">AgenticSystemCore turns a folder of plain text notes (Markdown text files) into a website, a knowledge graph and a set of tools for AI assistants, all at once. Every link says what kind of link it is, every machine-readable file the node lists carries a fingerprint (a digest) that anyone can check, and every change is approved by a person or by a rule that person wrote down. People, search engines and AI agents read the same checked knowledge, and no server, database or language model is needed to build, check or publish it.</p>
 ${GX_EMBED}<p><strong>Try it:</strong> <code>npm install -g agentic-system-core</code>, then <a href="/docs/demos/">a first node in five minutes</a>. <strong>See it:</strong> <a href="/graph/">the graph explorer</a>, and <a href="/webaiassist/">WebAIAssist</a>, the assistant for the browser. <strong>Measured:</strong> <a href="/docs/benchmarks/">the benchmarks</a>.</p>
 <ul>
+<li><a href="/docs/in-brief/">In brief</a>: the whole system on one page, in plain words, with what each part is for and what each kind of user gains.</li>
 <li><a href="/docs/start-here/">Start here</a>: one reading path for each kind of reader.</li>
 <li><a href="/docs/demos/">Try it in five minutes</a>: install the package and run each mode from an empty folder.</li>
 <li><a href="/docs/guides/">Use it on your own files</a>: seven short guides, one per mode and one for publishing, every command with the lines it prints.</li>
