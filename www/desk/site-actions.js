@@ -103,8 +103,10 @@ class SiteActions {
   static addAction() {
     return {
       name: "add_card",
-      description: "Call it only when the visitor asks, with node and passage from a search result. Add one passage to the visitor's brief as a cited card. The page checks the passage's digest first and refuses a passage that does not match, one already in the brief, or a ninth card. Returns the card and the new brief version, or ok false with a reason. The visitor can remove a card on the page.",
-      effect: "write",
+      description: "Call it only when the visitor asks, with node and passage from a search result. Add one passage to the visitor's brief as a cited card. The browser shows the visitor the passage and asks first. The page checks the passage's digest first and refuses a passage that does not match, one already in the brief, or a ninth card. Returns the card and the new brief version, or ok false with a reason. The visitor can remove a card on the page.",
+      // The specification (section 3.1) asks to show the visitor a write before it runs; the
+      // runtime asks only before an "irreversible" action, so every change to the brief is one.
+      effect: "irreversible",
       inputSchema: {
         type: "object",
         additionalProperties: false,
@@ -119,8 +121,8 @@ class SiteActions {
   static removeAction() {
     return {
       name: "remove_card",
-      description: "Call it only when the visitor asks, with a card id from website_get_desk_state. Remove one card from the brief. Returns the new brief version and count, or ok false with a reason. The visitor can add the passage again.",
-      effect: "write",
+      description: "Call it only when the visitor asks, with a card id from website_get_desk_state. Remove one card from the brief. The browser shows the visitor the card and asks first. Returns the new brief version and count, or ok false with a reason. The visitor can add the passage again.",
+      effect: "irreversible",
       inputSchema: {
         type: "object",
         additionalProperties: false,

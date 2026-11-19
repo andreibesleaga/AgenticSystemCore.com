@@ -405,6 +405,71 @@ export class BriefDesk {
   }
 
   /**
+   * What a change would do, from what the page already holds, without reading anything:
+   * for the confirmation dialog, which is built before the change runs.
+   *
+   * :param action: "add_card" or "remove_card".
+   * :param args: The action's arguments.
+   * :return: {ok, details} or a refusal.
+   */
+  previewChange(action, args) {
+    if (action === "remove_card") {
+      const card = this.cards.find((c) => c.card === args.card);
+      if (!card) {
+        return { ok: false, reason: `The brief has no card "${args.card}".`, field: "card" };
+      }
+      return { ok: true, details: { "Card": card.card, "Passage": card.section ? `${card.title}, ${card.section}` : card.title, "Address": card.address } };
+    }
+    const usable = this.usableNode(args.node);
+    if (!usable.ok) {
+      return usable;
+    }
+    if (this.cards.length >= BriefDesk.BRIEF_LIMIT) {
+      return { ok: false, reason: `The brief holds ${BriefDesk.BRIEF_LIMIT} cards at most. Remove one first.`, field: "passage" };
+    }
+    // The dialog's caller loads the node's passages first (preparePreview), so a passage
+    // that is not there is refused here, before any dialog.
+    const record = (usable.node.passages || []).find((p) => p.id.startsWith(String(args.passage)));
+    if (!record || String(args.passage).length !== 16) {
+      return { ok: false, reason: `The node ${usable.node.id} has no passage "${args.passage}". Use a passage value from a search result.`, field: "passage" };
+    }
+    const address = BriefDesk.address(record);
+    if (this.cards.some((c) => c.address === address)) {
+      return { ok: false, reason: "That passage is already in the brief.", field: "passage" };
+    }
+    return {
+      ok: true,
+      details: {
+        "From": usable.node.label,
+        "Passage": record.section ? `${record.title || record.item}, ${record.section}` : (record.title || record.item),
+        "Address": address,
+        "Check": "The page checks the passage against its published digest before it adds it.",
+      },
+    };
+  }
+
+  /**
+   * Load what previewChange() needs: the passages of the node an add names. A node that
+   * cannot be read is left unloaded, and previewChange() then refuses.
+   *
+   * :param action: The action name.
+   * :param args: Its arguments.
+   */
+  async preparePreview(action, args) {
+    if (action !== "add_card") {
+      return;
+    }
+    const usable = this.usableNode(args.node);
+    if (usable.ok) {
+      try {
+        await this.passagesOf(usable.node);
+      } catch (error) {
+        // previewChange() refuses: the passage is not there.
+      }
+    }
+  }
+
+  /**
    * Find one passage by the first 16 characters of its id.
    *
    * :param args: node and passage.

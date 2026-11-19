@@ -74,7 +74,7 @@ try {
     return { status: receipts[0].status, count: receipts[0].result.count, names: engine.actions.catalog(scope).map((e) => `${e.name}:${e.effect}`).sort() };
   });
   check("the runtime runs a read action of the page", read.status === "succeeded" && read.count > 0, `${read.count} passage(s)`);
-  check("six actions are registered with their effects", read.names.join(" ") === "add_card:write discard_brief:irreversible get_desk_state:read read_passage:read remove_card:write search_passages:read", read.names.join(" "));
+  check("six actions are registered; every change to the brief asks first", read.names.join(" ") === "add_card:irreversible discard_brief:irreversible get_desk_state:read read_passage:read remove_card:irreversible search_passages:read", read.names.join(" "));
 
   // The confirmation dialog of the irreversible action: decline, then Escape. Nothing runs.
   const dialog = async (press) => {
