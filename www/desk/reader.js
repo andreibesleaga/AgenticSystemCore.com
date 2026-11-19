@@ -6,7 +6,10 @@
 //
 // What is read, per node, and from that node only:
 //   /chunks.jsonl                     the passages: each line holds the address of its item
-//                                     (iri), its text and the SHA-256 digest of that text;
+//                                     (iri), its text and the SHA-256 digest of that text.
+//                                     A node of more than 500 items publishes the lines in
+//                                     /chunks-01.jsonl, /chunks-02.jsonl, … and this file
+//                                     is then the list of those shards;
 //   /.well-known/knowledge-linkset    the node's discovery document, which names the
 //                                     passage file and publishes the digest of the file.
 //
@@ -68,6 +71,10 @@ export class PassageReader {
   /** The most bytes of a file the reader takes, and how long it waits for one. */
   static FILE_LIMIT = 8 * 1000 * 1000;
   static FILE_TIMEOUT_MS = 20000;
+
+  /** The most shards of a passage file the reader takes, and the most characters of all of them. */
+  static SHARD_LIMIT = 20;
+  static SHARDS_TOTAL_LIMIT = 32 * 1000 * 1000;
 
   /** The most entries of a saved brief one check takes. */
   static SAVED_LIMIT = 40;
@@ -235,7 +242,66 @@ export class PassageReader {
   }
 
   /**
+   * The shard paths a passage file names, when it is a shard list and not the passages
+   * themselves: one JSON object with a "shards" member, as a node of more than 500 items
+   * publishes.
+   *
+   * :param text: The text of /chunks.jsonl.
+   * :return: The paths in order, or null when the file holds the passages itself.
+   * :raises Error: When the list names something other than /chunks-<nn>.jsonl, or too many.
+   */
+  static shardsOf(text) {
+    let value = null;
+    try {
+      value = JSON.parse(text);
+    } catch (error) {
+      return null; // several lines, so passages
+    }
+    if (!value || typeof value !== "object" || !Array.isArray(value.shards)) {
+      return null;
+    }
+    if (value.shards.length > PassageReader.SHARD_LIMIT) {
+      throw new Error(`the passage file names ${value.shards.length} shards; this reader takes ${PassageReader.SHARD_LIMIT} at most`);
+    }
+    for (const shard of value.shards) {
+      if (typeof shard !== "string" || !/^\/chunks-[0-9]{2,4}\.jsonl$/.test(shard)) {
+        throw new Error("the passage file names a shard that is not /chunks-<nn>.jsonl");
+      }
+    }
+    return value.shards;
+  }
+
+  /**
+   * The lines of a node's passages: those of its passage file, or, when that file is a
+   * shard list, those of the shards read in the listed order from the same node.
+   *
+   * :param node: The node.
+   * :param text: The text of its /chunks.jsonl.
+   * :return: The lines.
+   * :raises Error: When a shard cannot be read or the shards together are too large.
+   */
+  async linesOf(node, text) {
+    const shards = PassageReader.shardsOf(text);
+    if (!shards) {
+      return text.split("\n");
+    }
+    const lines = [];
+    let size = 0;
+    for (const shard of shards) {
+      const part = await this.fetchText(`${node.readFrom}${shard}`);
+      size += part.length;
+      if (size > PassageReader.SHARDS_TOTAL_LIMIT) {
+        throw new Error(`the passages of ${node.host} are larger than ${PassageReader.SHARDS_TOTAL_LIMIT} characters`);
+      }
+      lines.push(...part.split("\n"));
+    }
+    return lines;
+  }
+
+  /**
    * Load a node's passages once, and check the file against the node's discovery document.
+   * For a sharded node the discovery document's digest is that of the shard list, so the
+   * file check covers the list; each passage still carries its own digest.
    *
    * :param node: The node to load.
    * :return: The list of passages.
@@ -248,7 +314,7 @@ export class PassageReader {
     }
     const text = await this.fetchText(node.chunksUrl);
     const passages = [];
-    for (const line of text.split("\n")) {
+    for (const line of await this.linesOf(node, text)) {
       if (!line.trim()) {
         continue;
       }
