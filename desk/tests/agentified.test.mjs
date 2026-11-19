@@ -927,11 +927,16 @@ AgentifiedSiteTest.testWritesAskFirst = async () => {
   for (const entry of registry.catalog(AgentifiedSiteTest.scope())) {
     assert.notEqual(entry.effect, "write", `${entry.name} would run with no dialog.`);
   }
-  // The dialog for an add names the node and, once the page has read it, the passage.
-  await BriefDeskPage().search({ node: "core", query: "k5k" });
+  // The dialog for an add names the passage and its address: review() loads the node first.
+  await BriefDeskPage().preparePreview("add_card", { node: "core", passage: ID(FIXTURES.core[4]) });
   const add = AssistantMount.dialogContent({ action: "add_card", origin: BASE, effect: "irreversible", arguments: { node: "core", passage: ID(FIXTURES.core[4]) } });
   assert.equal(add.refusal, undefined);
   assert.equal(add.details.Address, `${FIXTURES.core[4].iri}#chunk-${ID(FIXTURES.core[4])}`);
+  // An unknown passage is refused before any dialog, also when the node was never read.
+  const unknown = { node: "core", passage: "0000000000000000" };
+  await BriefDeskPage().preparePreview("add_card", unknown);
+  const refused = AssistantMount.dialogContent({ action: "add_card", origin: BASE, effect: "irreversible", arguments: unknown });
+  assert.equal(refused.refusal, (await BriefDeskPage().pin(unknown)).reason);
   // An unknown card is refused before any dialog, with the page's own reason.
   const remove = AssistantMount.dialogContent({ action: "remove_card", origin: BASE, effect: "irreversible", arguments: { card: "c999" } });
   assert.equal(remove.refusal, BriefDeskPage().remove({ card: "c999" }).reason);

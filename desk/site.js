@@ -122,6 +122,11 @@ export class AssistantMount {
     // runtime's dialog, which names the partner's origin, and this page's check never runs.
     const own = items.length === 1 && items[0].origin === pageOrigin;
     if (own && Object.hasOwn(AssistantMount.DIALOGS, items[0].action)) {
+      // An add loads the passage the dialog shows first, so a passage the page would refuse
+      // opens no dialog. Other actions need nothing loaded and open their dialog at once.
+      if (items[0].action === "add_card") {
+        await BriefDesk.page.preparePreview(items[0].action, items[0].arguments);
+      }
       const content = AssistantMount.dialogContent(items[0]);
       if (content.refusal) {
         // A dialog would offer a button that cannot work. The runtime runs nothing
