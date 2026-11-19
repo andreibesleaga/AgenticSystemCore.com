@@ -291,7 +291,11 @@ const routeOf = f => '/' + rel(path.dirname(f)) + '/';
 const idsOf = new Map();
 const idsIn = html => [...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
 for (const f of files.filter(f => f.endsWith('.html'))) idsOf.set(f, new Set(idsIn(fs.readFileSync(f, 'utf8'))));
-for (const f of files.filter(f => f.endsWith('.html'))) {
+// The Brief Desk (desk/README.md): its bridge page is the agent runtime's own frame page, loaded hidden
+// by other sites, not a page of this site; the page /desk/ loads the runtime as two module scripts.
+const DESK_BRIDGE = 'desk/bridge/action-bridge.html';
+const DESK_MODULES = new Set(['<script type="module" src="/desk/page.js">', '<script type="module" src="/desk/site.js">']);
+for (const f of files.filter(f => f.endsWith('.html') && rel(f) !== DESK_BRIDGE)) {
   const r = rel(f), h = fs.readFileSync(f, 'utf8');
   const E = m => fails.push(`${r}: ${m}`);
   if (Buffer.byteLength(h) > 100 * 1000) E("exceeds the 100 KB page budget (AGSC-06-21)");
@@ -309,7 +313,7 @@ for (const f of files.filter(f => f.endsWith('.html'))) {
   if (!r.startsWith('boards/') && !h.includes('<link rel="stylesheet" href="/assets/site.css">\n<link rel="stylesheet" href="/assets/layout.css">\n')) E('does not load /assets/layout.css right after /assets/site.css');
   const ids = idsIn(h); const dup = ids.filter((x, i) => ids.indexOf(x) !== i);
   if (dup.length) E(`duplicate ids: ${[...new Set(dup)].slice(0, 5).join(', ')}`);
-  for (const m of h.matchAll(/<script(?![^>]*type="application\/ld\+json")[^>]*>/g)) if (!ALLOWED_SCRIPTS.has(m[0]) && !GX_SCRIPT.test(m[0])) E(`script other than the same-origin search and page-tool scripts: ${m[0]} (AGSC-06-05, CSP)`);
+  for (const m of h.matchAll(/<script(?![^>]*type="application\/ld\+json")[^>]*>/g)) if (!ALLOWED_SCRIPTS.has(m[0]) && !GX_SCRIPT.test(m[0]) && !(r === 'desk/index.html' && DESK_MODULES.has(m[0]))) E(`script other than the same-origin search and page-tool scripts: ${m[0]} (AGSC-06-05, CSP)`);
   if (!/<p class="summary"><strong>Summary<\/strong>[^<]{20,}<\/p>/.test(h)) E('summary line missing after the heading');
   for (const m of h.matchAll(/<figure class="diagram">([\s\S]*?)<\/figure>/g)) { if (!/<svg [^>]*role="img" aria-label="[^"]{20,}"/.test(m[1])) E('diagram without an accessible name'); if (!/<figcaption>[^<]{20,}<\/figcaption>/.test(m[1])) E('diagram without a caption'); }
   // Every rule carries a trailing trace bracket in the source except the ones listed (their source has none), so a missing trace line is a rendering defect.
@@ -450,7 +454,19 @@ for (const f of files) {
   const t = ['<code>.companion</code>', '/*.companion)', '`<dir>.companion/', 'companion director', 'no Web4/crypto framing, book or &quot;companion&quot; strings', 'no Web4/crypto framing, book or \\"companion\\" strings', 'with no reading order imposed', 'no &quot;start here&quot; link and no imposed reading order', 'no \\"start here\\" link and no imposed reading order'].reduce((x, q) => x.split(q).join(''), s);
   if (!r.startsWith('specs/') && r !== 'assets/search-site.json' && new RegExp(['wiley', 'companion', 'chapter \\d', 'reading order', 'discovery' + '-product', '05-' + 'WILEY'].join('|'), 'i').test(t)) fails.push(`${r}: forbidden string (AGSC-06-03 / private record)`);
   if (/\bWeb4\b|W3C (?:standard|Recommendation) for AgenticSystemCore/i.test(t)) fails.push(`${r}: forbidden claim`);
-  if (/andrei\.besleaga\.nicolae@|abnmaster@|@gmail\.com/i.test(s)) fails.push(`${r}: the operator's e-mail address is published`);
+  // desk/runtime/ is third-party code republished byte for byte (checked below); its bundle names its own
+  // libraries' authors.
+  if (!r.startsWith('desk/runtime/') && /andrei\.besleaga\.nicolae@|abnmaster@|@gmail\.com/i.test(s)) fails.push(`${r}: the operator's e-mail address is published`);
+}
+// The Brief Desk's runtime is the agent-web repository's, republished unchanged: every built file under
+// /desk/runtime/ equals the repository's desk/runtime/, and none is missing.
+{
+  const walk = (d, out = []) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) e.isDirectory() ? walk(path.join(d, e.name), out) : out.push(path.join(d, e.name)); return out; };
+  const src = path.join(ROOT, 'desk', 'runtime');
+  if (exists(src)) for (const f of walk(src)) {
+    const built = path.join(WWW, 'desk', 'runtime', path.relative(src, f));
+    ok(exists(built) && fs.readFileSync(built).equals(fs.readFileSync(f)), `desk/runtime/${path.relative(src, f)}: the built copy differs from the repository's`);
+  }
 }
 // AGSC-06-21: ≤1 MB per index document (decimal), sharded above 500 items.
 const searchJson = path.join(WWW, 'search.json');
@@ -588,6 +604,16 @@ for (const l of locs) ok(targetFile(l), `sitemap URL has no page: ${l}`);
   // files (one block, `/query/*`, whose splat also matches `/query/` itself) add 'wasm-unsafe-eval'
   // to script-src and to nothing else.
   want.set('/query/*', ['! Content-Security-Policy', `Content-Security-Policy: ${CSP_BASE.replace("script-src 'self'", "script-src 'self' 'wasm-unsafe-eval'")}`]);
+  // The Brief Desk (desk/README.md): its page admits the runtime's inline styles, any https model
+  // provider the visitor picks, the peers' bridge pages in a frame and the runtime's sandbox worker; its
+  // bridge page, which other sites frame, keeps scripts and requests on this origin; the sandbox worker
+  // runs only the blob it is given and reaches nothing.
+  {
+    const deskPeers = JSON.parse(fs.readFileSync(path.join(ROOT, 'desk', 'agent-manifest.json'), 'utf8')).allowed_peers.slice().sort();
+    want.set('/desk/', ['! Content-Security-Policy', `Content-Security-Policy: ${CSP_BASE.replace("style-src 'self'", "style-src 'self' 'unsafe-inline'").replace("connect-src 'self'", "connect-src 'self' https:")}; frame-src ${deskPeers.join(' ')}; worker-src 'self' blob:`]);
+    want.set('/desk/bridge/*', ['! Content-Security-Policy', "Content-Security-Policy: default-src 'none'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'"]);
+    want.set('/desk/runtime/sandbox-worker.js', ['! Content-Security-Policy', "Content-Security-Policy: default-src 'none'; script-src blob:; connect-src 'none'; worker-src 'none'"]);
+  }
   if (peerOrigins.length) want.set('/', ['! Content-Security-Policy', `Content-Security-Policy: ${CSP_BASE.replace("connect-src 'self'", `connect-src ${["'self'", ...peerOrigins].join(' ')}`)}`]);
   for (const [route, lines] of headerBlocks) {
     const csp = lines.filter(l => /^(?:! )?Content-Security-Policy\b/.test(l));

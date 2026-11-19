@@ -1,0 +1,42 @@
+<p>Ask a question, or search by hand. Every passage this page shows comes from a file a knowledge node publishes, and each one is checked against the digest that node published for it before it goes into your brief. The assistant below runs in your browser, on the AI provider and key you choose; this site has no server behind it and never receives your key.</p>
+<section id="desk" class="desk" aria-labelledby="desk-heading" data-node-origin="https://agenticsystemcore.com">
+<h2 id="desk-heading">Search and collect</h2>
+<fieldset class="desk-nodes">
+<legend>Nodes to read</legend>
+<label><input type="checkbox" checked disabled> AgenticSystemCore: the format and its vocabulary (this site)</label>
+<label><input type="checkbox" id="desk-allow-patterns"> AgenticSystemCore Graph: cards on agent-system designs, at patterns.agenticsystemcore.com</label>
+<label><input type="checkbox" id="desk-allow-standards"> Standards Map: documents an agent-readable site builds on, at standards.agenticsystemcore.com</label>
+<p class="desk-meta">This page reads another site's published passages only after you tick it here. The assistant cannot tick it for you.</p>
+</fieldset>
+<form id="desk-search-form" class="desk-search">
+<label for="desk-query">Words to look for</label>
+<input id="desk-query" type="search" required minlength="2" maxlength="200" autocomplete="off">
+<label for="desk-node">In</label>
+<select id="desk-node">
+<option value="core">AgenticSystemCore</option>
+<option value="patterns">AgenticSystemCore Graph</option>
+<option value="standards">Standards Map</option>
+</select>
+<button type="submit">Search</button>
+</form>
+<p id="desk-status" role="status"></p>
+<ol id="desk-results" class="desk-list"></ol>
+<h2 id="desk-brief-heading">Your brief</h2>
+<p id="desk-brief-count">The brief is empty. Search, then add passages.</p>
+<ol id="desk-brief" class="desk-list"></ol>
+<p class="desk-buttons"><button type="button" id="desk-copy">Copy the brief as Markdown</button> <button type="button" id="desk-discard">Discard the brief</button></p>
+</section>
+<section id="assistant" class="assistant" aria-labelledby="assistant-heading">
+<h2 id="assistant-heading">Ask the Brief Desk</h2>
+<p>The assistant searches the nodes you allowed, reads passages, checks each against its published digest, answers with the passage's address, and adds or removes cards when you ask.</p>
+<p class="assistant-note">Your messages and the passages the assistant reads go to the AI provider you choose in the settings below. You confirm anything that cannot be undone before it happens, and you are asked before another site's assistant is contacted.</p>
+<p id="assistant-status" role="status">Connecting the assistant… If this message stays, the assistant could not load. You can still use the page directly.</p>
+<div id="agent-app">
+<div data-ns-slot="header"></div>
+<div class="assistant-panels">
+<div data-ns-slot="chat"></div>
+<div data-ns-slot="agents"></div>
+</div>
+<div data-ns-slot="settings"></div>
+</div>
+</section>

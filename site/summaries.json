@@ -33,5 +33,6 @@
   "/specs/11-boundary/": "Where a node meets the outside: cross-origin access, the nine parts of federation, the plugin contract for every agent surface, visibility, retirement and tombstones.",
   "/specs/agentic-knowledge/": "The profile of the discovery document: how a client finds it, what it looks like, the relations and attributes it may carry, and how it relates to other work.",
   "/specs/mcp/": "The reference text of the MCP extension identifier com.agenticsystemcore/knowledge: what a server says by declaring it, how it declares it, the ten tools and the security floor they inherit.",
-  "/tags/": "The tags items of this node carry, and what each one gathers."
+  "/tags/": "The tags items of this node carry, and what each one gathers.",
+  "/desk/": "Search the passages a knowledge node publishes, check each against its published digest, and collect cited cards in a brief. Do it by hand, or ask the assistant: two published agents that run in your browser on your own AI provider key, and that ask before they discard anything or contact another site."
 }

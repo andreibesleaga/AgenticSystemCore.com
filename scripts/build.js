@@ -1155,7 +1155,7 @@ const summaryOf = url => { const s = SUMMARIES[url]; if (!s) die(`no summary for
 // an address of its own names it, with the site's name, as the engine names a build's card
 // (src/distribution/html.js#openGraph), and asks for the large preview where `twitter:card` is read.
 const OG_CARD = { url: `${ORIGIN}/assets/og-card.png`, alt: require('./og-card.js').CARD.alt };
-function page({ url, title, heading, summary, description, body, jsonld, section, wide, script, scripts, styles, mainClass }) {
+function page({ url, title, heading, summary, description, body, jsonld, section, wide, script, scripts, modules, styles, mainClass }) {
   const canonical = ORIGIN + url;
   if (!summary || cp_len(summary) < 20) die(`${url}: summary missing`);
   const ld = jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld).replace(/</g, '\\u003c')}</script>\n` : '';
@@ -1164,6 +1164,8 @@ function page({ url, title, heading, summary, description, body, jsonld, section
   // { src, integrity } carries its SRI hash (the graph explorer's files).
   const js = [...(script ? [script] : []), ...(scripts || [])]
     .map(s => (typeof s === 'string' ? `<script src="${esc(s)}" defer></script>\n` : `<script src="${esc(s.src)}" integrity="${esc(s.integrity)}" defer></script>\n`)).join('');
+  // Same-origin module scripts (the Brief Desk's page script and the agent runtime it loads).
+  const mjs = (modules || []).map(s => `<script type="module" src="${esc(s)}"></script>\n`).join('');
   const css = (styles || []).map(s => `<link rel="stylesheet" href="${esc(s)}">\n`).join('');
   const mainClasses = [wide ? 'wide' : '', mainClass || ''].filter(Boolean).join(' ');
   return `<!doctype html>
@@ -1189,7 +1191,7 @@ ${css}<script src="/assets/theme.js"></script>
 <meta property="og:image" content="${esc(OG_CARD.url)}">
 <meta property="og:image:alt" content="${esc(OG_CARD.alt)}">
 <meta name="twitter:card" content="summary_large_image">
-${ld}${js}</head>
+${ld}${js}${mjs}</head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site">
@@ -1368,6 +1370,7 @@ addPage('/', {
   body: `<p class="lead">AgenticSystemCore turns a folder of plain text notes (Markdown text files) into a website, a knowledge graph and a set of tools for AI assistants, all at once. Every link says what kind of link it is, every machine-readable file the node lists carries a fingerprint (a digest) that anyone can check, and every change is approved by a person or by a rule that person wrote down. People, search engines and AI agents read the same checked knowledge, and no server, database or language model is needed to build, check or publish it.</p>
 ${GX_EMBED}<p><strong>Try it:</strong> <code>npm install -g agentic-system-core</code>, then <a href="/docs/demos/">a first node in five minutes</a>. <strong>See it:</strong> <a href="/graph/">the graph explorer</a>, and <a href="/webaiassist/">WebAIAssist</a>, the assistant for the browser. <strong>Measured:</strong> <a href="/docs/benchmarks/">the benchmarks</a>.</p>
 <ul>
+<li><a href="/desk/">Brief Desk</a>: search a node&#39;s published passages, check each against its digest, and collect cited cards, by hand or with agents that run in your browser on your own key.</li>
 <li><a href="/docs/in-brief/">In brief</a>: the whole system on one page, in plain words, with what each part is for and what each kind of user gains.</li>
 <li><a href="/docs/start-here/">Start here</a>: one reading path for each kind of reader.</li>
 <li><a href="/docs/demos/">Try it in five minutes</a>: install the package and run each mode from an empty folder.</li>
@@ -2699,6 +2702,56 @@ for (const f of SKILL_FILES) {
   put(f, s);
   addHeaders(`/${f}`, 'Content-Type: text/markdown; charset=utf-8; variant=GFM', 'Access-Control-Allow-Origin: *', 'Access-Control-Expose-Headers: Link, ETag, Content-Type');
 }
+// ------------------------------------------------------------------ the Brief Desk (desk/)
+// An open agentic website page, as the Worldwide Agentic Web MVP specification (profile 0.2)
+// defines one: a published agent network (`brief_desk.network.json`, built from
+// `desk/brief_desk.hocon` by `desk/tools/build_network.mjs`), its manifest and link map, a
+// browser runtime that runs the network, and a page a visitor uses with or without it. The
+// runtime in desk/runtime/ is the challenge repository's copy of nsdeploy's (Apache-2.0,
+// desk/runtime/LICENSE.txt), republished byte for byte. desk/README.md has the commands.
+// Every file of desk/ is published as it is; only the page itself is drawn in this site's frame.
+const DESK_PUBLIC = ['agent-manifest.json', 'brief_desk.network.json', 'links.json', 'agent-mcp.json', '.well-known/nsdeploy.json', '.well-known/nsdeploy-agent.json'];
+const DESK_FILES = [...DESK_PUBLIC, 'page.js', 'site.js', 'site-actions.js', 'desk.css', 'bridge/action-bridge.html', 'bridge/agent-manifest.json', 'bridge/bridge-actions.js'];
+for (const f of DESK_FILES) put(`desk/${f}`, fs.readFileSync(path.join(ROOT, 'desk', f)));
+(function walk(dir) {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) walk(p);
+    else put(path.relative(ROOT, p).split(path.sep).join('/'), fs.readFileSync(p));
+  }
+})(path.join(ROOT, 'desk', 'runtime'));
+const DESK_NETWORK = JSON.parse(read('desk/brief_desk.network.json'));
+const DESK_MANIFEST = JSON.parse(read('desk/agent-manifest.json'));
+if (DESK_MANIFEST.networks[0].hocon !== './brief_desk.network.json') die('desk/agent-manifest.json: the network file is not ./brief_desk.network.json');
+const DESK_PEERS = [...DESK_MANIFEST.allowed_peers].sort(byCode);
+if (!read('desk/section.html').includes(`data-node-origin="${ORIGIN}"`)) die(`desk/section.html: data-node-origin is not ${ORIGIN}`);
+for (const origin of DESK_PEERS) if (!PEER_ORIGINS.includes(origin)) die(`desk/agent-manifest.json allows the peer ${origin}, which agsc.config.json peers[] does not name`);
+addPage('/desk/', {
+  title: 'Brief Desk', summary: summaryOf('/desk/'),
+  description: 'Search the published passages of a knowledge node, check each against its published digest, and collect cited cards in a brief, by hand or with an assistant that runs in your browser on your own AI provider key.',
+  styles: ['/desk/desk.css'], modules: ['/desk/page.js', '/desk/site.js'],
+  body: `${read('desk/section.html')}<h2 id="how">How this page works</h2>
+<ul>
+<li><strong>The agents are published data.</strong> The network of two agents is the file <a href="/desk/brief_desk.network.json"><code>brief_desk.network.json</code></a>, named by <a href="/desk/agent-manifest.json"><code>agent-manifest.json</code></a>; its instructions are public. Another agentic website can load it by the address <code>${esc(ORIGIN)}/desk/brief_desk</code> and run it in its own visitor&#39;s browser.</li>
+<li><strong>The agents run in your browser.</strong> The runtime in <code>/desk/runtime/</code> is the open-source browser runtime of the <a href="https://github.com/cognizant-ai-labs/agentic-web">Open Agentic Web</a> project, unchanged. Model calls go from your browser to the provider you choose, with your key, which stays in this browser&#39;s storage for this site.</li>
+<li><strong>What the agents can do here is this page&#39;s own list.</strong> Six actions: read the page&#39;s state, search passages, read one passage and check its digest, add a card, remove a card, discard the brief. Discarding asks you first. Another site that runs this network gets two of them, search and read with the digest check, over this node&#39;s published passages only.</li>
+<li><strong>Every card is checked.</strong> A node publishes each passage with the SHA-256 digest of its text in <a href="/chunks.jsonl"><code>/chunks.jsonl</code></a>. The page computes the digest of the text it received and adds the card only when the two are equal. This shows that the text is the published text, not that it is true.</li>
+<li><strong>Other sites are asked only with your consent.</strong> The page reads another node&#39;s passages after you tick it. The assistant can also ask the assistant of ${DESK_PEERS.map(o => `<a href="${esc(o)}/">${esc(new URL(o).host)}</a>`).join(' or ')}; a card names the site and shows the request before anything is sent.</li>
+</ul>
+<p>The page works without the assistant, and without a key: the search form and the brief use the same code the assistant calls. The source is in <a href="${esc(FORGE.site)}/tree/main/desk">the site&#39;s repository</a>, under Apache-2.0.</p>
+`,
+});
+// The public files of the network, which another site's browser reads (the specification's
+// section 3.3): CORS-enabled. The page's own policy allows what the runtime needs and nothing
+// else: model calls to the provider the visitor chooses (any https origin, as on /graph/), the
+// two peers' bridge pages in a frame, and no inline script. The bridge page is the one address
+// of this site another site may frame: it shares no action and loads none of this page's code.
+for (const f of DESK_PUBLIC) addHeaders(`/desk/${f}`, 'Access-Control-Allow-Origin: *');
+// The runtime writes its own style element and style attributes, so this one page admits inline
+// styles; scripts stay limited to this site's own files.
+addHeaders('/desk/', '! Content-Security-Policy', `Content-Security-Policy: ${cspConnect("'self' https:").replace("style-src 'self'", "style-src 'self' 'unsafe-inline'")}; frame-src ${DESK_PEERS.join(' ')}; worker-src 'self' blob:`);
+addHeaders('/desk/bridge/*', '! X-Frame-Options', '! Content-Security-Policy', "Content-Security-Policy: default-src 'none'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'");
+addHeaders('/desk/runtime/sandbox-worker.js', '! Content-Security-Policy', "Content-Security-Policy: default-src 'none'; script-src blob:; connect-src 'none'; worker-src 'none'");
 put('_headers', `# Generated by scripts/build.js — do not hand-edit (AGSC-06-04).\n${[...HEADER_BLOCKS].map(([route, lines]) => `${route}\n${lines.map(l => `  ${l}`).join('\n')}`).join('\n\n')}\n`);
 // No entry for a section published in parts: a fragment such as `/specs/06-surfaces/#AGSC-06-22`
 // never reaches the server, so nothing here could send it to `/specs/06-surfaces/page-2/`. Every

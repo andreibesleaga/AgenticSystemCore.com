@@ -1,0 +1,86 @@
+{
+  "brand": "Brief Desk",
+  "networks": [
+    {
+      "name": "brief_desk",
+      "front_man": "desk_assistant",
+      "hocon": "./brief_desk.network.json",
+      "description": "Ask for a passage from a published knowledge node; the assistant finds it, checks it against its published digest, and can add it to your brief.",
+      "tags": [
+        "agentified-website",
+        "knowledge",
+        "verified-citations"
+      ],
+      "sample_queries": [
+        "What is a Bundle? Answer from a passage and give its address.",
+        "Find a passage on how a digest in the discovery document is checked, and add it to my brief.",
+        "Ask the Standards Map what it offers on robots.txt and AI usage preferences.",
+        "Add the passage that defines a Cluster to my brief, then discard the brief.",
+        "Publish a new item on this node for me."
+      ]
+    }
+  ],
+  "llm_router": {
+    "base_url": "https://openrouter.ai/api/v1",
+    "mock": false,
+    "byok_router": "https://openrouter.ai/api/v1"
+  },
+  "allowed_peers": [
+    "https://patterns.agenticsystemcore.com",
+    "https://standards.agenticsystemcore.com"
+  ],
+  "peer_policy": {
+    "mode": "closed",
+    "deny_origins": [],
+    "note": "Local agents and page-local actions, and the partner sites in allowed_peers, each after the visitor agrees."
+  },
+  "agent_mcp": {
+    "protocol": "nsdeploy-agent-mcp/v1",
+    "network": "brief_desk",
+    "front_man": "desk_assistant",
+    "available": false,
+    "reason": "This is a static bundle; a public MCP facade requires an application host."
+  },
+  "theme": {
+    "primary": "#245a9c"
+  },
+  "linking": {
+    "protocol": "nsdeploy-link/v1",
+    "exports": [
+      {
+        "network": "brief_desk",
+        "front_man": "desk_assistant",
+        "aliases": [
+          "brief_desk",
+          "desk_assistant"
+        ],
+        "url": "brief_desk"
+      }
+    ],
+    "imports": [],
+    "link_updates": {
+      "mode": "browser-local"
+    }
+  },
+  "deployment": {
+    "mode": "static",
+    "self_contained_runtime": true,
+    "browser_mock": false,
+    "direct_byok": true,
+    "direct_mcp_requires_cors": true,
+    "public_mcp_facade": false
+  },
+  "actions": {
+    "version": 1,
+    "module": "./site-actions.js",
+    "bridge": "./bridge/action-bridge.html",
+    "agentTools": [
+      "get_desk_state",
+      "search_passages",
+      "read_passage",
+      "add_card",
+      "remove_card",
+      "discard_brief"
+    ]
+  }
+}

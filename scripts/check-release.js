@@ -232,7 +232,8 @@ function check(www, opts = {}) {
   }
   // Every page this generator writes names the feed in its head. The board pages under /boards/
   // are the engine's own bytes, republished unchanged (scripts/build.js), so they are not edited here.
-  for (const r of pages.filter(p => !p.startsWith('boards/'))) ok(read(r).includes(FEED_LINK), `/${r}: the head does not name the releases feed (${FEED_LINK})`);
+  // The Brief Desk's bridge page is the agent runtime's frame page, written by its build tool, not a page of this site.
+  for (const r of pages.filter(p => !p.startsWith('boards/') && p !== 'desk/bridge/action-bridge.html')) ok(read(r).includes(FEED_LINK), `/${r}: the head does not name the releases feed (${FEED_LINK})`);
   for (const r of ['changelog/index.html', 'docs/status/index.html']) ok(/<a href="\/changelog\.xml">Releases feed \(RSS\)<\/a>/.test(read(r)), `/${r.replace(/index\.html$/, '')} has no visible "Releases feed (RSS)" link`);
   return fails;
 }

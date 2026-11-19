@@ -11,6 +11,18 @@
     {
       "path": "www/assets/vendor/*.min.js",
       "reason": "the same vendored files as published; scripts/check.js asserts that their SHA-256 equals the pinned one"
+    },
+    {
+      "path": "desk/runtime/**",
+      "reason": "the agent runtime of cognizant-ai-labs/agentic-web (Apache-2.0), republished byte for byte; scripts/check.js asserts the built copy equals it; its bundle carries its libraries' own author lines and wording"
+    },
+    {
+      "path": "www/desk/runtime/**",
+      "reason": "the same runtime as published; scripts/check.js asserts it equals desk/runtime/"
+    },
+    {
+      "path": "desk/templates/**",
+      "reason": "the agentify-website skill's templates, unchanged, which desk/tools/build_network.mjs reads; their TODO lines are the skill's placeholders, never published"
     }
   ],
   "allow": [
@@ -73,12 +85,6 @@
       "reason": "the benchmark page names the models that were measured; the name is data, not a note about how the page was written"
     },
     {
-      "check": "process",
-      "path": "www/assets/search-site.json",
-      "text": "Claude Sonnet",
-      "reason": "the benchmark page names the models that were measured; the name is data, not a note about how the page was written"
-    },
-    {
       "check": "missing-file",
       "path": "site/docs/recipe-notes-apps.md",
       "text": "\\L\\2.md",
@@ -118,12 +124,6 @@
       "check": "missing-file",
       "path": "www/docs/recipe-notes-apps/index.html",
       "text": "hydration.md",
-      "reason": "a sample command and the lines it printed: the link is the text being converted in the example, not a link of this page"
-    },
-    {
-      "check": "missing-file",
-      "path": "www/docs/recipe-notes-apps/index.html",
-      "text": "sourdough.md",
       "reason": "a sample command and the lines it printed: the link is the text being converted in the example, not a link of this page"
     }
   ]
