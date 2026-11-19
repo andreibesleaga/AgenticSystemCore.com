@@ -17,6 +17,7 @@ globalThis.document = StubDocument.fromHtml(await readFile(new URL("../section.h
 // origin as section.html does.
 document.getElementById("desk").setAttribute("data-node-origin", FIXTURES.node);
 const { BriefDesk } = await import("../page.js");
+const { PassageReader } = await import("../reader.js");
 const { registerActions } = await import("../site-actions.js");
 const SCOPE = { base: BASE, network: "brief_desk" };
 
@@ -114,7 +115,7 @@ class BriefDeskTest {
     const registry = new ActionRegistry();
     await registerActions({ register: registry.register.bind(registry, SCOPE) });
     const names = registry.catalog(SCOPE).map((e) => e.name).sort();
-    assert.deepEqual(names, ["add_card", "discard_brief", "get_desk_state", "read_passage", "remove_card", "search_passages"]);
+    assert.deepEqual(names, ["add_card", "check_brief", "discard_brief", "get_desk_state", "read_passage", "remove_card", "search_passages"]);
     // The visitor ticks the box.
     const box = document.getElementById("desk-allow-patterns");
     box.checked = true;
@@ -123,7 +124,9 @@ class BriefDeskTest {
     const allowed = await BriefDeskTest.run("search_passages", { node: "patterns", query: "supervisor" });
     assert.equal(allowed.result.ok, true);
     assert.equal(allowed.result.passages[0].title, "Supervisor");
-    assert.equal(asked(), 1);
+    // Two files of that site are read, and no other: its passages and its discovery document.
+    assert.deepEqual(FIXTURES.requests.filter((url) => url.startsWith(FIXTURES.patterns)),
+      [`${FIXTURES.patterns}/chunks.jsonl`, `${FIXTURES.patterns}/.well-known/knowledge-linkset`]);
     // Unticking stops it again.
     box.checked = false;
     box.dispatch("change");
@@ -245,19 +248,19 @@ BriefDeskTest.testConcurrentAddsLeaveOneCard = async () => {
 /** A passage file larger than the limit, or one that never answers, fails closed. */
 BriefDeskTest.testFileLimits = async () => {
   const saved = globalThis.fetch;
-  const limit = BriefDesk.FILE_LIMIT;
-  const wait = BriefDesk.FILE_TIMEOUT_MS;
+  const limit = PassageReader.FILE_LIMIT;
+  const wait = PassageReader.FILE_TIMEOUT_MS;
   try {
-    BriefDesk.FILE_LIMIT = 10;
+    PassageReader.FILE_LIMIT = 10;
     globalThis.fetch = async () => new Response("x".repeat(100));
     await assert.rejects(BriefDesk.fetchText("https://example.org/chunks.jsonl"), /larger than 10 bytes/);
-    BriefDesk.FILE_TIMEOUT_MS = 20;
+    PassageReader.FILE_TIMEOUT_MS = 20;
     globalThis.fetch = (url, init) => new Promise((resolve, reject) => init.signal.addEventListener("abort", () => reject(Object.assign(new Error("aborted"), { name: "AbortError" }))));
     await assert.rejects(BriefDesk.fetchText("https://example.org/chunks.jsonl"), /did not answer within/);
   } finally {
     globalThis.fetch = saved;
-    BriefDesk.FILE_LIMIT = limit;
-    BriefDesk.FILE_TIMEOUT_MS = wait;
+    PassageReader.FILE_LIMIT = limit;
+    PassageReader.FILE_TIMEOUT_MS = wait;
   }
 };
 
@@ -272,3 +275,148 @@ test("an empty brief cannot be discarded", BriefDeskTest.testEmptyBriefIsRefused
 test("the page's own form and buttons work without the assistant", BriefDeskTest.testThePageWorksWithoutTheAssistant);
 test("two adds of the same passage at once leave one card", BriefDeskTest.testConcurrentAddsLeaveOneCard);
 test("a passage file over the size or time limit fails closed", BriefDeskTest.testFileLimits);
+
+/** The passage file is compared with the digest the node's discovery document publishes. */
+BriefDeskTest.testFileCheck = async () => {
+  const page = BriefDeskTest.page;
+  const linkset = `${FIXTURES.patterns}/.well-known/knowledge-linkset`;
+  const published = FIXTURES.linksets.get(linkset);
+  try {
+    page.forget();
+    const read = await BriefDeskTest.run("read_passage", { node: "core", passage: ID(FIXTURES.core[1]) });
+    assert.equal(read.result.fileCheck, "matches");
+    // A node whose discovery document publishes another digest for the file is not used.
+    page.setAllowed("patterns", true);
+    FIXTURES.linksets.set(linkset, () => Fixtures.linkset(FIXTURES.patterns, [...FIXTURES.patternCards, FIXTURES.core[0]]));
+    await assert.rejects(page.search({ node: "patterns", query: "supervisor" }), /does not match the digest that patterns\.agenticsystemcore\.com publishes/);
+    // A node whose discovery document cannot be read is not used either: nothing is read unchecked.
+    FIXTURES.linksets.delete(linkset);
+    await assert.rejects(page.read({ node: "patterns", passage: ID(FIXTURES.patternCards[0]) }), /could not be checked, because the discovery document of patterns\.agenticsystemcore\.com could not be read/);
+    // Nor one whose discovery document names the file without a digest.
+    FIXTURES.linksets.set(linkset, () => ({ linkset: [{ item: [{ href: `${FIXTURES.patterns}/chunks.jsonl` }] }] }));
+    await assert.rejects(page.read({ node: "patterns", passage: ID(FIXTURES.patternCards[0]) }), /has no digest in the discovery document/);
+    // With the digest published again, the node is read.
+    FIXTURES.linksets.set(linkset, published);
+    assert.equal((await page.read({ node: "patterns", passage: ID(FIXTURES.patternCards[0]) })).fileCheck, "matches");
+  } finally {
+    FIXTURES.linksets.set(linkset, published);
+    page.setAllowed("patterns", false);
+    page.forget();
+  }
+};
+
+/** Checking the brief again shows a passage the node has changed, moved or removed since. */
+BriefDeskTest.testCheckTheBriefAgain = async () => {
+  const page = BriefDeskTest.page;
+  for (const card of page.getState().brief.cards) page.remove({ card: card.card });
+  assert.equal((await BriefDeskTest.run("check_brief", {})).result.ok, false);
+  const [first, second, third, fourth] = FIXTURES.core;
+  for (const record of [first, second, third, fourth]) {
+    assert.equal((await page.pin({ node: "core", passage: ID(record) })).ok, true);
+  }
+  const version = page.getState().brief.version;
+  const same = await BriefDeskTest.run("check_brief", {});
+  assert.equal(same.status, "succeeded");
+  assert.deepEqual(same.result.results.map((r) => r.status), ["unchanged", "unchanged", "unchanged", "unchanged"]);
+  assert.equal(same.result.unchanged, 4);
+  const saved = [first, second, third].map((r) => ({ ...r }));
+  const at = FIXTURES.core.indexOf(third);
+  try {
+    // The publisher rewrites one passage, with a correct new digest: only the brief's own
+    // digest can show it.
+    first.text = "Passage 1 was rewritten after the brief was made. Its own keyword is k1k.";
+    first.digest = (await import("node:crypto")).createHash("sha256").update(first.text, "utf8").digest("hex");
+    // The same text under another passage id, and one passage removed.
+    second.id = second.id.split("").reverse().join("");
+    FIXTURES.core.splice(at, 1);
+    const found = await page.checkBrief();
+    assert.deepEqual(found.results.map((r) => r.status), ["changed", "moved", "gone", "unchanged"]);
+    assert.equal(found.unchanged, 1);
+    assert.equal(found.checked, 4);
+    const cards = page.getState().brief.cards;
+    assert.deepEqual(cards.map((c) => c.digestMatches), [false, false, false, true]);
+    assert.equal(page.getState().brief.version, version, "A check must not change the brief.");
+    const marks = document.getElementById("desk-brief").children.map((item) => item.children[1].textContent);
+    assert.match(marks[0], /changed since it was added/);
+    assert.match(marks[3], /unchanged since it was added/);
+  } finally {
+    Object.assign(first, saved[0]);
+    Object.assign(second, saved[1]);
+    FIXTURES.core.splice(at, 0, third);
+    page.forget();
+  }
+};
+
+/** A brief saved as Markdown can be checked later, by anyone, from its addresses and digests. */
+BriefDeskTest.testCheckASavedBrief = async () => {
+  const page = BriefDeskTest.page;
+  const markdown = page.briefMarkdown();
+  assert.match(markdown, /Check a saved brief/);
+  const fresh = await page.checkSaved(markdown);
+  assert.equal(fresh.ok, true);
+  assert.equal(fresh.results.length, 4);
+  assert.equal(fresh.unchanged, 4);
+  // One digit of a digest altered: that passage no longer matches what the brief says.
+  const digest = page.getState().brief.cards[0].digest;
+  const altered = markdown.replace(digest, `${digest[0] === "0" ? "1" : "0"}${digest.slice(1)}`);
+  const found = await page.checkSaved(altered);
+  assert.deepEqual(found.results.map((r) => r.status), ["changed", "unchanged", "unchanged", "unchanged"]);
+  // A passage of a node the visitor has not allowed, and one of a site this page does not read.
+  const other = `- x\n  Source: <${FIXTURES.patternCards[0].iri}#chunk-${ID(FIXTURES.patternCards[0])}> (sha-256 ${FIXTURES.patternCards[0].digest}; x)\n`
+    + `- y\n  Source: <https://elsewhere.example/concepts/stray/#chunk-0123456789abcdef> (sha-256 ${"a".repeat(64)}; y)\n`;
+  const asked = FIXTURES.requests.length;
+  const refused = await page.checkSaved(other);
+  assert.deepEqual(refused.results.map((r) => r.status), ["not checked", "not checked"]);
+  assert.match(refused.results[0].reason, /Tick patterns\.agenticsystemcore\.com/);
+  assert.match(refused.results[1].reason, /This page reads only/);
+  assert.equal(FIXTURES.requests.slice(asked).filter((url) => !url.startsWith(BASE)).length, 0, "A saved brief made the page contact another site.");
+  assert.equal((await page.checkSaved("no sources here")).ok, false);
+  // The page's own button shows the result.
+  document.getElementById("desk-saved-text").value = altered;
+  document.getElementById("desk-saved-check").dispatch("click");
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(document.getElementById("desk-saved-status").textContent, "3 of 4 cited passages unchanged.");
+  assert.match(document.getElementById("desk-saved-results").children[0].children[1].textContent, /^Changed:/);
+  for (const card of page.getState().brief.cards) page.remove({ card: card.card });
+};
+
+test("the passage file is checked against the digest in the node's discovery document", BriefDeskTest.testFileCheck);
+test("checking the brief again shows a changed, moved or removed passage", BriefDeskTest.testCheckTheBriefAgain);
+test("a saved brief can be checked later from its addresses and digests", BriefDeskTest.testCheckASavedBrief);
+
+/** A node of more than 500 items publishes a shard list; the reader reads the shards in order. */
+BriefDeskTest.testShardedPassageFile = async () => {
+  const origin = "https://big.example";
+  const first = [Fixtures.passage(origin, "one", "One", "", "The first shard holds the word alpha9.")];
+  const second = [Fixtures.passage(origin, "two", "Two", "", "The second shard holds the word beta9.")];
+  const list = `${JSON.stringify({ bundle_version: "sha256:0", lines_total: 2, shards: ["/chunks-01.jsonl", "/chunks-02.jsonl"] })}\n`;
+  const digest = (await import("node:crypto")).createHash("sha256").update(list, "utf8").digest("base64");
+  const files = new Map([
+    [`${origin}/chunks.jsonl`, list],
+    [`${origin}/chunks-01.jsonl`, Fixtures.fileText(first)],
+    [`${origin}/chunks-02.jsonl`, Fixtures.fileText(second)],
+    [`${origin}/.well-known/knowledge-linkset`, JSON.stringify({ linkset: [{ item: [{ href: `${origin}/chunks.jsonl`, digest: [`sha-256=:${digest}:`] }] }] })],
+  ]);
+  const asked = [];
+  const fetchText = async (url) => {
+    asked.push(url);
+    if (!files.has(url)) throw new Error(`${url} answered 404`);
+    return files.get(url);
+  };
+  const reader = new PassageReader({ nodes: [{ id: "big", label: "Big", origin }], fetchText });
+  const found = await reader.search({ node: "big", query: "beta9" });
+  assert.equal(found.count, 1);
+  const read = await reader.read({ node: "big", passage: found.passages[0].passage });
+  assert.equal(read.digestMatches, true);
+  assert.equal(read.fileCheck, "matches");
+  assert.equal((await reader.search({ node: "big", query: "alpha9" })).count, 1);
+  assert.deepEqual(asked, [`${origin}/chunks.jsonl`, `${origin}/chunks-01.jsonl`, `${origin}/chunks-02.jsonl`, `${origin}/.well-known/knowledge-linkset`]);
+  // A list that names anything but the node's own shard files is refused, and so is a long one.
+  files.set(`${origin}/chunks.jsonl`, JSON.stringify({ shards: ["https://elsewhere.example/chunks-01.jsonl"] }));
+  reader.forget();
+  await assert.rejects(reader.search({ node: "big", query: "alpha9" }), /not \/chunks-<nn>\.jsonl/);
+  files.set(`${origin}/chunks.jsonl`, JSON.stringify({ shards: Array.from({ length: 21 }, (_, i) => `/chunks-${String(i + 1).padStart(2, "0")}.jsonl`) }));
+  await assert.rejects(reader.search({ node: "big", query: "alpha9" }), /takes 20 at most/);
+};
+
+test("a sharded passage file is read shard by shard, from the node's own files only", BriefDeskTest.testShardedPassageFile);

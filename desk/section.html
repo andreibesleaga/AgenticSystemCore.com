@@ -1,4 +1,4 @@
-<p>Ask a question, or search by hand. Every passage this page shows comes from a file a knowledge node publishes, and each one is checked against the digest that node published for it before it goes into your brief. The assistant below runs in your browser, on the AI provider and key you choose; this site has no server behind it and never receives your key.</p>
+<p>Ask a question, or search by hand. Every passage this page shows comes from a file a knowledge node publishes, and each one is checked against the digest that node published for it before it goes into your brief. A brief keeps those digests, so anyone can check later whether a cited passage has changed. The assistant below runs in your browser, on the AI provider and key you choose; this site has no server behind it and never receives your key.</p>
 <section id="desk" class="desk" aria-labelledby="desk-heading" data-node-origin="https://agenticsystemcore.com">
 <h2 id="desk-heading">Search and collect</h2>
 <fieldset class="desk-nodes">
@@ -24,7 +24,15 @@
 <h2 id="desk-brief-heading">Your brief</h2>
 <p id="desk-brief-count">The brief is empty. Search, then add passages.</p>
 <ol id="desk-brief" class="desk-list"></ol>
-<p class="desk-buttons"><button type="button" id="desk-copy">Copy the brief as Markdown</button> <button type="button" id="desk-discard">Discard the brief</button></p>
+<p class="desk-buttons"><button type="button" id="desk-copy">Copy the brief as Markdown</button> <button type="button" id="desk-check">Check the brief again</button> <button type="button" id="desk-discard">Discard the brief</button></p>
+<details class="desk-saved">
+<summary>Check a saved brief</summary>
+<p><label for="desk-saved-text">Paste a brief that was copied from this page, by you or by someone else. The page reads each cited passage from its node now and compares it with the digest the brief holds, so you see which passages have changed since the brief was written.</label></p>
+<textarea id="desk-saved-text" rows="6" spellcheck="false"></textarea>
+<p class="desk-buttons"><button type="button" id="desk-saved-check">Check the saved brief</button></p>
+<p id="desk-saved-status" role="status"></p>
+<ol id="desk-saved-results" class="desk-list"></ol>
+</details>
 </section>
 <section id="assistant" class="assistant" aria-labelledby="assistant-heading">
 <h2 id="assistant-heading">Ask the Brief Desk</h2>

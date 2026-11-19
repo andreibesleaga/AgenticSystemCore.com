@@ -1,0 +1,18 @@
+{
+ "linkset": [
+  {
+   "anchor": "https://standards.agenticsystemcore.com/",
+   "https://w3id.org/agentic-system-core/rel#surface": [
+    {
+     "agsc-surface": [
+      "chunks"
+     ],
+     "digest": [
+      "sha-256=:SkJoemoGGH1Y7wUMG/OeIpd65Ofntv5D3bcoNcYwvz8=:"
+     ],
+     "href": "https://standards.agenticsystemcore.com/chunks.jsonl"
+    }
+   ]
+  }
+ ]
+}

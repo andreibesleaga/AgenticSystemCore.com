@@ -1,0 +1,11 @@
+{
+  "networks": [
+    {
+      "name": "standards_map"
+    }
+  ],
+  "actions": {
+    "version": 1,
+    "module": "./bridge-actions.js"
+  }
+}

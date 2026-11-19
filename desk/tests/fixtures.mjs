@@ -61,6 +61,32 @@ export class Fixtures {
       [`${this.patterns}/chunks.jsonl`, this.patternCards],
       [`${this.standards}/chunks.jsonl`, this.foreign],
     ]);
+    // Each node's discovery document, made when asked for, so it follows a test's change to
+    // the records; a test replaces an entry to publish a digest the file does not have.
+    this.linksets = new Map([
+      [`${base}/.well-known/knowledge-linkset`, () => Fixtures.linkset(this.node, this.core)],
+      [`${this.patterns}/.well-known/knowledge-linkset`, () => Fixtures.linkset(this.patterns, this.patternCards)],
+    ]);
+  }
+
+  /** The text of a passage file: one JSON line per record. */
+  static fileText(records) {
+    return `${records.map((r) => JSON.stringify(r)).join("\n")}\n`;
+  }
+
+  /**
+   * A discovery document that publishes the digest of a node's passage file, in the shape
+   * of /.well-known/knowledge-linkset.
+   *
+   * :param origin: The node's published origin.
+   * :param records: The records of its passage file.
+   * :return: The document.
+   */
+  static linkset(origin, records) {
+    const digest = createHash("sha256").update(Fixtures.fileText(records), "utf8").digest("base64");
+    return { linkset: [{ anchor: `${origin}/`, "https://w3id.org/agentic-system-core/rel#surface": [
+      { href: `${origin}/chunks.jsonl`, "agsc-surface": ["chunks"], digest: [`sha-256=:${digest}:`] },
+    ] }] };
   }
 
   /** The first 16 characters of a passage's id, as the actions take it. */
@@ -76,11 +102,15 @@ export class Fixtures {
   install() {
     globalThis.fetch = async (url) => {
       this.requests.push(String(url));
+      const linkset = this.linksets.get(String(url));
+      if (linkset) {
+        return { ok: true, status: 200, text: async () => JSON.stringify(linkset()) };
+      }
       const records = this.files.get(String(url));
       if (!records) {
         return { ok: false, status: 404, text: async () => "" };
       }
-      return { ok: true, status: 200, text: async () => `${records.map((r) => JSON.stringify(r)).join("\n")}\n` };
+      return { ok: true, status: 200, text: async () => Fixtures.fileText(records) };
     };
     return this;
   }

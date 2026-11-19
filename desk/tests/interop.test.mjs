@@ -5,13 +5,14 @@
 //
 // Nothing leaves the process: the three origins are served from disk (this site's built
 // www/, and the two peer networks under fixtures/peers/, copies of what those nodes
-// publish), the router is scripted and the key is fake. Each test names the check of
+// publish under /agents/ without the runtime files, with three passages of the standards
+// node and a discovery document for them), the router is scripted and the key is fake. Each test names the check of
 // section 6 it shows.
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { Engine } from "../runtime/engine.js";
 import { AgentNetwork, parseExternalAgent, validateNetwork } from "../runtime/kernel.js";
 import { safeName } from "../runtime/runner.js";
@@ -120,7 +121,7 @@ test("6.1 the site publishes a two-agent network and a manifest the runtime acce
   const agents = config.tools.filter((t) => typeof t.instructions === "string");
   assert.equal(agents.length, 2, "Expected a front agent and one specialist.");
   // The built site serves the same bytes, and the host sends CORS on each public file.
-  for (const f of ["agent-manifest.json", "brief_desk.network.json", "links.json", "page.js", "bridge/bridge-actions.js", "bridge/agent-manifest.json"]) {
+  for (const f of ["agent-manifest.json", "brief_desk.network.json", "links.json", "reader.js", "page.js", "bridge/bridge-actions.js", "bridge/agent-manifest.json"]) {
     assert.deepEqual(await readFile(path.join(ROOT, "www", "desk", f)), await readFile(path.join(ROOT, "desk", f)), `www/desk/${f} is not the source's bytes: rebuild the site.`);
   }
   const headers = await readFile(path.join(ROOT, "www", "_headers"), "utf8");
@@ -162,16 +163,31 @@ test("6.2 the network runs on the site's published default router and model, and
 test("6.4 after the visitor approves, an exact named network loads from a second origin and runs in the caller's browser", async () => {
   const { web, router } = Interop.web(new URL(VISITOR_ROUTER).origin, 1);
   router.aim(Interop.tool(STANDARDS_NET), null);
+  router.read("website_search_passages", { query: "robots" });
   await Interop.serveCaller(web);
   const run = await Interop.run(web, { routerOverride: VISITOR_ROUTER, modelOverride: "gpt-5.2" });
   assert.equal(run.cards.length, 1, "Expected one consent card.");
   assert.equal(run.cards[0].peerOrigin, new URL(STANDARDS).host);
   assert.equal(run.cards[0].requestText, REQUEST);
   assert.deepEqual(Interop.paths(web, STANDARDS, web.requests.slice(0, run.cards[0].before)), [], "The peer was contacted before the visitor answered.");
-  assert.deepEqual(Interop.paths(web, STANDARDS), ["/agents/agent-manifest.json", "/agents/standards_map.network.json", "/agents/links.json"]);
-  // The peer's agent ran here, on the caller's router: its prompt is the published guide.
+  // What was read at the peer, and nothing else: its network, its bridge, and, when its
+  // guide searched, its own published passages with their discovery document. No key went there.
+  assert.deepEqual([...new Set(Interop.paths(web, STANDARDS))].sort(), ["/.well-known/knowledge-linkset", "/agents/agent-manifest.json",
+    "/agents/bridge/action-bridge.html", "/agents/bridge/agent-manifest.json", "/agents/bridge/bridge-actions.js", "/agents/links.json",
+    "/agents/standards_map.network.json", "/chunks.jsonl"]);
+  assert.ok(web.requests.filter((r) => r.origin === STANDARDS).every((r) => !r.keySent && !r.authorization));
+  // The peer's agent ran here, on the caller's router: its prompt is the published guide,
+  // and its two tools are the reads the peer's bridge shares.
   const partner = router.partnerChats();
   assert.ok(partner.length >= 1, "The peer's network made no model call.");
+  assert.deepEqual(partner[0].websiteTools.slice().sort(), ["website_read_passage", "website_search_passages"]);
+  for (const frame of web.frames) {
+    assert.equal(frame.src, `${STANDARDS}/agents/bridge/action-bridge.html`);
+    assert.equal(frame.ready, true, String(frame.error));
+  }
+  assert.deepEqual(web.frames[0].shared.slice().sort(), ["read_passage", "search_passages"]);
+  assert.deepEqual(web.frames.flatMap((f) => f.executed), ["search_passages"], "The peer's guide did not search its own node through the bridge.");
+  assert.deepEqual(web.dialogs, [], "A read asked the visitor something.");
   assert.match(run.result.text, /^CALLER_FINAL: PARTNER_ANSWER:/);
   // A wrong name on the same site is refused: the runtime never picks another network.
   const { web: web2, router: router2 } = Interop.web(new URL(VISITOR_ROUTER).origin, 1);
@@ -315,5 +331,13 @@ test("the peer fixtures are the networks the two nodes publish", async () => {
     const config = JSON.parse(await readFile(path.join(HERE, "fixtures", "peers", host, "agents", `${name}.network.json`), "utf8"));
     assert.deepEqual(validateNetwork(new AgentNetwork(config, name)).errors, []);
     assert.ok(!JSON.stringify(config).includes("bookings"), `${host}: the guide claims bookings.`);
+    // Its bridge shares the two reads its manifest lists as the guide's tools.
+    assert.deepEqual(manifest.actions, { version: 1, bridge: "./bridge/action-bridge.html", agentTools: ["search_passages", "read_passage"] });
+    const shared = [];
+    const module = await import(pathToFileURL(path.join(HERE, "fixtures", "peers", host, "agents", "bridge", "bridge-actions.js")).href);
+    module.registerActions({ register: (definition) => shared.push(definition) });
+    assert.deepEqual(shared.map((d) => `${d.name}:${d.effect}:${d.availability}`), ["search_passages:read:bridge", "read_passage:read:bridge"]);
+    // The reader beside it is this repository's, byte for byte.
+    assert.ok((await readFile(path.join(HERE, "fixtures", "peers", host, "agents", "bridge", "reader.js"))).equals(await readFile(path.join(ROOT, "desk", "reader.js"))), `${host}: reader.js is not desk/reader.js`);
   }
 });

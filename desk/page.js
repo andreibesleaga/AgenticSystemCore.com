@@ -11,78 +11,34 @@
 // the address of its item, its text and the SHA-256 digest of that text. This page reads
 // its own node without asking. It reads another node only after the visitor ticks that
 // node under "Nodes to read"; the assistant cannot tick it.
-
-/** One knowledge node this page can read. */
-class DeskNode {
-  /**
-   * :param id: Short name used in arguments, such as "core".
-   * :param label: The name a visitor reads.
-   * :param origin: The node's origin, such as "https://standards.agenticsystemcore.com":
-   *   the origin its items' addresses carry.
-   * :param own: True for the node this page belongs to.
-   * :param readFrom: The origin its files are read from. It differs from origin only for
-   *   this page's own node on a preview address, where the files sit beside the page.
-   */
-  constructor(id, label, origin, own, readFrom = origin) {
-    this.id = id;
-    this.label = label;
-    this.origin = origin;
-    this.readFrom = readFrom;
-    this.own = own;
-    this.allowed = own;
-    this.passages = null; // loaded on first use
-  }
-
-  /** The address of the node's passage file. */
-  get chunksUrl() {
-    return `${this.readFrom}/chunks.jsonl`;
-  }
-
-  /** The host a visitor recognises, without the scheme. */
-  get host() {
-    return new URL(this.origin).host;
-  }
-}
+//
+// The reading and checking are in reader.js, which this site's bridge and the two peer
+// nodes' bridges use too. This file adds the page: the visitor's consent per node, the
+// brief, and what is drawn.
+import { PassageReader } from "./reader.js";
 
 /** The page object: state, operations and rendering of the Brief Desk. */
-export class BriefDesk {
+export class BriefDesk extends PassageReader {
   /** The single page object; site.js and site-actions.js use it. */
   static page = null;
 
   /** The most cards a brief holds. */
   static BRIEF_LIMIT = 8;
 
-  /** The most passages one search returns. */
-  static SEARCH_LIMIT = 8;
-
-  /** The most characters of a passage a read returns. */
-  static READ_LIMIT = 6000;
-
-  /** The most bytes of a passage file the page reads, and how long it waits for one. */
-  static FILE_LIMIT = 8 * 1000 * 1000;
-  static FILE_TIMEOUT_MS = 20000;
-
-  /** Words too common to search for. */
-  static STOP_WORDS = new Set(["a", "an", "and", "are", "as", "at", "be", "by", "can", "do", "does", "for", "from",
-    "how", "in", "is", "it", "its", "of", "on", "or", "that", "the", "this", "to", "what", "when", "which", "who",
-    "why", "with"]);
-
   /**
    * :param doc: The document to render into.
    * :param options: nodes (a list of {id, label, origin}), the first being this page's own
-   *   node; fetchText (url → text) and sha256Hex (text → hex), replaceable in tests;
-   *   readFrom and nodeOrigin, for a reader with no page (doc null), as in the bridge.
+   *   node; fetchText (url → text) and sha256Hex (text → hex), replaceable in tests.
    */
   constructor(doc, options = {}) {
-    this.doc = doc;
     // The page's own node is read from beside the page. Its items carry the node's
     // published origin, which the page states in data-node-origin.
-    const here = options.readFrom || new URL(doc.URL || doc.location.href).origin;
-    const own = options.nodeOrigin || doc.getElementById("desk").getAttribute("data-node-origin") || here;
-    const nodes = options.nodes || BriefDesk.defaultNodes(own);
-    this.nodes = nodes.map((n, i) => new DeskNode(n.id, n.label, n.origin, i === 0, i === 0 ? here : n.origin));
-    this.fetchText = options.fetchText || BriefDesk.fetchText;
-    this.sha256Hex = options.sha256Hex || BriefDesk.sha256Hex;
+    const here = new URL(doc.URL || doc.location.href).origin;
+    const own = doc.getElementById("desk").getAttribute("data-node-origin") || here;
+    const nodes = (options.nodes || BriefDesk.defaultNodes(own)).map((n, i) => ({ ...n, readFrom: i === 0 ? here : n.origin }));
+    super({ ...options, nodes });
+    this.doc = doc;
+    this.home = `${own}/desk/`;
     this.cards = [];
     this.version = 0;
     this.nextCard = 1;
@@ -101,74 +57,6 @@ export class BriefDesk {
       { id: "patterns", label: "AgenticSystemCore Graph (cards on agent-system designs)", origin: "https://patterns.agenticsystemcore.com" },
       { id: "standards", label: "Standards Map (documents an agent-readable site builds on)", origin: "https://standards.agenticsystemcore.com" },
     ];
-  }
-
-  /**
-   * Read a public file as text. Sends no credentials.
-   *
-   * :param url: The address to read.
-   * :return: The text of the file.
-   * :raises Error: When the file cannot be read.
-   */
-  static async fetchText(url) {
-    // Another node's file is read only after the visitor allows it, but it may still be
-    // slow or large: stop after FILE_TIMEOUT_MS or FILE_LIMIT bytes, and fail closed.
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), BriefDesk.FILE_TIMEOUT_MS);
-    try {
-      const response = await fetch(url, { credentials: "omit", redirect: "error", signal: controller.signal });
-      if (!response.ok) {
-        throw new Error(`${url} answered ${response.status}`);
-      }
-      if (!response.body || typeof response.body.getReader !== "function") {
-        const text = await response.text();
-        if (text.length > BriefDesk.FILE_LIMIT) {
-          throw new Error(`${url} is larger than ${BriefDesk.FILE_LIMIT} bytes`);
-        }
-        return text;
-      }
-      const reader = response.body.getReader();
-      const parts = [];
-      let size = 0;
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) {
-          break;
-        }
-        size += value.byteLength;
-        if (size > BriefDesk.FILE_LIMIT) {
-          controller.abort();
-          throw new Error(`${url} is larger than ${BriefDesk.FILE_LIMIT} bytes`);
-        }
-        parts.push(value);
-      }
-      const bytes = new Uint8Array(size);
-      let at = 0;
-      for (const part of parts) {
-        bytes.set(part, at);
-        at += part.byteLength;
-      }
-      return new TextDecoder().decode(bytes);
-    } catch (error) {
-      if (error && error.name === "AbortError") {
-        throw new Error(`${url} did not answer within ${BriefDesk.FILE_TIMEOUT_MS / 1000} seconds`);
-      }
-      throw error;
-    } finally {
-      clearTimeout(timer);
-    }
-  }
-
-  /**
-   * The SHA-256 digest of a text's UTF-8 bytes, in lower-case hexadecimal.
-   *
-   * :param text: The text to hash.
-   * :return: 64 hexadecimal characters.
-   */
-  static async sha256Hex(text) {
-    const bytes = new TextEncoder().encode(text);
-    const digest = await crypto.subtle.digest("SHA-256", bytes);
-    return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
   }
 
   // ---------------------------------------------------------------- state
@@ -199,27 +87,6 @@ export class BriefDesk {
   }
 
   /**
-   * Find a node by id, and say why it cannot be read when it cannot.
-   *
-   * :param id: The node id.
-   * :return: {node} or a refusal.
-   */
-  usableNode(id) {
-    const node = this.nodes.find((n) => n.id === id);
-    if (!node) {
-      return { ok: false, reason: `There is no node "${id}". The nodes are: ${this.nodes.map((n) => n.id).join(", ")}.`, field: "node" };
-    }
-    if (!node.allowed) {
-      return {
-        ok: false,
-        reason: `The visitor has not allowed this page to read ${node.host}. Only the visitor can allow it, by ticking it under "Nodes to read" on the page.`,
-        field: "node",
-      };
-    }
-    return { ok: true, node };
-  }
-
-  /**
    * Allow or stop reading a node. Only the page's own checkbox calls this.
    *
    * :param id: The node id.
@@ -237,171 +104,6 @@ export class BriefDesk {
     node.allowed = Boolean(allowed);
     this.render();
     return { ok: true, state: this.getState() };
-  }
-
-  /**
-   * Load a node's passages once per page load.
-   *
-   * :param node: The node to load.
-   * :return: The list of passages.
-   * :raises Error: When the file cannot be read or is not the expected format.
-   */
-  async passagesOf(node) {
-    if (node.passages) {
-      return node.passages;
-    }
-    const text = await this.fetchText(node.chunksUrl);
-    const passages = [];
-    for (const line of text.split("\n")) {
-      if (!line.trim()) {
-        continue;
-      }
-      const record = JSON.parse(line);
-      if (typeof record.id !== "string" || typeof record.text !== "string" || typeof record.digest !== "string"
-        || typeof record.iri !== "string") {
-        throw new Error(`${node.chunksUrl} holds a line without id, text, digest or iri`);
-      }
-      if (new URL(record.iri).origin !== node.origin) {
-        throw new Error(`${node.chunksUrl} names an item on another origin`);
-      }
-      passages.push(record);
-    }
-    node.passages = passages;
-    return passages;
-  }
-
-  // ---------------------------------------------------------------- reads
-
-  /**
-   * The words of a query that are worth searching for.
-   *
-   * :param query: What the visitor typed.
-   * :return: Lower-case words.
-   */
-  static words(query) {
-    return [...new Set(String(query).toLowerCase().split(/[^a-z0-9]+/)
-      .filter((w) => w.length > 1 && !BriefDesk.STOP_WORDS.has(w)))];
-  }
-
-  /**
-   * How well a passage matches the words: a title match counts most, then the abstract,
-   * then the text.
-   *
-   * :param passage: One passage record.
-   * :param words: The words to look for.
-   * :return: The score; 0 means no match.
-   */
-  static score(passage, words) {
-    const title = String(passage.title || "").toLowerCase();
-    const abstract = String(passage.abstract || "").toLowerCase();
-    const section = String(passage.section || "").toLowerCase();
-    const text = passage.text.toLowerCase();
-    let score = 0;
-    for (const word of words) {
-      if (title.includes(word)) {
-        score += 5;
-      }
-      if (section.includes(word)) {
-        score += 2;
-      }
-      if (abstract.includes(word)) {
-        score += 2;
-      }
-      const hits = text.split(word).length - 1;
-      score += Math.min(hits, 3);
-    }
-    return score;
-  }
-
-  /**
-   * The short form of a passage that a search returns.
-   *
-   * :param node: The node it belongs to.
-   * :param passage: The passage record.
-   * :return: Plain JSON.
-   */
-  static summary(node, passage) {
-    return {
-      node: node.id,
-      passage: passage.id.slice(0, 16),
-      title: passage.title || passage.item,
-      section: passage.section || "",
-      address: BriefDesk.address(passage),
-      abstract: passage.abstract || "",
-      excerpt: BriefDesk.excerpt(passage.text, 240),
-    };
-  }
-
-  /**
-   * The address of a passage: its item's address, then "#chunk-" and 16 characters.
-   *
-   * :param passage: The passage record.
-   * :return: The address.
-   */
-  static address(passage) {
-    return `${passage.iri}#chunk-${passage.id.slice(0, 16)}`;
-  }
-
-  /**
-   * A passage's Markdown as plain words, for an excerpt a person reads: no emphasis marks,
-   * no code ticks, no heading marks, a link as its text. The digest is always computed over
-   * the passage as published, never over this.
-   *
-   * :param text: Markdown text.
-   * :return: Plain text.
-   */
-  static plain(text) {
-    return text
-      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
-      .replace(/^#{1,6}\s+/gm, "")
-      .replace(/(\*\*|__|`)/g, "");
-  }
-
-  /**
-   * The start of a text, cut at a word, on one line.
-   *
-   * :param text: The text.
-   * :param length: The most characters to keep.
-   * :return: The excerpt.
-   */
-  static excerpt(text, length) {
-    const flat = BriefDesk.plain(text).replace(/\s+/g, " ").trim();
-    if (flat.length <= length) {
-      return flat;
-    }
-    const cut = flat.slice(0, length);
-    return `${cut.slice(0, Math.max(cut.lastIndexOf(" "), length - 40))}…`;
-  }
-
-  /**
-   * Search one node's passages for the words of a query. Changes nothing on the page.
-   *
-   * :param args: query, node and an optional limit.
-   * :return: {ok, node, query, count, passages} or a refusal.
-   */
-  async search(args) {
-    const usable = this.usableNode(args.node);
-    if (!usable.ok) {
-      return usable;
-    }
-    const words = BriefDesk.words(args.query);
-    if (words.length === 0) {
-      return { ok: false, reason: "Give at least one word of two letters or more to search for.", field: "query" };
-    }
-    const limit = Math.min(args.limit || 5, BriefDesk.SEARCH_LIMIT);
-    const passages = await this.passagesOf(usable.node);
-    const ranked = passages
-      .map((passage) => ({ passage, score: BriefDesk.score(passage, words) }))
-      .filter((r) => r.score > 0)
-      .sort((a, b) => b.score - a.score || (a.passage.id < b.passage.id ? -1 : 1))
-      .slice(0, limit);
-    return {
-      ok: true,
-      node: usable.node.id,
-      query: String(args.query),
-      count: ranked.length,
-      passages: ranked.map((r) => BriefDesk.summary(usable.node, r.passage)),
-    };
   }
 
   /**
@@ -443,6 +145,7 @@ export class BriefDesk {
         "From": usable.node.label,
         "Passage": record.section ? `${record.title || record.item}, ${record.section}` : (record.title || record.item),
         "Address": address,
+        "Excerpt": BriefDesk.excerpt(record.text, 240),
         "Check": "The page checks the passage against its published digest before it adds it.",
       },
     };
@@ -467,59 +170,6 @@ export class BriefDesk {
         // previewChange() refuses: the passage is not there.
       }
     }
-  }
-
-  /**
-   * Find one passage by the first 16 characters of its id.
-   *
-   * :param args: node and passage.
-   * :return: {ok, node, record} or a refusal.
-   */
-  async find(args) {
-    const usable = this.usableNode(args.node);
-    if (!usable.ok) {
-      return usable;
-    }
-    const passages = await this.passagesOf(usable.node);
-    const record = passages.find((p) => p.id.startsWith(String(args.passage)));
-    if (!record || String(args.passage).length !== 16) {
-      return {
-        ok: false,
-        reason: `The node ${usable.node.id} has no passage "${args.passage}". Use a passage value from a search result.`,
-        field: "passage",
-      };
-    }
-    return { ok: true, node: usable.node, record };
-  }
-
-  /**
-   * Read one passage in full and check it against the digest the node published.
-   * Changes nothing on the page.
-   *
-   * :param args: node and passage.
-   * :return: The passage with digest, digestMatches, licence and address, or a refusal.
-   */
-  async read(args) {
-    const found = await this.find(args);
-    if (!found.ok) {
-      return found;
-    }
-    const { node, record } = found;
-    const computed = await this.sha256Hex(record.text);
-    return {
-      ok: true,
-      node: node.id,
-      passage: record.id.slice(0, 16),
-      title: record.title || record.item,
-      section: record.section || "",
-      address: BriefDesk.address(record),
-      text: record.text.length > BriefDesk.READ_LIMIT ? `${record.text.slice(0, BriefDesk.READ_LIMIT)}…` : record.text,
-      truncated: record.text.length > BriefDesk.READ_LIMIT,
-      digest: record.digest,
-      digestMatches: computed === record.digest,
-      license: record.license || "",
-      licenseUrl: record.license_url || "",
-    };
   }
 
   // ---------------------------------------------------------------- writes
@@ -568,6 +218,7 @@ export class BriefDesk {
       address,
       digest: record.digest,
       digestMatches: true,
+      check: null, // what checkBrief() last found: "unchanged", "changed", "moved", "gone" or "not checked"
       excerpt: BriefDesk.excerpt(record.text, 320),
       license: record.license || "",
       licenseUrl: record.license_url || "",
@@ -646,7 +297,67 @@ export class BriefDesk {
       lines.push(`- **${where}**: ${card.excerpt}`);
       lines.push(`  Source: <${card.address}> (sha-256 ${card.digest}; the text matched this digest when it was added)`);
     }
+    if (this.cards.length) {
+      lines.push("", `To see whether a passage has changed since, paste this brief under "Check a saved brief" at <${this.home}>.`);
+    }
     return `${lines.join("\n")}\n`;
+  }
+
+  // ---------------------------------------------------------------- checking again
+
+  /**
+   * Read every card's passage again from its node and compare it with the digest the card
+   * holds. Marks each card with what was found; the brief itself is not changed.
+   *
+   * :return: {ok, checked, unchanged, results}, each result with the card id, or a refusal.
+   */
+  async checkBrief() {
+    if (this.cards.length === 0) {
+      return { ok: false, reason: "The brief is empty, so there is nothing to check.", field: "brief" };
+    }
+    const cards = [...this.cards];
+    const found = await this.verifyAll(cards.map((c) => ({ address: c.address, digest: c.digest })));
+    found.results = found.results.map((result, i) => ({ card: cards[i].card, ...result }));
+    for (const result of found.results) {
+      const card = this.cards.find((c) => c.card === result.card);
+      if (card) {
+        card.check = result.status;
+        card.digestMatches = result.status === "unchanged" || (result.status === "not checked" && card.digestMatches);
+      }
+    }
+    this.render();
+    return found;
+  }
+
+  /**
+   * Check a brief that was saved as Markdown, here or by someone else: read each cited
+   * passage from its node now and compare it with the digest the brief holds.
+   *
+   * :param markdown: The saved brief.
+   * :return: {ok, checked, unchanged, results} or a refusal.
+   */
+  async checkSaved(markdown) {
+    const entries = BriefDesk.savedEntries(markdown);
+    if (entries.length === 0) {
+      return { ok: false, reason: "No cited passage was found. Paste a brief copied from this page: each source line holds an address and a sha-256 digest.", field: "markdown" };
+    }
+    return this.verifyAll(entries);
+  }
+
+  /**
+   * What one check result means, in words a visitor reads.
+   *
+   * :param result: What verify() returned.
+   * :return: A short sentence.
+   */
+  static verdict(result) {
+    const words = {
+      "unchanged": "Unchanged: the node publishes the same text now.",
+      "changed": "Changed: the node now publishes other text at this address.",
+      "moved": "Moved: the same text is still on the item, under another passage address.",
+      "gone": "Gone: the item no longer has this passage.",
+    };
+    return words[result.status] || `Not checked. ${result.reason}`;
   }
 
   // ---------------------------------------------------------------- rendering
@@ -670,18 +381,32 @@ export class BriefDesk {
     return node;
   }
 
-  /** Draw the brief, its count and the node list from the state. A reader with no page draws nothing. */
+  /**
+   * The mark beside a card: its check when it was added, or what the last check found.
+   *
+   * :param card: One card of the brief.
+   * :return: The text of the mark.
+   */
+  static mark(card) {
+    const marks = {
+      "unchanged": " ✓ unchanged since it was added",
+      "changed": " ✗ changed since it was added",
+      "moved": " ✗ moved since it was added",
+      "gone": " ✗ gone since it was added",
+      "not checked": " ✓ digest matched when added; not checked again",
+    };
+    return marks[card.check] || " ✓ digest matches";
+  }
+
+  /** Draw the brief, its count and the node list from the state. */
   render() {
-    if (!this.doc) {
-      return;
-    }
     const list = this.doc.getElementById("desk-brief");
     const items = this.cards.map((card) => {
       const item = this.element("li", null, { "data-card": card.card });
       const where = card.section ? `${card.title} — ${card.section}` : card.title;
       item.append(
         this.element("a", where, { href: card.address }),
-        this.element("span", " ✓ digest matches", { class: "desk-ok", title: `sha-256 ${card.digest}` }),
+        this.element("span", BriefDesk.mark(card), { class: card.digestMatches ? "desk-ok" : "desk-bad", title: `sha-256 ${card.digest}` }),
         this.element("p", card.excerpt),
         this.element("p", `From ${card.nodeLabel}. Card ${card.card}.`, { class: "desk-meta" }),
       );
@@ -733,6 +458,35 @@ export class BriefDesk {
     }));
   }
 
+  /**
+   * Ask the visitor to confirm with a dialog of two named buttons. Escape declines.
+   *
+   * :param content: title, sentence, confirm and decline (the two button labels).
+   * :return: True when the visitor pressed the confirm button.
+   */
+  confirm(content) {
+    return new Promise((resolve) => {
+      const dialog = this.doc.createElement("dialog");
+      dialog.className = "assistant-review";
+      dialog.setAttribute("aria-labelledby", "desk-confirm-title");
+      const heading = this.element("h2", content.title, { id: "desk-confirm-title" });
+      // Start on the heading, which Enter cannot activate, so a stray Enter confirms nothing.
+      heading.tabIndex = -1;
+      heading.autofocus = true;
+      const confirmButton = this.element("button", content.confirm, { type: "button" });
+      confirmButton.addEventListener("click", () => dialog.close("confirm"));
+      const declineButton = this.element("button", content.decline, { type: "button", class: "assistant-decline" });
+      declineButton.addEventListener("click", () => dialog.close("decline"));
+      dialog.addEventListener("close", () => {
+        dialog.remove();
+        resolve(dialog.returnValue === "confirm");
+      });
+      dialog.append(heading, this.element("p", content.sentence), confirmButton, declineButton);
+      this.doc.body.append(dialog);
+      dialog.showModal();
+    });
+  }
+
   /** Connect the page's own form, buttons and checkboxes to the operations. */
   connect() {
     const status = this.doc.getElementById("desk-status");
@@ -751,9 +505,63 @@ export class BriefDesk {
         status.textContent = `The search could not read the node: ${error.message}`;
       }
     });
-    this.doc.getElementById("desk-discard").addEventListener("click", () => {
-      const result = this.discard({ expectedVersion: this.version });
+    this.doc.getElementById("desk-discard").addEventListener("click", async () => {
+      // The page cannot bring a discarded brief back, so its own button asks first, as the
+      // assistant's action does.
+      const version = this.version;
+      const check = this.checkDiscard({ expectedVersion: version });
+      if (!check.ok) {
+        status.textContent = check.reason;
+        return;
+      }
+      const confirmed = await this.confirm({
+        title: "Discard the whole brief?",
+        sentence: `${check.count} card${check.count === 1 ? " leaves" : "s leave"} the brief. This page cannot bring them back.`,
+        confirm: "Discard the brief",
+        decline: "Keep the brief",
+      });
+      if (!confirmed) {
+        status.textContent = "The brief was kept.";
+        return;
+      }
+      const result = this.discard({ expectedVersion: version });
       status.textContent = result.ok ? `Discarded ${result.discarded} card${result.discarded === 1 ? "" : "s"}.` : result.reason;
+    });
+    this.doc.getElementById("desk-check").addEventListener("click", async () => {
+      status.textContent = "Reading the passages again…";
+      try {
+        const result = await this.checkBrief();
+        status.textContent = result.ok
+          ? `Checked again: ${result.unchanged} of ${result.results.length} card${result.results.length === 1 ? "" : "s"} unchanged.`
+          : result.reason;
+      } catch (error) {
+        status.textContent = `The check could not finish: ${error.message}`;
+      }
+    });
+    this.doc.getElementById("desk-saved-check").addEventListener("click", async () => {
+      const report = this.doc.getElementById("desk-saved-status");
+      const list = this.doc.getElementById("desk-saved-results");
+      report.textContent = "Reading the passages…";
+      list.replaceChildren();
+      try {
+        const result = await this.checkSaved(this.doc.getElementById("desk-saved-text").value);
+        if (!result.ok) {
+          report.textContent = result.reason;
+          return;
+        }
+        report.textContent = `${result.unchanged} of ${result.results.length} cited passage${result.results.length === 1 ? "" : "s"} unchanged.`;
+        list.replaceChildren(...result.results.map((r) => {
+          const item = this.element("li");
+          // Only an address this page read from one of its nodes becomes a link.
+          item.append(
+            r.status === "not checked" ? this.element("span", r.address) : this.element("a", r.address, { href: r.address }),
+            this.element("p", BriefDesk.verdict(r), { class: r.status === "unchanged" ? "desk-ok" : "desk-bad" }),
+          );
+          return item;
+        }));
+      } catch (error) {
+        report.textContent = `The check could not finish: ${error.message}`;
+      }
     });
     this.doc.getElementById("desk-copy").addEventListener("click", async () => {
       try {
