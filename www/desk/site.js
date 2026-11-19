@@ -24,6 +24,18 @@ export class AssistantMount {
    * leave this empty.
    */
   static DIALOGS = {
+    add_card: {
+      title: "Add this passage to your brief?",
+      sentence: "The assistant asks to add the passage below as a cited card. You can remove it later.",
+      confirm: "Add the card",
+      decline: "Don't add it",
+    },
+    remove_card: {
+      title: "Remove this card from your brief?",
+      sentence: "The assistant asks to remove the card below. You can add the passage again later.",
+      confirm: "Remove the card",
+      decline: "Keep the card",
+    },
     discard_brief: {
       title: "Discard the whole brief?",
       sentence: "Every card below leaves the brief. This page cannot bring them back.",
@@ -110,6 +122,11 @@ export class AssistantMount {
     // runtime's dialog, which names the partner's origin, and this page's check never runs.
     const own = items.length === 1 && items[0].origin === pageOrigin;
     if (own && Object.hasOwn(AssistantMount.DIALOGS, items[0].action)) {
+      // An add loads the passage the dialog shows first, so a passage the page would refuse
+      // opens no dialog. Other actions need nothing loaded and open their dialog at once.
+      if (items[0].action === "add_card") {
+        await BriefDesk.page.preparePreview(items[0].action, items[0].arguments);
+      }
       const content = AssistantMount.dialogContent(items[0]);
       if (content.refusal) {
         // A dialog would offer a button that cannot work. The runtime runs nothing
@@ -203,6 +220,10 @@ export class AssistantMount {
    * :return: Details by label, {refusal: reason}, or {} when the action has none.
    */
   static reviewDetails(action, args) {
+    if (action === "add_card" || action === "remove_card") {
+      const preview = BriefDesk.page.previewChange(action, args);
+      return preview.ok ? preview.details : { refusal: preview.reason };
+    }
     if (action === "discard_brief") {
       const check = BriefDesk.page.checkDiscard(args);
       if (!check.ok) {
