@@ -89,7 +89,9 @@ export class PassageReader {
   }
 
   /**
-   * Read a public file as text. Sends no credentials and follows no redirect.
+   * Read a public file as text. Sends no credentials, follows no redirect, and asks the
+   * site again each time instead of trusting a copy the browser kept, so that a later
+   * check compares with what the node publishes now.
    *
    * :param url: The address to read.
    * :return: The text of the file.
@@ -101,7 +103,7 @@ export class PassageReader {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), PassageReader.FILE_TIMEOUT_MS);
     try {
-      const response = await fetch(url, { credentials: "omit", redirect: "error", signal: controller.signal });
+      const response = await fetch(url, { credentials: "omit", redirect: "error", cache: "no-cache", signal: controller.signal });
       if (!response.ok) {
         throw new Error(`${url} answered ${response.status}`);
       }
