@@ -20,7 +20,7 @@ From the Chrome Web Store: [WebAIAssist](https://chromewebstore.google.com/detai
 
 Or load the release zip yourself:
 
-1. Download `webaiassist-0.1.0.zip` from the [releases page](https://repo.invalid/releases) and unzip it.
+1. Download `webaiassist-0.1.1.zip` from the [releases page](https://repo.invalid/releases) and unzip it.
 2. Open `chrome://extensions` and turn on **Developer mode**.
 3. Choose **Load unpacked** and pick the unzipped folder.
 
@@ -74,7 +74,7 @@ Pick one in the panel or in Options. The panel picks one for you and says why.
 
 | Where it runs | What runs it | What leaves the computer |
 |---|---|---|
-| In the browser, on the graphics card | WebLLM on WebGPU: Qwen3 0.6B or Qwen3.5 2B; Llama 3.2 3B and Gemma 4 E2B, marked slow | Only the download of the model files, once, from `huggingface.co`. Your questions, the page text and the results stay. |
+| In the browser, on the graphics card | llama.cpp in WebAssembly with WebGPU: Qwen3 1.7B (the default), Qwen3 0.6B, Qwen3.5 2B or Llama 3.2 3B; Gemma 4 E2B, marked slow (Chrome 137 or newer) | Only the download of the model files, once, from `huggingface.co`. Your questions, the page text and the results stay. |
 | In the browser, on the processor and memory | llama.cpp in WebAssembly: Qwen3 0.6B, Qwen3 1.7B or Qwen3.5 2B (Chrome 137 or newer) | The same: the model download only. |
 | Chrome's built-in model | Chrome's own model (Gemini Nano), under Google's terms | Nothing from this extension. Chrome downloads and runs the model. |
 | Your own server on this computer | An address on `localhost` or `127.0.0.1`: Ollama, LM Studio or another OpenAI-style server | The conversation goes to that local address. It does not leave the computer. |
@@ -92,21 +92,22 @@ There is no account and no analytics. Every host the extension can reach, and wh
 
 ## Limits
 
-- Chromium browsers only. Chrome 126 or later; the processor models need Chrome 137. Tried: Chrome 157.0.8103.52 on Windows (built-in model, 15 November 2026) and Chromium 156.0.8078.4 (automated tests).
+- Chromium browsers only. Chrome 126 or later; the models in the browser, on the graphics card or the processor, need Chrome 137. Tried: Chrome 157.0.8103.52 on Windows (built-in model, 15 November 2026) and Chromium 156.0.8078.4 (automated tests).
 - WebMCP is a draft, not a W3C Standard, and its shape may still change. In Chrome it needs the switch above.
 - A page has tools only if its own scripts register them through WebMCP.
 - Answers can be wrong, because they come from an AI model. Check anything that matters.
-- Small models pick tools less reliably than large ones. On 15 November 2026, Chrome's built-in model used a tool in 5 of 5 questions on the test node and in 5 of 5 on the live node, and called the whole expected sequence in 4 of 5 on each. On one laptop graphics card (16 November 2026), Qwen3 0.6B picked the right tool in 8 of 10 test-node questions and in 2 of 10 on the live node.
-- The model in the browser needs WebGPU. Qwen3 0.6B needs about 1.4 GB of graphics memory, Qwen3.5 2B and Llama 3.2 3B about 2.3 GB, Gemma 4 E2B about 3.4 GB. Llama 3.2 3B and Gemma 4 E2B are marked slow in the list: on one laptop graphics card both ran past five minutes on their first question.
+- Small models pick tools less reliably than large ones. On 15 November 2026, Chrome's built-in model used a tool in 5 of 5 questions on the test node and in 5 of 5 on the live node, and called the whole expected sequence in 4 of 5 on each. On one laptop with two graphics cards (18 November 2026, version 0.1.1), the default model, Qwen3 1.7B, picked the right tool in 8 of 10 test-node questions and in 5 of 10 on the live node, on both cards, with a median answer of 9 to 20 seconds.
+- A model on the graphics card needs WebGPU. Qwen3 0.6B needs about 0.7 GB of graphics memory, Qwen3 1.7B about 1.4 GB, Qwen3.5 2B about 1.6 GB, Llama 3.2 3B about 2.4 GB, Gemma 4 E2B about 3.5 GB. Gemma 4 E2B is marked slow in the list: on one laptop it took 1 to 2.5 minutes an answer.
+- On a laptop with two graphics cards the browser decides which one the extension gets; the extension cannot choose.
 - The extension asks before tool calls, but it cannot check what a page's tool really does.
 
 ## Works with
 
 | Part | Version |
 |---|---|
-| This extension | 0.1.0, the first release |
+| This extension | 0.1.1 (19 November 2026): one engine, llama.cpp, for every model in the browser. 0.1.0 was the first release |
 | AgenticSystemCore specification | 1.1.0, the version the two public nodes (agenticsystemcore.com and patterns.agenticsystemcore.com) state on 14 November 2026 |
-| Chrome | 126 or later; the processor models need 137 |
+| Chrome | 126 or later; the models in the browser need 137 |
 | WebMCP draft | Draft Community Group Report of 13 November 2026, Web Machine Learning Community Group. A draft: not a W3C Standard |
 
 "Works with" says the extension can read what a node publishes and call its tools. It does not say that any body or company has checked the extension, or that it meets a specification.
