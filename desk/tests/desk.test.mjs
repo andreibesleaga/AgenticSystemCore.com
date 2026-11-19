@@ -289,16 +289,15 @@ BriefDeskTest.testFileCheck = async () => {
     page.setAllowed("patterns", true);
     FIXTURES.linksets.set(linkset, () => Fixtures.linkset(FIXTURES.patterns, [...FIXTURES.patternCards, FIXTURES.core[0]]));
     await assert.rejects(page.search({ node: "patterns", query: "supervisor" }), /does not match the digest that patterns\.agenticsystemcore\.com publishes/);
-    // A node with no readable discovery document is read, and the read says the file was not checked.
+    // A node whose discovery document cannot be read is not used either: nothing is read unchecked.
     FIXTURES.linksets.delete(linkset);
-    const unchecked = await page.read({ node: "patterns", passage: ID(FIXTURES.patternCards[0]) });
-    assert.equal(unchecked.ok, true);
-    assert.equal(unchecked.digestMatches, true);
-    assert.equal(unchecked.fileCheck, "unreadable");
-    // A discovery document that names the file without a digest says so.
+    await assert.rejects(page.read({ node: "patterns", passage: ID(FIXTURES.patternCards[0]) }), /could not be checked, because the discovery document of patterns\.agenticsystemcore\.com could not be read/);
+    // Nor one whose discovery document names the file without a digest.
     FIXTURES.linksets.set(linkset, () => ({ linkset: [{ item: [{ href: `${FIXTURES.patterns}/chunks.jsonl` }] }] }));
-    page.forget();
-    assert.equal((await page.read({ node: "patterns", passage: ID(FIXTURES.patternCards[0]) })).fileCheck, "not published");
+    await assert.rejects(page.read({ node: "patterns", passage: ID(FIXTURES.patternCards[0]) }), /has no digest in the discovery document/);
+    // With the digest published again, the node is read.
+    FIXTURES.linksets.set(linkset, published);
+    assert.equal((await page.read({ node: "patterns", passage: ID(FIXTURES.patternCards[0]) })).fileCheck, "matches");
   } finally {
     FIXTURES.linksets.set(linkset, published);
     page.setAllowed("patterns", false);

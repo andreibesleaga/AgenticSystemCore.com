@@ -41,7 +41,7 @@ export class DeskNode {
     this.own = own;
     this.allowed = own;
     this.passages = null; // loaded on first use
-    this.fileCheck = null; // "matches", "not published" or "unreadable", once loaded
+    this.fileCheck = null; // "matches" once the passage file is loaded and checked
   }
 
   /** The address the node's passage file is read from. */
@@ -305,8 +305,9 @@ export class PassageReader {
    *
    * :param node: The node to load.
    * :return: The list of passages.
-   * :raises Error: When the file cannot be read, is not the expected format, or differs
-   *   from the digest the node's discovery document publishes for it.
+   * :raises Error: When the file cannot be read or is not the expected format, and when it
+   *   cannot be checked: the discovery document cannot be read, publishes no digest for
+   *   the file, or publishes another digest. A node's passages are used only when checked.
    */
   async passagesOf(node) {
     if (node.passages) {
@@ -329,8 +330,13 @@ export class PassageReader {
       passages.push(record);
     }
     const fileCheck = await this.checkFile(node, text);
-    if (fileCheck === "differs") {
-      throw new Error(`${node.chunksUrl} does not match the digest that ${node.host} publishes for it in its discovery document, so it was not used`);
+    if (fileCheck !== "matches") {
+      const why = {
+        "differs": `does not match the digest that ${node.host} publishes for it in its discovery document`,
+        "not published": `has no digest in the discovery document of ${node.host}`,
+        "unreadable": `could not be checked, because the discovery document of ${node.host} could not be read`,
+      };
+      throw new Error(`${node.chunksUrl} ${why[fileCheck]}, so it was not used`);
     }
     node.fileCheck = fileCheck;
     node.passages = passages;
@@ -499,8 +505,8 @@ export class PassageReader {
    * Changes nothing.
    *
    * :param args: node and passage.
-   * :return: The passage with digest, digestMatches, fileCheck, licence and address, or a
-   *   refusal.
+   * :return: The passage with digest, digestMatches, fileCheck (always "matches": a file
+   *   that is not checked is not used), licence and address, or a refusal.
    */
   async read(args) {
     const found = await this.find(args);
