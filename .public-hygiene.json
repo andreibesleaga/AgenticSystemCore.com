@@ -125,6 +125,18 @@
       "path": "www/docs/recipe-notes-apps/index.html",
       "text": "hydration.md",
       "reason": "a sample command and the lines it printed: the link is the text being converted in the example, not a link of this page"
+    },
+    {
+      "check": "missing-file",
+      "path": "desk/tests/fixtures/peers/patterns/agents/bridge/action-bridge.html",
+      "text": "../runtime/action-bridge.js",
+      "reason": "a test fixture: the peer node's published bridge page without its copy of the runtime files, which the tests do not load (desk/tests/interop.test.mjs)"
+    },
+    {
+      "check": "missing-file",
+      "path": "desk/tests/fixtures/peers/standards/agents/bridge/action-bridge.html",
+      "text": "../runtime/action-bridge.js",
+      "reason": "a test fixture: the peer node's published bridge page without its copy of the runtime files, which the tests do not load (desk/tests/interop.test.mjs)"
     }
   ]
 }

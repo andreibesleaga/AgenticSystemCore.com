@@ -74,7 +74,32 @@ try {
     return { status: receipts[0].status, count: receipts[0].result.count, names: engine.actions.catalog(scope).map((e) => `${e.name}:${e.effect}`).sort() };
   });
   check("the runtime runs a read action of the page", read.status === "succeeded" && read.count > 0, `${read.count} passage(s)`);
-  check("six actions are registered; every change to the brief asks first", read.names.join(" ") === "add_card:irreversible discard_brief:irreversible get_desk_state:read read_passage:read remove_card:irreversible search_passages:read", read.names.join(" "));
+  check("seven actions are registered; every change to the brief asks first", read.names.join(" ") === "add_card:irreversible check_brief:read discard_brief:irreversible get_desk_state:read read_passage:read remove_card:irreversible search_passages:read", read.names.join(" "));
+
+  // The checks behind a card: the passage file against the node's discovery document, then
+  // the brief again, then the brief as someone else would receive it, with one digest altered.
+  const checks = await page.evaluate(async () => {
+    const { BriefDesk } = await import("/desk/page.js");
+    const desk = BriefDesk.page;
+    const card = desk.getState().brief.cards[0];
+    const id = card.address.slice(-16);
+    const read = await desk.read({ node: "core", passage: id });
+    const markdown = desk.briefMarkdown();
+    const wrong = `${card.digest[0] === "0" ? "1" : "0"}${card.digest.slice(1)}`;
+    return { fileCheck: read.fileCheck, digestMatches: read.digestMatches, altered: markdown.replace(card.digest, wrong) };
+  });
+  check("the passage file matches the digest in the node's discovery document", checks.fileCheck === "matches" && checks.digestMatches === true, checks.fileCheck);
+  await page.click("#desk-check");
+  await page.waitForFunction(() => /^Checked again/.test(document.querySelector("#desk-status").textContent), null, { timeout: 20000 });
+  check("checking the brief again finds the card unchanged", (await page.textContent("#desk-status")) === "Checked again: 1 of 1 card unchanged." && /unchanged since it was added/.test(await page.textContent("#desk-brief li .desk-ok")), await page.textContent("#desk-status"));
+  await page.click(".desk-saved summary");
+  await page.fill("#desk-saved-text", checks.altered);
+  await page.click("#desk-saved-check");
+  await page.waitForSelector("#desk-saved-results li");
+  const savedStatus = await page.textContent("#desk-saved-status");
+  const verdict = await page.textContent("#desk-saved-results li p");
+  await shot("5-saved-brief");
+  check("a saved brief with an altered digest is reported as changed", savedStatus === "0 of 1 cited passage unchanged." && /^Changed:/.test(verdict), `${savedStatus} / ${verdict}`);
 
   // The confirmation dialog of the irreversible action: decline, then Escape. Nothing runs.
   const dialog = async (press) => {
@@ -99,6 +124,14 @@ try {
   check("Escape declines", escaped.answer === false);
   check("the brief is unchanged after two declines", await page.locator("#desk-brief li").count() === 1);
 
+  // The page's own Discard button asks first too: keep, then discard.
+  await page.click("#desk-discard");
+  await page.waitForSelector("dialog.assistant-review[open]");
+  const ownTitle = await page.textContent("dialog.assistant-review h2");
+  await page.click("dialog.assistant-review .assistant-decline");
+  const kept = await page.locator("#desk-brief li").count() === 1 && (await page.textContent("#desk-status")) === "The brief was kept.";
+  check("the page's own Discard button asks first, and declining keeps the brief", ownTitle === "Discard the whole brief?" && kept, ownTitle);
+
   // The consent card for a partner site: shown, named, declined. Nothing is sent.
   const consent = page.evaluate(() => window.__nsweb.engine.onConsent({
     kind: "network", peerLabel: "Standards Map", peerOrigin: "standards.agenticsystemcore.com",
@@ -113,6 +146,10 @@ try {
   await buttons.nth(labels.findIndex((l) => /decline|don.t|no/i.test(l))).click();
   check("declining the card answers decline", (await consent) === "decline", labels.join(" / "));
   check("still no other origin was contacted", asked().length === 0, asked().slice(0, 3).join(" | "));
+  await page.click("#desk-discard");
+  await page.waitForSelector("dialog.assistant-review[open]");
+  await page.click("dialog.assistant-review button:not(.assistant-decline)");
+  check("confirming discards the brief", await page.locator("#desk-brief li").count() === 0 && (await page.textContent("#desk-status")) === "Discarded 1 card.", await page.textContent("#desk-status"));
   check("no script or policy error at the end", errors.length === 0, errors.slice(0, 3).join(" | "));
 } catch (error) {
   check("the browser check ran to its end", false, String(error).split("\n")[0]);

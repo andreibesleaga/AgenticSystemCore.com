@@ -1,0 +1,11 @@
+{
+  "networks": [
+    {
+      "name": "pattern_cards"
+    }
+  ],
+  "actions": {
+    "version": 1,
+    "module": "./bridge-actions.js"
+  }
+}

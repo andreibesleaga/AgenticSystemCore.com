@@ -13,8 +13,9 @@ It follows the [Worldwide Agentic Web MVP specification](https://github.com/cogn
 | Path | What it is |
 |---|---|
 | `section.html` | the page body; `scripts/build.js` draws it in the site's frame at `/desk/` |
-| `page.js` | the page logic: search, read with the digest check, the brief; the page's buttons and the assistant call the same methods |
-| `site-actions.js` | the six actions the page's own agents get (`website_*` tools) |
+| `reader.js` | reads and checks a node's published passages: search, read with the digest check, the check of the passage file against the node's discovery document, and the later check of a noted digest; used by the page, by this site's bridge and by the bridges of the two peer nodes |
+| `page.js` | the page: the visitor's consent per node, the brief, checking a brief again, what is drawn; the page's buttons and the assistant call the same methods |
+| `site-actions.js` | the seven actions the page's own agents get (`website_*` tools) |
 | `bridge/bridge-actions.js` | the two reads shared with every calling site: search and read, this node only |
 | `site.js` | boots the runtime, the confirmation dialog, the consent card's focus |
 | `brief_desk.hocon` | the agent network, source of truth |
@@ -29,7 +30,20 @@ The network's address is `https://agenticsystemcore.com/desk/brief_desk`. It can
 networks of the two peer nodes, each after the visitor agrees:
 `https://patterns.agenticsystemcore.com/agents/pattern_cards` and
 `https://standards.agenticsystemcore.com/agents/standards_map`. Those are written by
-`../tools/agentify-node.mjs` in each node's repository.
+`../tools/agentify-node.mjs` in each node's repository, with a bridge that shares two reads
+over that node's own passages (search, and read with the digest check), so a peer's guide
+answers from passages it read and checked.
+
+## What the checks show
+
+A node publishes each passage with the SHA-256 digest of its text (`/chunks.jsonl`) and the
+digest of that whole file in its discovery document (`/.well-known/knowledge-linkset`).
+`reader.js` compares the file with the one and each passage with the other. Both digests
+come from the same site as the text: a match shows that the node's files agree and arrived
+whole, not that the text is true, and not that the publisher left it alone. The check that
+does not depend on the node is the later one: a brief keeps each card's digest, and
+**Check the brief again**, or **Check a saved brief** on a brief copied as Markdown, reads
+each passage again and reports it unchanged, changed, moved or gone.
 
 ## Commands
 
@@ -37,7 +51,7 @@ From the repository root:
 
 ```sh
 node desk/tools/build_network.mjs desk/brief_desk.hocon --manifest desk/agent-manifest.json   # after editing the .hocon or the manifest
-node --test "desk/tests/*.test.mjs"                                                            # no browser, no network, no model
+node --test "desk/tests/*.test.mjs" tools/agentify-node.test.mjs                               # no browser, no network, no model
 node scripts/build.js && node scripts/check.js                                                 # the site, with /desk/
 node scripts/serve-www.mjs --port 8090                                                         # the built site with its real headers
 CHROME_EXE=<chromium> PW_MODULES=<folder with node_modules/playwright-core> node desk/tests/browser-check.mjs --base http://127.0.0.1:8090
@@ -63,4 +77,7 @@ that provider, never to a peer site. To stop using it, select **Delete setup** u
 [cognizant-ai-labs/agentic-web](https://github.com/cognizant-ai-labs/agentic-web) at commit
 `29a4226`, Apache-2.0 (`runtime/LICENSE.txt`, `tools/LICENSE.txt`); they are not changed, except one import path in
 `tests/linking/example_web.mjs`, which points at `../../runtime/`.
+`site.js` and `tests/agentified.test.mjs` are that repository's templates (`templates/site.js`
+and its test template, Apache-2.0), filled in for this page. `bridge/action-bridge.html`
+is its bridge page, written by `tools/build_network.mjs`.
 The rest of this folder is this repository's own code, Apache-2.0.

@@ -5,10 +5,10 @@
       "name": "standards_map",
       "front_man": "standards_map_guide",
       "hocon": "./standards_map.network.json",
-      "description": "Says which cards of Standards Map cover a subject, with their addresses.",
+      "description": "Answers from the published passages of Standards Map, each checked against its digest, with their addresses.",
       "tags": [
         "knowledge-node",
-        "table-of-contents"
+        "verified-citations"
       ],
       "sample_queries": [
         "What does Standards Map offer on AI usage preferences (IETF drafts)?",
@@ -26,7 +26,7 @@
   "peer_policy": {
     "mode": "closed",
     "deny_origins": [],
-    "note": "This network calls no other site and no tool."
+    "note": "This network calls no other site. Its two tools read this site's own published passages."
   },
   "agent_mcp": {
     "protocol": "nsdeploy-agent-mcp/v1",
@@ -66,5 +66,13 @@
     "title": "Standards Map",
     "generated_from": "https://standards.agenticsystemcore.com/chunks.jsonl",
     "cards": 29
+  },
+  "actions": {
+    "version": 1,
+    "bridge": "./bridge/action-bridge.html",
+    "agentTools": [
+      "search_passages",
+      "read_passage"
+    ]
   }
 }

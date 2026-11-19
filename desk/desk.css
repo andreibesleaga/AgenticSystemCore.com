@@ -104,5 +104,9 @@ body > dialog button { margin-right: 8px; }
 .desk-list li { margin: 0 0 1rem; padding: 0.5rem 0.75rem; border: 1px solid var(--rule); background: var(--bg-alt); }
 .desk-list li p { margin: 0.25rem 0; }
 .desk-ok { color: var(--fg); font-weight: 600; }
+/* A failed check is said in words and a cross; the rule on the left does not carry it alone. */
+.desk-bad { color: var(--fg); font-weight: 600; border-left: 4px solid currentColor; padding-left: 0.5rem; }
+.desk-saved { margin: 1rem 0; }
+.desk-saved textarea { width: 100%; box-sizing: border-box; font-family: ui-monospace, monospace; font-size: 0.85em; }
 .desk-meta { color: var(--muted); font-size: 0.9em; }
 .desk-buttons button { margin-right: 0.5rem; }

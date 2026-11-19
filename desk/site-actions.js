@@ -47,6 +47,7 @@ class SiteActions {
     actions.register(SiteActions.stateAction());
     actions.register(SiteActions.searchAction());
     actions.register(SiteActions.readAction());
+    actions.register(SiteActions.checkAction());
     actions.register(SiteActions.addAction());
     actions.register(SiteActions.removeAction());
     actions.register(SiteActions.discardAction());
@@ -87,7 +88,7 @@ class SiteActions {
   static readAction() {
     return {
       name: "read_passage",
-      description: "Read one passage in full and check it: returns its text, its address, its licence, the SHA-256 digest its node published and digestMatches, which is true when the text read now has that digest. Use the text only when digestMatches is true. Changes nothing on the page.",
+      description: "Read one passage in full and check it: returns its text, its address, its licence, the SHA-256 digest its node published and digestMatches, which is true when the text read now has that digest. Use the text only when digestMatches is true. fileCheck says whether the node's whole passage file matched the digest in the node's discovery document. Changes nothing on the page.",
       effect: "read",
       inputSchema: {
         type: "object",
@@ -96,6 +97,17 @@ class SiteActions {
         properties: { node: SiteActions.nodeProperty(), passage: SiteActions.passageProperty() },
       },
       execute: (args) => BriefDesk.page.read(args),
+    };
+  }
+
+  /** Read every card's passage again and say which have changed. */
+  static checkAction() {
+    return {
+      name: "check_brief",
+      description: "Check the brief again: read every card's passage from its node now and compare it with the digest the card holds. Returns, per card, status unchanged, changed, moved, gone or not checked (with the reason), and how many are unchanged. The page marks each card with the result; no card is added or removed. Use it when the visitor asks whether the brief is still current. Returns ok false when the brief is empty.",
+      effect: "read",
+      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      execute: () => BriefDesk.page.checkBrief(),
     };
   }
 

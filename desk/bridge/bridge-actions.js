@@ -3,7 +3,7 @@
 // on this site's origin, which has no Brief Desk page. A calling site's agent can then
 // search this node's published passages and read one with its digest check, as the
 // page's own assistant does. Nothing else is shared: not the brief, not another node.
-import { BriefDesk } from "../page.js";
+import { PassageReader } from "../reader.js";
 
 /**
  * Shares two reads with every site that calls this network. They read only what this
@@ -13,23 +13,21 @@ class BridgeActions {
   /** Every caller: the passages are public facts the node publishes. */
   static CALLERS = ["*"];
 
-  /** The reader: this node only, read from this origin, with no page to draw. */
+  /** The reader: this node only, read from this origin. */
   static reader = null;
 
   /**
-   * The page-less reader of this node's passages, made on first use.
+   * The reader of this node's passages, made on first use.
    *
-   * :return: A BriefDesk with no page.
+   * :return: A PassageReader.
    */
   static desk() {
     if (!BridgeActions.reader) {
       // The bridge frame runs on this site's origin; a test that imports the module from disk
       // has no location, and reads the node at its published origin.
       const here = typeof location !== "undefined" && location.origin && location.origin !== "null" ? location.origin : "https://agenticsystemcore.com";
-      BridgeActions.reader = new BriefDesk(null, {
-        readFrom: here,
-        nodeOrigin: "https://agenticsystemcore.com",
-        nodes: [{ id: "core", label: "AgenticSystemCore (the format and its vocabulary)", origin: "https://agenticsystemcore.com" }],
+      BridgeActions.reader = new PassageReader({
+        nodes: [{ id: "core", label: "AgenticSystemCore (the format and its vocabulary)", origin: "https://agenticsystemcore.com", readFrom: here }],
       });
     }
     return BridgeActions.reader;

@@ -884,7 +884,15 @@ class AgentifiedSiteTest {
     await AgentifiedSiteTest.arrangeIrreversibleState(registry);
     const again = await AgentifiedSiteTest.readState(registry);
     assert.equal(again.brief.cards.length, 1);
+    // The page's own button asks first too: declining keeps the brief, confirming discards it.
     document.getElementById("desk-discard").dispatch("click");
+    document.body.children.at(-1).close("decline");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.equal((await AgentifiedSiteTest.readState(registry)).brief.cards.length, 1);
+    assert.equal(document.getElementById("desk-status").textContent, "The brief was kept.");
+    document.getElementById("desk-discard").dispatch("click");
+    document.body.children.at(-1).close("confirm");
+    await new Promise((resolve) => setTimeout(resolve, 0));
     const byButton = await AgentifiedSiteTest.readState(registry);
     assert.deepEqual(byButton.brief.cards, []);
     assert.equal(byButton.brief.version, again.brief.version + 1);
