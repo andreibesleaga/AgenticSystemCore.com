@@ -384,3 +384,40 @@ BriefDeskTest.testCheckASavedBrief = async () => {
 test("the passage file is checked against the digest in the node's discovery document", BriefDeskTest.testFileCheck);
 test("checking the brief again shows a changed, moved or removed passage", BriefDeskTest.testCheckTheBriefAgain);
 test("a saved brief can be checked later from its addresses and digests", BriefDeskTest.testCheckASavedBrief);
+
+/** A node of more than 500 items publishes a shard list; the reader reads the shards in order. */
+BriefDeskTest.testShardedPassageFile = async () => {
+  const origin = "https://big.example";
+  const first = [Fixtures.passage(origin, "one", "One", "", "The first shard holds the word alpha9.")];
+  const second = [Fixtures.passage(origin, "two", "Two", "", "The second shard holds the word beta9.")];
+  const list = `${JSON.stringify({ bundle_version: "sha256:0", lines_total: 2, shards: ["/chunks-01.jsonl", "/chunks-02.jsonl"] })}\n`;
+  const digest = (await import("node:crypto")).createHash("sha256").update(list, "utf8").digest("base64");
+  const files = new Map([
+    [`${origin}/chunks.jsonl`, list],
+    [`${origin}/chunks-01.jsonl`, Fixtures.fileText(first)],
+    [`${origin}/chunks-02.jsonl`, Fixtures.fileText(second)],
+    [`${origin}/.well-known/knowledge-linkset`, JSON.stringify({ linkset: [{ item: [{ href: `${origin}/chunks.jsonl`, digest: [`sha-256=:${digest}:`] }] }] })],
+  ]);
+  const asked = [];
+  const fetchText = async (url) => {
+    asked.push(url);
+    if (!files.has(url)) throw new Error(`${url} answered 404`);
+    return files.get(url);
+  };
+  const reader = new PassageReader({ nodes: [{ id: "big", label: "Big", origin }], fetchText });
+  const found = await reader.search({ node: "big", query: "beta9" });
+  assert.equal(found.count, 1);
+  const read = await reader.read({ node: "big", passage: found.passages[0].passage });
+  assert.equal(read.digestMatches, true);
+  assert.equal(read.fileCheck, "matches");
+  assert.equal((await reader.search({ node: "big", query: "alpha9" })).count, 1);
+  assert.deepEqual(asked, [`${origin}/chunks.jsonl`, `${origin}/chunks-01.jsonl`, `${origin}/chunks-02.jsonl`, `${origin}/.well-known/knowledge-linkset`]);
+  // A list that names anything but the node's own shard files is refused, and so is a long one.
+  files.set(`${origin}/chunks.jsonl`, JSON.stringify({ shards: ["https://elsewhere.example/chunks-01.jsonl"] }));
+  reader.forget();
+  await assert.rejects(reader.search({ node: "big", query: "alpha9" }), /not \/chunks-<nn>\.jsonl/);
+  files.set(`${origin}/chunks.jsonl`, JSON.stringify({ shards: Array.from({ length: 21 }, (_, i) => `/chunks-${String(i + 1).padStart(2, "0")}.jsonl`) }));
+  await assert.rejects(reader.search({ node: "big", query: "alpha9" }), /takes 20 at most/);
+};
+
+test("a sharded passage file is read shard by shard, from the node's own files only", BriefDeskTest.testShardedPassageFile);

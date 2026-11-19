@@ -65,6 +65,24 @@ function die(message) {
 }
 
 /**
+ * The text of a built node's passages: its chunks.jsonl, or, when that file is the shard
+ * list a node of more than 500 items publishes, the shards it names, joined in order.
+ *
+ * :param out: The built site's folder.
+ * :return: The passages, one JSON record per line.
+ */
+export function chunksText(out) {
+  const text = fs.readFileSync(path.join(out, 'chunks.jsonl'), 'utf8');
+  let list = null;
+  try { list = JSON.parse(text); } catch { return text; }
+  if (!list || !Array.isArray(list.shards)) return text;
+  return list.shards.map(shard => {
+    if (!/^\/chunks-[0-9]{2,4}\.jsonl$/.test(shard)) die(`chunks.jsonl names a shard that is not /chunks-<nn>.jsonl: ${shard}`);
+    return fs.readFileSync(path.join(out, shard.slice(1)), 'utf8');
+  }).join('');
+}
+
+/**
  * The node's knowledge cards, one per item, from its published passages.
  *
  * :param chunksText: The text of /chunks.jsonl.
@@ -283,7 +301,7 @@ function main(argv) {
   const label = flag('--label') || String(site.title || config.title || new URL(base).host);
   const name = flag('--name') || label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
   if (!/^[a-z][a-z0-9_]*$/.test(name)) die(`the network name "${name}" must be lower-case letters, digits and underscores`);
-  const cards = cardsOf(fs.readFileSync(chunks, 'utf8'), base);
+  const cards = cardsOf(chunksText(out), base);
   if (cards.length === 0) die('the node publishes no knowledge card');
   const tagline = String(site.tagline || '').replace(/\s+/g, ' ').trim() || `${label}.`;
   const { network, manifest, links } = networkOf({ base, title: label, tagline, name, label, cards });

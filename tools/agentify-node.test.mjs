@@ -9,7 +9,7 @@ import path from "node:path";
 import test from "node:test";
 import { pathToFileURL } from "node:url";
 import { AgentNetwork, validateNetwork } from "../desk/runtime/kernel.js";
-import { bridgeModule, bridgeRuntime, cardsOf, networkOf, withHeaders } from "./agentify-node.mjs";
+import { bridgeModule, bridgeRuntime, cardsOf, chunksText, networkOf, withHeaders } from "./agentify-node.mjs";
 
 const BASE = "https://node.example/";
 const sha = (text, encoding = "hex") => createHash("sha256").update(text, "utf8").digest(encoding);
@@ -95,4 +95,20 @@ test("the headers block opens the three JSON files, lets the bridge be framed, a
   assert.match(once, /\/agents\/bridge\/\*\n  ! X-Frame-Options\n  ! Content-Security-Policy\n  Content-Security-Policy: default-src 'none'; script-src 'self'; connect-src 'self'/);
   assert.equal(withHeaders(once, ["agent-manifest.json", "node_cards.network.json", "links.json"]), once);
   assert.ok(once.startsWith(before));
+});
+
+test("a node of more than 500 items is read from the shards its passage file lists", () => {
+  const out = fs.mkdtempSync(path.join(os.tmpdir(), "agentify-node-"));
+  try {
+    fs.writeFileSync(path.join(out, "chunks.jsonl"), `${JSON.stringify({ bundle_version: "sha256:0", lines_total: 3, shards: ["/chunks-01.jsonl", "/chunks-02.jsonl"] })}\n`);
+    fs.writeFileSync(path.join(out, "chunks-01.jsonl"), `${JSON.stringify(RECORDS[0])}\n`);
+    fs.writeFileSync(path.join(out, "chunks-02.jsonl"), `${JSON.stringify(RECORDS[1])}\n${JSON.stringify(RECORDS[2])}\n`);
+    assert.equal(chunksText(out), CHUNKS);
+    assert.equal(cardsOf(chunksText(out), BASE).length, 2);
+    // A node at or below 500 items: the file holds the passages itself.
+    fs.writeFileSync(path.join(out, "chunks.jsonl"), CHUNKS);
+    assert.equal(chunksText(out), CHUNKS);
+  } finally {
+    fs.rmSync(out, { recursive: true, force: true });
+  }
 });
