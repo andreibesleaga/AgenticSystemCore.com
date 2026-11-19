@@ -468,7 +468,8 @@ export class BriefDesk extends PassageReader {
     return new Promise((resolve) => {
       const dialog = this.doc.createElement("dialog");
       dialog.className = "assistant-review";
-      const heading = this.element("h2", content.title);
+      dialog.setAttribute("aria-labelledby", "desk-confirm-title");
+      const heading = this.element("h2", content.title, { id: "desk-confirm-title" });
       // Start on the heading, which Enter cannot activate, so a stray Enter confirms nothing.
       heading.tabIndex = -1;
       heading.autofocus = true;
