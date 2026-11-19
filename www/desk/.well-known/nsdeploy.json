@@ -1,0 +1,18 @@
+{
+  "protocol": "nsdeploy-link/v1",
+  "exports": [
+    {
+      "network": "brief_desk",
+      "front_man": "desk_assistant",
+      "aliases": [
+        "brief_desk",
+        "desk_assistant"
+      ],
+      "url": "brief_desk"
+    }
+  ],
+  "imports": [],
+  "link_updates": {
+    "mode": "browser-local"
+  }
+}

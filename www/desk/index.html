@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Brief Desk — AgenticSystemCore</title>
+<meta name="description" content="Search the published passages of a knowledge node, check each against its published digest, and collect cited cards in a brief, by hand or with an assistant that runs in your browser on your own AI provider key.">
+<link rel="canonical" href="https://agenticsystemcore.com/desk/">
+<link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json">
+<link rel="alternate" type="application/rss+xml" title="AgenticSystemCore releases" href="/changelog.xml">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/layout.css">
+<link rel="stylesheet" href="/desk/desk.css">
+<script src="/assets/theme.js"></script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://agenticsystemcore.com/desk/">
+<meta property="og:title" content="Brief Desk">
+<meta property="og:description" content="Search the published passages of a knowledge node, check each against its published digest, and collect cited cards in a brief, by hand or with an assistant that runs in your browser on your own AI provider key.">
+<meta property="og:site_name" content="AgenticSystemCore">
+<meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
+<meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="module" src="/desk/page.js"></script>
+<script type="module" src="/desk/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<nav aria-label="Site">
+<a class="brand" href="/">AgenticSystemCore</a>
+<ul>
+<li><a href="/docs/">Guide</a></li>
+<li><a href="/specs/">Specification</a></li>
+<li><a href="/concepts/">Vocabulary</a></li>
+<li><a href="/ns/">Ontology</a></li>
+<li><a href="/specs/agentic-knowledge/">Discovery</a></li>
+<li><a href="/query/">Query</a></li>
+<li><a href="/docs/standards/">Standards</a></li>
+<li><a href="/webaiassist/">WebAIAssist</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/search/">Search</a></li>
+</ul>
+<div class="theme" id="theme" hidden><select id="theme-select" aria-label="Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+</nav>
+</header>
+<main id="main">
+<h1>Brief Desk</h1>
+<p class="summary"><strong>Summary</strong>Search the passages a knowledge node publishes, check each against its published digest, and collect cited cards in a brief. Do it by hand, or ask the assistant: two published agents that run in your browser on your own AI provider key, and that ask before they discard anything or contact another site.</p>
+<p>Ask a question, or search by hand. Every passage this page shows comes from a file a knowledge node publishes, and each one is checked against the digest that node published for it before it goes into your brief. The assistant below runs in your browser, on the AI provider and key you choose; this site has no server behind it and never receives your key.</p>
+<section id="desk" class="desk" aria-labelledby="desk-heading" data-node-origin="https://agenticsystemcore.com">
+<h2 id="desk-heading">Search and collect</h2>
+<fieldset class="desk-nodes">
+<legend>Nodes to read</legend>
+<label><input type="checkbox" checked disabled> AgenticSystemCore: the format and its vocabulary (this site)</label>
+<label><input type="checkbox" id="desk-allow-patterns"> AgenticSystemCore Graph: cards on agent-system designs, at patterns.agenticsystemcore.com</label>
+<label><input type="checkbox" id="desk-allow-standards"> Standards Map: documents an agent-readable site builds on, at standards.agenticsystemcore.com</label>
+<p class="desk-meta">This page reads another site's published passages only after you tick it here. The assistant cannot tick it for you.</p>
+</fieldset>
+<form id="desk-search-form" class="desk-search">
+<label for="desk-query">Words to look for</label>
+<input id="desk-query" type="search" required minlength="2" maxlength="200" autocomplete="off">
+<label for="desk-node">In</label>
+<select id="desk-node">
+<option value="core">AgenticSystemCore</option>
+<option value="patterns">AgenticSystemCore Graph</option>
+<option value="standards">Standards Map</option>
+</select>
+<button type="submit">Search</button>
+</form>
+<p id="desk-status" role="status"></p>
+<ol id="desk-results" class="desk-list"></ol>
+<h2 id="desk-brief-heading">Your brief</h2>
+<p id="desk-brief-count">The brief is empty. Search, then add passages.</p>
+<ol id="desk-brief" class="desk-list"></ol>
+<p class="desk-buttons"><button type="button" id="desk-copy">Copy the brief as Markdown</button> <button type="button" id="desk-discard">Discard the brief</button></p>
+</section>
+<section id="assistant" class="assistant" aria-labelledby="assistant-heading">
+<h2 id="assistant-heading">Ask the Brief Desk</h2>
+<p>The assistant searches the nodes you allowed, reads passages, checks each against its published digest, answers with the passage's address, and adds or removes cards when you ask.</p>
+<p class="assistant-note">Your messages and the passages the assistant reads go to the AI provider you choose in the settings below. You confirm anything that cannot be undone before it happens, and you are asked before another site's assistant is contacted.</p>
+<p id="assistant-status" role="status">Connecting the assistant… If this message stays, the assistant could not load. You can still use the page directly.</p>
+<div id="agent-app">
+<div data-ns-slot="header"></div>
+<div class="assistant-panels">
+<div data-ns-slot="chat"></div>
+<div data-ns-slot="agents"></div>
+</div>
+<div data-ns-slot="settings"></div>
+</div>
+</section>
+<h2 id="how">How this page works</h2>
+<ul>
+<li><strong>The agents are published data.</strong> The network of two agents is the file <a href="/desk/brief_desk.network.json"><code>brief_desk.network.json</code></a>, named by <a href="/desk/agent-manifest.json"><code>agent-manifest.json</code></a>; its instructions are public. Another agentic website can load it by the address <code>https://agenticsystemcore.com/desk/brief_desk</code> and run it in its own visitor&#39;s browser.</li>
+<li><strong>The agents run in your browser.</strong> The runtime in <code>/desk/runtime/</code> is the open-source browser runtime of the <a href="https://github.com/cognizant-ai-labs/agentic-web">Open Agentic Web</a> project, unchanged. Model calls go from your browser to the provider you choose, with your key, which stays in this browser&#39;s storage for this site.</li>
+<li><strong>What the agents can do here is this page&#39;s own list.</strong> Six actions: read the page&#39;s state, search passages, read one passage and check its digest, add a card, remove a card, discard the brief. Discarding asks you first. Another site that runs this network gets two of them, search and read with the digest check, over this node&#39;s published passages only.</li>
+<li><strong>Every card is checked.</strong> A node publishes each passage with the SHA-256 digest of its text in <a href="/chunks.jsonl"><code>/chunks.jsonl</code></a>. The page computes the digest of the text it received and adds the card only when the two are equal. This shows that the text is the published text, not that it is true.</li>
+<li><strong>Other sites are asked only with your consent.</strong> The page reads another node&#39;s passages after you tick it. The assistant can also ask the assistant of <a href="https://patterns.agenticsystemcore.com/">patterns.agenticsystemcore.com</a> or <a href="https://standards.agenticsystemcore.com/">standards.agenticsystemcore.com</a>; a card names the site and shows the request before anything is sent.</li>
+</ul>
+<p>The page works without the assistant, and without a key: the search form and the brief use the same code the assistant calls. The source is in <a href="https://github.com/andreibesleaga/AgenticSystemCore.com/tree/main/desk">the site&#39;s repository</a>, under Apache-2.0.</p>
+</main>
+<footer class="site">
+<p class="copyright">&#169; 2026 Andrei N. Besleaga. All rights reserved, citing and linking allowed. Spec: Apache-2.0. Schemas, ontology, IDs, discovery: CC0-1.0. AI-assisted, human-reviewed. As is, no warranty or liability; not advice. Unaffiliated with named organisations; marks belong to their owners. <span class="footer-links"><a href="/legal/">Legal &amp; privacy</a> · <a href="/legal/#terms" rel="license">Content Use Terms</a> · <a href="/docs/compliance/">Compliance</a> · <a href="/docs/status/">Status</a> · <a href="/.well-known/knowledge-linkset">Discovery file</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://patterns.agenticsystemcore.com/">AgenticSystemCore Graph</a> · <a href="https://standards.agenticsystemcore.com/">Standards Map</a></span></p>
+</footer>
+</body>
+</html>

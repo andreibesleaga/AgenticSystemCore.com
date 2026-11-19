@@ -165,3 +165,34 @@
   Content-Type: text/markdown; charset=utf-8; variant=GFM
   Access-Control-Allow-Origin: *
   Access-Control-Expose-Headers: Link, ETag, Content-Type
+
+/desk/agent-manifest.json
+  Access-Control-Allow-Origin: *
+
+/desk/brief_desk.network.json
+  Access-Control-Allow-Origin: *
+
+/desk/links.json
+  Access-Control-Allow-Origin: *
+
+/desk/agent-mcp.json
+  Access-Control-Allow-Origin: *
+
+/desk/.well-known/nsdeploy.json
+  Access-Control-Allow-Origin: *
+
+/desk/.well-known/nsdeploy-agent.json
+  Access-Control-Allow-Origin: *
+
+/desk/
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'self' https:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; frame-src https://patterns.agenticsystemcore.com https://standards.agenticsystemcore.com; worker-src 'self' blob:
+
+/desk/bridge/*
+  ! X-Frame-Options
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'none'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'
+
+/desk/runtime/sandbox-worker.js
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'none'; script-src blob:; connect-src 'none'; worker-src 'none'
