@@ -58,6 +58,10 @@ export class BriefDesk {
   /** The most characters of a passage a read returns. */
   static READ_LIMIT = 6000;
 
+  /** The most bytes of a passage file the page reads, and how long it waits for one. */
+  static FILE_LIMIT = 8 * 1000 * 1000;
+  static FILE_TIMEOUT_MS = 20000;
+
   /** Words too common to search for. */
   static STOP_WORDS = new Set(["a", "an", "and", "are", "as", "at", "be", "by", "can", "do", "does", "for", "from",
     "how", "in", "is", "it", "its", "of", "on", "or", "that", "the", "this", "to", "what", "when", "which", "who",
@@ -107,11 +111,52 @@ export class BriefDesk {
    * :raises Error: When the file cannot be read.
    */
   static async fetchText(url) {
-    const response = await fetch(url, { credentials: "omit", redirect: "error" });
-    if (!response.ok) {
-      throw new Error(`${url} answered ${response.status}`);
+    // Another node's file is read only after the visitor allows it, but it may still be
+    // slow or large: stop after FILE_TIMEOUT_MS or FILE_LIMIT bytes, and fail closed.
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), BriefDesk.FILE_TIMEOUT_MS);
+    try {
+      const response = await fetch(url, { credentials: "omit", redirect: "error", signal: controller.signal });
+      if (!response.ok) {
+        throw new Error(`${url} answered ${response.status}`);
+      }
+      if (!response.body || typeof response.body.getReader !== "function") {
+        const text = await response.text();
+        if (text.length > BriefDesk.FILE_LIMIT) {
+          throw new Error(`${url} is larger than ${BriefDesk.FILE_LIMIT} bytes`);
+        }
+        return text;
+      }
+      const reader = response.body.getReader();
+      const parts = [];
+      let size = 0;
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+        size += value.byteLength;
+        if (size > BriefDesk.FILE_LIMIT) {
+          controller.abort();
+          throw new Error(`${url} is larger than ${BriefDesk.FILE_LIMIT} bytes`);
+        }
+        parts.push(value);
+      }
+      const bytes = new Uint8Array(size);
+      let at = 0;
+      for (const part of parts) {
+        bytes.set(part, at);
+        at += part.byteLength;
+      }
+      return new TextDecoder().decode(bytes);
+    } catch (error) {
+      if (error && error.name === "AbortError") {
+        throw new Error(`${url} did not answer within ${BriefDesk.FILE_TIMEOUT_MS / 1000} seconds`);
+      }
+      throw error;
+    } finally {
+      clearTimeout(timer);
     }
-    return response.text();
   }
 
   /**
@@ -440,6 +485,14 @@ export class BriefDesk {
         reason: "The text of that passage does not match the digest its node published, so it was not added.",
         field: "passage",
       };
+    }
+    // The checks above waited for the file and the digest; another add or a discard may
+    // have changed the brief meanwhile, so check the brief again just before changing it.
+    if (this.cards.some((c) => c.address === address)) {
+      return { ok: false, reason: "That passage is already in the brief.", field: "passage" };
+    }
+    if (this.cards.length >= BriefDesk.BRIEF_LIMIT) {
+      return { ok: false, reason: `The brief holds ${BriefDesk.BRIEF_LIMIT} cards at most. Remove one first.`, field: "passage" };
     }
     const card = {
       card: `c${this.nextCard}`,
