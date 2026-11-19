@@ -23,9 +23,11 @@ class BridgeActions {
    */
   static desk() {
     if (!BridgeActions.reader) {
-      const here = new URL("../", import.meta.url);
+      // The bridge frame runs on this site's origin; a test that imports the module from disk
+      // has no location, and reads the node at its published origin.
+      const here = typeof location !== "undefined" && location.origin && location.origin !== "null" ? location.origin : "https://agenticsystemcore.com";
       BridgeActions.reader = new BriefDesk(null, {
-        readFrom: here.origin,
+        readFrom: here,
         nodeOrigin: "https://agenticsystemcore.com",
         nodes: [{ id: "core", label: "AgenticSystemCore (the format and its vocabulary)", origin: "https://agenticsystemcore.com" }],
       });

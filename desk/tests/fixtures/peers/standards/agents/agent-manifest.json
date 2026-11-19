@@ -1,0 +1,70 @@
+{
+  "brand": "Standards Map guide",
+  "networks": [
+    {
+      "name": "standards_map",
+      "front_man": "standards_map_guide",
+      "hocon": "./standards_map.network.json",
+      "description": "Says which cards of Standards Map cover a subject, with their addresses.",
+      "tags": [
+        "knowledge-node",
+        "table-of-contents"
+      ],
+      "sample_queries": [
+        "What does Standards Map offer on AI usage preferences (IETF drafts)?",
+        "Which cards of Standards Map should I read first?",
+        "Book a call with the author for me."
+      ]
+    }
+  ],
+  "llm_router": {
+    "base_url": "https://openrouter.ai/api/v1",
+    "mock": false,
+    "byok_router": "https://openrouter.ai/api/v1"
+  },
+  "allowed_peers": [],
+  "peer_policy": {
+    "mode": "closed",
+    "deny_origins": [],
+    "note": "This network calls no other site and no tool."
+  },
+  "agent_mcp": {
+    "protocol": "nsdeploy-agent-mcp/v1",
+    "network": "standards_map",
+    "front_man": "standards_map_guide",
+    "available": false,
+    "reason": "This is a static site; it runs no MCP server."
+  },
+  "linking": {
+    "protocol": "nsdeploy-link/v1",
+    "exports": [
+      {
+        "network": "standards_map",
+        "front_man": "standards_map_guide",
+        "aliases": [
+          "standards_map",
+          "standards_map_guide"
+        ],
+        "url": "standards_map"
+      }
+    ],
+    "imports": [],
+    "link_updates": {
+      "mode": "browser-local"
+    }
+  },
+  "deployment": {
+    "mode": "static",
+    "self_contained_runtime": false,
+    "browser_mock": false,
+    "direct_byok": true,
+    "direct_mcp_requires_cors": true,
+    "public_mcp_facade": false
+  },
+  "source": {
+    "node": "https://standards.agenticsystemcore.com/",
+    "title": "Standards Map",
+    "generated_from": "https://standards.agenticsystemcore.com/chunks.jsonl",
+    "cards": 29
+  }
+}
