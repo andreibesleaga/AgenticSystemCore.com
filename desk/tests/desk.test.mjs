@@ -226,6 +226,41 @@ class BriefDeskTest {
   }
 }
 
+/** Two adds of the same passage started together leave one card (review of PR #45). */
+BriefDeskTest.testConcurrentAddsLeaveOneCard = async () => {
+  const page = BriefDeskTest.page;
+  for (const card of page.getState().brief.cards) page.remove({ card: card.card });
+  const args = { node: "core", passage: ID(FIXTURES.core[5]) };
+  const [a, b] = await Promise.all([page.pin(args), page.pin(args)]);
+  assert.equal([a, b].filter((r) => r.ok).length, 1);
+  assert.equal(page.getState().brief.cards.length, 1);
+  // An add that is still checking when the visitor discards does not bring the card back.
+  const pending = page.pin({ node: "core", passage: ID(FIXTURES.core[6]) });
+  page.discard({ expectedVersion: page.getState().brief.version });
+  const late = await pending;
+  assert.ok(late.ok === false || page.getState().brief.cards.length === 1);
+  for (const card of page.getState().brief.cards) page.remove({ card: card.card });
+};
+
+/** A passage file larger than the limit, or one that never answers, fails closed. */
+BriefDeskTest.testFileLimits = async () => {
+  const saved = globalThis.fetch;
+  const limit = BriefDesk.FILE_LIMIT;
+  const wait = BriefDesk.FILE_TIMEOUT_MS;
+  try {
+    BriefDesk.FILE_LIMIT = 10;
+    globalThis.fetch = async () => new Response("x".repeat(100));
+    await assert.rejects(BriefDesk.fetchText("https://example.org/chunks.jsonl"), /larger than 10 bytes/);
+    BriefDesk.FILE_TIMEOUT_MS = 20;
+    globalThis.fetch = (url, init) => new Promise((resolve, reject) => init.signal.addEventListener("abort", () => reject(Object.assign(new Error("aborted"), { name: "AbortError" }))));
+    await assert.rejects(BriefDesk.fetchText("https://example.org/chunks.jsonl"), /did not answer within/);
+  } finally {
+    globalThis.fetch = saved;
+    BriefDesk.FILE_LIMIT = limit;
+    BriefDesk.FILE_TIMEOUT_MS = wait;
+  }
+};
+
 test("a search ranks, returns addresses and changes nothing", BriefDeskTest.testSearchReadsOnly);
 test("a read recomputes the digest of the passage", BriefDeskTest.testReadChecksTheDigest);
 test("a passage that does not match its digest is not added", BriefDeskTest.testChangedPassageIsNotAdded);
@@ -235,3 +270,5 @@ test("the brief refuses a duplicate and a ninth card", BriefDeskTest.testBriefLi
 test("the brief as Markdown carries each address and digest", BriefDeskTest.testBriefAsMarkdown);
 test("an empty brief cannot be discarded", BriefDeskTest.testEmptyBriefIsRefused);
 test("the page's own form and buttons work without the assistant", BriefDeskTest.testThePageWorksWithoutTheAssistant);
+test("two adds of the same passage at once leave one card", BriefDeskTest.testConcurrentAddsLeaveOneCard);
+test("a passage file over the size or time limit fails closed", BriefDeskTest.testFileLimits);
