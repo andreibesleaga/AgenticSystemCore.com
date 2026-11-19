@@ -48,8 +48,8 @@
 </header>
 <main id="main" class="wide">
 <h1>WebAIAssist privacy</h1>
-<p class="summary"><strong>Summary</strong>What leaves your computer, every host the extension can reach, what it stores and how to remove it. Last updated 16 November 2026.</p>
-<p>Last updated 16 November 2026. This is the privacy notice of the WebAIAssist extension, version 0.1.0.</p>
+<p class="summary"><strong>Summary</strong>What leaves your computer, every host the extension can reach, what it stores and how to remove it. Last updated 18 November 2026.</p>
+<p>Last updated 18 November 2026. This is the privacy notice of the WebAIAssist extension, version 0.1.1.</p>
 <blockquote>
 <p><strong>In short</strong></p>
 <ul>
@@ -65,7 +65,7 @@
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table 1"><table>
 <thead><tr><th scope="col">When</th><th scope="col">What is sent</th><th scope="col">To</th></tr></thead>
 <tbody>
-<tr><td>You press Start with a model in the browser</td><td>Requests for the model weights and their small configuration files. Nothing about you, the page or the chat; the host sees your IP address and the model asked for. The model library (program code) is inside the extension and is never downloaded.</td><td><code>huggingface.co</code> (the <code>mlc-ai</code> repositories, one fixed revision per model), which redirects the large files to Hugging Face's download network under <code>hf.co</code> (see below). Once per model.</td></tr>
+<tr><td>You press Start with a model in the browser</td><td>Requests for the model file (the weights). Nothing about you, the page or the chat; the host sees your IP address and the model asked for. The engine (program code) is inside the extension and is never downloaded.</td><td><code>huggingface.co</code> (the <code>unsloth</code> repositories, one fixed commit per model), which redirects the large files to Hugging Face's download network under <code>hf.co</code> (see below). Once per model.</td></tr>
 <tr><td>You press Start with a model on the processor</td><td>The same: requests for one model file (<code>.gguf</code>) from one fixed address (the <code>unsloth</code> repositories, one commit each; size and SHA-256 are checked after the download). Nothing about you, the page or the chat. The engine (program code) is inside the extension.</td><td><code>huggingface.co</code>, which redirects the large file to <code>*.hf.co</code>. Once per model.</td></tr>
 <tr><td>You use Chrome's built-in model</td><td>Nothing from WebAIAssist: no request, to any host. Chrome downloads and runs its own model under Google's terms, and the prompt stays in the browser.</td><td>Chrome</td></tr>
 <tr><td>You choose a chat endpoint in Options</td><td>The whole conversation for each question: the instructions, the page's tool list, tool results, page text you read, the short facts from the site's published files (Options can turn them off), your questions, and the API key if set.</td><td>The endpoint address you set, and nowhere else</td></tr>
@@ -93,9 +93,8 @@ schemas, <code>webgpureport.org</code> is part of an error message, <code>www.w3
 <code>w3id.org</code> and <code>www.rfc-editor.org</code> are names the extension compares a site's published files
 with (it never requests them), <code>purl.org</code>, <code>schema.org</code> and <code>www.w3.org</code> are identifiers of vocabularies inside the
 graph explorer's code and <code>github.com</code> is the address of force-graph's source in its header, and addresses such as <code>github.com</code> and
-<code>localhost:8080</code> appear in the comments of the model libraries (none of them is
-contacted, they are names, not contact points), <code>agenticsystemcore.com</code> is the address of the links &quot;Open the demo page, which offers tools&quot; and &quot;More at the AgenticSystemCore site&quot; in the panel (the extension never requests it; your browser opens it only when you click the link), and WebLLM's own model list names <code>huggingface.co</code> repositories of models this extension does not
-offer.</p>
+<code>localhost:8080</code> appear in the comments of the bundled libraries (none of them is
+contacted, they are names, not contact points), <code>agenticsystemcore.com</code> is the address of the links &quot;Open the demo page, which offers tools&quot; and &quot;More at the AgenticSystemCore site&quot; in the panel (the extension never requests it; your browser opens it only when you click the link).</p>
 <h2 id="what-is-stored-and-where">What is stored, and where</h2>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table 3"><table>
 <thead><tr><th scope="col">What</th><th scope="col">Where</th><th scope="col">How long</th></tr></thead>
@@ -106,7 +105,7 @@ offer.</p>
 <tr><td>Remote endpoint hosts you agreed to</td><td><code>chrome.storage.local</code></td><td>Until you press Forget all sites or Reset to defaults, or remove the extension</td></tr>
 <tr><td>Chat per site, with the tool results and the page text you read with Read this page (up to 4000 characters per read), and how often each tool worked per site (memory)</td><td>The extension's IndexedDB</td><td>Until you press Clear memory in Options or remove the extension. Nothing is kept when memory is off.</td></tr>
 <tr><td>The activity log: one entry per question (site, model, where it ran, counts of tokens, price when the service reports one, times, the tools called and whether you allowed them, an estimate of the window use). No question text, no argument values (the names are kept), no results and no error text unless you switch on Include content</td><td>The extension's own IndexedDB <code>webaiassist-activity</code></td><td>Until you press Clear in the Activity view, press Forget this site or Forget all sites, or remove the extension. The oldest entries go first above 8 MiB. Nothing is kept when memory is off.</td></tr>
-<tr><td>Model weights</td><td>The extension's Cache Storage (WebLLM's cache)</td><td>Until you remove them in Options (Downloaded models) or remove the extension</td></tr>
+<tr><td>Model weights</td><td>The extension's private file storage (wllama's cache)</td><td>Until you remove them in Options (Downloaded models) or remove the extension</td></tr>
 <tr><td>Model file of the processor model</td><td>The extension's private file storage (wllama's cache)</td><td>Until you remove it in Options (Downloaded models) or remove the extension</td></tr>
 <tr><td>Whether the welcome screen was dismissed, and how long the first answer of your graphics card took</td><td><code>chrome.storage.local</code></td><td>Until you remove the extension; the time is a number with the adapter's name, used only to pick the default model</td></tr>
 <tr><td>The last error text the panel showed (addresses and the endpoint key removed, cut to 300 characters), and whether persistent storage was asked for</td><td><code>chrome.storage.local</code></td><td>Until the next error replaces it, or you remove the extension; used only by Copy diagnostics</td></tr>
@@ -124,12 +123,12 @@ calls <code>navigator.storage.persist()</code> once. That asks Chrome not to cle
 space runs low; Chrome decides, and the panel does not say whether it agreed. Options shows the
 total size of the downloaded models beside <strong>Remove downloaded models</strong>.</p>
 <p>What an update does to the downloads: an update keeps the extension's address
-(<code>chrome-extension://&lt;id&gt;</code>), so its Cache Storage and private file storage are the same ones
-afterwards. Chrome's documentation (storage page, read 14 Nov 2026) does not say in so many words
+(<code>chrome-extension://&lt;id&gt;</code>), so its private file storage is the same one
+afterwards. On an update from version 0.1.0 the extension deletes the three caches the old engine
+kept in Cache Storage. Chrome's documentation (storage page, read 14 Nov 2026) does not say in so many words
 that this storage survives an update or an uninstall, and this was not tested here; treat
 removal at uninstall as likely and survival of an update as expected, not guaranteed. What the
-code does decide: the graphics-card models are looked up by the exact files of the pinned
-revision, and the processor models by file address and recorded size. If an update pins a new
+code does decide: every local model is looked up by file address and recorded size. If an update pins a new
 revision of a model, the new files download again (the panel asks first) and the old files stay
 in the cache, not listed by Options, until the extension is removed or its data is cleared. This
 case has not happened yet.</p>
