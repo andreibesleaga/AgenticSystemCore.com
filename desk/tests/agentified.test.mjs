@@ -46,6 +46,8 @@ globalThis.Option = StubOption;
 const { registerActions } = await import("../site-actions.js");
 // site.js boots the runtime only in a browser. Here it gives the dialog's words.
 const { AssistantMount } = await import("../site.js");
+const { BriefDesk } = await import("../page.js");
+const BriefDeskPage = () => BriefDesk.page;
 // All tests in this file share this one page and run in order, as in one browser tab.
 // Give each test its own data, and compare with the state it read at the start.
 
@@ -771,21 +773,9 @@ class AgentifiedSiteTest {
   static async testOtherBundlesGetRuntimeDialog() {
     AssistantMount.defaultReview = AgentifiedSiteTest.recordRuntimeReview;
     document.provide("#ns-input", [new StubElement("textarea")]);
+    // This page has no plain write action: every change to the brief asks first in the
+    // page's own dialog (testWritesAskFirst). So the only other bundle is a partner's.
     const bundles = [
-      [
-        {
-          action: WRITE_ACTION,
-          origin: BASE,
-          effect: "write",
-          arguments: {},
-        },
-        {
-          action: WRITE_ACTION,
-          origin: BASE,
-          effect: "write",
-          arguments: {},
-        },
-      ],
       [
         {
           action: IRREVERSIBLE_ACTION,
@@ -928,6 +918,25 @@ AgentifiedSiteTest.testInternalAgentReadsThroughSiteAction = async () => {
   assert.match(result.text, /FRONT: done/);
 };
 
+/**
+ * Every change to the brief asks the visitor first, with the passage or card it changes:
+ * the specification's section 3.1 asks to show a write before it runs.
+ */
+AgentifiedSiteTest.testWritesAskFirst = async () => {
+  const registry = await AgentifiedSiteTest.registry();
+  for (const entry of registry.catalog(AgentifiedSiteTest.scope())) {
+    assert.notEqual(entry.effect, "write", `${entry.name} would run with no dialog.`);
+  }
+  // The dialog for an add names the node and, once the page has read it, the passage.
+  await BriefDeskPage().search({ node: "core", query: "k5k" });
+  const add = AssistantMount.dialogContent({ action: "add_card", origin: BASE, effect: "irreversible", arguments: { node: "core", passage: ID(FIXTURES.core[4]) } });
+  assert.equal(add.refusal, undefined);
+  assert.equal(add.details.Address, `${FIXTURES.core[4].iri}#chunk-${ID(FIXTURES.core[4])}`);
+  // An unknown card is refused before any dialog, with the page's own reason.
+  const remove = AssistantMount.dialogContent({ action: "remove_card", origin: BASE, effect: "irreversible", arguments: { card: "c999" } });
+  assert.equal(remove.refusal, BriefDeskPage().remove({ card: "c999" }).reason);
+};
+
 test("network is valid, has no demo mode and keeps its grounding and partner rules", AgentifiedSiteTest.testNetworkIsValid);
 test("agentTools are local-only page actions or shared bridge actions, with no TODO left", AgentifiedSiteTest.testActionsMatchManifest);
 test("front agent reads page state through a website tool", AgentifiedSiteTest.testReadActionRunsAsTool);
@@ -943,6 +952,7 @@ test("a chat form that bundles the irreversible action runs nothing", Agentified
 test("other chat forms with several actions get the runtime's dialog", AgentifiedSiteTest.testOtherBundlesGetRuntimeDialog);
 test("the consent card gets focus, and focus then returns to the chat", AgentifiedSiteTest.testConsentFocusesTheCardThenTheChat);
 test("a visitor typing in the page's form keeps focus when a consent card appears", AgentifiedSiteTest.testConsentLeavesFocusInThePage);
+test("every change to the brief asks the visitor first", AgentifiedSiteTest.testWritesAskFirst);
 test("the front agent delegates to passage_reader, which reads through a site action", AgentifiedSiteTest.testInternalAgentReadsThroughSiteAction);
 // This one changes the page for good, so it runs last.
 test("an approved irreversible call stores the record", AgentifiedSiteTest.testApprovedIrreversibleCall);
