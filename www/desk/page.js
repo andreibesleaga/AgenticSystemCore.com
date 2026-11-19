@@ -405,6 +405,43 @@ export class BriefDesk {
   }
 
   /**
+   * What a change would do, from what the page already holds, without reading anything:
+   * for the confirmation dialog, which is built before the change runs.
+   *
+   * :param action: "add_card" or "remove_card".
+   * :param args: The action's arguments.
+   * :return: {ok, details} or a refusal.
+   */
+  previewChange(action, args) {
+    if (action === "remove_card") {
+      const card = this.cards.find((c) => c.card === args.card);
+      if (!card) {
+        return { ok: false, reason: `The brief has no card "${args.card}".`, field: "card" };
+      }
+      return { ok: true, details: { "Card": card.card, "Passage": card.section ? `${card.title}, ${card.section}` : card.title, "Address": card.address } };
+    }
+    const usable = this.usableNode(args.node);
+    if (!usable.ok) {
+      return usable;
+    }
+    if (this.cards.length >= BriefDesk.BRIEF_LIMIT) {
+      return { ok: false, reason: `The brief holds ${BriefDesk.BRIEF_LIMIT} cards at most. Remove one first.`, field: "passage" };
+    }
+    const record = (usable.node.passages || []).find((p) => p.id.startsWith(String(args.passage)));
+    const details = { "From": usable.node.label, "Passage id": String(args.passage) };
+    if (record) {
+      const address = BriefDesk.address(record);
+      if (this.cards.some((c) => c.address === address)) {
+        return { ok: false, reason: "That passage is already in the brief.", field: "passage" };
+      }
+      details.Passage = record.section ? `${record.title || record.item}, ${record.section}` : (record.title || record.item);
+      details.Address = address;
+    }
+    details.Check = "The page checks the passage against its published digest before it adds it.";
+    return { ok: true, details };
+  }
+
+  /**
    * Find one passage by the first 16 characters of its id.
    *
    * :param args: node and passage.

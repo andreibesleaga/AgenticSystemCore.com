@@ -24,6 +24,18 @@ export class AssistantMount {
    * leave this empty.
    */
   static DIALOGS = {
+    add_card: {
+      title: "Add this passage to your brief?",
+      sentence: "The assistant asks to add the passage below as a cited card. You can remove it later.",
+      confirm: "Add the card",
+      decline: "Don't add it",
+    },
+    remove_card: {
+      title: "Remove this card from your brief?",
+      sentence: "The assistant asks to remove the card below. You can add the passage again later.",
+      confirm: "Remove the card",
+      decline: "Keep the card",
+    },
     discard_brief: {
       title: "Discard the whole brief?",
       sentence: "Every card below leaves the brief. This page cannot bring them back.",
@@ -203,6 +215,10 @@ export class AssistantMount {
    * :return: Details by label, {refusal: reason}, or {} when the action has none.
    */
   static reviewDetails(action, args) {
+    if (action === "add_card" || action === "remove_card") {
+      const preview = BriefDesk.page.previewChange(action, args);
+      return preview.ok ? preview.details : { refusal: preview.reason };
+    }
     if (action === "discard_brief") {
       const check = BriefDesk.page.checkDiscard(args);
       if (!check.ok) {
