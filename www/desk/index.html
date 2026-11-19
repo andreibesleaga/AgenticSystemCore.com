@@ -48,7 +48,7 @@
 <main id="main">
 <h1>Brief Desk</h1>
 <p class="summary"><strong>Summary</strong>Search the passages a knowledge node publishes, check each against its published digest, and collect cited cards in a brief. Do it by hand, or ask the assistant: two published agents that run in your browser on your own AI provider key, and that ask before they discard anything or contact another site.</p>
-<p>Ask a question, or search by hand. Every passage this page shows comes from a file a knowledge node publishes, and each one is checked against the digest that node published for it before it goes into your brief. The assistant below runs in your browser, on the AI provider and key you choose; this site has no server behind it and never receives your key.</p>
+<p>Ask a question, or search by hand. Every passage this page shows comes from a file a knowledge node publishes, and each one is checked against the digest that node published for it before it goes into your brief. A brief keeps those digests, so anyone can check later whether a cited passage has changed. The assistant below runs in your browser, on the AI provider and key you choose; this site has no server behind it and never receives your key.</p>
 <section id="desk" class="desk" aria-labelledby="desk-heading" data-node-origin="https://agenticsystemcore.com">
 <h2 id="desk-heading">Search and collect</h2>
 <fieldset class="desk-nodes">
@@ -74,7 +74,15 @@
 <h2 id="desk-brief-heading">Your brief</h2>
 <p id="desk-brief-count">The brief is empty. Search, then add passages.</p>
 <ol id="desk-brief" class="desk-list"></ol>
-<p class="desk-buttons"><button type="button" id="desk-copy">Copy the brief as Markdown</button> <button type="button" id="desk-discard">Discard the brief</button></p>
+<p class="desk-buttons"><button type="button" id="desk-copy">Copy the brief as Markdown</button> <button type="button" id="desk-check">Check the brief again</button> <button type="button" id="desk-discard">Discard the brief</button></p>
+<details class="desk-saved">
+<summary>Check a saved brief</summary>
+<p><label for="desk-saved-text">Paste a brief that was copied from this page, by you or by someone else. The page reads each cited passage from its node now and compares it with the digest the brief holds, so you see which passages have changed since the brief was written.</label></p>
+<textarea id="desk-saved-text" rows="6" spellcheck="false"></textarea>
+<p class="desk-buttons"><button type="button" id="desk-saved-check">Check the saved brief</button></p>
+<p id="desk-saved-status" role="status"></p>
+<ol id="desk-saved-results" class="desk-list"></ol>
+</details>
 </section>
 <section id="assistant" class="assistant" aria-labelledby="assistant-heading">
 <h2 id="assistant-heading">Ask the Brief Desk</h2>
@@ -94,8 +102,8 @@
 <ul>
 <li><strong>The agents are published data.</strong> The network of two agents is the file <a href="/desk/brief_desk.network.json"><code>brief_desk.network.json</code></a>, named by <a href="/desk/agent-manifest.json"><code>agent-manifest.json</code></a>; its instructions are public. Another agentic website can load it by the address <code>https://agenticsystemcore.com/desk/brief_desk</code> and run it in its own visitor&#39;s browser.</li>
 <li><strong>The agents run in your browser.</strong> The runtime in <code>/desk/runtime/</code> is the open-source browser runtime of the <a href="https://github.com/cognizant-ai-labs/agentic-web">Open Agentic Web</a> project, unchanged. Model calls go from your browser to the provider you choose, with your key, which stays in this browser&#39;s storage for this site.</li>
-<li><strong>What the agents can do here is this page&#39;s own list.</strong> Six actions: read the page&#39;s state, search passages, read one passage and check its digest, add a card, remove a card, discard the brief. Each change to your brief shows you what it changes and asks first. Another site that runs this network gets two of them, search and read with the digest check, over this node&#39;s published passages only.</li>
-<li><strong>Every card is checked.</strong> A node publishes each passage with the SHA-256 digest of its text in <a href="/chunks.jsonl"><code>/chunks.jsonl</code></a>. The page computes the digest of the text it received and adds the card only when the two are equal. This shows that the text is the published text, not that it is true.</li>
+<li><strong>What the agents can do here is this page&#39;s own list.</strong> Seven actions: read the page&#39;s state, search passages, read one passage and check its digest, check the brief again, add a card, remove a card, discard the brief. Each change to your brief shows you what it changes and asks first. Another site that runs this network gets two of them, search and read with the digest check, over this node&#39;s published passages only.</li>
+<li><strong>What the checks show.</strong> A node publishes each passage with the SHA-256 digest of its text in <a href="/chunks.jsonl"><code>/chunks.jsonl</code></a>, and the digest of that whole file in its discovery document, <a href="/.well-known/knowledge-linkset"><code>/.well-known/knowledge-linkset</code></a>. The page compares the file with the one digest and each passage with the other, and adds a card only when they agree. Both digests come from the same site as the text, so a match shows that the node&#39;s files agree with each other and arrived whole; it does not show that the text is true. The check that does not depend on the node comes later. A brief keeps each card&#39;s digest, so <em>Check the brief again</em>, or <em>Check a saved brief</em> on a brief someone sent you, shows which cited passages the node has changed since.</li>
 <li><strong>Other sites are asked only with your consent.</strong> The page reads another node&#39;s passages after you tick it. The assistant can also ask the assistant of <a href="https://patterns.agenticsystemcore.com/">patterns.agenticsystemcore.com</a> or <a href="https://standards.agenticsystemcore.com/">standards.agenticsystemcore.com</a>; a card names the site and shows the request before anything is sent.</li>
 </ul>
 <p>The page works without the assistant, and without a key: the search form and the brief use the same code the assistant calls. The source is in <a href="https://github.com/andreibesleaga/AgenticSystemCore.com/tree/main/desk">the site&#39;s repository</a>, under Apache-2.0.</p>
