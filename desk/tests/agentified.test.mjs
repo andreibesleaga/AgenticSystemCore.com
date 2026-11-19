@@ -902,6 +902,32 @@ class AgentifiedSiteTest {
   }
 }
 
+/**
+ * The front agent delegates to the internal agent passage_reader, which reads a passage
+ * through the site action read_passage (the specification's section 6, third check).
+ */
+AgentifiedSiteTest.testInternalAgentReadsThroughSiteAction = async () => {
+  const loaded = await AgentifiedSiteTest.load();
+  const registry = await AgentifiedSiteTest.registry();
+  const passage = ID(FIXTURES.core[3]);
+  const model = new ScriptedModel([
+    { tool: "passage_reader", arguments: { request: `Node core, passage ${passage}: what does it explain?` } },
+    { tool: "website_read_passage", arguments: { node: "core", passage } },
+    { text: "READER: it explains the ledger and the digest." },
+    { text: "FRONT: done." },
+  ]);
+  const ctx = AgentifiedSiteTest.context(loaded, registry, model, AgentifiedSiteTest.approve);
+  const result = await runAgent(ctx, ctx.frontMan, "What does that passage explain?", null, []);
+  assert.ok(model.toolNames(0).includes("passage_reader"), "The front agent is not offered passage_reader.");
+  assert.ok(model.toolNames(1).includes("website_read_passage"), "passage_reader is not offered website_read_passage.");
+  const read = model.toolResults(2)[0];
+  assert.equal(read.status, "succeeded");
+  assert.equal(read.result.digestMatches, true);
+  assert.equal(read.result.text, FIXTURES.core[3].text);
+  assert.match(JSON.stringify(model.calls[3].messages), /READER: it explains the ledger/);
+  assert.match(result.text, /FRONT: done/);
+};
+
 test("network is valid, has no demo mode and keeps its grounding and partner rules", AgentifiedSiteTest.testNetworkIsValid);
 test("agentTools are local-only page actions or shared bridge actions, with no TODO left", AgentifiedSiteTest.testActionsMatchManifest);
 test("front agent reads page state through a website tool", AgentifiedSiteTest.testReadActionRunsAsTool);
@@ -917,5 +943,6 @@ test("a chat form that bundles the irreversible action runs nothing", Agentified
 test("other chat forms with several actions get the runtime's dialog", AgentifiedSiteTest.testOtherBundlesGetRuntimeDialog);
 test("the consent card gets focus, and focus then returns to the chat", AgentifiedSiteTest.testConsentFocusesTheCardThenTheChat);
 test("a visitor typing in the page's form keeps focus when a consent card appears", AgentifiedSiteTest.testConsentLeavesFocusInThePage);
+test("the front agent delegates to passage_reader, which reads through a site action", AgentifiedSiteTest.testInternalAgentReadsThroughSiteAction);
 // This one changes the page for good, so it runs last.
 test("an approved irreversible call stores the record", AgentifiedSiteTest.testApprovedIrreversibleCall);
