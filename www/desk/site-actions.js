@@ -88,7 +88,7 @@ class SiteActions {
   static readAction() {
     return {
       name: "read_passage",
-      description: "Read one passage in full and check it: returns its text, its address, its licence, the SHA-256 digest its node published and digestMatches, which is true when the text read now has that digest. Use the text only when digestMatches is true. fileCheck says whether the node's whole passage file matched the digest in the node's discovery document. Changes nothing on the page.",
+      description: "Read one passage in full and check it: returns its text, its address, its licence, the SHA-256 digest its node published and digestMatches, which is true when the text read now has that digest. Use the text only when digestMatches is true. fileCheck is matches: the node's whole passage file matched the digest in the node's discovery document; a file that does not is not read at all. Changes nothing on the page.",
       effect: "read",
       inputSchema: {
         type: "object",
