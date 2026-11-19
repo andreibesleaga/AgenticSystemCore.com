@@ -1,0 +1,70 @@
+{
+  "brand": "AgenticSystemCore Graph guide",
+  "networks": [
+    {
+      "name": "pattern_cards",
+      "front_man": "pattern_cards_guide",
+      "hocon": "./pattern_cards.network.json",
+      "description": "Says which cards of AgenticSystemCore Graph cover a subject, with their addresses.",
+      "tags": [
+        "knowledge-node",
+        "table-of-contents"
+      ],
+      "sample_queries": [
+        "What does AgenticSystemCore Graph offer on Agent Identity and Scoped Credentials?",
+        "Which cards of AgenticSystemCore Graph should I read first?",
+        "Book a call with the author for me."
+      ]
+    }
+  ],
+  "llm_router": {
+    "base_url": "https://openrouter.ai/api/v1",
+    "mock": false,
+    "byok_router": "https://openrouter.ai/api/v1"
+  },
+  "allowed_peers": [],
+  "peer_policy": {
+    "mode": "closed",
+    "deny_origins": [],
+    "note": "This network calls no other site and no tool."
+  },
+  "agent_mcp": {
+    "protocol": "nsdeploy-agent-mcp/v1",
+    "network": "pattern_cards",
+    "front_man": "pattern_cards_guide",
+    "available": false,
+    "reason": "This is a static site; it runs no MCP server."
+  },
+  "linking": {
+    "protocol": "nsdeploy-link/v1",
+    "exports": [
+      {
+        "network": "pattern_cards",
+        "front_man": "pattern_cards_guide",
+        "aliases": [
+          "pattern_cards",
+          "pattern_cards_guide"
+        ],
+        "url": "pattern_cards"
+      }
+    ],
+    "imports": [],
+    "link_updates": {
+      "mode": "browser-local"
+    }
+  },
+  "deployment": {
+    "mode": "static",
+    "self_contained_runtime": false,
+    "browser_mock": false,
+    "direct_byok": true,
+    "direct_mcp_requires_cors": true,
+    "public_mcp_facade": false
+  },
+  "source": {
+    "node": "https://patterns.agenticsystemcore.com/",
+    "title": "AgenticSystemCore Graph",
+    "generated_from": "https://patterns.agenticsystemcore.com/chunks.jsonl",
+    "cards": 50
+  }
+}
