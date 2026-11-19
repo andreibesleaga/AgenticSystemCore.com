@@ -668,6 +668,6 @@ export class BriefDesk {
   }
 }
 
-if (typeof document !== "undefined" && document.getElementById("desk-search-form")) {
+if (typeof document !== "undefined" && typeof document.getElementById === "function" && document.getElementById("desk-search-form")) {
   BriefDesk.start(document);
 }
