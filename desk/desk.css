@@ -131,3 +131,8 @@ body > dialog button { margin-right: 8px; }
 .desk-try button:hover, .desk-try button:focus-visible { background: var(--bg-alt); }
 .desk-try-result { padding-left: 1.25rem; margin: 0.5rem 0; }
 .desk-try-result li { margin: 0.25rem 0; overflow-wrap: anywhere; }
+
+/* Every button of the page in one style, so the page reads as one product. The runtime's own
+   buttons inside #agent-app keep the runtime's style. */
+.desk button, .assistant > .desk-samples button, .desk-saved button, .desk-buttons button { font: inherit; padding: 0.3rem 0.75rem; border: 1px solid currentColor; border-radius: 6px; background: var(--bg); color: var(--fg); cursor: pointer; }
+.desk button:hover, .desk button:focus-visible, .desk-samples button:hover, .desk-samples button:focus-visible { background: var(--bg-alt); }

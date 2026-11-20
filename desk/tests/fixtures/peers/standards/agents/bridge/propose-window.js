@@ -382,7 +382,7 @@ export class ProposeWindow {
       link.href = prefilled;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
-      where.append(link, document.createTextNode(prefilled === NODE.proposals ? " (a new tab) and paste the text there." : " (a new tab), check it and submit it there."));
+      where.append(link, document.createTextNode(prefilled === NODE.proposals ? " (a new tab) and paste the text there." : " (a new tab; a GitHub issue is public, with your name as you typed it), check it and submit it there."));
       box.append(where);
     }
     box.append(actions);

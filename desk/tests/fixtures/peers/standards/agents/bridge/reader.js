@@ -691,8 +691,19 @@ export class PassageReader {
    */
   async checkCitations(citations) {
     const list = Array.isArray(citations) ? citations.slice(0, PassageReader.CITATION_LIMIT) : [];
-    const wellFormed = list.map((c) => /^https:\/\/[^\s<>#]+#chunk-[0-9a-f]{16}$/.test(String(c?.address)) && /^[0-9a-fA-F]{64}$/.test(String(c?.digest)));
-    const found = await this.verifyAll(list.filter((c, i) => wellFormed[i]).map((c) => ({ address: c.address, digest: c.digest.toLowerCase() })));
+    // An address as a browser writes it (lower-case host, no default port); one with a query is
+    // not a passage address, so it gets "not checked" instead of a false "gone".
+    const plain = (address) => {
+      try {
+        const url = new URL(String(address));
+        return url.search ? null : `${url.origin}${url.pathname}${url.hash}`;
+      } catch {
+        return null;
+      }
+    };
+    const addresses = list.map((c) => plain(c?.address));
+    const wellFormed = list.map((c, i) => /^https:\/\/[^\s<>#]+#chunk-[0-9a-f]{16}$/.test(String(addresses[i])) && /^[0-9a-fA-F]{64}$/.test(String(c?.digest)));
+    const found = await this.verifyAll(list.map((c, i) => ({ address: addresses[i], digest: String(c?.digest).toLowerCase() })).filter((c, i) => wellFormed[i]));
     const checked = [...found.results];
     const results = list.map((c, i) => (wellFormed[i] ? checked.shift() : { address: String(c?.address ?? "").slice(0, 500), status: "not checked", reason: "This is not a passage address with a SHA-256 digest of 64 hexadecimal characters." }));
     return { ok: true, checked: results.filter((r) => r.status !== "not checked").length, unchanged: results.filter((r) => r.status === "unchanged").length, results };
