@@ -25,6 +25,9 @@ export class BriefDesk extends PassageReader {
   /** The most cards a brief holds. */
   static BRIEF_LIMIT = 8;
 
+  /** The browser storage key under which this site keeps the visitor's brief. */
+  static STORE_KEY = "brief-desk:brief";
+
   /** The words the first-minute buttons search for, in this site's own node. */
   static TRY_QUERY = "bundle";
 
@@ -44,7 +47,9 @@ export class BriefDesk extends PassageReader {
   /**
    * :param doc: The document to render into.
    * :param options: nodes (a list of {id, label, origin}), the first being this page's own
-   *   node; fetchText (url → text) and sha256Hex (text → hex), replaceable in tests.
+   *   node; fetchText (url → text) and sha256Hex (text → hex), replaceable in tests;
+   *   storage, where the brief is kept between visits (the browser's localStorage when
+   *   left out, null for none).
    */
   constructor(doc, options = {}) {
     // The page's own node is read from beside the page. Its items carry the node's
@@ -59,6 +64,120 @@ export class BriefDesk extends PassageReader {
     this.version = 0;
     this.nextCard = 1;
     this.lastSearch = null;
+    this.storage = options.storage === undefined ? BriefDesk.browserStorage(doc) : options.storage;
+  }
+
+  /**
+   * The browser's storage for this site, when the browser allows it.
+   *
+   * :param doc: The document.
+   * :return: The storage, or null.
+   */
+  static browserStorage(doc) {
+    try {
+      return doc.defaultView ? doc.defaultView.localStorage : null;
+    } catch {
+      // A private window or blocked site data: the page works, and the brief is not kept.
+      return null;
+    }
+  }
+
+  // ---------------------------------------------------------------- keeping the brief
+
+  /** Keep the brief in this browser, for this site only. Nothing leaves the browser. */
+  saveBrief() {
+    if (!this.storage) {
+      return;
+    }
+    try {
+      const cards = this.cards.map((c) => ({ card: c.card, node: c.node, title: c.title, section: c.section, address: c.address, digest: c.digest, excerpt: c.excerpt, license: c.license, licenseUrl: c.licenseUrl }));
+      this.storage.setItem(BriefDesk.STORE_KEY, JSON.stringify({ format: 1, nextCard: this.nextCard, cards }));
+    } catch {
+      // Storage full or refused: the brief stays on the page for this visit.
+    }
+  }
+
+  /**
+   * Bring back the brief kept in this browser. A card is kept only when it names one of the
+   * page's nodes, an address on that node's origin and a SHA-256 digest; anything else in
+   * storage is ignored. A restored card shows that its digest matched when it was added and
+   * that it was not checked again since.
+   *
+   * :return: The number of cards restored.
+   */
+  restoreBrief() {
+    let saved = null;
+    try {
+      saved = this.storage ? JSON.parse(this.storage.getItem(BriefDesk.STORE_KEY) || "null") : null;
+    } catch {
+      saved = null;
+    }
+    if (!saved || saved.format !== 1 || !Array.isArray(saved.cards)) {
+      return 0;
+    }
+    const text = (v, limit) => (typeof v === "string" ? v.slice(0, limit) : "");
+    const cards = [];
+    for (const c of saved.cards.slice(0, BriefDesk.BRIEF_LIMIT)) {
+      if (!c || typeof c !== "object") {
+        continue;
+      }
+      const node = this.nodes.find((n) => n.id === c.node);
+      const fits = node && typeof c.address === "string" && c.address.startsWith(`${node.origin}/`)
+        && /#chunk-[0-9a-f]{16}$/.test(c.address) && /^[0-9a-f]{64}$/.test(c.digest) && /^c[0-9]{1,4}$/.test(c.card)
+        && !cards.some((k) => k.address === c.address || k.card === c.card);
+      if (fits) {
+        cards.push({
+          card: c.card, node: node.id, nodeLabel: node.label, title: text(c.title, 300), section: text(c.section, 300),
+          address: c.address, digest: c.digest, digestMatches: true, check: "not checked",
+          excerpt: text(c.excerpt, 400), license: text(c.license, 200), licenseUrl: text(c.licenseUrl, 500),
+        });
+      }
+    }
+    const highest = Math.max(0, ...cards.map((c) => Number(c.card.slice(1))));
+    this.cards = cards;
+    this.nextCard = Math.max(highest + 1, Number.isInteger(saved.nextCard) ? saved.nextCard : 1);
+    this.version = cards.length ? 1 : 0;
+    return cards.length;
+  }
+
+  /**
+   * A link that opens this page and checks the brief's passages at once: each address and
+   * digest, in the part of the link after "#", which the browser does not send to the site.
+   *
+   * :return: The link, or "" when the brief is empty.
+   */
+  recheckLink() {
+    if (this.cards.length === 0) {
+      return "";
+    }
+    const lines = this.cards.map((c) => `${c.address} ${c.digest}`).join("\n");
+    const bytes = new TextEncoder().encode(lines);
+    const encoded = btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    return `${this.home}#check=${encoded}`;
+  }
+
+  /**
+   * The saved brief a re-check link carries, as Markdown the saved-brief check reads.
+   *
+   * :param hash: The part of the address from "#", such as location.hash.
+   * :return: The Markdown, or "" when the link carries no brief.
+   */
+  static linkBrief(hash) {
+    const match = /^#check=([A-Za-z0-9_-]{1,20000})$/.exec(String(hash || ""));
+    if (!match) {
+      return "";
+    }
+    let text = "";
+    try {
+      const binary = atob(match[1].replace(/-/g, "+").replace(/_/g, "/"));
+      text = new TextDecoder().decode(Uint8Array.from(binary, (ch) => ch.charCodeAt(0)));
+    } catch {
+      return "";
+    }
+    const lines = text.split("\n").map((line) => line.trim().split(/\s+/)).filter((parts) => parts.length === 2)
+      .map(([address, digest]) => `- Source: <${address}> (sha-256 ${digest})`);
+    const markdown = `# Brief (from a re-check link)\n\n${lines.join("\n")}\n`;
+    return BriefDesk.savedEntries(markdown).length ? markdown : "";
   }
 
   /**
@@ -314,7 +433,7 @@ export class BriefDesk extends PassageReader {
       lines.push(`  Source: <${card.address}> (sha-256 ${card.digest}; the text matched this digest when it was added)`);
     }
     if (this.cards.length) {
-      lines.push("", `To see whether a passage has changed since, paste this brief under "Check a saved brief" at <${this.home}>.`);
+      lines.push("", `To see whether a passage has changed since, open <${this.recheckLink()}>, or paste this brief under "Check a saved brief" at <${this.home}>.`);
     }
     return `${lines.join("\n")}\n`;
   }
@@ -603,6 +722,7 @@ export class BriefDesk extends PassageReader {
       return item;
     });
     list.replaceChildren(...items);
+    this.saveBrief();
     this.doc.getElementById("desk-brief-count").textContent = this.cards.length === 0
       ? "The brief is empty. Search, then add passages."
       : `${this.cards.length} of ${BriefDesk.BRIEF_LIMIT} cards. Each was checked against its published digest when it was added.`;
@@ -677,6 +797,7 @@ export class BriefDesk extends PassageReader {
   /** Connect the page's own form, buttons and checkboxes to the operations. */
   connect() {
     const status = this.doc.getElementById("desk-status");
+    this.restoreBrief();
     this.doc.getElementById("desk-search-form").addEventListener("submit", async (event) => {
       event.preventDefault();
       await this.runSearch(this.doc.getElementById("desk-query").value, this.doc.getElementById("desk-node").value);
@@ -729,9 +850,46 @@ export class BriefDesk extends PassageReader {
         box.addEventListener("change", () => this.setAllowed(node.id, box.checked));
       }
     }
+    this.doc.getElementById("desk-link").addEventListener("click", async () => {
+      const link = this.recheckLink();
+      if (!link) {
+        status.textContent = "The brief is empty, so there is no link to copy.";
+        return;
+      }
+      try {
+        await this.doc.defaultView.navigator.clipboard.writeText(link);
+        // Another site's passages are read only after the person who opens the link ticks
+        // that site, so say so when the brief cites one.
+        const others = this.cards.some((c) => !this.nodes.find((n) => n.id === c.node)?.own);
+        status.textContent = others
+          ? "A link that re-checks this brief was copied. Whoever opens it sees whether each passage of this site has changed; passages of the other sites show as not checked until they tick those sites under Nodes to read."
+          : "A link that re-checks this brief was copied. Anyone who opens it sees whether each passage has changed.";
+      } catch (error) {
+        status.textContent = `The browser did not allow copying. The link is: ${link}`;
+      }
+    });
     this.connectFirstMinute();
     this.renderSamples();
     this.render();
+    this.checkLinkedBrief();
+  }
+
+  /**
+   * When the page was opened with a re-check link, put its brief under "Check a saved brief"
+   * and check it.
+   *
+   * :return: What showSaved() returned, or null when the address carries no brief.
+   */
+  async checkLinkedBrief() {
+    const markdown = BriefDesk.linkBrief(this.doc.location ? this.doc.location.hash : "");
+    if (!markdown) {
+      return null;
+    }
+    this.doc.getElementById("desk-saved-text").value = markdown;
+    this.doc.getElementById("desk-saved").open = true;
+    const result = await this.showSaved();
+    this.doc.getElementById("desk-saved").scrollIntoView?.({ block: "start" });
+    return result;
   }
 
   /** Connect the three first-minute buttons, which need no key. */

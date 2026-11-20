@@ -500,3 +500,79 @@ class FirstMinuteTest {
 test("the first-minute cite button adds the first passage once, checked", FirstMinuteTest.testCiteAddsTheFirstPassageOnce);
 test("the example saved brief shows an unchanged and a changed passage", FirstMinuteTest.testExampleBriefShowsAChange);
 test("the sample questions are the manifest's, and the page sends none itself", FirstMinuteTest.testSamplesAreTheManifests);
+
+/** The brief kept in the browser, and the link that re-checks it. */
+class KeptBriefTest {
+  /** A storage that holds strings in memory, as localStorage does. */
+  static storage() {
+    const items = new Map();
+    return { getItem: (k) => (items.has(k) ? items.get(k) : null), setItem: (k, v) => items.set(k, String(v)), items };
+  }
+
+  /** A brief survives a reload in the same browser, and comes back marked as not checked again. */
+  static async testTheBriefIsKept() {
+    const storage = KeptBriefTest.storage();
+    const first = new BriefDesk(document, { storage });
+    const found = await first.search({ node: "core", query: "k7k ledger", limit: 2 });
+    for (const p of found.passages) {
+      assert.equal((await first.pin({ node: "core", passage: p.passage })).ok, true);
+    }
+    first.remove({ card: "c1" });
+    const second = new BriefDesk(document, { storage });
+    assert.equal(second.restoreBrief(), 1);
+    assert.deepEqual(second.cards.map((c) => [c.card, c.address, c.digest, c.check]), first.cards.map((c) => [c.card, c.address, c.digest, "not checked"]));
+    assert.equal(second.nextCard, 3, "A restored brief must not reuse a card id.");
+    assert.equal((await second.checkBrief()).unchanged, 1);
+  }
+
+  /** Storage that holds anything but a kept brief of this page's own nodes is ignored. */
+  static testStorageIsCheckedBeforeUse() {
+    for (const value of ["not json", "null", JSON.stringify({ format: 2, cards: [] }), JSON.stringify({ format: 1, cards: "x" }), JSON.stringify({ format: 1, cards: [null, 3, "c1", []] })]) {
+      const storage = KeptBriefTest.storage();
+      storage.setItem(BriefDesk.STORE_KEY, value);
+      assert.equal(new BriefDesk(document, { storage }).restoreBrief(), 0, value);
+    }
+    const good = { card: "c1", node: "core", title: "T", section: "", address: `${FIXTURES.node}/concepts/x/#chunk-0123456789abcdef`, digest: "a".repeat(64), excerpt: "e" };
+    const storage = KeptBriefTest.storage();
+    storage.setItem(BriefDesk.STORE_KEY, JSON.stringify({ format: 1, nextCard: 2, cards: [
+      good,
+      { ...good, card: "c2", address: "https://elsewhere.example/concepts/x/#chunk-0123456789abcdef" },
+      { ...good, card: "c3", digest: "not-a-digest" },
+      { ...good, card: "c4", node: "nowhere" },
+      { ...good, card: "c5" },
+    ] }));
+    const page = new BriefDesk(document, { storage });
+    assert.equal(page.restoreBrief(), 1);
+    assert.equal(page.cards[0].nodeLabel, page.nodes[0].label, "The node's label must come from the page, not from storage.");
+    // With no storage at all the page still works.
+    assert.equal(new BriefDesk(document, { storage: null }).restoreBrief(), 0);
+    const refusing = { getItem() { throw new Error("blocked"); }, setItem() { throw new Error("blocked"); } };
+    const blocked = new BriefDesk(document, { storage: refusing });
+    assert.equal(blocked.restoreBrief(), 0);
+    blocked.saveBrief();
+  }
+
+  /** The link carries each address and digest after "#", and opening it checks them. */
+  static async testTheLinkRechecksTheBrief() {
+    const page = new BriefDesk(document, { storage: null });
+    assert.equal(page.recheckLink(), "");
+    const found = await page.search({ node: "core", query: "k7k ledger", limit: 2 });
+    for (const p of found.passages) {
+      await page.pin({ node: "core", passage: p.passage });
+    }
+    const link = page.recheckLink();
+    assert.ok(link.startsWith(`${page.home}#check=`));
+    const markdown = BriefDesk.linkBrief(new URL(link).hash);
+    assert.deepEqual(BriefDesk.savedEntries(markdown), page.cards.map((c) => ({ address: c.address, digest: c.digest })));
+    assert.match(page.briefMarkdown(), new RegExp(`open <${link.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}>`));
+    for (const bad of ["", "#check=", "#check=!!", "#other=abc", `#check=${btoa("not an entry")}`]) {
+      assert.equal(BriefDesk.linkBrief(bad), "", bad);
+    }
+    const checked = await page.verifyAll(BriefDesk.savedEntries(markdown));
+    assert.equal(checked.unchanged, 2);
+  }
+}
+
+test("the brief is kept in this browser and comes back after a reload", KeptBriefTest.testTheBriefIsKept);
+test("kept data is checked before use, and the page works without storage", KeptBriefTest.testStorageIsCheckedBeforeUse);
+test("a re-check link carries the addresses and digests and checks them", KeptBriefTest.testTheLinkRechecksTheBrief);
