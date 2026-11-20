@@ -695,8 +695,10 @@ export class PassageReader {
     // not a passage address, so it gets "not checked" instead of a false "gone".
     const plain = (address) => {
       try {
-        const url = new URL(String(address));
-        return url.search ? null : `${url.origin}${url.pathname}${url.hash}`;
+        const text = String(address);
+        const url = new URL(text);
+        // A "?" before the fragment, even with nothing after it, is a query.
+        return url.search || text.split("#")[0].includes("?") ? null : `${url.origin}${url.pathname}${url.hash}`;
       } catch {
         return null;
       }

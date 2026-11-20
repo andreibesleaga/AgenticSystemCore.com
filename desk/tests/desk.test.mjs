@@ -707,6 +707,7 @@ test("the shared citation check reads an address as a browser writes it, and ref
   const result = await page.checkCitations([
     { address: upper, digest: passage.digest },
     { address: `${url.origin}${url.pathname}?x=1${url.hash}`, digest: passage.digest },
+    { address: `${url.origin}${url.pathname}?${url.hash}`, digest: passage.digest },
   ]);
-  assert.deepEqual(result.results.map((r) => r.status), ["unchanged", "not checked"]);
+  assert.deepEqual(result.results.map((r) => r.status), ["unchanged", "not checked", "not checked"]);
 });
