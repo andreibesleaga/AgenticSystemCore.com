@@ -27,7 +27,7 @@
   "peer_policy": {
     "mode": "closed",
     "deny_origins": [],
-    "note": "This network calls no other site. Two tools read this site's own published passages; one writes a proposal with the visitor, in a window on this site, for the sites this site names."
+    "note": "This network calls no other site. Three tools read this site's own published passages; one writes a proposal with the visitor, in a window on this site, for the sites this site names."
   },
   "agent_mcp": {
     "protocol": "nsdeploy-agent-mcp/v1",

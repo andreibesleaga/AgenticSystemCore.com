@@ -595,4 +595,12 @@ test("the shared citation check reports each citation, and a malformed one as no
   const definition = PassageReader.citationCheck(() => page, "the test node");
   assert.equal(definition.effect, "read");
   assert.equal(definition.inputSchema.properties.citations.maxItems, PassageReader.CITATION_LIMIT);
+  // Through the runtime's registry, a short address or digest still gets its own report.
+  const registry = new ActionRegistry();
+  registry.register(SCOPE, { ...definition, availability: "bridge", callerOrigins: ["*"] });
+  const entry = registry.catalog(SCOPE).find((e) => e.name === "check_citations");
+  const plan = registry.prepare({ kind: "action", action: entry.ref, arguments: { citations: [{ address: "x", digest: "short" }, { address: passage.address, digest: passage.digest }] } });
+  const [receipt] = await registry.execute(plan, async () => true, "desk-test");
+  assert.equal(receipt.status, "succeeded");
+  assert.deepEqual(receipt.result.results.map((r) => r.status), ["not checked", "unchanged"]);
 });

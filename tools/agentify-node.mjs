@@ -192,8 +192,8 @@ export function networkOf({ base, title, tagline, name, label, cards, callers = 
     llm_router: { base_url: 'https://openrouter.ai/api/v1', mock: false, byok_router: 'https://openrouter.ai/api/v1' },
     allowed_peers: [],
     peer_policy: { mode: 'closed', deny_origins: [], note: writes
-      ? 'This network calls no other site. Two tools read this site\'s own published passages; one writes a proposal with the visitor, in a window on this site, for the sites this site names.'
-      : 'This network calls no other site. Its two tools read this site\'s own published passages.' },
+      ? 'This network calls no other site. Three tools read this site\'s own published passages; one writes a proposal with the visitor, in a window on this site, for the sites this site names.'
+      : 'This network calls no other site. Its three tools read this site\'s own published passages.' },
     agent_mcp: { protocol: 'nsdeploy-agent-mcp/v1', network: name, front_man: guide, available: false, reason: 'This is a static site; it runs no MCP server.' },
     linking: { protocol: 'nsdeploy-link/v1', exports: [{ network: name, front_man: guide, aliases: [name, guide], url: name }], imports: [], link_updates: { mode: 'browser-local' } },
     deployment: { mode: 'static', self_contained_runtime: false, browser_mock: false, direct_byok: true, direct_mcp_requires_cors: true, public_mcp_facade: false },
