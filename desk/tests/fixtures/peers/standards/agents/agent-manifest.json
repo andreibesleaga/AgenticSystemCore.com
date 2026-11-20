@@ -13,6 +13,7 @@
       "sample_queries": [
         "What does Standards Map offer on AI usage preferences (IETF drafts)?",
         "Which cards of Standards Map should I read first?",
+        "Propose a correction to the card on AI usage preferences (IETF drafts).",
         "Book a call with the author for me."
       ]
     }
@@ -26,7 +27,7 @@
   "peer_policy": {
     "mode": "closed",
     "deny_origins": [],
-    "note": "This network calls no other site. Its two tools read this site's own published passages."
+    "note": "This network calls no other site. Two tools read this site's own published passages; one writes a proposal with the visitor, in a window on this site, for the sites this site names."
   },
   "agent_mcp": {
     "protocol": "nsdeploy-agent-mcp/v1",
@@ -72,7 +73,8 @@
     "bridge": "./bridge/action-bridge.html",
     "agentTools": [
       "search_passages",
-      "read_passage"
+      "read_passage",
+      "propose_change"
     ]
   }
 }

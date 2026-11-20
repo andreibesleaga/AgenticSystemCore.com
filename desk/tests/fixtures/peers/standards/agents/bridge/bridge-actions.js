@@ -1,9 +1,10 @@
-// The reads this site shares with other agent sites, through its action bridge.
+// The reads, and the one write, this site shares with other agent sites, through its action bridge.
 // Written by tools/agentify-node.mjs of the AgenticSystemCore.com repository; do not edit.
 // A calling site's agent can search this node's published passages and read one with its
 // digest check. They read only what the node publishes to everyone (/chunks.jsonl and the
 // discovery document), so "*" shares nothing private. Nothing here changes anything.
 import { PassageReader } from "./reader.js";
+import { ProposeWindow } from "./propose-window.js";
 
 const ORIGIN = "https://standards.agenticsystemcore.com";
 const NODE = "standards_map";
@@ -56,4 +57,7 @@ export function registerActions(actions) {
     },
     execute: (args) => node().read({ passage: args.passage, node: NODE }),
   });
+  // The write, for the sites this node names: a proposal, made with the visitor in a window
+  // on this site (propose-window.js).
+  actions.register(ProposeWindow.definition());
 }
