@@ -527,7 +527,7 @@ class KeptBriefTest {
 
   /** Storage that holds anything but a kept brief of this page's own nodes is ignored. */
   static testStorageIsCheckedBeforeUse() {
-    for (const value of ["not json", "null", JSON.stringify({ format: 2, cards: [] }), JSON.stringify({ format: 1, cards: "x" })]) {
+    for (const value of ["not json", "null", JSON.stringify({ format: 2, cards: [] }), JSON.stringify({ format: 1, cards: "x" }), JSON.stringify({ format: 1, cards: [null, 3, "c1", []] })]) {
       const storage = KeptBriefTest.storage();
       storage.setItem(BriefDesk.STORE_KEY, value);
       assert.equal(new BriefDesk(document, { storage }).restoreBrief(), 0, value);
