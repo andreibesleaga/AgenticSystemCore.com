@@ -697,3 +697,16 @@ test("the then and now sentences are shown in the block, in order, and a linked 
     document.location = before;
   }
 });
+
+test("the shared citation check reads an address as a browser writes it, and refuses one with a query", async () => {
+  const page = new BriefDesk(document, { storage: null });
+  const found = await page.search({ node: "core", query: "k7k ledger", limit: 1 });
+  const passage = await page.read({ node: "core", passage: found.passages[0].passage });
+  const url = new URL(passage.address);
+  const upper = `${url.protocol}//${url.host.toUpperCase()}${url.pathname}${url.hash}`;
+  const result = await page.checkCitations([
+    { address: upper, digest: passage.digest },
+    { address: `${url.origin}${url.pathname}?x=1${url.hash}`, digest: passage.digest },
+  ]);
+  assert.deepEqual(result.results.map((r) => r.status), ["unchanged", "not checked"]);
+});

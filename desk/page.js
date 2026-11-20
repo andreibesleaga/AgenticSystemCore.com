@@ -96,7 +96,7 @@ export class BriefDesk extends PassageReader {
   renderActivity() {
     const hosts = [...this.contacted].sort();
     this.doc.getElementById("desk-activity").textContent = (hosts.length
-      ? `Sites read during this visit: ${hosts.join(", ")}. They get no key and no personal data.`
+      ? `Sites read during this visit: ${hosts.join(", ")}. They get no key and nothing you typed.`
       : "No site has been read yet during this visit.")
       + " The AI provider you choose is shown under AI model settings.";
   }
@@ -988,7 +988,7 @@ export class BriefDesk extends PassageReader {
     if (result.ok) {
       // A link can carry any digest; say what "changed" compares.
       const report = this.doc.getElementById("desk-saved-status");
-      report.textContent += " These citations came from a link: \"changed\" means the digest in the link differs from what the node publishes now.";
+      report.textContent += " These citations came from a link: \"changed\" means the digest in the link differs from what the node publishes now. A link holds only addresses and digests, so it shows whether the text matches them, not what was cited or when.";
     }
     this.doc.getElementById("desk-saved").scrollIntoView?.({ block: "start" });
     return result;

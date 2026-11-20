@@ -177,7 +177,7 @@ test("6.4 after the visitor approves, an exact named network loads from a second
     "/agents/standards_map.network.json", "/chunks.jsonl"]);
   assert.ok(web.requests.filter((r) => r.origin === STANDARDS).every((r) => !r.keySent && !r.authorization));
   // The peer's agent ran here, on the caller's router: its prompt is the published guide,
-  // and its tools are the two reads and the one write the peer's bridge shares with this site.
+  // and its tools are the three reads and the one write the peer's bridge shares with this site.
   const partner = router.partnerChats();
   assert.ok(partner.length >= 1, "The peer's network made no model call.");
   assert.deepEqual(partner[0].websiteTools.slice().sort(), ["website_check_citations", "website_propose_change", "website_read_passage", "website_search_passages"]);
@@ -331,7 +331,7 @@ test("the peer fixtures are the networks the two nodes publish", async () => {
     const config = JSON.parse(await readFile(path.join(HERE, "fixtures", "peers", host, "agents", `${name}.network.json`), "utf8"));
     assert.deepEqual(validateNetwork(new AgentNetwork(config, name)).errors, []);
     assert.ok(!JSON.stringify(config).includes("bookings"), `${host}: the guide claims bookings.`);
-    // Its bridge shares what its manifest lists as the guide's tools: the two reads with any
+    // Its bridge shares what its manifest lists as the guide's tools: the three reads with any
     // site, and the proposal write with this site only, in the peer's own window.
     assert.deepEqual(manifest.actions, { version: 1, bridge: "./bridge/action-bridge.html", agentTools: ["search_passages", "read_passage", "check_citations", "propose_change"] });
     const shared = [];
