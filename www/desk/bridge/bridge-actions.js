@@ -2,11 +2,12 @@
 // bridge/agent-manifest.json names this module; the runtime loads it in the bridge frame
 // on this site's origin, which has no Brief Desk page. A calling site's agent can then
 // search this node's published passages and read one with its digest check, as the
-// page's own assistant does. Nothing else is shared: not the brief, not another node.
+// page's own assistant does, and check citations someone saved earlier. Nothing else is
+// shared: not the brief, not another node.
 import { PassageReader } from "../reader.js";
 
 /**
- * Shares two reads with every site that calls this network. They read only what this
+ * Shares three reads with every site that calls this network. They read only what this
  * node already publishes to everyone (/chunks.jsonl), so "*" shares nothing private.
  */
 class BridgeActions {
@@ -73,6 +74,11 @@ class BridgeActions {
         properties: { node, passage },
       },
       execute: (args) => BridgeActions.desk().read(args),
+    });
+    actions.register({
+      ...PassageReader.citationCheck(BridgeActions.desk, "the AgenticSystemCore node"),
+      availability: "bridge",
+      callerOrigins: BridgeActions.CALLERS,
     });
   }
 }

@@ -115,7 +115,7 @@ class BriefDeskTest {
     const registry = new ActionRegistry();
     await registerActions({ register: registry.register.bind(registry, SCOPE) });
     const names = registry.catalog(SCOPE).map((e) => e.name).sort();
-    assert.deepEqual(names, ["add_card", "check_brief", "discard_brief", "get_desk_state", "read_passage", "remove_card", "search_passages"]);
+    assert.deepEqual(names, ["add_card", "check_brief", "check_citations", "discard_brief", "get_desk_state", "read_passage", "remove_card", "search_passages"]);
     // The visitor ticks the box.
     const box = document.getElementById("desk-allow-patterns");
     box.checked = true;
@@ -576,3 +576,31 @@ class KeptBriefTest {
 test("the brief is kept in this browser and comes back after a reload", KeptBriefTest.testTheBriefIsKept);
 test("kept data is checked before use, and the page works without storage", KeptBriefTest.testStorageIsCheckedBeforeUse);
 test("a re-check link carries the addresses and digests and checks them", KeptBriefTest.testTheLinkRechecksTheBrief);
+
+test("the shared citation check reports each citation, and a malformed one as not checked", async () => {
+  const page = new BriefDesk(document, { storage: null });
+  const found = await page.search({ node: "core", query: "k7k ledger", limit: 1 });
+  const passage = await page.read({ node: "core", passage: found.passages[0].passage });
+  const changed = passage.digest.slice(0, -1) + (passage.digest.endsWith("0") ? "1" : "0");
+  const result = await page.checkCitations([
+    { address: passage.address, digest: passage.digest.toUpperCase() },
+    { address: passage.address, digest: changed },
+    { address: "not an address", digest: passage.digest },
+    { address: passage.address, digest: "short" },
+    null,
+  ]);
+  assert.deepEqual(result.results.map((r) => r.status), ["unchanged", "changed", "not checked", "not checked", "not checked"]);
+  assert.equal(result.checked, 2);
+  assert.equal(result.unchanged, 1);
+  const definition = PassageReader.citationCheck(() => page, "the test node");
+  assert.equal(definition.effect, "read");
+  assert.equal(definition.inputSchema.properties.citations.maxItems, PassageReader.CITATION_LIMIT);
+  // Through the runtime's registry, a short address or digest still gets its own report.
+  const registry = new ActionRegistry();
+  registry.register(SCOPE, { ...definition, availability: "bridge", callerOrigins: ["*"] });
+  const entry = registry.catalog(SCOPE).find((e) => e.name === "check_citations");
+  const plan = registry.prepare({ kind: "action", action: entry.ref, arguments: { citations: [{ address: "x", digest: "short" }, { address: passage.address, digest: passage.digest }] } });
+  const [receipt] = await registry.execute(plan, async () => true, "desk-test");
+  assert.equal(receipt.status, "succeeded");
+  assert.deepEqual(receipt.result.results.map((r) => r.status), ["not checked", "unchanged"]);
+});

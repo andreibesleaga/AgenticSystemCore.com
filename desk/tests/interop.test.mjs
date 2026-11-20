@@ -180,12 +180,12 @@ test("6.4 after the visitor approves, an exact named network loads from a second
   // and its tools are the two reads and the one write the peer's bridge shares with this site.
   const partner = router.partnerChats();
   assert.ok(partner.length >= 1, "The peer's network made no model call.");
-  assert.deepEqual(partner[0].websiteTools.slice().sort(), ["website_propose_change", "website_read_passage", "website_search_passages"]);
+  assert.deepEqual(partner[0].websiteTools.slice().sort(), ["website_check_citations", "website_propose_change", "website_read_passage", "website_search_passages"]);
   for (const frame of web.frames) {
     assert.equal(frame.src, `${STANDARDS}/agents/bridge/action-bridge.html`);
     assert.equal(frame.ready, true, String(frame.error));
   }
-  assert.deepEqual(web.frames[0].shared.slice().sort(), ["propose_change", "read_passage", "search_passages"]);
+  assert.deepEqual(web.frames[0].shared.slice().sort(), ["check_citations", "propose_change", "read_passage", "search_passages"]);
   assert.deepEqual(web.frames.flatMap((f) => f.executed), ["search_passages"], "The peer's guide did not search its own node through the bridge.");
   assert.deepEqual(web.dialogs, [], "A read asked the visitor something.");
   assert.match(run.result.text, /^CALLER_FINAL: PARTNER_ANSWER:/);
@@ -203,7 +203,7 @@ test("6.4 after the visitor approves, an exact named network loads from a second
   assert.deepEqual(router2.partnerChats(), []);
 });
 
-test("6.4 (other direction) another site runs this site's network, with only the two reads this site shares", async () => {
+test("6.4 (other direction) another site runs this site's network, with only the three reads this site shares", async () => {
   // A caller on another origin whose network names this site's network.
   const CALLER = "https://caller.example";
   const { web, router } = Interop.web(new URL(VISITOR_ROUTER).origin, 1);
@@ -228,12 +228,12 @@ test("6.4 (other direction) another site runs this site's network, with only the
     assert.equal(frame.src, `${SITE}/desk/bridge/action-bridge.html`);
     assert.equal(frame.ready, true, String(frame.error));
   }
-  assert.deepEqual(web.frames[0].shared.slice().sort(), ["read_passage", "search_passages"]);
+  assert.deepEqual(web.frames[0].shared.slice().sort(), ["check_citations", "read_passage", "search_passages"]);
   assert.deepEqual(web.frames[1].executed, ["search_passages"], "The peer's agent did not run the shared search in the bridge.");
   assert.deepEqual(web.dialogs, [], "A read asked the visitor something.");
   const partner = router.partnerChats();
   assert.ok(partner.length >= 1);
-  assert.deepEqual(partner[0].websiteTools.slice().sort(), ["website_read_passage", "website_search_passages"]);
+  assert.deepEqual(partner[0].websiteTools.slice().sort(), ["website_check_citations", "website_read_passage", "website_search_passages"]);
   assert.match(result.text, /website_search_passages said status succeeded/);
   // The read went to this site's published passages, with no key.
   assert.ok(web.requests.some((r) => r.url === `${SITE}/chunks.jsonl` && !r.keySent));
@@ -333,13 +333,13 @@ test("the peer fixtures are the networks the two nodes publish", async () => {
     assert.ok(!JSON.stringify(config).includes("bookings"), `${host}: the guide claims bookings.`);
     // Its bridge shares what its manifest lists as the guide's tools: the two reads with any
     // site, and the proposal write with this site only, in the peer's own window.
-    assert.deepEqual(manifest.actions, { version: 1, bridge: "./bridge/action-bridge.html", agentTools: ["search_passages", "read_passage", "propose_change"] });
+    assert.deepEqual(manifest.actions, { version: 1, bridge: "./bridge/action-bridge.html", agentTools: ["search_passages", "read_passage", "check_citations", "propose_change"] });
     const shared = [];
     const module = await import(pathToFileURL(path.join(HERE, "fixtures", "peers", host, "agents", "bridge", "bridge-actions.js")).href);
     module.registerActions({ register: (definition) => shared.push(definition) });
     assert.deepEqual(shared.map((d) => `${d.name}:${d.effect}:${d.availability}:${d.callerOrigins.join(",")}`),
-      ["search_passages:read:bridge:*", "read_passage:read:bridge:*", `propose_change:write:bridge:${SITE}`]);
-    assert.equal(shared[2].confirmsInWindow, true);
+      ["search_passages:read:bridge:*", "read_passage:read:bridge:*", "check_citations:read:bridge:*", `propose_change:write:bridge:${SITE}`]);
+    assert.equal(shared[3].confirmsInWindow, true);
     // The window's code beside it is this repository's, byte for byte.
     for (const f of ["propose-window.js", "window.css"]) {
       assert.ok((await readFile(path.join(HERE, "fixtures", "peers", host, "agents", "bridge", f))).equals(await readFile(path.join(ROOT, "tools", "node-bridge", f))), `${host}: ${f} is not tools/node-bridge/${f}`);

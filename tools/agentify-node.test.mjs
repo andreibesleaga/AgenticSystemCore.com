@@ -44,7 +44,7 @@ test("the network is valid, lists the two shared reads as the guide's tools and 
   const cards = cardsOf(CHUNKS, BASE);
   const { network, manifest, links } = networkOf({ base: BASE, title: "Node", tagline: "A test node.", name: "node_cards", label: "Node", cards });
   assert.deepEqual(validateNetwork(new AgentNetwork(network, "node_cards")).errors, []);
-  assert.deepEqual(manifest.actions, { version: 1, bridge: "./bridge/action-bridge.html", agentTools: ["search_passages", "read_passage"] });
+  assert.deepEqual(manifest.actions, { version: 1, bridge: "./bridge/action-bridge.html", agentTools: ["search_passages", "read_passage", "check_citations"] });
   assert.match(network.tools[0].instructions, /website_search_passages/);
   assert.match(network.tools[0].instructions, /digestMatches is true/);
   assert.deepEqual(manifest.allowed_peers, []);
@@ -68,7 +68,7 @@ test("the bridge module shares two reads that search and read the node's own pas
     const shared = [];
     const module = await import(pathToFileURL(path.join(folder, "bridge-actions.mjs")).href);
     module.registerActions({ register: (definition) => shared.push(definition) });
-    assert.deepEqual(shared.map((d) => [d.name, d.effect, d.availability, d.callerOrigins]), [["search_passages", "read", "bridge", ["*"]], ["read_passage", "read", "bridge", ["*"]]]);
+    assert.deepEqual(shared.map((d) => [d.name, d.effect, d.availability, d.callerOrigins]), [["search_passages", "read", "bridge", ["*"]], ["read_passage", "read", "bridge", ["*"]], ["check_citations", "read", "bridge", ["*"]]]);
     const found = await shared[0].execute({ query: "ledger" });
     assert.equal(found.ok, true);
     assert.equal(found.passages[0].address, `${BASE}concepts/beta/#chunk-${RECORDS[1].id.slice(0, 16)}`);
@@ -152,11 +152,11 @@ test("--callers takes exact https origins and never a wildcard; a node without i
   }
   const cards = cardsOf(CHUNKS, BASE);
   const reads = networkOf({ base: BASE, title: "Node", tagline: "A test node.", name: "node_cards", label: "Node", cards });
-  assert.deepEqual(reads.manifest.actions.agentTools, ["search_passages", "read_passage"]);
+  assert.deepEqual(reads.manifest.actions.agentTools, ["search_passages", "read_passage", "check_citations"]);
   assert.ok(!reads.network.tools[0].instructions.includes("website_propose_change"));
   assert.ok(!bridgeModule({ base: BASE, name: "node_cards", label: "Node" }).includes("propose-window"));
   const writes = networkOf({ base: BASE, title: "Node", tagline: "A test node.", name: "node_cards", label: "Node", cards, callers: [CALLER] });
-  assert.deepEqual(writes.manifest.actions.agentTools, ["search_passages", "read_passage", "propose_change"]);
+  assert.deepEqual(writes.manifest.actions.agentTools, ["search_passages", "read_passage", "check_citations", "propose_change"]);
   assert.deepEqual(validateNetwork(new AgentNetwork(writes.network, "node_cards")).errors, []);
   assert.match(writes.network.tools[0].instructions, /name and reason in this site's own window: never ask for them/);
   assert.match(writes.network.tools[0].instructions, /Nothing is published until this site's maintainers decide/);

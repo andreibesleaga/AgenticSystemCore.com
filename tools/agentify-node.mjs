@@ -13,9 +13,10 @@
 //                              own published passages (/chunks.jsonl)
 //   links.json                 the peer-network link map (empty: the guide calls no one)
 //   bridge/                    the action bridge: the page another site loads in a hidden
-//                              frame, and the two reads it shares with every caller, search
-//                              and read with the digest check, over this node's own
-//                              published passages (bridge-actions.js, reader.js)
+//                              frame, and the three reads it shares with every caller:
+//                              search, read with the digest check, and a check of saved
+//                              citations, over this node's own published passages
+//                              (bridge-actions.js, reader.js)
 //   runtime/                   the six files of the browser runtime the bridge page loads,
 //                              copied unchanged from ../desk/runtime/ (Apache-2.0, LICENSE.txt)
 //
@@ -57,8 +58,8 @@ const LIST_BUDGET = 3000;
 const TITLE_LIMIT = 120;
 /** The Brief Desk's folder, which holds the reader, the bridge page and the runtime. */
 const DESK = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'desk');
-/** The two reads the bridge shares, by the names the guide's tools get (website_<name>). */
-const SHARED = ['search_passages', 'read_passage'];
+/** The three reads the bridge shares, by the names the guide's tools get (website_<name>). */
+const SHARED = ['search_passages', 'read_passage', 'check_citations'];
 /** The write the bridge shares with the sites named by --callers. */
 const WRITE = 'propose_change';
 /** The folder of the files a node's bridge gets unchanged for that write. */
@@ -158,6 +159,7 @@ export function networkOf({ base, title, tagline, name, label, cards, callers = 
     'How to work:',
     '- Call website_search_passages with two to six plain words from the request. If nothing matches, try other words once.',
     '- Call website_read_passage on the best one or two results. Use a passage only when its digestMatches is true; if it is false, say the passage failed its check.',
+    '- To check citations of this site saved earlier (an address and a sha-256 digest each), call website_check_citations and report each status.',
     '- Answer in a few sentences from the passages you read, quoting the sentences that answer, and give each passage\'s address.',
     '- If you have no website_ tools, or a tool fails, answer from the list below: name the cards that match, each with its full address, and say that the card\'s own page has the text.',
     ...(writes ? [
@@ -190,8 +192,8 @@ export function networkOf({ base, title, tagline, name, label, cards, callers = 
     llm_router: { base_url: 'https://openrouter.ai/api/v1', mock: false, byok_router: 'https://openrouter.ai/api/v1' },
     allowed_peers: [],
     peer_policy: { mode: 'closed', deny_origins: [], note: writes
-      ? 'This network calls no other site. Two tools read this site\'s own published passages; one writes a proposal with the visitor, in a window on this site, for the sites this site names.'
-      : 'This network calls no other site. Its two tools read this site\'s own published passages.' },
+      ? 'This network calls no other site. Three tools read this site\'s own published passages; one writes a proposal with the visitor, in a window on this site, for the sites this site names.'
+      : 'This network calls no other site. Its three tools read this site\'s own published passages.' },
     agent_mcp: { protocol: 'nsdeploy-agent-mcp/v1', network: name, front_man: guide, available: false, reason: 'This is a static site; it runs no MCP server.' },
     linking: { protocol: 'nsdeploy-link/v1', exports: [{ network: name, front_man: guide, aliases: [name, guide], url: name }], imports: [], link_updates: { mode: 'browser-local' } },
     deployment: { mode: 'static', self_contained_runtime: false, browser_mock: false, direct_byok: true, direct_mcp_requires_cors: true, public_mcp_facade: false },
@@ -204,7 +206,7 @@ export function networkOf({ base, title, tagline, name, label, cards, callers = 
 }
 
 /**
- * The module the bridge page loads: the two reads this node shares with every caller.
+ * The module the bridge page loads: the three reads this node shares with every caller.
  *
  * :param o: base (the node's base address), name (the network name), label (the site name),
  *   callers (the origins that may ask for the shared write; none: reads only).
@@ -269,7 +271,8 @@ export function registerActions(actions) {
       },
     },
     execute: (args) => node().read({ passage: args.passage, node: NODE }),
-  });${writes ? `
+  });
+  actions.register({ ...PassageReader.citationCheck(node, LABEL), availability: "bridge", callerOrigins: ["*"] });${writes ? `
   // The write, for the sites this node names: a proposal, made with the visitor in a window
   // on this site (propose-window.js).
   actions.register(ProposeWindow.definition());` : ''}

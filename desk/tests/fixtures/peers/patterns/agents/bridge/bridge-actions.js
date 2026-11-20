@@ -57,6 +57,7 @@ export function registerActions(actions) {
     },
     execute: (args) => node().read({ passage: args.passage, node: NODE }),
   });
+  actions.register({ ...PassageReader.citationCheck(node, LABEL), availability: "bridge", callerOrigins: ["*"] });
   // The write, for the sites this node names: a proposal, made with the visitor in a window
   // on this site (propose-window.js).
   actions.register(ProposeWindow.definition());
