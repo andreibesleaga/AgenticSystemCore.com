@@ -25,6 +25,22 @@ export class BriefDesk extends PassageReader {
   /** The most cards a brief holds. */
   static BRIEF_LIMIT = 8;
 
+  /** The words the first-minute buttons search for, in this site's own node. */
+  static TRY_QUERY = "bundle";
+
+  /**
+   * The questions the page offers for the chat, the manifest's sample_queries in the same
+   * order (a test keeps the two the same).
+   */
+  static SAMPLES = [
+    "What is a Bundle? Answer from a passage and give its address.",
+    "Find a passage on how a digest in the discovery document is checked, and add it to my brief.",
+    "Ask the Standards Map what it offers on robots.txt and AI usage preferences.",
+    "Add the passage that defines a Cluster to my brief, then discard the brief.",
+    "Ask the Standards Map to write a proposal that corrects its card on robots.txt.",
+    "Publish a new item on this node for me."
+  ];
+
   /**
    * :param doc: The document to render into.
    * :param options: nodes (a list of {id, label, origin}), the first being this page's own
@@ -360,6 +376,177 @@ export class BriefDesk extends PassageReader {
     return words[result.status] || `Not checked. ${result.reason}`;
   }
 
+  // ---------------------------------------------------------------- the first minute
+
+  /**
+   * Search one node and show the results, as the search form does.
+   *
+   * :param query: The words to look for.
+   * :param node: The node id.
+   * :return: What search() returned.
+   */
+  async runSearch(query, node) {
+    const status = this.doc.getElementById("desk-status");
+    status.textContent = "Searching…";
+    try {
+      const result = await this.search({ query, node, limit: BriefDesk.SEARCH_LIMIT });
+      if (result.ok) {
+        this.lastSearch = { query: result.query, node: result.node, count: result.count };
+      }
+      this.renderResults(result);
+      return result;
+    } catch (error) {
+      status.textContent = `The search could not read the node: ${error.message}`;
+      return { ok: false, reason: status.textContent };
+    }
+  }
+
+  /**
+   * The first-minute "cite" button: search this site's node for TRY_QUERY and add the first
+   * passage to the brief, with its digest check, unless the brief already holds it.
+   *
+   * :return: {ok, card, title, already} or a refusal.
+   */
+  async tryCite() {
+    const found = await this.runSearch(BriefDesk.TRY_QUERY, "core");
+    if (!found.ok || found.count === 0) {
+      return { ok: false, reason: found.reason || `Nothing matches "${BriefDesk.TRY_QUERY}".` };
+    }
+    const first = found.passages[0];
+    const held = this.cards.find((c) => c.address === first.address);
+    if (held) {
+      return { ok: true, card: held.card, title: held.title, already: true };
+    }
+    const added = await this.pin({ node: first.node, passage: first.passage });
+    return added.ok ? { ok: true, card: added.card.card, title: first.title, already: false } : added;
+  }
+
+  /**
+   * An example of a saved brief for the first-minute check: one passage as it is, and the
+   * same passage again with the last character of its digest altered, as a brief would
+   * read if the text had changed since it was saved. The example says so in its own text.
+   *
+   * :param passage: A passage read from a node: title, address and digest.
+   * :return: The Markdown text.
+   */
+  static exampleBrief(passage) {
+    const altered = passage.digest.slice(0, -1) + (passage.digest.endsWith("0") ? "1" : "0");
+    return [
+      "# Brief (example: the second entry's digest was altered on purpose)",
+      "",
+      `- **${passage.title}**: as it is published.`,
+      `  Source: <${passage.address}> (sha-256 ${passage.digest})`,
+      `- **${passage.title}**: the same passage, with the last character of its digest altered, as if its text had changed since.`,
+      `  Source: <${passage.address}> (sha-256 ${altered})`,
+      "",
+    ].join("\n");
+  }
+
+  /**
+   * Put an example saved brief in the "Check a saved brief" box, open it and check it. The
+   * example is built from the first passage of this site's own node for TRY_QUERY; the
+   * visitor's brief is not touched.
+   *
+   * :return: What checkSaved() returned, with changedShown, or a refusal.
+   */
+  async tryExample() {
+    const found = await this.search({ query: BriefDesk.TRY_QUERY, node: "core", limit: 1 });
+    if (!found.ok || found.count === 0) {
+      return { ok: false, reason: found.reason || `Nothing matches "${BriefDesk.TRY_QUERY}".` };
+    }
+    const passage = await this.read({ node: "core", passage: found.passages[0].passage });
+    if (!passage.ok || !passage.digestMatches) {
+      return { ok: false, reason: passage.reason || "The example passage does not match its published digest, so no example was made." };
+    }
+    this.doc.getElementById("desk-saved-text").value = BriefDesk.exampleBrief(passage);
+    this.doc.getElementById("desk-saved").open = true;
+    const result = await this.showSaved();
+    return result.ok ? { ...result, changedShown: result.results.some((r) => r.status === "changed") } : result;
+  }
+
+  /**
+   * Check what the "Check a saved brief" box holds and show one line per cited passage.
+   *
+   * :return: What checkSaved() returned, or a refusal.
+   */
+  async showSaved() {
+    const report = this.doc.getElementById("desk-saved-status");
+    const list = this.doc.getElementById("desk-saved-results");
+    report.textContent = "Reading the passages…";
+    list.replaceChildren();
+    try {
+      const result = await this.checkSaved(this.doc.getElementById("desk-saved-text").value);
+      if (!result.ok) {
+        report.textContent = result.reason;
+        return result;
+      }
+      report.textContent = `${result.unchanged} of ${result.results.length} cited passage${result.results.length === 1 ? "" : "s"} unchanged.`;
+      list.replaceChildren(...result.results.map((r) => {
+        const item = this.element("li");
+        // Only an address this page read from one of its nodes becomes a link.
+        item.append(
+          r.status === "not checked" ? this.element("span", r.address) : this.element("a", r.address, { href: r.address }),
+          this.element("p", BriefDesk.verdict(r), { class: r.status === "unchanged" ? "desk-ok" : "desk-bad" }),
+        );
+        return item;
+      }));
+      return result;
+    } catch (error) {
+      report.textContent = `The check could not finish: ${error.message}`;
+      return { ok: false, reason: report.textContent };
+    }
+  }
+
+  /**
+   * The runtime's chat box, once the assistant has loaded.
+   *
+   * :return: The input element, or null.
+   */
+  chatInput() {
+    try {
+      return this.doc.querySelector("#ns-input");
+    } catch {
+      // The test document knows only this page's own ids.
+      return null;
+    }
+  }
+
+  /**
+   * Put one sample question in the chat box, for the visitor to send. Nothing is sent here.
+   *
+   * :param text: The question.
+   * :return: {ok, needsKey} or a refusal.
+   */
+  askSample(text) {
+    const input = this.chatInput();
+    if (!input || input.disabled) {
+      return { ok: false, reason: "The chat box is not ready. Add a key in AI model settings below, then try again." };
+    }
+    input.value = text;
+    // The runtime enables its Send button on input events.
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.focus();
+    // site.js marks the chat when the runtime has no key yet.
+    return { ok: true, needsKey: this.doc.getElementById("agent-app").getAttribute("data-needs-key") === "true" };
+  }
+
+  /** Draw the sample questions as buttons. */
+  renderSamples() {
+    const status = this.doc.getElementById("desk-samples-status");
+    this.doc.getElementById("desk-samples").replaceChildren(...BriefDesk.SAMPLES.map((text) => {
+      const item = this.element("li");
+      const button = this.element("button", text, { type: "button" });
+      button.addEventListener("click", () => {
+        const asked = this.askSample(text);
+        status.textContent = !asked.ok ? asked.reason : asked.needsKey
+          ? "The question is in the chat box. Add your key in AI model settings below, then press Send."
+          : "The question is in the chat box. Press Send.";
+      });
+      item.append(button);
+      return item;
+    }));
+  }
+
   // ---------------------------------------------------------------- rendering
 
   /**
@@ -492,18 +679,7 @@ export class BriefDesk extends PassageReader {
     const status = this.doc.getElementById("desk-status");
     this.doc.getElementById("desk-search-form").addEventListener("submit", async (event) => {
       event.preventDefault();
-      const query = this.doc.getElementById("desk-query").value;
-      const node = this.doc.getElementById("desk-node").value;
-      status.textContent = "Searching…";
-      try {
-        const result = await this.search({ query, node, limit: BriefDesk.SEARCH_LIMIT });
-        if (result.ok) {
-          this.lastSearch = { query: result.query, node: result.node, count: result.count };
-        }
-        this.renderResults(result);
-      } catch (error) {
-        status.textContent = `The search could not read the node: ${error.message}`;
-      }
+      await this.runSearch(this.doc.getElementById("desk-query").value, this.doc.getElementById("desk-node").value);
     });
     this.doc.getElementById("desk-discard").addEventListener("click", async () => {
       // The page cannot bring a discarded brief back, so its own button asks first, as the
@@ -538,31 +714,7 @@ export class BriefDesk extends PassageReader {
         status.textContent = `The check could not finish: ${error.message}`;
       }
     });
-    this.doc.getElementById("desk-saved-check").addEventListener("click", async () => {
-      const report = this.doc.getElementById("desk-saved-status");
-      const list = this.doc.getElementById("desk-saved-results");
-      report.textContent = "Reading the passages…";
-      list.replaceChildren();
-      try {
-        const result = await this.checkSaved(this.doc.getElementById("desk-saved-text").value);
-        if (!result.ok) {
-          report.textContent = result.reason;
-          return;
-        }
-        report.textContent = `${result.unchanged} of ${result.results.length} cited passage${result.results.length === 1 ? "" : "s"} unchanged.`;
-        list.replaceChildren(...result.results.map((r) => {
-          const item = this.element("li");
-          // Only an address this page read from one of its nodes becomes a link.
-          item.append(
-            r.status === "not checked" ? this.element("span", r.address) : this.element("a", r.address, { href: r.address }),
-            this.element("p", BriefDesk.verdict(r), { class: r.status === "unchanged" ? "desk-ok" : "desk-bad" }),
-          );
-          return item;
-        }));
-      } catch (error) {
-        report.textContent = `The check could not finish: ${error.message}`;
-      }
-    });
+    this.doc.getElementById("desk-saved-check").addEventListener("click", () => this.showSaved());
     this.doc.getElementById("desk-copy").addEventListener("click", async () => {
       try {
         await this.doc.defaultView.navigator.clipboard.writeText(this.briefMarkdown());
@@ -577,7 +729,36 @@ export class BriefDesk extends PassageReader {
         box.addEventListener("change", () => this.setAllowed(node.id, box.checked));
       }
     }
+    this.connectFirstMinute();
+    this.renderSamples();
     this.render();
+  }
+
+  /** Connect the three first-minute buttons, which need no key. */
+  connectFirstMinute() {
+    const status = this.doc.getElementById("desk-try-status");
+    this.doc.getElementById("desk-try-search").addEventListener("click", async () => {
+      this.doc.getElementById("desk-query").value = BriefDesk.TRY_QUERY;
+      this.doc.getElementById("desk-node").value = "core";
+      const found = await this.runSearch(BriefDesk.TRY_QUERY, "core");
+      status.textContent = found.ok
+        ? `Found ${found.count} passage${found.count === 1 ? "" : "s"} for "${BriefDesk.TRY_QUERY}" in this site's published passages. They are listed under Search and collect.`
+        : found.reason;
+    });
+    this.doc.getElementById("desk-try-cite").addEventListener("click", async () => {
+      const cited = await this.tryCite();
+      status.textContent = !cited.ok ? cited.reason : cited.already
+        ? `"${cited.title}" is already card ${cited.card} of your brief.`
+        : `"${cited.title}" is now card ${cited.card} of your brief. Its text matched the digest the site published for it.`;
+    });
+    this.doc.getElementById("desk-try-example").addEventListener("click", async () => {
+      const checked = await this.tryExample();
+      if (!checked.ok) {
+        status.textContent = checked.reason;
+        return;
+      }
+      status.textContent = `An example brief was checked under "Check a saved brief": ${checked.unchanged} of ${checked.results.length} passages unchanged.${checked.changedShown ? " The entry with the altered digest shows as changed." : ""} Your own brief was not changed.`;
+    });
   }
 
   /**
