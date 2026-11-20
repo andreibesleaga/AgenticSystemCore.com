@@ -30,9 +30,10 @@ The network's address is `https://agenticsystemcore.com/desk/brief_desk`. It can
 networks of the two peer nodes, each after the visitor agrees:
 `https://patterns.agenticsystemcore.com/agents/pattern_cards` and
 `https://standards.agenticsystemcore.com/agents/standards_map`. Those are written by
-`../tools/agentify-node.mjs` in each node's repository, with a bridge that shares two reads
-over that node's own passages (search, and read with the digest check), so a peer's guide
-answers from passages it read and checked.
+`../tools/agentify-node.mjs` in each node's repository, with a bridge that shares three reads over
+that node's own passages (search, read with the digest check, and a check of saved citations), so a
+peer's guide answers from passages it read and checked. With `--callers`, it also shares one write
+with the sites named: a proposal to change a card, confirmed in a window on the node's own site.
 
 ## What the checks show
 
@@ -79,5 +80,7 @@ that provider, never to a peer site. To stop using it, select **Delete setup** u
 `tests/linking/example_web.mjs`, which points at `../../runtime/`.
 `site.js` and `tests/agentified.test.mjs` are that repository's templates (`templates/site.js`
 and its test template, Apache-2.0), filled in for this page. `bridge/action-bridge.html`
-is its bridge page, written by `tools/build_network.mjs`.
+is its bridge page, written by `tools/build_network.mjs`. `templates/bridge/` comes from
+commit `0516537` of the same repository, and `../tools/node-bridge/propose-window.js` is adapted from its
+`templates/bridge/write-window.js` (Apache-2.0).
 The rest of this folder is this repository's own code, Apache-2.0.

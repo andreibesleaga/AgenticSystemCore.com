@@ -34,7 +34,8 @@
 // it searched and read on this node, each checked against its published digest.
 //
 // The network holds no private text: every line of it comes from what the node already
-// publishes. The bridge shares only reads of files the node publishes to everyone. The
+// publishes. The bridge shares reads of files the node publishes to everyone, and with
+// --callers one write that the visitor confirms in a window on the node's own site. The
 // network is validated with the browser runtime's own validator before anything is written.
 // With --check nothing is written: the tool exits 1 when the files on disk differ from what
 // it would write, so a build that forgot this step is caught.
@@ -216,9 +217,11 @@ export function bridgeModule({ base, name, label, callers = [] }) {
   const writes = callers.length > 0;
   return `// The reads${writes ? ', and the one write,' : ''} this site shares with other agent sites, through its action bridge.
 // Written by tools/agentify-node.mjs of the AgenticSystemCore.com repository; do not edit.
-// A calling site's agent can search this node's published passages and read one with its
-// digest check. They read only what the node publishes to everyone (/chunks.jsonl and the
-// discovery document), so "*" shares nothing private. Nothing here changes anything.
+// A calling site's agent can search this node's published passages, read one with its digest
+// check, and check citations saved earlier. The reads use only what the node publishes to
+// everyone (/chunks.jsonl and the discovery document), so "*" shares nothing private.${writes ? `
+// The write changes nothing on this site: the visitor confirms a proposal in this site's own
+// window and sends it to the maintainers.` : ' Nothing here changes anything.'}
 import { PassageReader } from "./reader.js";
 ${writes ? 'import { ProposeWindow } from "./propose-window.js";\n' : ''}
 const ORIGIN = ${JSON.stringify(base.replace(/\/$/, ''))};

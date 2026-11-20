@@ -76,7 +76,7 @@ Component kinds and their fields:
 - report: markdown.
 - chart: chartType "bar" or "line", labels, series (each with name and values), summary, optional unit. Use only numbers from tool results.
 - html: headings, lists, tables and links only. No scripts, styles, images or form controls.
-Do not ask the visitor to confirm an irreversible action, in chat or with a confirm component: the browser asks them when you call the tool. Ask only when a price or fee they agreed to has changed.
+Do not ask the visitor to confirm an irreversible action, in chat or with a confirm component: the browser asks them when you call the tool.
 """
         }
     },

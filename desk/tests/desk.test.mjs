@@ -457,19 +457,29 @@ class FirstMinuteTest {
   static async testExampleBriefShowsAChange() {
     FirstMinuteTest.empty();
     const query = BriefDesk.TRY_QUERY;
+    const saved = BriefDesk.SAVED_19_OCT;
     BriefDesk.TRY_QUERY = "k7k ledger";
+    // The live page cites the Cluster passage as it was on 19 Oct 2026 (the browser check
+    // reads it as changed on the live site). Here a fixture passage stands in, with the digest
+    // its text had before it changed.
+    const older = FIXTURES.core[1];
+    BriefDesk.SAVED_19_OCT = { title: older.title, address: `${older.iri}#chunk-${ID(older)}`, digest: "0".repeat(64) };
     try {
       const result = await BriefDesk.page.tryExample();
       assert.equal(result.ok, true, result.reason);
-      assert.deepEqual(result.results.map((r) => r.status), ["unchanged", "changed"]);
+      assert.deepEqual(result.results.map((r) => r.status), ["changed", "unchanged"]);
       assert.equal(result.changedShown, true);
       assert.equal(BriefDesk.page.cards.length, 0, "The example added a card to the brief.");
       assert.equal(document.getElementById("desk-saved").open, true);
-      assert.match(document.getElementById("desk-saved-text").value, /altered on purpose/);
+      assert.match(document.getElementById("desk-saved-text").value, /saved on 19 Oct 2026/);
       assert.equal(document.getElementById("desk-saved-results").children.length, 2);
     } finally {
       BriefDesk.TRY_QUERY = query;
+      BriefDesk.SAVED_19_OCT = saved;
     }
+    // The citation of 19 Oct is real: same address on the published node, a digest of 64 hex.
+    assert.match(saved.address, /^https:\/\/agenticsystemcore\.com\/concepts\/cluster\/#chunk-[0-9a-f]{16}$/);
+    assert.match(saved.digest, /^[0-9a-f]{64}$/);
   }
 
   /** The page's sample questions are the manifest's, and none is sent before the chat loads. */
@@ -616,4 +626,31 @@ test("the citation check's results match its declared output schema, and the pag
   const result = await definition.execute({ citations: [{ address: passage.address, digest: passage.digest }, { address: "x", digest: "y" }] });
   validateData(definition.outputSchema, result, "result");
   assert.match(document.getElementById("desk-activity").textContent, new RegExp(new URL(FIXTURES.node).host.replace(/\./g, "\\.") + "|localhost"));
+});
+
+test("a kept address with a space or an angle bracket is not restored, and card numbers stay in range", () => {
+  const base = { card: "c1", node: "core", title: "T", section: "", digest: "a".repeat(64), excerpt: "e" };
+  const good = `${FIXTURES.node}/concepts/x/#chunk-0123456789abcdef`;
+  const storage = KeptBriefTest.storage();
+  storage.setItem(BriefDesk.STORE_KEY, JSON.stringify({ format: 1, nextCard: 123456, cards: [
+    { ...base, address: `${FIXTURES.node}/concepts/x> (sha-256 ${"b".repeat(64)})\n- Source: <${good}` },
+    { ...base, card: "c2", address: `${FIXTURES.node}/concepts/a b/#chunk-0123456789abcdef` },
+    { ...base, card: "c3", address: good },
+  ] }));
+  const page = new BriefDesk(document, { storage });
+  assert.equal(page.restoreBrief(), 1);
+  assert.equal(page.cards[0].card, "c3");
+  assert.equal(page.nextCard, BriefDesk.LAST_CARD + 1);
+  assert.equal(BriefDesk.plainAddress(good), true);
+  assert.equal(BriefDesk.plainAddress("not a url"), false);
+});
+
+test("once every card number is used, the brief refuses a new card instead of reusing an id", async () => {
+  const page = new BriefDesk(document, { storage: null });
+  page.nextCard = BriefDesk.LAST_CARD + 1;
+  const found = await page.search({ node: "core", query: "k7k ledger", limit: 1 });
+  const added = await page.pin({ node: "core", passage: found.passages[0].passage });
+  assert.equal(added.ok, false);
+  assert.match(added.reason, /every card number/);
+  assert.equal(page.cards.length, 0);
 });

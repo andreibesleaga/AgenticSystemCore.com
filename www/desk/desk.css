@@ -125,3 +125,9 @@ body > dialog button { margin-right: 8px; }
   .desk-recorded dl { grid-template-columns: 1fr; gap: 0; }
   .desk-recorded dd { margin-bottom: 8px; }
 }
+
+/* The first-minute buttons are the page's main actions, and their results show in the block. */
+.desk-try button { font: inherit; font-weight: 600; padding: 0.35rem 0.8rem; border: 1px solid currentColor; border-radius: 6px; background: var(--bg); color: var(--fg); cursor: pointer; }
+.desk-try button:hover, .desk-try button:focus-visible { background: var(--bg-alt); }
+.desk-try-result { padding-left: 1.25rem; margin: 0.5rem 0; }
+.desk-try-result li { margin: 0.25rem 0; overflow-wrap: anywhere; }

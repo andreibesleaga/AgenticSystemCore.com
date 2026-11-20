@@ -310,7 +310,11 @@ export class ProposeWindow {
     }
     state.done = true;
     const text = ProposeWindow.proposalText(state, details, new Date().toISOString().slice(0, 10));
-    const reference = `P-${(await ProposeWindow.node().sha256Hex(text)).slice(0, 12)}`;
+    // A random reference: a hash of the text would let the caller test guesses of what the
+    // visitor typed.
+    // getRandomValues works on plain-HTTP pages too, where randomUUID is missing.
+    const bytes = crypto.getRandomValues(new Uint8Array(6));
+    const reference = `P-${Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")}`;
     const done = {
       reference: reference,
       text: `${text}Reference: ${reference}\n`,
@@ -367,21 +371,40 @@ export class ProposeWindow {
     actions.append(copyButton, finishButton);
     box.append(
       ProposeWindow.element("h2", "Your proposal is written"),
-      ProposeWindow.element("p", `Its reference is ${done.reference}. Copy it now: this window closes when you finish, and this site keeps no copy.`),
+      ProposeWindow.element("p", `Its reference is ${done.reference}. Copy it or send it now, then press Finish: the assistant waits about three minutes for this window. It closes when you finish, and this site keeps no copy.`),
       text,
       copied,
     );
     if (NODE.proposals) {
+      const prefilled = ProposeWindow.issueLink(NODE.proposals, `Proposal ${done.reference}: ${state.passage.title}`, text.value);
       const where = ProposeWindow.element("p", "To send it, open ", "note");
-      const link = ProposeWindow.element("a", "the page where this site's maintainers take proposals");
-      link.href = NODE.proposals;
+      const link = ProposeWindow.element("a", prefilled === NODE.proposals ? "the page where this site's maintainers take proposals" : "a new issue for this site's maintainers, already filled in");
+      link.href = prefilled;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
-      where.append(link, document.createTextNode(" (a new tab) and paste the text there."));
+      where.append(link, document.createTextNode(prefilled === NODE.proposals ? " (a new tab) and paste the text there." : " (a new tab), check it and submit it there."));
       box.append(where);
     }
     box.append(actions);
     return box;
+  }
+
+  /**
+   * The maintainers' page with the proposal filled in, when it is a GitHub "new issue" page;
+   * otherwise the page as it is. GitHub takes the title and body from the address.
+   *
+   * :param page: The maintainers' page (--proposals).
+   * :param title: The issue title.
+   * :param body: The proposal text.
+   * :return: The address to open.
+   */
+  static issueLink(page, title, body) {
+    if (!/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/new$/.test(page)) {
+      return page;
+    }
+    const link = `${page}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
+    // Long addresses fail in some browsers; the visitor then pastes the copied text.
+    return link.length <= 7000 ? link : page;
   }
 
   /**

@@ -2729,7 +2729,10 @@ for (const origin of DESK_PEERS) if (!PEER_ORIGINS.includes(origin)) die(`desk/a
 addPage('/desk/', {
   title: 'Brief Desk', summary: summaryOf('/desk/'),
   description: 'Search the published passages of a knowledge node, check each against its published digest, and collect cited cards in a brief, by hand or with an assistant that runs in your browser on your own AI provider key.',
-  styles: ['/desk/desk.css'], modules: ['/desk/page.js', '/desk/site.js'],
+  // The engine's page tools, as on the home page and every item page: a browser assistant that
+  // supports WebMCP can search and read this node here too. The Brief Desk's own actions stay
+  // with the runtime.
+  styles: ['/desk/desk.css'], scripts: PAGE_TOOL_SCRIPTS, modules: ['/desk/page.js', '/desk/site.js'],
   body: `${read('desk/section.html')}<h2 id="how">How this page works</h2>
 <ul>
 <li><strong>The agents are published data.</strong> The network of two agents is the file <a href="/desk/brief_desk.network.json"><code>brief_desk.network.json</code></a>, named by <a href="/desk/agent-manifest.json"><code>agent-manifest.json</code></a>; its instructions are public. Another agentic website can load it by the address <code>${esc(ORIGIN)}/desk/brief_desk</code> and run it in its own visitor&#39;s browser.</li>
@@ -2742,7 +2745,7 @@ addPage('/desk/', {
 <ul>
 <li><a href="/graph/">The graph explorer</a> draws the same items as a typed graph, with the peer nodes when you ask, so you can see what a cited passage connects to.</li>
 <li><a href="/ns/">The vocabulary</a> names the terms the items use, as published linked data.</li>
-<li><a href="/webaiassist/">WebAIAssist</a>, a browser extension by the same author, runs a small model on your own computer with no key. On this site&#39;s other pages it uses the page tools they offer, and asks you before each one.</li>
+<li><a href="/webaiassist/">WebAIAssist</a>, a browser extension by the same author, runs a small model on your own computer with no key. On this page, as on the site&#39;s other pages, it can use the page tools the engine offers (search, read and cite this node), and asks you before each one.</li>
 </ul>
 <p>The page works without the assistant, and without a key: the search form and the brief use the same code the assistant calls. The source is in <a href="${esc(FORGE.site)}/tree/main/desk">the site&#39;s repository</a>, under Apache-2.0.</p>
 `,
@@ -2751,7 +2754,7 @@ addPage('/desk/', {
 // section 3.3): CORS-enabled. The page's own policy allows what the runtime needs and nothing
 // else: model calls to the provider the visitor chooses (any https origin, as on /graph/), the
 // two peers' bridge pages in a frame, and no inline script. The bridge page is the one address
-// of this site another site may frame: it shares no action and loads none of this page's code.
+// of this site another site may frame: it shares three reads (bridge/bridge-actions.js, with reader.js) and loads none of the page's own scripts.
 for (const f of DESK_PUBLIC) addHeaders(`/desk/${f}`, 'Access-Control-Allow-Origin: *');
 // The runtime writes its own style element and style attributes, so this one page admits inline
 // styles; scripts stay limited to this site's own files.
