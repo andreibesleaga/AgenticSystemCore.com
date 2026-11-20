@@ -312,7 +312,9 @@ export class ProposeWindow {
     const text = ProposeWindow.proposalText(state, details, new Date().toISOString().slice(0, 10));
     // A random reference: a hash of the text would let the caller test guesses of what the
     // visitor typed.
-    const reference = `P-${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
+    // getRandomValues works on plain-HTTP pages too, where randomUUID is missing.
+    const bytes = crypto.getRandomValues(new Uint8Array(6));
+    const reference = `P-${Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")}`;
     const done = {
       reference: reference,
       text: `${text}Reference: ${reference}\n`,

@@ -640,7 +640,17 @@ test("a kept address with a space or an angle bracket is not restored, and card 
   const page = new BriefDesk(document, { storage });
   assert.equal(page.restoreBrief(), 1);
   assert.equal(page.cards[0].card, "c3");
-  assert.equal(page.nextCard, 9999);
+  assert.equal(page.nextCard, BriefDesk.LAST_CARD + 1);
   assert.equal(BriefDesk.plainAddress(good), true);
   assert.equal(BriefDesk.plainAddress("not a url"), false);
+});
+
+test("once every card number is used, the brief refuses a new card instead of reusing an id", async () => {
+  const page = new BriefDesk(document, { storage: null });
+  page.nextCard = BriefDesk.LAST_CARD + 1;
+  const found = await page.search({ node: "core", query: "k7k ledger", limit: 1 });
+  const added = await page.pin({ node: "core", passage: found.passages[0].passage });
+  assert.equal(added.ok, false);
+  assert.match(added.reason, /every card number/);
+  assert.equal(page.cards.length, 0);
 });
