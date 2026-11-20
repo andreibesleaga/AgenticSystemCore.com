@@ -25,6 +25,9 @@ export class BriefDesk extends PassageReader {
   /** The most cards a brief holds. */
   static BRIEF_LIMIT = 8;
 
+  /** The highest card number; card ids are c1 to c9999. */
+  static LAST_CARD = 9999;
+
   /** The browser storage key under which this site keeps the visitor's brief. */
   static STORE_KEY = "brief-desk:brief";
 
@@ -166,7 +169,8 @@ export class BriefDesk extends PassageReader {
     }
     const highest = Math.max(0, ...cards.map((c) => Number(c.card.slice(1))));
     this.cards = cards;
-    this.nextCard = Math.min(9999, Math.max(highest + 1, Number.isInteger(saved.nextCard) ? saved.nextCard : 1));
+    // Card ids run to c9999; past that, pin() refuses new cards instead of reusing an id.
+    this.nextCard = Math.min(BriefDesk.LAST_CARD + 1, Math.max(highest + 1, Number.isInteger(saved.nextCard) ? saved.nextCard : 1));
     this.version = cards.length ? 1 : 0;
     return cards.length;
   }
@@ -373,6 +377,9 @@ export class BriefDesk extends PassageReader {
     }
     if (this.cards.length >= BriefDesk.BRIEF_LIMIT) {
       return { ok: false, reason: `The brief holds ${BriefDesk.BRIEF_LIMIT} cards at most. Remove one first.`, field: "passage" };
+    }
+    if (this.nextCard > BriefDesk.LAST_CARD) {
+      return { ok: false, reason: "This brief has used every card number. Copy it if you want to keep it, then discard it to start a new one.", field: "passage" };
     }
     const computed = await this.sha256Hex(record.text);
     if (computed !== record.digest) {
