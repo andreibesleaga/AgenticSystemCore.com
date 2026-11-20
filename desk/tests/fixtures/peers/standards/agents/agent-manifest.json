@@ -74,6 +74,7 @@
     "agentTools": [
       "search_passages",
       "read_passage",
+      "check_citations",
       "propose_change"
     ]
   }

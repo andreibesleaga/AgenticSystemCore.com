@@ -115,7 +115,7 @@ class BriefDeskTest {
     const registry = new ActionRegistry();
     await registerActions({ register: registry.register.bind(registry, SCOPE) });
     const names = registry.catalog(SCOPE).map((e) => e.name).sort();
-    assert.deepEqual(names, ["add_card", "check_brief", "discard_brief", "get_desk_state", "read_passage", "remove_card", "search_passages"]);
+    assert.deepEqual(names, ["add_card", "check_brief", "check_citations", "discard_brief", "get_desk_state", "read_passage", "remove_card", "search_passages"]);
     // The visitor ticks the box.
     const box = document.getElementById("desk-allow-patterns");
     box.checked = true;

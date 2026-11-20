@@ -79,6 +79,9 @@ export class PassageReader {
   /** The most entries of a saved brief one check takes. */
   static SAVED_LIMIT = 40;
 
+  /** The most citations one call of the shared citation check takes. */
+  static CITATION_LIMIT = 8;
+
   /** Words too common to search for. */
   static STOP_WORDS = new Set(["a", "an", "and", "are", "as", "at", "be", "by", "can", "do", "does", "for", "from",
     "how", "in", "is", "it", "its", "of", "on", "or", "that", "the", "this", "to", "what", "when", "which", "who",
@@ -610,6 +613,63 @@ export class PassageReader {
       }
     }
     return entries;
+  }
+
+  /**
+   * The citation check as an action definition: the page, this site's bridge and the
+   * bridges of other nodes register the same one. It takes citations someone saved, each an
+   * address and a SHA-256 digest, and says for each whether the node publishes the same text
+   * now. A citation that is not an address of a node this reader reads, or not a digest, is
+   * reported as not checked. The caller adds availability and callerOrigins.
+   *
+   * :param readerOf: A function that returns the PassageReader to use.
+   * :param label: The node or nodes, as the description names them.
+   * :return: The definition: name, description, effect, inputSchema, execute.
+   */
+  static citationCheck(readerOf, label) {
+    return {
+      name: "check_citations",
+      description: `Check citations of ${label} that someone saved earlier, such as the source lines of a brief: give each passage address (it ends in #chunk- and 16 characters) with the SHA-256 digest the citation holds. Returns, for each, unchanged (the same text is published now), changed, moved (the same text at another address, which is given) or gone, or not checked with the reason. Changes nothing.`,
+      effect: "read",
+      inputSchema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["citations"],
+        properties: {
+          citations: {
+            type: "array",
+            minItems: 1,
+            maxItems: PassageReader.CITATION_LIMIT,
+            items: {
+              type: "object",
+              additionalProperties: false,
+              required: ["address", "digest"],
+              properties: {
+                address: { type: "string", minLength: 30, maxLength: 500, description: "The passage address, ending in #chunk- and 16 characters." },
+                digest: { type: "string", minLength: 64, maxLength: 64, description: "The SHA-256 digest the citation holds, 64 hexadecimal characters." },
+              },
+            },
+          },
+        },
+      },
+      execute: (args) => readerOf().checkCitations(args.citations),
+    };
+  }
+
+  /**
+   * Check citations given by a caller: well-formed ones against their node, the rest
+   * reported as not checked.
+   *
+   * :param citations: A list of {address, digest}.
+   * :return: {ok, checked, unchanged, results}, results in the order given.
+   */
+  async checkCitations(citations) {
+    const list = Array.isArray(citations) ? citations.slice(0, PassageReader.CITATION_LIMIT) : [];
+    const wellFormed = list.map((c) => /^https:\/\/[^\s<>#]+#chunk-[0-9a-f]{16}$/.test(String(c?.address)) && /^[0-9a-fA-F]{64}$/.test(String(c?.digest)));
+    const found = await this.verifyAll(list.filter((c, i) => wellFormed[i]).map((c) => ({ address: c.address, digest: c.digest.toLowerCase() })));
+    const checked = [...found.results];
+    const results = list.map((c, i) => (wellFormed[i] ? checked.shift() : { address: String(c?.address ?? "").slice(0, 500), status: "not checked", reason: "This is not a passage address with a SHA-256 digest of 64 hexadecimal characters." }));
+    return { ok: true, checked: results.filter((r) => r.status !== "not checked").length, unchanged: results.filter((r) => r.status === "unchanged").length, results };
   }
 
   /**

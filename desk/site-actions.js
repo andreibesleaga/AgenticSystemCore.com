@@ -6,6 +6,7 @@
 // (page.js), so the assistant and the visitor follow one set of rules. The rules live
 // in page.js, not here.
 import { BriefDesk } from "./page.js";
+import { PassageReader } from "./reader.js";
 
 /**
  * Describes the page's operations as actions the agents can call.
@@ -48,6 +49,7 @@ class SiteActions {
     actions.register(SiteActions.searchAction());
     actions.register(SiteActions.readAction());
     actions.register(SiteActions.checkAction());
+    actions.register(SiteActions.citationsAction());
     actions.register(SiteActions.addAction());
     actions.register(SiteActions.removeAction());
     actions.register(SiteActions.discardAction());
@@ -109,6 +111,14 @@ class SiteActions {
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
       execute: () => BriefDesk.page.checkBrief(),
     };
+  }
+
+  /**
+   * Check citations the visitor pastes or names, from a brief saved earlier: the same check
+   * this site's bridge shares with other sites, over the nodes the visitor allowed.
+   */
+  static citationsAction() {
+    return PassageReader.citationCheck(() => BriefDesk.page, "the nodes this page reads (a node the visitor has not allowed is not checked)");
   }
 
   /** Add a passage to the brief as a cited card. */
