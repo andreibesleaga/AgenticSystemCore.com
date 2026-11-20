@@ -653,6 +653,31 @@ export class PassageReader {
           },
         },
       },
+      // The runtime checks every result against this schema before the agent sees it.
+      outputSchema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["ok", "checked", "unchanged", "results"],
+        properties: {
+          ok: { type: "boolean" },
+          checked: { type: "integer", minimum: 0 },
+          unchanged: { type: "integer", minimum: 0 },
+          results: {
+            type: "array",
+            maxItems: PassageReader.CITATION_LIMIT,
+            items: {
+              type: "object",
+              additionalProperties: false,
+              required: ["address", "status", "reason"],
+              properties: {
+                address: { type: "string", maxLength: 500 },
+                status: { type: "string", enum: ["unchanged", "changed", "moved", "gone", "not checked"] },
+                reason: { type: "string" },
+              },
+            },
+          },
+        },
+      },
       execute: (args) => readerOf().checkCitations(args.citations),
     };
   }
