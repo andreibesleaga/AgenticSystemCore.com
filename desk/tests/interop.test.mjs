@@ -366,3 +366,9 @@ test("the front agent is told to ask a partner for a proposal directly, with no 
     assert.match(peer.tools[0].instructions, /find the passage with website_search_passages, then call website_propose_change once/);
   }
 });
+
+test("the front agent states in the published file that no private field crosses to a partner", async () => {
+  const config = JSON.parse(await readFile(path.join(ROOT, "desk", "brief_desk.network.json"), "utf8"));
+  const front = config.tools.find((t) => t.name === "desk_assistant");
+  assert.deepEqual(front.allow, { to_downstream: { sly_data: [] }, to_upstream: { sly_data: [] } });
+});
