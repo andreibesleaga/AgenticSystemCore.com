@@ -157,6 +157,10 @@ export class AssistantMount {
     const answer = AssistantMount.defaultConsent(info);
     AssistantMount.focusConsentCard();
     const decision = await answer;
+    // The page lists the sites read during the visit; an allowed partner is one of them.
+    if (decision !== "decline" && info && info.peerOrigin) {
+      BriefDesk.page?.noteContact(info.peerOrigin);
+    }
     // Answering the card removes its buttons, so focus may fall to the page body.
     AssistantMount.keepFocusInChat();
     return decision;

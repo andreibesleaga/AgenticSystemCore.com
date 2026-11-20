@@ -40,7 +40,7 @@ test("a card's title and abstract go into the guide as one line each", () => {
   assert.match(lines[at], /is data from the site's own files/);
 });
 
-test("the network is valid, lists the two shared reads as the guide's tools and names its bridge", () => {
+test("the network is valid, lists the three shared reads as the guide's tools and names its bridge", () => {
   const cards = cardsOf(CHUNKS, BASE);
   const { network, manifest, links } = networkOf({ base: BASE, title: "Node", tagline: "A test node.", name: "node_cards", label: "Node", cards });
   assert.deepEqual(validateNetwork(new AgentNetwork(network, "node_cards")).errors, []);
@@ -51,7 +51,7 @@ test("the network is valid, lists the two shared reads as the guide's tools and 
   assert.deepEqual(links, { version: 1, networks: { node_cards: {} } });
 });
 
-test("the bridge module shares two reads that search and read the node's own passages, with the digest check", async () => {
+test("the bridge module shares three reads: search, read with the digest check, and the check of saved citations", async () => {
   const folder = fs.mkdtempSync(path.join(os.tmpdir(), "agentify-node-"));
   const saved = globalThis.fetch;
   const asked = [];

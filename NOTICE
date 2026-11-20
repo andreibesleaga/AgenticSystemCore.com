@@ -28,7 +28,9 @@ dependencies (among them d3, and three.js in the 3D one) under their licences.
   and desk/tests/linking/; licence texts desk/runtime/LICENSE.txt and
   desk/tools/LICENSE.txt). desk/site.js and desk/tests/agentified.test.mjs
   are its templates, filled in for the /desk/ page; desk/README.md says which
-  one line of the copied files differs.
+  one line of the copied files differs. desk/templates/bridge/ comes from
+  commit 0516537 of the same repository, and tools/node-bridge/propose-window.js
+  is adapted from its templates/bridge/write-window.js (Apache License 2.0).
 
 Third-party code the site serves as the reference engine writes it, when built
 with an engine of specification 1.1 or later (the build copies it into the

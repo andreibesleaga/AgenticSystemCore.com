@@ -1,8 +1,10 @@
 // The reads, and the one write, this site shares with other agent sites, through its action bridge.
 // Written by tools/agentify-node.mjs of the AgenticSystemCore.com repository; do not edit.
-// A calling site's agent can search this node's published passages and read one with its
-// digest check. They read only what the node publishes to everyone (/chunks.jsonl and the
-// discovery document), so "*" shares nothing private. Nothing here changes anything.
+// A calling site's agent can search this node's published passages, read one with its digest
+// check, and check citations saved earlier. The reads use only what the node publishes to
+// everyone (/chunks.jsonl and the discovery document), so "*" shares nothing private.
+// The write changes nothing on this site: the visitor confirms a proposal in this site's own
+// window and sends it to the maintainers.
 import { PassageReader } from "./reader.js";
 import { ProposeWindow } from "./propose-window.js";
 
