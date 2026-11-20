@@ -46,7 +46,9 @@ class BriefDeskTest {
 
   /** A search ranks a title match first, returns addresses, and leaves the page as it was. */
   static async testSearchReadsOnly() {
-    const before = document.snapshot();
+    // The activity line logs the sites read; everything else on the page must stay as it was.
+    const page = () => { const { "desk-activity": activity, ...rest } = document.snapshot(); return rest; };
+    const before = page();
     const state = BriefDeskTest.page.getState();
     const receipt = await BriefDeskTest.run("search_passages", { node: "core", query: "k7k ledger", limit: 3 });
     assert.equal(receipt.status, "succeeded");
@@ -57,7 +59,7 @@ class BriefDeskTest {
     assert.equal(result.passages[0].passage, ID(seventh));
     assert.equal(result.passages[0].address, `${seventh.iri}#chunk-${ID(seventh)}`);
     assert.equal(result.passages[0].title, "Item 7");
-    assert.deepEqual(document.snapshot(), before);
+    assert.deepEqual(page(), before);
     assert.deepEqual(BriefDeskTest.page.getState(), state);
     // Words too common to search for are refused with the page's reason.
     const empty = await BriefDeskTest.run("search_passages", { node: "core", query: "of the" });
@@ -603,4 +605,15 @@ test("the shared citation check reports each citation, and a malformed one as no
   const [receipt] = await registry.execute(plan, async () => true, "desk-test");
   assert.equal(receipt.status, "succeeded");
   assert.deepEqual(receipt.result.results.map((r) => r.status), ["not checked", "unchanged"]);
+});
+
+test("the citation check's results match its declared output schema, and the page lists the sites it read", async () => {
+  const { validateData } = await import("../runtime/actions.js");
+  const page = new BriefDesk(document, { storage: null });
+  const found = await page.search({ node: "core", query: "k7k ledger", limit: 1 });
+  const passage = await page.read({ node: "core", passage: found.passages[0].passage });
+  const definition = PassageReader.citationCheck(() => page, "the test node");
+  const result = await definition.execute({ citations: [{ address: passage.address, digest: passage.digest }, { address: "x", digest: "y" }] });
+  validateData(definition.outputSchema, result, "result");
+  assert.match(document.getElementById("desk-activity").textContent, new RegExp(new URL(FIXTURES.node).host.replace(/\./g, "\\.") + "|localhost"));
 });
