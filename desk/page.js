@@ -422,44 +422,46 @@ export class BriefDesk extends PassageReader {
   }
 
   /**
-   * An example of a saved brief for the first-minute check: the first card as it is, and
-   * the same card again with the last character of its digest altered, as a brief would
+   * An example of a saved brief for the first-minute check: one passage as it is, and the
+   * same passage again with the last character of its digest altered, as a brief would
    * read if the text had changed since it was saved. The example says so in its own text.
    *
-   * :return: The Markdown text, or "" when the brief is empty.
+   * :param passage: A passage read from a node: title, address and digest.
+   * :return: The Markdown text.
    */
-  exampleBrief() {
-    const card = this.cards[0];
-    if (!card) {
-      return "";
-    }
-    const altered = card.digest.slice(0, -1) + (card.digest.endsWith("0") ? "1" : "0");
+  static exampleBrief(passage) {
+    const altered = passage.digest.slice(0, -1) + (passage.digest.endsWith("0") ? "1" : "0");
     return [
       "# Brief (example: the second entry's digest was altered on purpose)",
       "",
-      `- **${card.title}**: as it was added.`,
-      `  Source: <${card.address}> (sha-256 ${card.digest})`,
-      `- **${card.title}**: the same passage, with the last character of its digest altered, as if its text had changed since.`,
-      `  Source: <${card.address}> (sha-256 ${altered})`,
+      `- **${passage.title}**: as it is published.`,
+      `  Source: <${passage.address}> (sha-256 ${passage.digest})`,
+      `- **${passage.title}**: the same passage, with the last character of its digest altered, as if its text had changed since.`,
+      `  Source: <${passage.address}> (sha-256 ${altered})`,
       "",
     ].join("\n");
   }
 
   /**
-   * Put an example saved brief in the "Check a saved brief" box, open it and check it.
+   * Put an example saved brief in the "Check a saved brief" box, open it and check it. The
+   * example is built from the first passage of this site's own node for TRY_QUERY; the
+   * visitor's brief is not touched.
    *
-   * :return: What checkSaved() returned, or a refusal.
+   * :return: What checkSaved() returned, with changedShown, or a refusal.
    */
   async tryExample() {
-    if (this.cards.length === 0) {
-      const cited = await this.tryCite();
-      if (!cited.ok) {
-        return cited;
-      }
+    const found = await this.search({ query: BriefDesk.TRY_QUERY, node: "core", limit: 1 });
+    if (!found.ok || found.count === 0) {
+      return { ok: false, reason: found.reason || `Nothing matches "${BriefDesk.TRY_QUERY}".` };
     }
-    this.doc.getElementById("desk-saved-text").value = this.exampleBrief();
+    const passage = await this.read({ node: "core", passage: found.passages[0].passage });
+    if (!passage.ok || !passage.digestMatches) {
+      return { ok: false, reason: passage.reason || "The example passage does not match its published digest, so no example was made." };
+    }
+    this.doc.getElementById("desk-saved-text").value = BriefDesk.exampleBrief(passage);
     this.doc.getElementById("desk-saved").open = true;
-    return this.showSaved();
+    const result = await this.showSaved();
+    return result.ok ? { ...result, changedShown: result.results.some((r) => r.status === "changed") } : result;
   }
 
   /**
@@ -502,7 +504,7 @@ export class BriefDesk extends PassageReader {
    */
   chatInput() {
     try {
-      return this.doc.getElementById("ns-input");
+      return this.doc.querySelector("#ns-input");
     } catch {
       // The test document knows only this page's own ids.
       return null;
@@ -751,9 +753,11 @@ export class BriefDesk extends PassageReader {
     });
     this.doc.getElementById("desk-try-example").addEventListener("click", async () => {
       const checked = await this.tryExample();
-      status.textContent = checked.ok
-        ? `The example brief was checked under "Check a saved brief": ${checked.unchanged} of ${checked.results.length} passages unchanged. The altered digest shows as changed.`
-        : checked.reason;
+      if (!checked.ok) {
+        status.textContent = checked.reason;
+        return;
+      }
+      status.textContent = `An example brief was checked under "Check a saved brief": ${checked.unchanged} of ${checked.results.length} passages unchanged.${checked.changedShown ? " The entry with the altered digest shows as changed." : ""} Your own brief was not changed.`;
     });
   }
 
