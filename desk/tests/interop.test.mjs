@@ -348,3 +348,21 @@ test("the peer fixtures are the networks the two nodes publish", async () => {
     assert.ok((await readFile(path.join(HERE, "fixtures", "peers", host, "agents", "bridge", "reader.js"))).equals(await readFile(path.join(ROOT, "desk", "reader.js"))), `${host}: reader.js is not desk/reader.js`);
   }
 });
+
+test("the front agent is told to ask a partner for a proposal directly, with no tick and no passage id of its own", async () => {
+  // The write itself runs in the partner's own window, which this in-process harness does not
+  // have (tools/agentify-node.test.mjs drives the window; a live run with a model is kept as
+  // evidence). What can regress here is the instruction that made the assistant stop before
+  // asking: it once required a passage id from a search of a node the visitor had not ticked.
+  const config = JSON.parse(await readFile(path.join(ROOT, "desk", "brief_desk.network.json"), "utf8"));
+  const front = config.tools.find((t) => t.name === "desk_assistant");
+  assert.match(front.instructions, /ask that partner at once to write a proposal: name the card and say the change/);
+  assert.match(front.instructions, /It finds the passage on its own site, so no tick under "Nodes to read" is needed/);
+  assert.ok(!/passage id from a search of that node/.test(front.instructions));
+  assert.match(front.instructions, /never ask for them in chat/);
+  // The partner's guide does the search and the write with its own tools.
+  for (const [host, name] of [["patterns", "pattern_cards"], ["standards", "standards_map"]]) {
+    const peer = JSON.parse(await readFile(path.join(HERE, "fixtures", "peers", host, "agents", `${name}.network.json`), "utf8"));
+    assert.match(peer.tools[0].instructions, /find the passage with website_search_passages, then call website_propose_change once/);
+  }
+});
