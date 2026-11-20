@@ -80,6 +80,7 @@
       "search_passages",
       "read_passage",
       "check_brief",
+      "check_citations",
       "add_card",
       "remove_card",
       "discard_brief"
