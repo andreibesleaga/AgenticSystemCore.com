@@ -654,7 +654,9 @@ export class BriefDesk extends PassageReader {
     const cited = await this.read({ node: "core", passage: BriefDesk.SAVED_14_OCT.address.slice(-16) }).catch(() => null);
     if (cited && cited.ok && cited.digestMatches) {
       const line = cited.text.split("\n").find((l) => l.includes(BriefDesk.SAVED_14_OCT.marker)) || "";
-      now = line.replace(/^\s*\d+\.\s*/, "").trim();
+      // The sentence that holds the marker, from the marker on.
+      const at = line.indexOf(BriefDesk.SAVED_14_OCT.marker);
+      now = (at >= 0 ? line.slice(at) : line.replace(/^\s*\d+\.\s*/, "")).trim();
     }
     return { ...result, changedShown: result.results.some((r) => r.status === "changed"), then: BriefDesk.SAVED_14_OCT.then, now };
   }
@@ -1018,7 +1020,7 @@ export class BriefDesk extends PassageReader {
         status.textContent = checked.reason;
         return;
       }
-      status.textContent = `A brief with one citation saved on 14 Oct 2026 and one made now: ${checked.unchanged} of ${checked.results.length} unchanged.${checked.changedShown ? " The step cited on 14 Oct has changed since:" : ""} Your own brief was not changed.`;
+      status.textContent = `A brief with one citation saved on 14 Oct 2026 and one made now: ${checked.unchanged} of ${checked.results.length} unchanged. Your own brief was not changed.${checked.changedShown ? " The step cited on 14 Oct has changed since:" : ""}`;
       const lines = checked.results.map((r) => ({ text: r.address, href: r.status === "not checked" ? null : r.address, note: BriefDesk.verdict(r), ok: r.status === "unchanged" }));
       if (checked.changedShown && checked.now) {
         lines.splice(1, 0, { text: `On 14 Oct 2026 it said: "${checked.then}"` }, { text: `Now it says: "${checked.now}"` });
