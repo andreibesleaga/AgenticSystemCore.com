@@ -65,6 +65,22 @@ export class BriefDesk extends PassageReader {
     this.nextCard = 1;
     this.lastSearch = null;
     this.storage = options.storage === undefined ? BriefDesk.browserStorage(doc) : options.storage;
+    // Every site this page reads during the visit, shown under "Nodes to read".
+    this.contacted = new Set();
+    const fetchText = this.fetchText;
+    this.fetchText = async (url) => {
+      this.contacted.add(new URL(url).host);
+      this.renderActivity();
+      return fetchText.call(this, url);
+    };
+  }
+
+  /** Say which sites the page has read during this visit. Nothing is stored. */
+  renderActivity() {
+    const hosts = [...this.contacted].sort();
+    this.doc.getElementById("desk-activity").textContent = hosts.length
+      ? `Sites this page has read during this visit: ${hosts.join(", ")}. It sends them no key and no personal data.`
+      : "This page has read no site yet during this visit.";
   }
 
   /**
@@ -871,6 +887,7 @@ export class BriefDesk extends PassageReader {
     this.connectFirstMinute();
     this.renderSamples();
     this.render();
+    this.renderActivity();
     this.checkLinkedBrief();
   }
 

@@ -29,6 +29,10 @@
     # Maximum model/tool round trips per agent invocation (runtime default 12).
     "max_steps": 12,
 
+    # Wall-clock limit per agent invocation, in seconds. The runtime applies its own 90 s
+    # limit to a partner call (linking.md "Limits"); this states the same for the network.
+    "max_execution_seconds": 90,
+
     # Turns on the render_cruse tool and per-invocation CRUSE context.
     "cruse": {
         "version": 1
