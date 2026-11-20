@@ -620,7 +620,8 @@ export class PassageReader {
    * bridges of other nodes register the same one. It takes citations someone saved, each an
    * address and a SHA-256 digest, and says for each whether the node publishes the same text
    * now. A citation that is not an address of a node this reader reads, or not a digest, is
-   * reported as not checked. The caller adds availability and callerOrigins.
+   * reported as not checked; the schema checks only the shape, so such a citation reaches
+   * that per-entry report. The caller adds availability and callerOrigins.
    *
    * :param readerOf: A function that returns the PassageReader to use.
    * :param label: The node or nodes, as the description names them.
@@ -645,8 +646,8 @@ export class PassageReader {
               additionalProperties: false,
               required: ["address", "digest"],
               properties: {
-                address: { type: "string", minLength: 30, maxLength: 500, description: "The passage address, ending in #chunk- and 16 characters." },
-                digest: { type: "string", minLength: 64, maxLength: 64, description: "The SHA-256 digest the citation holds, 64 hexadecimal characters." },
+                address: { type: "string", maxLength: 500, description: "The passage address, ending in #chunk- and 16 characters." },
+                digest: { type: "string", maxLength: 200, description: "The SHA-256 digest the citation holds, 64 hexadecimal characters." },
               },
             },
           },
