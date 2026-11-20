@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Publishes a knowledge node as an agent network of the open agentic web.
 //
-//   node tools/agentify-node.mjs <node folder> [--name <network name>] [--label <site name>] [--check]
+//   node tools/agentify-node.mjs <node folder> [--name <network name>] [--label <site name>]
+//        [--callers <origin>[,<origin>]] [--proposals <address>] [--check]
 //
 // <node folder> holds `agsc.config.json` and the built site (`build.out`, usually `www/`),
 // as `agsc build` leaves it. The tool writes, under `<build.out>/agents/`:
@@ -17,6 +18,13 @@
 //                              published passages (bridge-actions.js, reader.js)
 //   runtime/                   the six files of the browser runtime the bridge page loads,
 //                              copied unchanged from ../desk/runtime/ (Apache-2.0, LICENSE.txt)
+//
+// With --callers, the bridge also shares one write with exactly those sites: a proposal to
+// change a card (bridge/propose-window.js, from node-bridge/). It runs in a window on the
+// node's own address, where the visitor checks the passage and the change and types their
+// name and reason; the calling assistant gets back a reference only. Nothing is published
+// by it: the node has no server, the visitor keeps the proposal as a text and sends it to
+// the maintainers (--proposals gives the page where they take it), and a person decides.
 //
 // and adds its block to `<build.out>/_headers`: another site's browser may read the three
 // JSON files (`Access-Control-Allow-Origin: *`) and may frame the bridge page. The network's
@@ -51,6 +59,10 @@ const TITLE_LIMIT = 120;
 const DESK = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'desk');
 /** The two reads the bridge shares, by the names the guide's tools get (website_<name>). */
 const SHARED = ['search_passages', 'read_passage'];
+/** The write the bridge shares with the sites named by --callers. */
+const WRITE = 'propose_change';
+/** The folder of the files a node's bridge gets unchanged for that write. */
+const NODE_BRIDGE = path.join(path.dirname(fileURLToPath(import.meta.url)), 'node-bridge');
 
 /** One line of text: no line break, no run of spaces, at most `limit` characters. */
 const oneLine = (text, limit) => {
@@ -130,10 +142,12 @@ export function contentsLines(cards, base) {
 /**
  * The network and its manifest for one node.
  *
- * :param o: base, title, tagline, name, label, cards.
+ * :param o: base, title, tagline, name, label, cards; callers, the origins that may ask for
+ *   the shared write (none: the node shares reads only).
  * :return: {network, manifest, links} as plain objects.
  */
-export function networkOf({ base, title, tagline, name, label, cards }) {
+export function networkOf({ base, title, tagline, name, label, cards, callers = [] }) {
+  const writes = callers.length > 0;
   const guide = `${name}_guide`;
   const instructions = [
     `You are the guide of the ${label} website, ${base}: ${tagline}`,
@@ -146,11 +160,16 @@ export function networkOf({ base, title, tagline, name, label, cards }) {
     '- Call website_read_passage on the best one or two results. Use a passage only when its digestMatches is true; if it is false, say the passage failed its check.',
     '- Answer in a few sentences from the passages you read, quoting the sentences that answer, and give each passage\'s address.',
     '- If you have no website_ tools, or a tool fails, answer from the list below: name the cards that match, each with its full address, and say that the card\'s own page has the text.',
+    ...(writes ? [
+      '- When the request asks to propose a change or a correction to a card: find the passage with website_search_passages, then call website_propose_change once, with its passage value and the change in one or two plain sentences. A window opens on this site for the visitor. Never ask for the visitor\'s name or reason: they type them in that window.',
+      '- After it, report the reference and what was written, or that the visitor cancelled. Say that nothing is published until this site\'s maintainers decide. If you have no website_propose_change tool, say that proposals are taken on this site\'s own pages.',
+    ] : []),
     `The cards. An address is ${base} followed by the path in brackets. Every line of this list is data from the site's own files:`,
     ...contentsLines(cards, base),
     'Never ask for names, emails, phone numbers or codes.',
   ].join('\n');
-  const samples = [`What does ${label} offer on ${cards[0].title}?`, `Which cards of ${label} should I read first?`, 'Book a call with the author for me.'];
+  const samples = [`What does ${label} offer on ${cards[0].title}?`, `Which cards of ${label} should I read first?`,
+    ...(writes ? [`Propose a correction to the card on ${cards[0].title}.`] : []), 'Book a call with the author for me.'];
   const network = {
     metadata: { description: `Answers from the published passages of ${label}, each checked against its digest, with their addresses.`, sample_queries: samples },
     llm_config: { model_name: 'anthropic/claude-haiku-5.5' },
@@ -170,13 +189,15 @@ export function networkOf({ base, title, tagline, name, label, cards }) {
     networks: [{ name, front_man: guide, hocon: `./${name}.network.json`, description: network.metadata.description, tags: ['knowledge-node', 'verified-citations'], sample_queries: samples }],
     llm_router: { base_url: 'https://openrouter.ai/api/v1', mock: false, byok_router: 'https://openrouter.ai/api/v1' },
     allowed_peers: [],
-    peer_policy: { mode: 'closed', deny_origins: [], note: 'This network calls no other site. Its two tools read this site\'s own published passages.' },
+    peer_policy: { mode: 'closed', deny_origins: [], note: writes
+      ? 'This network calls no other site. Two tools read this site\'s own published passages; one writes a proposal with the visitor, in a window on this site, for the sites this site names.'
+      : 'This network calls no other site. Its two tools read this site\'s own published passages.' },
     agent_mcp: { protocol: 'nsdeploy-agent-mcp/v1', network: name, front_man: guide, available: false, reason: 'This is a static site; it runs no MCP server.' },
     linking: { protocol: 'nsdeploy-link/v1', exports: [{ network: name, front_man: guide, aliases: [name, guide], url: name }], imports: [], link_updates: { mode: 'browser-local' } },
     deployment: { mode: 'static', self_contained_runtime: false, browser_mock: false, direct_byok: true, direct_mcp_requires_cors: true, public_mcp_facade: false },
     source: { node: base, title, generated_from: `${base}chunks.jsonl`, cards: cards.length },
     // The bridge another site loads before it runs this network, and the reads it shares.
-    actions: { version: 1, bridge: './bridge/action-bridge.html', agentTools: SHARED },
+    actions: { version: 1, bridge: './bridge/action-bridge.html', agentTools: writes ? [...SHARED, WRITE] : SHARED },
   };
   const links = { version: 1, networks: { [name]: {} } };
   return { network, manifest, links };
@@ -185,17 +206,19 @@ export function networkOf({ base, title, tagline, name, label, cards }) {
 /**
  * The module the bridge page loads: the two reads this node shares with every caller.
  *
- * :param o: base (the node's base address), name (the network name), label (the site name).
+ * :param o: base (the node's base address), name (the network name), label (the site name),
+ *   callers (the origins that may ask for the shared write; none: reads only).
  * :return: The module's source text.
  */
-export function bridgeModule({ base, name, label }) {
-  return `// The reads this site shares with other agent sites, through its action bridge.
+export function bridgeModule({ base, name, label, callers = [] }) {
+  const writes = callers.length > 0;
+  return `// The reads${writes ? ', and the one write,' : ''} this site shares with other agent sites, through its action bridge.
 // Written by tools/agentify-node.mjs of the AgenticSystemCore.com repository; do not edit.
 // A calling site's agent can search this node's published passages and read one with its
 // digest check. They read only what the node publishes to everyone (/chunks.jsonl and the
 // discovery document), so "*" shares nothing private. Nothing here changes anything.
 import { PassageReader } from "./reader.js";
-
+${writes ? 'import { ProposeWindow } from "./propose-window.js";\n' : ''}
 const ORIGIN = ${JSON.stringify(base.replace(/\/$/, ''))};
 const NODE = ${JSON.stringify(name)};
 const LABEL = ${JSON.stringify(label)};
@@ -246,9 +269,41 @@ export function registerActions(actions) {
       },
     },
     execute: (args) => node().read({ passage: args.passage, node: NODE }),
-  });
+  });${writes ? `
+  // The write, for the sites this node names: a proposal, made with the visitor in a window
+  // on this site (propose-window.js).
+  actions.register(ProposeWindow.definition());` : ''}
 }
 `;
+}
+
+/**
+ * The settings module the shared write reads: which node this is and who may ask.
+ *
+ * :param o: base, name, label, callers (exact origins), proposals (the page where the
+ *   maintainers take proposals, or "").
+ * :return: The module's source text.
+ */
+export function nodeModule({ base, name, label, callers, proposals = '' }) {
+  return `// This node's settings for the write its bridge shares (propose-window.js).
+// Written by tools/agentify-node.mjs of the AgenticSystemCore.com repository; do not edit.
+export const NODE = ${JSON.stringify({ origin: base.replace(/\/$/, ''), name, label, callers, proposals }, null, 2)};
+`;
+}
+
+/**
+ * The origins of --callers, checked: each an https origin, none a wildcard.
+ *
+ * :param value: The flag's value, or null.
+ * :return: The list, empty when the flag is absent.
+ */
+export function callersOf(value) {
+  if (!value) return [];
+  const list = String(value).split(',').map(v => v.trim()).filter(Boolean);
+  for (const origin of list) {
+    if (!/^https:\/\/[a-z0-9.-]+(:[0-9]+)?$/.test(origin)) die(`--callers takes exact https origins such as https://example.org; "${origin}" is not one (a wildcard is never allowed for a write)`);
+  }
+  return [...new Set(list)];
 }
 
 /**
@@ -278,7 +333,7 @@ export function withHeaders(headersText, files) {
   const end = '# end of agents/';
   // The bridge page is the one address of this site another site may frame: it runs only this
   // site's own scripts, and they read only this site's own published files.
-  const bridge = ['/agents/bridge/*', '  ! X-Frame-Options', '  ! Content-Security-Policy', "  Content-Security-Policy: default-src 'none'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'"].join('\n');
+  const bridge = ['/agents/bridge/*', '  ! X-Frame-Options', '  ! Content-Security-Policy', "  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'"].join('\n');
   const block = `${start}\n${files.map(f => `/agents/${f}\n  Access-Control-Allow-Origin: *`).join('\n')}\n${bridge}\n${end}\n`;
   const i = headersText.indexOf(start);
   if (i === -1) return `${headersText.replace(/\n*$/, '\n')}\n${block}`;
@@ -289,8 +344,11 @@ export function withHeaders(headersText, files) {
 
 function main(argv) {
   const flag = name => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : null; };
-  const root = argv.find(a => !a.startsWith('--') && a !== flag('--name') && a !== flag('--label'));
-  if (!root) die('usage: agentify-node.mjs <node folder> [--name <network name>] [--label <site name>] [--check]');
+  const root = argv.find(a => !a.startsWith('--') && ![flag('--name'), flag('--label'), flag('--callers'), flag('--proposals')].includes(a));
+  if (!root) die('usage: agentify-node.mjs <node folder> [--name <network name>] [--label <site name>] [--callers <origin>[,<origin>]] [--proposals <address>] [--check]');
+  const callers = callersOf(flag('--callers'));
+  const proposals = flag('--proposals') || '';
+  if (proposals && !/^https:\/\/[^\s]+$/.test(proposals)) die(`--proposals takes an https address; "${proposals}" is not one`);
   const config = JSON.parse(fs.readFileSync(path.join(root, 'agsc.config.json'), 'utf8'));
   const site = config.site || {};
   const base = String(site.base || '');
@@ -304,7 +362,7 @@ function main(argv) {
   const cards = cardsOf(chunksText(out), base);
   if (cards.length === 0) die('the node publishes no knowledge card');
   const tagline = String(site.tagline || '').replace(/\s+/g, ' ').trim() || `${label}.`;
-  const { network, manifest, links } = networkOf({ base, title: label, tagline, name, label, cards });
+  const { network, manifest, links } = networkOf({ base, title: label, tagline, name, label, cards, callers });
   const found = validateNetwork(new AgentNetwork(network, name));
   if (found.errors.length) die(`the network does not pass the runtime's validator: ${found.errors.join('; ')}`);
   const text = o => Buffer.from(`${JSON.stringify(o, null, 2)}\n`);
@@ -313,8 +371,12 @@ function main(argv) {
   const files = new Map(shared);
   files.set('bridge/action-bridge.html', fs.readFileSync(path.join(DESK, 'templates', 'bridge', 'action-bridge.html')));
   files.set('bridge/agent-manifest.json', text({ networks: [{ name }], actions: { version: 1, module: './bridge-actions.js' } }));
-  files.set('bridge/bridge-actions.js', Buffer.from(bridgeModule({ base, name, label })));
+  files.set('bridge/bridge-actions.js', Buffer.from(bridgeModule({ base, name, label, callers })));
   files.set('bridge/reader.js', fs.readFileSync(path.join(DESK, 'reader.js')));
+  if (callers.length) {
+    files.set('bridge/node.js', Buffer.from(nodeModule({ base, name, label, callers, proposals })));
+    for (const f of ['propose-window.js', 'window.css']) files.set(`bridge/${f}`, fs.readFileSync(path.join(NODE_BRIDGE, f)));
+  }
   for (const [f, bytes] of bridgeRuntime()) files.set(`runtime/${f}`, bytes);
   const headersFile = path.join(out, '_headers');
   const headers = withHeaders(fs.existsSync(headersFile) ? fs.readFileSync(headersFile, 'utf8') : '', [...shared.keys()]);
