@@ -659,3 +659,41 @@ test("once every card number is used, the brief refuses a new card instead of re
   assert.match(added.reason, /every card number/);
   assert.equal(page.cards.length, 0);
 });
+
+test("the then and now sentences are shown in the block, in order, and a linked brief says what changed compares", async () => {
+  FirstMinuteTest.empty();
+  const query = BriefDesk.TRY_QUERY;
+  const saved = BriefDesk.SAVED_14_OCT;
+  BriefDesk.TRY_QUERY = "k7k ledger";
+  const older = FIXTURES.core[1];
+  const marker = older.text.split(/\s+/).slice(0, 2).join(" ");
+  BriefDesk.SAVED_14_OCT = { title: older.title, address: `${older.iri}#chunk-${ID(older)}`, digest: "0".repeat(64), then: "What it said before.", marker };
+  try {
+    document.getElementById("desk-try-example").dispatch("click");
+    const list = document.getElementById("desk-try-result");
+    for (let i = 0; i < 100 && list.children.length < 4; i += 1) await new Promise((resolve) => setTimeout(resolve, 10));
+    const texts = list.children.map((item) => item.children.map((c) => c.textContent).join(""));
+    assert.equal(texts.length, 4, texts.join(" | "));
+    assert.match(texts[0], /Changed/);
+    assert.equal(texts[1], 'On 14 Oct 2026 it said: "What it said before."');
+    assert.match(texts[2], new RegExp(`^Now it says: "${marker}`));
+    assert.match(texts[3], /Unchanged/);
+  } finally {
+    BriefDesk.TRY_QUERY = query;
+    BriefDesk.SAVED_14_OCT = saved;
+  }
+  // A brief opened from a re-check link.
+  const page = new BriefDesk(document, { storage: null });
+  const found = await page.search({ node: "core", query: "k7k ledger", limit: 1 });
+  await page.pin({ node: "core", passage: found.passages[0].passage });
+  const link = page.recheckLink();
+  const before = document.location;
+  document.location = { hash: new URL(link).hash };
+  try {
+    const result = await page.checkLinkedBrief();
+    assert.equal(result.ok, true, result.reason);
+    assert.match(document.getElementById("desk-saved-status").textContent, /came from a link: "changed" means the digest in the link differs from what the node publishes now/);
+  } finally {
+    document.location = before;
+  }
+});
