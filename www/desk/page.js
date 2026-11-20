@@ -118,7 +118,10 @@ export class BriefDesk extends PassageReader {
     const text = (v, limit) => (typeof v === "string" ? v.slice(0, limit) : "");
     const cards = [];
     for (const c of saved.cards.slice(0, BriefDesk.BRIEF_LIMIT)) {
-      const node = this.nodes.find((n) => n.id === c?.node);
+      if (!c || typeof c !== "object") {
+        continue;
+      }
+      const node = this.nodes.find((n) => n.id === c.node);
       const fits = node && typeof c.address === "string" && c.address.startsWith(`${node.origin}/`)
         && /#chunk-[0-9a-f]{16}$/.test(c.address) && /^[0-9a-f]{64}$/.test(c.digest) && /^c[0-9]{1,4}$/.test(c.card)
         && !cards.some((k) => k.address === c.address || k.card === c.card);
@@ -855,7 +858,12 @@ export class BriefDesk extends PassageReader {
       }
       try {
         await this.doc.defaultView.navigator.clipboard.writeText(link);
-        status.textContent = "A link that re-checks this brief was copied. Anyone who opens it sees whether each passage has changed.";
+        // Another site's passages are read only after the person who opens the link ticks
+        // that site, so say so when the brief cites one.
+        const others = this.cards.some((c) => !this.nodes.find((n) => n.id === c.node)?.own);
+        status.textContent = others
+          ? "A link that re-checks this brief was copied. Whoever opens it sees whether each passage of this site has changed; passages of the other sites show as not checked until they tick those sites under Nodes to read."
+          : "A link that re-checks this brief was copied. Anyone who opens it sees whether each passage has changed.";
       } catch (error) {
         status.textContent = `The browser did not allow copying. The link is: ${link}`;
       }
