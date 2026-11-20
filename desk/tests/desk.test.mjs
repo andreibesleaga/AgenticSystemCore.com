@@ -453,33 +453,38 @@ class FirstMinuteTest {
     }
   }
 
-  /** The example saved brief shows one passage unchanged and the altered one changed, and leaves the brief alone. */
+  /** The example saved brief shows the old citation changed, in words, and the new one unchanged, and leaves the brief alone. */
   static async testExampleBriefShowsAChange() {
     FirstMinuteTest.empty();
     const query = BriefDesk.TRY_QUERY;
-    const saved = BriefDesk.SAVED_19_OCT;
+    const saved = BriefDesk.SAVED_14_OCT;
     BriefDesk.TRY_QUERY = "k7k ledger";
-    // The live page cites the Cluster passage as it was on 19 Oct 2026 (the browser check
-    // reads it as changed on the live site). Here a fixture passage stands in, with the digest
-    // its text had before it changed.
+    // The live page cites step 2 of "Publish a Level-0 node" as it was on 14 Oct 2026 (the browser
+    // check reads it as changed on the live site). Here a fixture passage stands in, with a digest
+    // its text no longer has, and a marker that finds a line of its text today.
     const older = FIXTURES.core[1];
-    BriefDesk.SAVED_19_OCT = { title: older.title, address: `${older.iri}#chunk-${ID(older)}`, digest: "0".repeat(64) };
+    const marker = older.text.split(/\s+/).slice(0, 2).join(" ");
+    BriefDesk.SAVED_14_OCT = { title: older.title, address: `${older.iri}#chunk-${ID(older)}`, digest: "0".repeat(64), then: "What it said before.", marker };
     try {
       const result = await BriefDesk.page.tryExample();
       assert.equal(result.ok, true, result.reason);
       assert.deepEqual(result.results.map((r) => r.status), ["changed", "unchanged"]);
       assert.equal(result.changedShown, true);
+      assert.equal(result.then, "What it said before.");
+      assert.ok(result.now.includes(marker), `the step read now: ${result.now}`);
       assert.equal(BriefDesk.page.cards.length, 0, "The example added a card to the brief.");
       assert.equal(document.getElementById("desk-saved").open, true);
-      assert.match(document.getElementById("desk-saved-text").value, /saved on 19 Oct 2026/);
+      assert.match(document.getElementById("desk-saved-text").value, /saved on 14 Oct 2026/);
       assert.equal(document.getElementById("desk-saved-results").children.length, 2);
     } finally {
       BriefDesk.TRY_QUERY = query;
-      BriefDesk.SAVED_19_OCT = saved;
+      BriefDesk.SAVED_14_OCT = saved;
     }
-    // The citation of 19 Oct is real: same address on the published node, a digest of 64 hex.
-    assert.match(saved.address, /^https:\/\/agenticsystemcore\.com\/concepts\/cluster\/#chunk-[0-9a-f]{16}$/);
-    assert.match(saved.digest, /^[0-9a-f]{64}$/);
+    // The citation of 14 Oct is real: same address on the published node, the digest of that day,
+    // and the sentence of that day, whose rule the live text reverses (checked live by first-minute.mjs).
+    assert.match(saved.address, /^https:\/\/agenticsystemcore\.com\/procedures\/publish-a-level-0-node\/#chunk-5054b2c80f6cb7de$/);
+    assert.equal(saved.digest, "33bc2f7ed5e14ed6ea50e7aa1aca9242dba4986ebd2aaa2ad85faa62b5374700");
+    assert.match(saved.then, /inherits the operator of the Bundle at Level 0, with a warning/);
   }
 
   /** The page's sample questions are the manifest's, and none is sent before the chat loads. */
@@ -653,4 +658,42 @@ test("once every card number is used, the brief refuses a new card instead of re
   assert.equal(added.ok, false);
   assert.match(added.reason, /every card number/);
   assert.equal(page.cards.length, 0);
+});
+
+test("the then and now sentences are shown in the block, in order, and a linked brief says what changed compares", async () => {
+  FirstMinuteTest.empty();
+  const query = BriefDesk.TRY_QUERY;
+  const saved = BriefDesk.SAVED_14_OCT;
+  BriefDesk.TRY_QUERY = "k7k ledger";
+  const older = FIXTURES.core[1];
+  const marker = older.text.split(/\s+/).slice(0, 2).join(" ");
+  BriefDesk.SAVED_14_OCT = { title: older.title, address: `${older.iri}#chunk-${ID(older)}`, digest: "0".repeat(64), then: "What it said before.", marker };
+  try {
+    document.getElementById("desk-try-example").dispatch("click");
+    const list = document.getElementById("desk-try-result");
+    for (let i = 0; i < 100 && list.children.length < 4; i += 1) await new Promise((resolve) => setTimeout(resolve, 10));
+    const texts = list.children.map((item) => item.children.map((c) => c.textContent).join(""));
+    assert.equal(texts.length, 4, texts.join(" | "));
+    assert.match(texts[0], /Changed/);
+    assert.equal(texts[1], 'On 14 Oct 2026 it said: "What it said before."');
+    assert.match(texts[2], new RegExp(`^Now it says: "${marker}`));
+    assert.match(texts[3], /Unchanged/);
+  } finally {
+    BriefDesk.TRY_QUERY = query;
+    BriefDesk.SAVED_14_OCT = saved;
+  }
+  // A brief opened from a re-check link.
+  const page = new BriefDesk(document, { storage: null });
+  const found = await page.search({ node: "core", query: "k7k ledger", limit: 1 });
+  await page.pin({ node: "core", passage: found.passages[0].passage });
+  const link = page.recheckLink();
+  const before = document.location;
+  document.location = { hash: new URL(link).hash };
+  try {
+    const result = await page.checkLinkedBrief();
+    assert.equal(result.ok, true, result.reason);
+    assert.match(document.getElementById("desk-saved-status").textContent, /came from a link: "changed" means the digest in the link differs from what the node publishes now/);
+  } finally {
+    document.location = before;
+  }
 });

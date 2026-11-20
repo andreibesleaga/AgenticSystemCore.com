@@ -594,30 +594,33 @@ export class BriefDesk extends PassageReader {
   }
 
   /**
-   * A citation saved on 19 Oct 2026 from this node's own passages file of that day (commit
-   * 83c6c2c of the site's public repository, www/chunks.jsonl): the Cluster passage, at the
-   * same address it has today, with the digest its text had then. The text has changed since,
-   * so the check shows a real change.
+   * A citation saved on 14 Oct 2026 from this node's own passages file of that day (commit
+   * aad097e of the site's public repository, www/chunks.jsonl): step 2 of "Publish a Level-0
+   * node", at the same address it has today, with the digest its text had then. The rule in
+   * that step has since reversed, so the check shows a real change of meaning. `then` is the
+   * sentence of that day, quoted from the commit; `marker` finds the same step in today's text.
    */
-  static SAVED_19_OCT = {
-    title: "Cluster",
-    address: "https://agenticsystemcore.com/concepts/cluster/#chunk-ad750a7932a82146",
-    digest: "49af1773173305c7b97ae2caf020ad2ed0d54728886d6886f3a89a61e5a59e4e",
+  static SAVED_14_OCT = {
+    title: "Publish a Level-0 node",
+    address: "https://agenticsystemcore.com/procedures/publish-a-level-0-node/#chunk-5054b2c80f6cb7de",
+    digest: "33bc2f7ed5e14ed6ea50e7aa1aca9242dba4986ebd2aaa2ad85faa62b5374700",
+    then: "An item without `prov` inherits the operator of the Bundle at Level 0, with a warning.",
+    marker: "`prov` is required",
   };
 
   /**
-   * An example of a saved brief for the first-minute check: the citation of 19 Oct 2026, and
+   * An example of a saved brief for the first-minute check: the citation of 14 Oct 2026, and
    * a passage cited now, as read from the node.
    *
    * :param passage: A passage read from a node now: title, address and digest.
    * :return: The Markdown text.
    */
   static exampleBrief(passage) {
-    const saved = BriefDesk.SAVED_19_OCT;
+    const saved = BriefDesk.SAVED_14_OCT;
     return [
-      "# Brief (example: one citation saved on 19 Oct 2026, one made now)",
+      "# Brief (example: one citation saved on 14 Oct 2026, one made now)",
       "",
-      `- **${saved.title}**: cited on 19 Oct 2026, from this node's passages file of that day (commit 83c6c2c of the site's public repository).`,
+      `- **${saved.title}**, step 2: "${saved.then}" Cited on 14 Oct 2026, from this node's passages file of that day (commit aad097e of the site's public repository).`,
       `  Source: <${saved.address}> (sha-256 ${saved.digest})`,
       `- **${passage.title}**: cited now.`,
       `  Source: <${passage.address}> (sha-256 ${passage.digest})`,
@@ -643,7 +646,19 @@ export class BriefDesk extends PassageReader {
     this.doc.getElementById("desk-saved-text").value = BriefDesk.exampleBrief(passage);
     this.doc.getElementById("desk-saved").open = true;
     const result = await this.showSaved();
-    return result.ok ? { ...result, changedShown: result.results.some((r) => r.status === "changed") } : result;
+    if (!result.ok) {
+      return result;
+    }
+    // What the cited step says now, read from the same passage, so the change is shown in words.
+    let now = "";
+    const cited = await this.read({ node: "core", passage: BriefDesk.SAVED_14_OCT.address.slice(-16) }).catch(() => null);
+    if (cited && cited.ok && cited.digestMatches) {
+      const line = cited.text.split("\n").find((l) => l.includes(BriefDesk.SAVED_14_OCT.marker)) || "";
+      // The sentence that holds the marker, from the marker on.
+      const at = line.indexOf(BriefDesk.SAVED_14_OCT.marker);
+      now = (at >= 0 ? line.slice(at) : line.replace(/^\s*\d+\.\s*/, "")).trim();
+    }
+    return { ...result, changedShown: result.results.some((r) => r.status === "changed"), then: BriefDesk.SAVED_14_OCT.then, now };
   }
 
   /**
@@ -970,6 +985,11 @@ export class BriefDesk extends PassageReader {
     this.doc.getElementById("desk-saved-text").value = markdown;
     this.doc.getElementById("desk-saved").open = true;
     const result = await this.showSaved();
+    if (result.ok) {
+      // A link can carry any digest; say what "changed" compares.
+      const report = this.doc.getElementById("desk-saved-status");
+      report.textContent += " These citations came from a link: \"changed\" means the digest in the link differs from what the node publishes now.";
+    }
     this.doc.getElementById("desk-saved").scrollIntoView?.({ block: "start" });
     return result;
   }
@@ -1000,8 +1020,12 @@ export class BriefDesk extends PassageReader {
         status.textContent = checked.reason;
         return;
       }
-      status.textContent = `A brief with one citation saved on 19 Oct 2026 and one made now: ${checked.unchanged} of ${checked.results.length} unchanged.${checked.changedShown ? " The passage cited on 19 Oct has changed since." : ""} Your own brief was not changed.`;
-      this.showTry(checked.results.map((r) => ({ text: r.address, href: r.status === "not checked" ? null : r.address, note: BriefDesk.verdict(r), ok: r.status === "unchanged" })));
+      status.textContent = `A brief with one citation saved on 14 Oct 2026 and one made now: ${checked.unchanged} of ${checked.results.length} unchanged. Your own brief was not changed.${checked.changedShown ? " The step cited on 14 Oct has changed since:" : ""}`;
+      const lines = checked.results.map((r) => ({ text: r.address, href: r.status === "not checked" ? null : r.address, note: BriefDesk.verdict(r), ok: r.status === "unchanged" }));
+      if (checked.changedShown && checked.now) {
+        lines.splice(1, 0, { text: `On 14 Oct 2026 it said: "${checked.then}"` }, { text: `Now it says: "${checked.now}"` });
+      }
+      this.showTry(lines);
     });
   }
 

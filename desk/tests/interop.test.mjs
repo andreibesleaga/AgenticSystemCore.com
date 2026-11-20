@@ -357,7 +357,8 @@ test("the front agent is told to ask a partner for a proposal directly, with no 
   const config = JSON.parse(await readFile(path.join(ROOT, "desk", "brief_desk.network.json"), "utf8"));
   const front = config.tools.find((t) => t.name === "desk_assistant");
   assert.match(front.instructions, /ask that partner at once to write a proposal: name the card and say the change/);
-  assert.match(front.instructions, /It finds the passage on its own site, so no tick under "Nodes to read" is needed/);
+  assert.match(front.instructions, /It finds the passage itself; no tick is needed/);
+  assert.match(front.instructions, /the visitor already holds the proposal, so do not send them back/);
   assert.ok(!/passage id from a search of that node/.test(front.instructions));
   assert.match(front.instructions, /never ask for them in chat/);
   // The partner's guide does the search and the write with its own tools.
