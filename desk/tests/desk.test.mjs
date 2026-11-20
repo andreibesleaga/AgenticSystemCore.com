@@ -420,3 +420,60 @@ BriefDeskTest.testShardedPassageFile = async () => {
 };
 
 test("a sharded passage file is read shard by shard, from the node's own files only", BriefDeskTest.testShardedPassageFile);
+
+/** The first minute: the buttons that need no key, and the sample questions. */
+class FirstMinuteTest {
+  /** Empty the shared page's brief, so each check starts from nothing. */
+  static empty() {
+    const page = BriefDesk.page;
+    if (page.cards.length) {
+      page.discard({ expectedVersion: page.version });
+    }
+  }
+
+  /** "Cite the first passage" searches this site's node and adds the first result once. */
+  static async testCiteAddsTheFirstPassageOnce() {
+    FirstMinuteTest.empty();
+    const query = BriefDesk.TRY_QUERY;
+    BriefDesk.TRY_QUERY = "k7k ledger";
+    try {
+      const first = await BriefDesk.page.tryCite();
+      assert.equal(first.ok, true, first.reason);
+      assert.equal(first.already, false);
+      assert.equal(first.title, "Item 7");
+      assert.equal(BriefDesk.page.cards.length, 1);
+      assert.equal(BriefDesk.page.cards[0].digestMatches, true);
+      const second = await BriefDesk.page.tryCite();
+      assert.equal(second.already, true);
+      assert.equal(BriefDesk.page.cards.length, 1);
+    } finally {
+      BriefDesk.TRY_QUERY = query;
+    }
+  }
+
+  /** The example saved brief shows one passage unchanged and the altered one changed. */
+  static async testExampleBriefShowsAChange() {
+    const result = await BriefDesk.page.tryExample();
+    assert.equal(result.ok, true, result.reason);
+    assert.deepEqual(result.results.map((r) => r.status), ["unchanged", "changed"]);
+    assert.equal(document.getElementById("desk-saved").open, true);
+    assert.match(document.getElementById("desk-saved-text").value, /altered on purpose/);
+    assert.equal(document.getElementById("desk-saved-results").children.length, 2);
+    FirstMinuteTest.empty();
+    assert.equal(BriefDesk.page.exampleBrief(), "");
+  }
+
+  /** The page's sample questions are the manifest's, and none is sent before the chat loads. */
+  static async testSamplesAreTheManifests() {
+    const manifest = JSON.parse(await readFile(new URL("../agent-manifest.json", import.meta.url), "utf8"));
+    assert.deepEqual(BriefDesk.SAMPLES, manifest.networks[0].sample_queries);
+    assert.equal(document.getElementById("desk-samples").children.length, BriefDesk.SAMPLES.length);
+    const asked = BriefDesk.page.askSample(BriefDesk.SAMPLES[0]);
+    assert.equal(asked.ok, false);
+    assert.match(asked.reason, /AI model settings/);
+  }
+}
+
+test("the first-minute cite button adds the first passage once, checked", FirstMinuteTest.testCiteAddsTheFirstPassageOnce);
+test("the example saved brief shows an unchanged and a changed passage", FirstMinuteTest.testExampleBriefShowsAChange);
+test("the sample questions are the manifest's, and the page sends none itself", FirstMinuteTest.testSamplesAreTheManifests);

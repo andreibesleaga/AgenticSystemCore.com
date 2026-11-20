@@ -1,4 +1,31 @@
 <p>Ask a question, or search by hand. Every passage this page shows comes from a file a knowledge node publishes, and each one is checked against the digest that node published for it before it goes into your brief. A brief keeps those digests, so anyone can check later whether a cited passage has changed. The assistant below runs in your browser, on the AI provider and key you choose; this site has no server behind it and never receives your key.</p>
+<section id="desk-try" class="desk-try" aria-labelledby="desk-try-heading">
+<h2 id="desk-try-heading">Try it now, with no key</h2>
+<p>Each button runs the same code the assistant calls. It reads only files this site publishes, and nothing you do here leaves your browser.</p>
+<ol class="desk-steps">
+<li><button type="button" id="desk-try-search">Search for "bundle"</button> finds passages in this site's published text.</li>
+<li><button type="button" id="desk-try-cite">Cite the first passage</button> adds it to your brief after checking its text against the digest the site published.</li>
+<li><button type="button" id="desk-try-example">Check an example saved brief</button> reads the cited passage again, the way anyone can check a brief later, and shows what a changed passage looks like.</li>
+</ol>
+<p id="desk-try-status" role="status"></p>
+<details id="desk-recorded" class="desk-recorded">
+<summary>Read a recorded run of the assistant (20 Nov 2026, model anthropic/claude-haiku-5.5 on OpenRouter)</summary>
+<p class="desk-meta">Copied from one run on this page; long answers are cut where you see "…".</p>
+<dl>
+<dt>Visitor</dt><dd>What is a Bundle? Answer from a passage and give its address.</dd>
+<dt>Assistant</dt><dd>A Bundle is "one directory tree of Markdown items plus exactly one agsc.config.json. It is the unit of publication and the unit of conformance: one repository is one Bundle." Source: https://agenticsystemcore.com/concepts/bundle/#chunk-3bb4f25f4fb8a70b</dd>
+<dt>Visitor</dt><dd>Add the Bundle passage you used to my brief.</dd>
+<dt>Page</dt><dd>A dialog: "Add this passage to your brief?", with the passage, its address and an excerpt. The visitor pressed "Add the card".</dd>
+<dt>Assistant</dt><dd>I've added the Bundle passage to your brief as card c1. … Its digest matched the published one.</dd>
+<dt>Visitor</dt><dd>Is my brief still current? Check it again.</dd>
+<dt>Assistant</dt><dd>Yes, your brief is still current. I checked its one card, and it is unchanged. …</dd>
+<dt>Visitor</dt><dd>Ask the Standards Map what it offers on robots.txt and AI usage preferences.</dd>
+<dt>Page</dt><dd>A card: "Contact Standards Map on your behalf?", with the request. The visitor pressed "Allow".</dd>
+<dt>Assistant</dt><dd>The Standards Map answered. Its assistant reports two cards on this subject. … robots.txt (RFC 9309) … AI usage preferences (IETF drafts) …</dd>
+</dl>
+</details>
+<p><a href="#assistant">The assistant</a> needs your own key for an AI provider.</p>
+</section>
 <section id="desk" class="desk" aria-labelledby="desk-heading" data-node-origin="https://agenticsystemcore.com">
 <h2 id="desk-heading">Search and collect</h2>
 <fieldset class="desk-nodes">
@@ -25,7 +52,7 @@
 <p id="desk-brief-count">The brief is empty. Search, then add passages.</p>
 <ol id="desk-brief" class="desk-list"></ol>
 <p class="desk-buttons"><button type="button" id="desk-copy">Copy the brief as Markdown</button> <button type="button" id="desk-check">Check the brief again</button> <button type="button" id="desk-discard">Discard the brief</button></p>
-<details class="desk-saved">
+<details id="desk-saved" class="desk-saved">
 <summary>Check a saved brief</summary>
 <p><label for="desk-saved-text">Paste a brief that was copied from this page, by you or by someone else. The page reads each cited passage from its node now and compares it with the digest the brief holds, so you see which passages have changed since the brief was written.</label></p>
 <textarea id="desk-saved-text" rows="6" spellcheck="false"></textarea>
@@ -38,6 +65,13 @@
 <h2 id="assistant-heading">Ask the Brief Desk</h2>
 <p>The assistant searches the nodes you allowed, reads passages, checks each against its published digest, answers with the passage's address, and adds or removes cards when you ask.</p>
 <p class="assistant-note">Your messages and the passages the assistant reads go to the AI provider you choose in the settings below. You confirm anything that cannot be undone before it happens, and you are asked before another site's assistant is contacted.</p>
+<ol class="desk-steps">
+<li>Open AI model settings below and add a key. This page was tested with OpenRouter and the model anthropic/claude-haiku-5.5.</li>
+<li>Pick a question; it goes into the chat box. Press Send.</li>
+<li>When the assistant asks to change your brief, or to contact another site, the page shows you what it will do first.</li>
+</ol>
+<ul id="desk-samples" class="desk-samples"></ul>
+<p id="desk-samples-status" role="status"></p>
 <p id="assistant-status" role="status">Connecting the assistant… If this message stays, the assistant could not load. You can still use the page directly.</p>
 <div id="agent-app">
 <div data-ns-slot="header"></div>

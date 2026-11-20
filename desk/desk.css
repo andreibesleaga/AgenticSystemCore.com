@@ -110,3 +110,18 @@ body > dialog button { margin-right: 8px; }
 .desk-saved textarea { width: 100%; box-sizing: border-box; font-family: ui-monospace, monospace; font-size: 0.85em; }
 .desk-meta { color: var(--muted); font-size: 0.9em; }
 .desk-buttons button { margin-right: 0.5rem; }
+
+/* The first minute: three buttons that need no key, and a recorded run. */
+.desk-try { border: 1px solid var(--rule); background: var(--bg-alt); padding: 0.5rem 1rem; margin: 1rem 0; }
+.desk-steps li { margin: 0.5rem 0; }
+.desk-steps button { margin-right: 0.25rem; }
+.desk-recorded dl { display: grid; grid-template-columns: fit-content(20%) 1fr; gap: 4px 12px; }
+.desk-recorded dt { font-weight: 600; }
+.desk-recorded dd { margin: 0; overflow-wrap: anywhere; }
+/* Sample questions: one button per line, wrapped text, so a phone shows the whole question. */
+.desk-samples { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.desk-samples button { text-align: left; white-space: normal; }
+@media (max-width: 760px) {
+  .desk-recorded dl { grid-template-columns: 1fr; gap: 0; }
+  .desk-recorded dd { margin-bottom: 8px; }
+}
