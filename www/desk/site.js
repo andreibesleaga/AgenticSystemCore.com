@@ -68,6 +68,8 @@ export class AssistantMount {
       // runtime's "API key required" badge in runtime/ui.js.
       const needsKey = !booted.engine.mockLLM
         && (!booted.engine.byokKey || booted.engine.byokKey === "demo");
+      // The page's sample-question buttons read this to say a key is needed before Send.
+      document.querySelector("#agent-app").setAttribute("data-needs-key", String(needsKey));
       status.textContent = needsKey
         ? "Assistant needs your AI provider key. Add it in AI model settings below."
         : "Assistant connected to this page.";
