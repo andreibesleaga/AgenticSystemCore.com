@@ -75,12 +75,27 @@ export class BriefDesk extends PassageReader {
     };
   }
 
-  /** Say which sites the page has read during this visit. Nothing is stored. */
+  /**
+   * Note a site the assistant may contact, once the visitor allowed it on the consent card.
+   *
+   * :param origin: The site's origin.
+   */
+  noteContact(origin) {
+    try {
+      this.contacted.add(new URL(origin).host);
+    } catch {
+      return;
+    }
+    this.renderActivity();
+  }
+
+  /** Say which sites the page and its assistant have read during this visit. Nothing is stored. */
   renderActivity() {
     const hosts = [...this.contacted].sort();
-    this.doc.getElementById("desk-activity").textContent = hosts.length
-      ? `Sites this page has read during this visit: ${hosts.join(", ")}. It sends them no key and no personal data.`
-      : "This page has read no site yet during this visit.";
+    this.doc.getElementById("desk-activity").textContent = (hosts.length
+      ? `Sites read during this visit: ${hosts.join(", ")}. They get no key and no personal data.`
+      : "No site has been read yet during this visit.")
+      + " The AI provider you choose is shown under AI model settings.";
   }
 
   /**
@@ -138,7 +153,7 @@ export class BriefDesk extends PassageReader {
         continue;
       }
       const node = this.nodes.find((n) => n.id === c.node);
-      const fits = node && typeof c.address === "string" && c.address.startsWith(`${node.origin}/`)
+      const fits = node && typeof c.address === "string" && BriefDesk.plainAddress(c.address) && c.address.startsWith(`${node.origin}/`)
         && /#chunk-[0-9a-f]{16}$/.test(c.address) && /^[0-9a-f]{64}$/.test(c.digest) && /^c[0-9]{1,4}$/.test(c.card)
         && !cards.some((k) => k.address === c.address || k.card === c.card);
       if (fits) {
@@ -151,9 +166,24 @@ export class BriefDesk extends PassageReader {
     }
     const highest = Math.max(0, ...cards.map((c) => Number(c.card.slice(1))));
     this.cards = cards;
-    this.nextCard = Math.max(highest + 1, Number.isInteger(saved.nextCard) ? saved.nextCard : 1);
+    this.nextCard = Math.min(9999, Math.max(highest + 1, Number.isInteger(saved.nextCard) ? saved.nextCard : 1));
     this.version = cards.length ? 1 : 0;
     return cards.length;
+  }
+
+  /**
+   * True when an address is exactly what a browser would write for it, with no space or
+   * angle bracket, so it cannot add lines to the Markdown brief or the re-check link.
+   *
+   * :param address: The address.
+   * :return: True or false.
+   */
+  static plainAddress(address) {
+    try {
+      return !/[\s<>]/.test(address) && new URL(address).href === address;
+    } catch {
+      return false;
+    }
   }
 
   /**
@@ -557,30 +587,40 @@ export class BriefDesk extends PassageReader {
   }
 
   /**
-   * An example of a saved brief for the first-minute check: one passage as it is, and the
-   * same passage again with the last character of its digest altered, as a brief would
-   * read if the text had changed since it was saved. The example says so in its own text.
+   * A citation saved on 19 Oct 2026 from this node's own passages file of that day (commit
+   * 83c6c2c of the site's public repository, www/chunks.jsonl): the Cluster passage, at the
+   * same address it has today, with the digest its text had then. The text has changed since,
+   * so the check shows a real change.
+   */
+  static SAVED_19_OCT = {
+    title: "Cluster",
+    address: "https://agenticsystemcore.com/concepts/cluster/#chunk-ad750a7932a82146",
+    digest: "49af1773173305c7b97ae2caf020ad2ed0d54728886d6886f3a89a61e5a59e4e",
+  };
+
+  /**
+   * An example of a saved brief for the first-minute check: the citation of 19 Oct 2026, and
+   * a passage cited now, as read from the node.
    *
-   * :param passage: A passage read from a node: title, address and digest.
+   * :param passage: A passage read from a node now: title, address and digest.
    * :return: The Markdown text.
    */
   static exampleBrief(passage) {
-    const altered = passage.digest.slice(0, -1) + (passage.digest.endsWith("0") ? "1" : "0");
+    const saved = BriefDesk.SAVED_19_OCT;
     return [
-      "# Brief (example: the second entry's digest was altered on purpose)",
+      "# Brief (example: one citation saved on 19 Oct 2026, one made now)",
       "",
-      `- **${passage.title}**: as it is published.`,
+      `- **${saved.title}**: cited on 19 Oct 2026, from this node's passages file of that day (commit 83c6c2c of the site's public repository).`,
+      `  Source: <${saved.address}> (sha-256 ${saved.digest})`,
+      `- **${passage.title}**: cited now.`,
       `  Source: <${passage.address}> (sha-256 ${passage.digest})`,
-      `- **${passage.title}**: the same passage, with the last character of its digest altered, as if its text had changed since.`,
-      `  Source: <${passage.address}> (sha-256 ${altered})`,
       "",
     ].join("\n");
   }
 
   /**
-   * Put an example saved brief in the "Check a saved brief" box, open it and check it. The
-   * example is built from the first passage of this site's own node for TRY_QUERY; the
-   * visitor's brief is not touched.
+   * Put the example saved brief in the "Check a saved brief" box, open it and check it. The
+   * visitor's own brief is not touched.
    *
    * :return: What checkSaved() returned, with changedShown, or a refusal.
    */
@@ -597,6 +637,22 @@ export class BriefDesk extends PassageReader {
     this.doc.getElementById("desk-saved").open = true;
     const result = await this.showSaved();
     return result.ok ? { ...result, changedShown: result.results.some((r) => r.status === "changed") } : result;
+  }
+
+  /**
+   * Show what a first-minute button found inside its own block, so the result is on screen.
+   *
+   * :param lines: A list of {text, href, ok}; href makes the line a link, ok false marks it.
+   */
+  showTry(lines) {
+    this.doc.getElementById("desk-try-result").replaceChildren(...lines.map((line) => {
+      const item = this.element("li", null, line.ok === false ? { class: "desk-bad" } : {});
+      item.append(line.href ? this.element("a", line.text, { href: line.href }) : this.element("span", line.text));
+      if (line.note) {
+        item.append(this.element("span", ` ${line.note}`, { class: line.ok === false ? "" : "desk-ok" }));
+      }
+      return item;
+    }));
   }
 
   /**
@@ -618,7 +674,7 @@ export class BriefDesk extends PassageReader {
       report.textContent = `${result.unchanged} of ${result.results.length} cited passage${result.results.length === 1 ? "" : "s"} unchanged.`;
       list.replaceChildren(...result.results.map((r) => {
         const item = this.element("li");
-        // Only an address this page read from one of its nodes becomes a link.
+        // An address on one of the page's nodes becomes a link; one it could not check stays text.
         item.append(
           r.status === "not checked" ? this.element("span", r.address) : this.element("a", r.address, { href: r.address }),
           this.element("p", BriefDesk.verdict(r), { class: r.status === "unchanged" ? "desk-ok" : "desk-bad" }),
@@ -889,6 +945,8 @@ export class BriefDesk extends PassageReader {
     this.render();
     this.renderActivity();
     this.checkLinkedBrief();
+    // A re-check link opened in a tab already on this page changes only the part after "#".
+    this.doc.defaultView?.addEventListener?.("hashchange", () => this.checkLinkedBrief());
   }
 
   /**
@@ -917,14 +975,17 @@ export class BriefDesk extends PassageReader {
       this.doc.getElementById("desk-node").value = "core";
       const found = await this.runSearch(BriefDesk.TRY_QUERY, "core");
       status.textContent = found.ok
-        ? `Found ${found.count} passage${found.count === 1 ? "" : "s"} for "${BriefDesk.TRY_QUERY}" in this site's published passages. They are listed under Search and collect.`
+        ? `Found ${found.count} passage${found.count === 1 ? "" : "s"} for "${BriefDesk.TRY_QUERY}" in this site's published passages. The first ones:`
         : found.reason;
+      this.showTry(found.ok ? found.passages.slice(0, 3).map((p) => ({ text: p.section ? `${p.title} — ${p.section}` : p.title, href: p.address })) : []);
     });
     this.doc.getElementById("desk-try-cite").addEventListener("click", async () => {
       const cited = await this.tryCite();
       status.textContent = !cited.ok ? cited.reason : cited.already
         ? `"${cited.title}" is already card ${cited.card} of your brief.`
         : `"${cited.title}" is now card ${cited.card} of your brief. Its text matched the digest the site published for it.`;
+      const card = cited.ok ? this.cards.find((c) => c.card === cited.card) : null;
+      this.showTry(card ? [{ text: card.title, href: card.address, note: BriefDesk.mark(card) }] : []);
     });
     this.doc.getElementById("desk-try-example").addEventListener("click", async () => {
       const checked = await this.tryExample();
@@ -932,7 +993,8 @@ export class BriefDesk extends PassageReader {
         status.textContent = checked.reason;
         return;
       }
-      status.textContent = `An example brief was checked under "Check a saved brief": ${checked.unchanged} of ${checked.results.length} passages unchanged.${checked.changedShown ? " The entry with the altered digest shows as changed." : ""} Your own brief was not changed.`;
+      status.textContent = `A brief with one citation saved on 19 Oct 2026 and one made now: ${checked.unchanged} of ${checked.results.length} unchanged.${checked.changedShown ? " The passage cited on 19 Oct has changed since." : ""} Your own brief was not changed.`;
+      this.showTry(checked.results.map((r) => ({ text: r.address, href: r.status === "not checked" ? null : r.address, note: BriefDesk.verdict(r), ok: r.status === "unchanged" })));
     });
   }
 

@@ -22,6 +22,9 @@
 <meta property="og:image" content="https://agenticsystemcore.com/assets/og-card.png">
 <meta property="og:image:alt" content="AgenticSystemCore: An open specification for knowledge that people and software agents can both read, verify and build on.">
 <meta name="twitter:card" content="summary_large_image">
+<script src="/compose/agsc-core.js" defer></script>
+<script src="/compose/agsc-page-tools.js" defer></script>
+<script src="/compose/webmcp.js" defer></script>
 <script type="module" src="/desk/page.js"></script>
 <script type="module" src="/desk/site.js"></script>
 </head>
@@ -48,19 +51,19 @@
 <main id="main">
 <h1>Brief Desk</h1>
 <p class="summary"><strong>Summary</strong>Search the passages a knowledge node publishes, check each against its published digest, and collect cited cards in a brief. Do it by hand, or ask the assistant: two published agents that run in your browser on your own AI provider key, and that ask before they discard anything or contact another site.</p>
-<p>Ask a question, or search by hand. Every passage this page shows comes from a file a knowledge node publishes, and each one is checked against the digest that node published for it before it goes into your brief. A brief keeps those digests, so anyone can check later whether a cited passage has changed. The assistant below runs in your browser, on the AI provider and key you choose; this site has no server behind it and never receives your key.</p>
 <section id="desk-try" class="desk-try" aria-labelledby="desk-try-heading">
 <h2 id="desk-try-heading">Try it now, with no key</h2>
-<p>Each button runs the same code the assistant calls. It reads only files this site publishes, and nothing you do here leaves your browser.</p>
+<p>For anyone who quotes a published page, such as a writer, a reviewer or an agent, and needs to know later whether it still says the same. Each button runs the same code the assistant calls, on files this site publishes; nothing you do here leaves your browser.</p>
 <ol class="desk-steps">
 <li><button type="button" id="desk-try-search">Search for "bundle"</button> finds passages in this site's published text.</li>
 <li><button type="button" id="desk-try-cite">Cite the first passage</button> adds it to your brief after checking its text against the digest the site published.</li>
-<li><button type="button" id="desk-try-example">Check an example saved brief</button> reads the cited passage again, the way anyone can check a brief later, and shows what a changed passage looks like.</li>
+<li><button type="button" id="desk-try-example">Check a brief saved on 19 Oct</button> reads two cited passages again, one cited on 19 Oct 2026 and one cited now, and shows which has changed since.</li>
 </ol>
 <p id="desk-try-status" role="status"></p>
+<ul id="desk-try-result" class="desk-try-result"></ul>
 <details id="desk-recorded" class="desk-recorded">
-<summary>Read a recorded run of the assistant (20 Nov 2026, model anthropic/claude-haiku-5.5 on OpenRouter)</summary>
-<p class="desk-meta">Copied from one run on this page; long answers are cut where you see "…".</p>
+<summary>Read a recorded run of the assistant (20 Nov 2026, a hosted model)</summary>
+<p class="desk-meta">Copied from one run on this page, with the model anthropic/claude-haiku-5.5 through OpenRouter; long answers are cut where you see "…".</p>
 <dl>
 <dt>Visitor</dt><dd>What is a Bundle? Answer from a passage and give its address.</dd>
 <dt>Assistant</dt><dd>A Bundle is "one directory tree of Markdown items plus exactly one agsc.config.json. It is the unit of publication and the unit of conformance: one repository is one Bundle." Source: https://agenticsystemcore.com/concepts/bundle/#chunk-3bb4f25f4fb8a70b</dd>
@@ -76,6 +79,7 @@
 </details>
 <p><a href="#assistant">The assistant</a> needs your own key for an AI provider.</p>
 </section>
+<p>Ask a question, or search by hand. Every passage this page shows comes from a file a knowledge node publishes, and each one is checked against the digest that node published for it before it goes into your brief. A brief keeps those digests, so anyone can check later whether a cited passage has changed. The assistant below runs in your browser, on the AI provider and key you choose; this site has no application server behind it and never receives your key.</p>
 <section id="desk" class="desk" aria-labelledby="desk-heading" data-node-origin="https://agenticsystemcore.com">
 <h2 id="desk-heading">Search and collect</h2>
 <fieldset class="desk-nodes">
@@ -118,7 +122,7 @@
 <p>The assistant searches the nodes you allowed, reads passages, checks each against its published digest, answers with the passage's address, and adds or removes cards when you ask.</p>
 <p class="assistant-note">Your messages and the passages the assistant reads go to the AI provider you choose in the settings below. You confirm anything that cannot be undone before it happens, and you are asked before another site's assistant is contacted.</p>
 <ol class="desk-steps">
-<li>Open AI model settings below and add a key. This page was tested with OpenRouter and the model anthropic/claude-haiku-5.5.</li>
+<li>Open AI model settings below and add a key. Tested routes: an Otari key alone (the panel fills in the rest), or an OpenRouter key with the model anthropic/claude-haiku-5.5 under Advanced settings.</li>
 <li>Pick a question; it goes into the chat box. Press Send.</li>
 <li>When the assistant asks to change your brief, or to contact another site, the page shows you what it will do first.</li>
 </ol>
@@ -146,7 +150,7 @@
 <ul>
 <li><a href="/graph/">The graph explorer</a> draws the same items as a typed graph, with the peer nodes when you ask, so you can see what a cited passage connects to.</li>
 <li><a href="/ns/">The vocabulary</a> names the terms the items use, as published linked data.</li>
-<li><a href="/webaiassist/">WebAIAssist</a>, a browser extension by the same author, runs a small model on your own computer with no key. On this site&#39;s other pages it uses the page tools they offer, and asks you before each one.</li>
+<li><a href="/webaiassist/">WebAIAssist</a>, a browser extension by the same author, runs a small model on your own computer with no key. On this page, as on the site&#39;s other pages, it can use the page tools the engine offers (search, read and cite this node), and asks you before each one.</li>
 </ul>
 <p>The page works without the assistant, and without a key: the search form and the brief use the same code the assistant calls. The source is in <a href="https://github.com/andreibesleaga/AgenticSystemCore.com/tree/main/desk">the site&#39;s repository</a>, under Apache-2.0.</p>
 </main>
