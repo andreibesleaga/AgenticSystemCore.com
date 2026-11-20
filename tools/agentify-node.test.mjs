@@ -10,7 +10,7 @@ import test from "node:test";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { AgentNetwork, validateNetwork } from "../desk/runtime/kernel.js";
-import { bridgeModule, bridgeRuntime, callersOf, cardsOf, chunksText, networkOf, nodeModule, withHeaders } from "./agentify-node.mjs";
+import { bridgeModule, bridgeRuntime, callersOf, cardsOf, chunksText, contentsLines, networkOf, nodeModule, withHeaders } from "./agentify-node.mjs";
 import { StubDocument } from "../desk/tests/stub_document.mjs";
 
 const BASE = "https://node.example/";
@@ -238,4 +238,17 @@ test("the shared write is offered to the named sites only, opens no form for a p
     globalThis.document = saved.document;
     fs.rmSync(folder, { recursive: true, force: true });
   }
+});
+
+test("a node with too many cards lists the ones that fit and counts the rest; the guide says what the site cannot do", () => {
+  const many = Array.from({ length: 120 }, (_, i) => ({ title: `Card number ${String(i).padStart(3, "0")} with a long descriptive title`, address: `${BASE}concepts/card-${i}/`, description: "A description." }));
+  const lines = contentsLines(many, BASE);
+  assert.ok(lines.join("\n").length <= 2300, `the list is ${lines.join("\n").length} characters`);
+  const listed = lines.length - 1;
+  assert.match(lines[lines.length - 1], new RegExp(`and ${120 - listed} more cards`));
+  assert.ok(listed > 10 && listed < 120);
+  const reads = networkOf({ base: BASE, title: "Node", tagline: "A test node.", name: "node_cards", label: "Node", cards: cardsOf(CHUNKS, BASE) });
+  assert.match(reads.network.tools[0].instructions, /This site cannot: answer from anything but its own published cards; publish or change a card itself; book, order or pay for anything; search the web\./);
+  const writes = networkOf({ base: BASE, title: "Node", tagline: "A test node.", name: "node_cards", label: "Node", cards: cardsOf(CHUNKS, BASE), callers: [CALLER] });
+  assert.match(writes.network.tools[0].instructions, /publish or change a card itself \(a proposal goes to its maintainers, who decide\)/);
 });

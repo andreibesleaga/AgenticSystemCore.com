@@ -102,6 +102,12 @@ How to work:
 {partner_rules}
 {cruse_rules}
 """,
+            # No private field crosses to a partner site or comes back from one. This is the
+            # runtime's default; the empty lists state it in the published file.
+            "allow": {
+                "to_downstream": {"sly_data": []},
+                "to_upstream": {"sly_data": []}
+            },
             "tools": [
                 "passage_reader",
                 "https://patterns.agenticsystemcore.com/agents/pattern_cards",
