@@ -301,7 +301,11 @@ export function callersOf(value) {
   if (!value) return [];
   const list = String(value).split(',').map(v => v.trim()).filter(Boolean);
   for (const origin of list) {
-    if (!/^https:\/\/[a-z0-9.-]+(:[0-9]+)?$/.test(origin)) die(`--callers takes exact https origins such as https://example.org; "${origin}" is not one (a wildcard is never allowed for a write)`);
+    let parsed = null;
+    try { parsed = new URL(origin); } catch { parsed = null; }
+    // The canonical origin must be the very string given, so the bridge's own check of
+    // callerOrigins accepts it: no path, no default port, no wildcard, no upper case.
+    if (!parsed || parsed.protocol !== 'https:' || parsed.origin !== origin) die(`--callers takes exact https origins such as https://example.org; "${origin}" is not one (a wildcard is never allowed for a write)`);
   }
   return [...new Set(list)];
 }

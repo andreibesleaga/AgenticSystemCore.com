@@ -7,7 +7,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { pathToFileURL } from "node:url";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { AgentNetwork, validateNetwork } from "../desk/runtime/kernel.js";
 import { bridgeModule, bridgeRuntime, callersOf, cardsOf, chunksText, networkOf, nodeModule, withHeaders } from "./agentify-node.mjs";
 import { StubDocument } from "../desk/tests/stub_document.mjs";
@@ -142,6 +143,13 @@ function windowDocument() {
 test("--callers takes exact https origins and never a wildcard; a node without it shares reads only", () => {
   assert.deepEqual(callersOf(null), []);
   assert.deepEqual(callersOf("https://a.example, https://b.example:8443,https://a.example"), ["https://a.example", "https://b.example:8443"]);
+  // What the bridge's own check of callerOrigins would refuse stops the tool before it writes.
+  const tool = fileURLToPath(new URL("./agentify-node.mjs", import.meta.url));
+  for (const bad of ["*", "http://a.example", "https://a.example/", "https://a.example:99999", "https://A.example", "https://a.example:443"]) {
+    const run = spawnSync(process.execPath, [tool, os.tmpdir(), "--callers", bad], { encoding: "utf8" });
+    assert.equal(run.status, 2, bad);
+    assert.match(run.stderr, /--callers takes exact https origins/, bad);
+  }
   const cards = cardsOf(CHUNKS, BASE);
   const reads = networkOf({ base: BASE, title: "Node", tagline: "A test node.", name: "node_cards", label: "Node", cards });
   assert.deepEqual(reads.manifest.actions.agentTools, ["search_passages", "read_passage"]);
@@ -174,6 +182,11 @@ test("the shared write is offered to the named sites only, opens no form for a p
     assert.equal(document.body.children.length, 0);
     // A real passage: the window shows the passage and the change, and waits.
     const passage = RECORDS[1].id.slice(0, 16);
+    // A change that is only spaces passes the schema's length but gets no window.
+    const blank = await write.execute({ passage, change: "    \n     \t   " }, { callerOrigin: CALLER });
+    assert.equal(blank.ok, false);
+    assert.match(blank.reason, /too short/);
+    assert.equal(document.body.children.length, 0);
     const pending = write.execute({ passage, change: "Say that the ledger is public." }, { callerOrigin: CALLER });
     await new Promise((resolve) => setTimeout(resolve, 20));
     const [header, main] = document.body.children;

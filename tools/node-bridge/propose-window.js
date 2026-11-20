@@ -94,9 +94,14 @@ export class ProposeWindow {
     if (!passage.digestMatches) {
       return { ok: false, reason: "That passage does not match the digest this site published for it, so no proposal was written." };
     }
+    // The schema counts spaces, so check the change again once its spaces are folded.
+    const change = String(args.change).replace(/\s+/g, " ").trim();
+    if (change.length < 10) {
+      return { ok: false, reason: "The change is too short once its spaces are removed: say in at least 10 characters what should change." };
+    }
     const state = {
       passage: passage,
-      change: String(args.change).replace(/\s+/g, " ").trim(),
+      change: change,
       caller: ProposeWindow.hostOf(context?.callerOrigin),
       inputs: {},
       messages: {},
