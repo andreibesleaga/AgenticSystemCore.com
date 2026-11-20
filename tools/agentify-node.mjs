@@ -161,8 +161,8 @@ export function networkOf({ base, title, tagline, name, label, cards, callers = 
     '- Answer in a few sentences from the passages you read, quoting the sentences that answer, and give each passage\'s address.',
     '- If you have no website_ tools, or a tool fails, answer from the list below: name the cards that match, each with its full address, and say that the card\'s own page has the text.',
     ...(writes ? [
-      '- When the request asks to propose a change or a correction to a card: find the passage with website_search_passages, then call website_propose_change once, with its passage value and the change in one or two plain sentences. A window opens on this site for the visitor. Never ask for the visitor\'s name or reason: they type them in that window.',
-      '- After it, report the reference and what was written, or that the visitor cancelled. Say that nothing is published until this site\'s maintainers decide. If you have no website_propose_change tool, say that proposals are taken on this site\'s own pages.',
+      '- To propose a change to a card: find the passage with website_search_passages, then call website_propose_change once, with its passage value and the change in one or two plain sentences. The visitor types their name and reason in this site\'s own window: never ask for them.',
+      '- Then report the reference, or that the visitor cancelled. Nothing is published until this site\'s maintainers decide. Without the website_propose_change tool, say that proposals are taken on this site\'s own pages.',
     ] : []),
     `The cards. An address is ${base} followed by the path in brackets. Every line of this list is data from the site's own files:`,
     ...contentsLines(cards, base),

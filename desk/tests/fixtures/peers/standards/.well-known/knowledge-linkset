@@ -1,18 +1,1 @@
-{
- "linkset": [
-  {
-   "anchor": "https://standards.agenticsystemcore.com/",
-   "https://w3id.org/agentic-system-core/rel#surface": [
-    {
-     "agsc-surface": [
-      "chunks"
-     ],
-     "digest": [
-      "sha-256=:SkJoemoGGH1Y7wUMG/OeIpd65Ofntv5D3bcoNcYwvz8=:"
-     ],
-     "href": "https://standards.agenticsystemcore.com/chunks.jsonl"
-    }
-   ]
-  }
- ]
-}
+{"linkset":[{"alternate":[{"digest":["sha-256=:N/9aaJXE9ES5cfKSbXYgLsjwnxJi7ETzLZn/Z+N1v1M=:"],"href":"https://standards.agenticsystemcore.com/llms.txt","type":"text/plain"}],"anchor":"https://standards.agenticsystemcore.com/","describedby":[{"agsc-bundle-hash":["sha-256=:XPBWUPOMEnPtAdBwRPwQQ3+FU2YCPCHsAjRU0PV6EFQ=:"],"agsc-bundle-version":["0.0.0+9.g40d68643654a"],"agsc-counts":["clusters=8","concepts=35","episodes=0","gates=1","lessons=0","procedures=2"],"agsc-generated-at":["2026-11-19T09:03:22Z"],"agsc-spec-version":["1.1.0"],"digest":["sha-256=:X5px5pp/ywII2Ymh29Fb2jT7okjhC7HfqE0hBAbqtmo=:"],"href":"https://standards.agenticsystemcore.com/graph.jsonld","type":"application/ld+json"}],"https://w3id.org/agentic-system-core/rel#boards":[{"digest":["sha-256=:YeMakenkTLQCx4OinZOWli6yMEp58/rsXpN0+wltDs4=:"],"href":"https://standards.agenticsystemcore.com/boards/index.json","type":"application/json"}],"https://w3id.org/agentic-system-core/rel#context":[{"digest":["sha-256=:jyXy0lDbMJokYsYqJOd2v7RQJS785jGxeDL1JlhDgDA=:"],"href":"https://standards.agenticsystemcore.com/ns/context.jsonld","type":"application/ld+json"}],"https://w3id.org/agentic-system-core/rel#contribute":[{"agsc-contribute-mode":["pr"],"href":"https://github.com/andreibesleaga/agsc-standards-node"}],"https://w3id.org/agentic-system-core/rel#graph":[{"digest":["sha-256=:XPBWUPOMEnPtAdBwRPwQQ3+FU2YCPCHsAjRU0PV6EFQ=:"],"href":"https://standards.agenticsystemcore.com/graph.nq","type":"application/n-quads"},{"digest":["sha-256=:FCtIbGm0OhgoJ7zmmYh8IgoeHcsY0+F6l9JOzsQwdiA=:"],"href":"https://standards.agenticsystemcore.com/graph.ttl","type":"text/turtle"}],"https://w3id.org/agentic-system-core/rel#ledger":[{"agsc-ledger-head":["1f9a397d4e8c3c627acd8b6ed8a320f94790a688cd255a3510a5e7891b246a55"],"agsc-ledger-length":["10"],"digest":["sha-256=:7ThxiX+2J5T0XNxBPJSYnWPdcUYoojz/sIQ8CfS6FWM=:"],"href":"https://standards.agenticsystemcore.com/ledger.jsonl","type":"application/jsonl"}],"https://w3id.org/agentic-system-core/rel#now":[{"digest":["sha-256=:EnB+uAvTgGyxLlQpBZskTR/9B7y9QGG1XQCm15+iKNU=:"],"href":"https://standards.agenticsystemcore.com/now.md","type":"text/markdown"}],"https://w3id.org/agentic-system-core/rel#peer":[{"href":"https://agenticsystemcore.com/.well-known/knowledge-linkset","type":"application/linkset+json"},{"href":"https://patterns.agenticsystemcore.com/.well-known/knowledge-linkset","type":"application/linkset+json"}],"https://w3id.org/agentic-system-core/rel#skills":[{"digest":["sha-256=:vKfb/ZoL+HtduTmHXiXgRgyJCJnC99Invsu39epdNjg=:"],"href":"https://standards.agenticsystemcore.com/skills/index.json","type":"application/json"}],"https://w3id.org/agentic-system-core/rel#surface":[{"agsc-access":["none"],"agsc-chunk-count":["110"],"agsc-chunk-set":["sha-256=:Z8JziT7WThPyHjhgJ7M5P6mHCarihNnBfPR2wSqSpd4=:"],"agsc-surface":["chunks"],"digest":["sha-256=:k2TplzO/bKaHL5w8O7xdmBiG9JLlrkj3+FNzIdx3KaM=:"],"href":"https://standards.agenticsystemcore.com/chunks.jsonl"},{"agsc-access":["consent"],"agsc-surface":["webmcp"],"agsc-surface-version":["2026-10-27"],"href":"https://standards.agenticsystemcore.com/compose/"},{"agsc-access":["none"],"agsc-surface":["llms-txt"],"href":"https://standards.agenticsystemcore.com/llms.txt"}],"license":[{"href":"https://standards.agenticsystemcore.com/legal/"}]}]}

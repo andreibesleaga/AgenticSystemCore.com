@@ -150,8 +150,8 @@ test("--callers takes exact https origins and never a wildcard; a node without i
   const writes = networkOf({ base: BASE, title: "Node", tagline: "A test node.", name: "node_cards", label: "Node", cards, callers: [CALLER] });
   assert.deepEqual(writes.manifest.actions.agentTools, ["search_passages", "read_passage", "propose_change"]);
   assert.deepEqual(validateNetwork(new AgentNetwork(writes.network, "node_cards")).errors, []);
-  assert.match(writes.network.tools[0].instructions, /Never ask for the visitor's name or reason/);
-  assert.match(writes.network.tools[0].instructions, /nothing is published until this site's maintainers decide/);
+  assert.match(writes.network.tools[0].instructions, /name and reason in this site's own window: never ask for them/);
+  assert.match(writes.network.tools[0].instructions, /Nothing is published until this site's maintainers decide/);
 });
 
 test("the shared write is offered to the named sites only, opens no form for a passage the node refuses, and returns a reference without what the visitor typed", async () => {
