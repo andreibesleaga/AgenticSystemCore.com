@@ -513,7 +513,7 @@ export class BriefDesk extends PassageReader {
    * Put one sample question in the chat box, for the visitor to send. Nothing is sent here.
    *
    * :param text: The question.
-   * :return: {ok} or a refusal.
+   * :return: {ok, needsKey} or a refusal.
    */
   askSample(text) {
     const input = this.chatInput();
@@ -524,7 +524,8 @@ export class BriefDesk extends PassageReader {
     // The runtime enables its Send button on input events.
     input.dispatchEvent(new Event("input", { bubbles: true }));
     input.focus();
-    return { ok: true };
+    // site.js marks the chat when the runtime has no key yet.
+    return { ok: true, needsKey: this.doc.getElementById("agent-app").getAttribute("data-needs-key") === "true" };
   }
 
   /** Draw the sample questions as buttons. */
@@ -535,7 +536,9 @@ export class BriefDesk extends PassageReader {
       const button = this.element("button", text, { type: "button" });
       button.addEventListener("click", () => {
         const asked = this.askSample(text);
-        status.textContent = asked.ok ? "The question is in the chat box. Press Send." : asked.reason;
+        status.textContent = !asked.ok ? asked.reason : asked.needsKey
+          ? "The question is in the chat box. Add your key in AI model settings below, then press Send."
+          : "The question is in the chat box. Press Send.";
       });
       item.append(button);
       return item;
