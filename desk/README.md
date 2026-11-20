@@ -16,7 +16,7 @@ It follows the [Worldwide Agentic Web MVP specification](https://github.com/cogn
 | `reader.js` | reads and checks a node's published passages: search, read with the digest check, the check of the passage file against the node's discovery document, and the later check of a noted digest; used by the page, by this site's bridge and by the bridges of the two peer nodes |
 | `page.js` | the page: the visitor's consent per node, the brief, checking a brief again, what is drawn; the page's buttons and the assistant call the same methods |
 | `site-actions.js` | the eight actions the page's own agents get (`website_*` tools) |
-| `bridge/bridge-actions.js` | the two reads shared with every calling site: search and read, this node only |
+| `bridge/bridge-actions.js` | the three reads shared with every calling site: search, read, and the check of saved citations, this node only |
 | `site.js` | boots the runtime, the confirmation dialog, the consent card's focus |
 | `brief_desk.hocon` | the agent network, source of truth |
 | `brief_desk.network.json`, `agent-mcp.json`, `.well-known/`, `bridge/action-bridge.html`, `bridge/agent-manifest.json` | written by `tools/build_network.mjs`; do not edit |
