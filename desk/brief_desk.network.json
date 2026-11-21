@@ -18,7 +18,7 @@
     "version": 1
   },
   "link_labels": {
-    "https://patterns.agenticsystemcore.com/agents/pattern_cards": "AgenticSystemCore Graph (pattern cards)",
+    "https://patterns.agenticsystemcore.com/agents/pattern_cards": "Systems Graph (pattern cards)",
     "https://standards.agenticsystemcore.com/agents/standards_map": "Standards Map"
   },
   "commondefs": {

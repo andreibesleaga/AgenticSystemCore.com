@@ -3,7 +3,7 @@
 export const NODE = {
   "origin": "https://patterns.agenticsystemcore.com",
   "name": "pattern_cards",
-  "label": "AgenticSystemCore Graph",
+  "label": "Systems Graph",
   "callers": [
     "https://agenticsystemcore.com"
   ],

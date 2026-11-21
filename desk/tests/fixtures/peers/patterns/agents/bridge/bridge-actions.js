@@ -10,7 +10,7 @@ import { ProposeWindow } from "./propose-window.js";
 
 const ORIGIN = "https://patterns.agenticsystemcore.com";
 const NODE = "pattern_cards";
-const LABEL = "AgenticSystemCore Graph";
+const LABEL = "Systems Graph";
 let reader = null;
 
 /** The reader of this node's passages, made on first use. */
