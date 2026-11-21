@@ -1,18 +1,18 @@
 {
-  "brand": "AgenticSystemCore Graph guide",
+  "brand": "Systems Graph guide",
   "networks": [
     {
       "name": "pattern_cards",
       "front_man": "pattern_cards_guide",
       "hocon": "./pattern_cards.network.json",
-      "description": "Answers from the published passages of AgenticSystemCore Graph, each checked against its digest, with their addresses.",
+      "description": "Answers from the published passages of Systems Graph, each checked against its digest, with their addresses.",
       "tags": [
         "knowledge-node",
         "verified-citations"
       ],
       "sample_queries": [
-        "What does AgenticSystemCore Graph offer on Agent Identity and Scoped Credentials?",
-        "Which cards of AgenticSystemCore Graph should I read first?",
+        "What does Systems Graph offer on Agent Identity and Scoped Credentials?",
+        "Which cards of Systems Graph should I read first?",
         "Propose a correction to the card on Agent Identity and Scoped Credentials.",
         "Book a call with the author for me."
       ]
@@ -64,7 +64,7 @@
   },
   "source": {
     "node": "https://patterns.agenticsystemcore.com/",
-    "title": "AgenticSystemCore Graph",
+    "title": "Systems Graph",
     "generated_from": "https://patterns.agenticsystemcore.com/chunks.jsonl",
     "cards": 50
   },
