@@ -239,7 +239,7 @@ export class BriefDesk extends PassageReader {
   static defaultNodes(own) {
     return [
       { id: "core", label: "AgenticSystemCore (the format and its vocabulary)", origin: own },
-      { id: "patterns", label: "Systems Graph (cards on agent-system designs)", origin: "https://patterns.agenticsystemcore.com" },
+      { id: "patterns", label: "AgenticSystemCore Graph (cards on agent-system designs)", origin: "https://patterns.agenticsystemcore.com" },
       { id: "standards", label: "Standards Map (documents an agent-readable site builds on)", origin: "https://standards.agenticsystemcore.com" },
     ];
   }
