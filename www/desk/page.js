@@ -43,7 +43,7 @@ export class BriefDesk extends PassageReader {
     "Find a passage on how a digest in the discovery document is checked, and add it to my brief.",
     "Ask the Standards Map what it offers on robots.txt and AI usage preferences.",
     "Add the passage that defines a Cluster to my brief, then discard the brief.",
-    "Ask the Standards Map to write a proposal: its card on robots.txt should link to the errata page of RFC 9309.",
+    "Ask the Standards Map to write a proposal: its card on robots.txt should link to the errata page of RFC 9309. The page is https://www.rfc-editor.org/errata/rfc9309",
     "Publish a new item on this node for me."
   ];
 
