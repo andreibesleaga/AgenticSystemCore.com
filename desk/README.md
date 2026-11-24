@@ -18,13 +18,14 @@ It follows the [Worldwide Agentic Web MVP specification](https://github.com/cogn
 | `site-actions.js` | the eight actions the page's own agents get (`website_*` tools) |
 | `bridge/bridge-actions.js` | the three reads shared with every calling site: search, read, and the check of saved citations, this node only |
 | `site.js` | boots the runtime, the confirmation dialog, the consent card's focus |
+| `webmcp-tools.js` | offers the same eight actions to a browser assistant that supports WebMCP (such as the WebAIAssist extension), as tools named `desk_*`; the three that change the brief open the page's own dialog first; with no WebMCP in the browser it registers nothing |
 | `brief_desk.hocon` | the agent network, source of truth |
 | `brief_desk.network.json`, `agent-mcp.json`, `.well-known/`, `bridge/action-bridge.html`, `bridge/agent-manifest.json` | written by `tools/build_network.mjs`; do not edit |
 | `agent-manifest.json`, `links.json` | the site's index of networks, and the peer link map |
 | `desk.css` | the assistant's layout with this site's colours |
 | `runtime/` | the browser runtime, copied unchanged from the skill (see below) |
 | `tools/`, `templates/` | the skill's build, partner-check and serve scripts, and the templates the build reads |
-| `tests/` | the skill's test template filled in for this page, `desk.test.mjs` (the page's own rules), `interop.test.mjs` (the seven interoperability checks of the specification's section 6, on this site's built files and the two peers' published networks in `fixtures/peers/`), `fixtures.mjs`, the skill's DOM stand-ins, the organisers' in-process web and scripted router in `linking/`, and `browser-check.mjs` |
+| `tests/` | the skill's test template filled in for this page, `desk.test.mjs` (the page's own rules), `webmcp.test.mjs` (the WebMCP tools), `interop.test.mjs` (the seven interoperability checks of the specification's section 6, on this site's built files and the two peers' published networks in `fixtures/peers/`), `fixtures.mjs`, the skill's DOM stand-ins, the organisers' in-process web and scripted router in `linking/`, and `browser-check.mjs` |
 
 The network's address is `https://agenticsystemcore.com/desk/brief_desk`. It can call the
 networks of the two peer nodes, each after the visitor agrees:
@@ -76,7 +77,8 @@ that provider, never to a peer site. To stop using it, select **Delete setup** u
 `runtime/`, `tools/`, `templates/`, the DOM stand-ins in `tests/` (`stub_*.mjs`,
 `scripted_model.mjs`) and `tests/linking/` come from
 [cognizant-ai-labs/agentic-web](https://github.com/cognizant-ai-labs/agentic-web) at commit
-`29a4226`, Apache-2.0 (`runtime/LICENSE.txt`, `tools/LICENSE.txt`); they are not changed, except one import path in
+`29a4226`, except `runtime/` and `tools/build_network.mjs`, which are from commit `d67755e` (24 Nov 2026; it adds
+"Connect with Otari" to the runtime's model settings), Apache-2.0 (`runtime/LICENSE.txt`, `tools/LICENSE.txt`); they are not changed, except one import path in
 `tests/linking/example_web.mjs`, which points at `../../runtime/`.
 `site.js` and `tests/agentified.test.mjs` are that repository's templates (`templates/site.js`
 and its test template, Apache-2.0), filled in for this page. `bridge/action-bridge.html`
