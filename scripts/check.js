@@ -292,9 +292,10 @@ const idsOf = new Map();
 const idsIn = html => [...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
 for (const f of files.filter(f => f.endsWith('.html'))) idsOf.set(f, new Set(idsIn(fs.readFileSync(f, 'utf8'))));
 // The Brief Desk (desk/README.md): its bridge page is the agent runtime's own frame page, loaded hidden
-// by other sites, not a page of this site; the page /desk/ loads the runtime as two module scripts.
+// by other sites, not a page of this site; the page /desk/ loads the runtime as two module scripts,
+// and webmcp-tools.js, which offers the page's actions to a WebMCP assistant.
 const DESK_BRIDGE = 'desk/bridge/action-bridge.html';
-const DESK_MODULES = new Set(['<script type="module" src="/desk/page.js">', '<script type="module" src="/desk/site.js">']);
+const DESK_MODULES = new Set(['<script type="module" src="/desk/page.js">', '<script type="module" src="/desk/site.js">', '<script type="module" src="/desk/webmcp-tools.js">']);
 for (const f of files.filter(f => f.endsWith('.html') && rel(f) !== DESK_BRIDGE)) {
   const r = rel(f), h = fs.readFileSync(f, 'utf8');
   const E = m => fails.push(`${r}: ${m}`);

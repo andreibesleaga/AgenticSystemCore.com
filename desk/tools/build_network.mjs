@@ -365,10 +365,12 @@ class NetworkBuilder {
   }
 
   /**
-   * Import the runtime modules that parse and validate networks and name their tools.
+   * Import the runtime modules that parse and validate networks, name their tools and
+   * pick the router.
    *
    * :return: An object with parseHocon, AgentNetwork, validateNetwork, parseExternalAgent,
-   *   agentPresentationContext and safeName.
+   *   agentPresentationContext, safeName and isPublisherFundedRouter. The last is
+   *   undefined for a runtime older than publisher-funded routers.
    * :raises Error: When the runtime directory does not contain the expected modules.
    */
   async loadRuntime() {
@@ -378,6 +380,7 @@ class NetworkBuilder {
       const kernel = await import(pathToFileURL(path.join(runtimeDir, "kernel.js")).href);
       const cruse = await import(pathToFileURL(path.join(runtimeDir, "cruse.js")).href);
       const runner = await import(pathToFileURL(path.join(runtimeDir, "runner.js")).href);
+      const engine = await import(pathToFileURL(path.join(runtimeDir, "engine.js")).href);
       return {
         parseHocon: hocon.parseHocon,
         AgentNetwork: kernel.AgentNetwork,
@@ -385,6 +388,7 @@ class NetworkBuilder {
         parseExternalAgent: kernel.parseExternalAgent,
         agentPresentationContext: cruse.agentPresentationContext,
         safeName: runner.safeName,
+        isPublisherFundedRouter: engine.isPublisherFundedRouter,
       };
     } catch (error) {
       // The build uses the site's copy of the runtime, which step 3 adds.
@@ -659,6 +663,15 @@ class NetworkBuilder {
     const router = manifest.llm_router || {};
     if (!router.byok_router) {
       this.errors.push("Manifest: llm_router.byok_router is required for BYOK.");
+    }
+    if (router.publisher_funded === true && router.mock !== true) {
+      if (!this.runtime.isPublisherFundedRouter) {
+        this.errors.push("Manifest: llm_router.publisher_funded needs the skill's current runtime. Copy runtime/ again.");
+      } else if (router.byok_router && this.runtime.isPublisherFundedRouter(manifest, router.byok_router)) {
+        // The runtime sends a visitor's own key to byok_router. If that is the router the
+        // site pays for, the key reaches the site's proxy.
+        this.errors.push("Manifest: llm_router.byok_router must be a different URL from base_url when publisher_funded is true. Otherwise a visitor's own key goes to the site's proxy.");
+      }
     }
     this.checkDiscovery(manifest, frontMan);
     this.checkAgentTools(manifest, resolved);

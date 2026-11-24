@@ -82,10 +82,19 @@ for (const [route, expected] of Object.entries(EXPECTED)) {
 // with its worker and its engine (AGSC-06-38, AGSC-06-39) — are the engine's bytes too and are held
 // to the same: no page tool, no WebMCP.
 // The Brief Desk's scripts (desk/README.md) — its own and the agent runtime's — are held to the same:
-// the agents call the page's own actions through the runtime, never through WebMCP.
+// the agents call the page's own actions through the runtime, never through WebMCP. One exception
+// (24 Nov 2026): /desk/webmcp-tools.js offers the page's own eight actions to a WebMCP assistant under
+// the prefix desk_, calling the same action definitions. It is not a second implementation of the
+// engine's page tools, so it may name none of them, and it registers nothing else.
+const DESK_WEBMCP = '/desk/webmcp-tools.js';
 const EXPLORER_SCRIPTS = ['/assets/graph-data.js', '/assets/graph-explorer.js', '/assets/vendor/force-graph-1.52.0.min.js', '/assets/vendor/3d-force-graph-1.80.1.min.js',
   ...[...files.keys()].filter(r => r.endsWith('.js') && (r.startsWith('/query/') || r.startsWith('/desk/') || r === '/clusters/agsc-explorer.js')).sort()];
-for (const route of EXPLORER_SCRIPTS) if (files.has(route)) ok(!/modelContext|registerTool|provideContext/.test(files.get(route)), `${route}: the graph explorer touches the WebMCP surface; the page tools are the engine's four /compose/ files only`);
+for (const route of EXPLORER_SCRIPTS) if (files.has(route) && route !== DESK_WEBMCP) ok(!/modelContext|registerTool|provideContext/.test(files.get(route)), `${route}: the graph explorer touches the WebMCP surface; the page tools are the engine's four /compose/ files only`);
+if (files.has(DESK_WEBMCP)) {
+  const deskTools = files.get(DESK_WEBMCP);
+  ok(/static PREFIX = "desk_";/.test(deskTools) && /const name = DeskWebMcp\.PREFIX \+ definition\.name;/.test(deskTools), `${DESK_WEBMCP}: every tool it registers must carry the prefix desk_`);
+  ok(/from "\.\/site-actions\.js"/.test(deskTools) && !/AGSC_TOOLS|\/compose\//.test(deskTools), `${DESK_WEBMCP}: it must register the page's own actions only, never the engine's page tools`);
+}
 for (const route of [...files.keys()]) {
   if (route.endsWith('.js') && !route.startsWith('/compose/') && route !== '/assets/search.js' && route !== '/assets/theme.js' && !EXPLORER_SCRIPTS.includes(route)) {
     fails.push(`${route}: an unexpected script — the page tools are the engine's four /compose/ files only`);
