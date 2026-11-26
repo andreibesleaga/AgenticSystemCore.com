@@ -38,6 +38,14 @@ function recording(t) {
       'Contact: https://example.org/contact/\nExpires: 2027-10-07T07:30:56Z\nPreferred-Languages: en\n'));
     if (node.report) map.set(at('/.well-known/sustainability-data'), response(200, { 'content-type': 'application/sustainability-data+json', 'strict-transport-security': 'max-age=15552000' },
       JSON.stringify({ period: { start: '2026-09-01T00:00:00Z', end: '2026-10-01T00:00:00Z' }, target: new URL(node.base).host })));
+    if (node.network) {
+      const name = node.network.address.split('/').pop();
+      const folder = node.network.address.slice(0, -name.length);
+      const json = { 'content-type': 'application/json', 'access-control-allow-origin': '*', 'strict-transport-security': 'max-age=15552000' };
+      map.set(at(`${folder}agent-manifest.json`), response(200, json, JSON.stringify({ networks: [{ name, hocon: `./${name}.network.json` }] })));
+      map.set(at(`${folder}${name}.network.json`), response(200, json, '{"tools":[]}'));
+      if (node.network.page) map.set(at(node.network.address), response(302, { location: node.network.page }));
+    }
     for (const [route, file] of Object.entries(node.committed)) {
       fs.mkdirSync(path.dirname(path.join(www, file)), { recursive: true });
       fs.writeFileSync(path.join(www, file), PAGE);
@@ -171,6 +179,30 @@ test('the w3id addresses must answer 303, and both registries must name a versio
   const messages = fails(await run(r)).map(x => x.message).join('\n');
   assert.match(messages, new RegExp(`${W3ID.paths[1].replace(/[.]/g, '\\.')} answers 404, not 303`));
   assert.match(messages, /PyPI: agentic-system-core 1\.0\.0 has no files/);
+});
+
+test('an agent network: the manifest lists it, its file answers for other sites, and its address leads to its page', async t => {
+  const r = recording(t);
+  const clean = await run(r);
+  const passes = clean.results.filter(x => x.check === 'agent network' && x.severity === 'pass').map(x => `${x.node}: ${x.message}`);
+  assert.equal(passes.length, NODES.length + 1, passes.join(' | ')); // one per node, and the main site's address
+  assert.ok(passes.some(m => m.includes('/desk/brief_desk: the address itself leads to /desk/')));
+
+  // The address named in public texts answers 404: a failure that says where it must lead.
+  r.map.set(r.at(MAIN, MAIN.network.address), response(404, {}, 'not found'));
+  assert.match(fails(await run(r)).map(x => x.message).join('\n'), /\/desk\/brief_desk: answers 404; a person who opens the network's address must reach \/desk\//);
+  // It redirects, but somewhere else.
+  r.map.set(r.at(MAIN, MAIN.network.address), response(301, { location: 'https://agenticsystemcore.com/' }));
+  assert.match(fails(await run(r)).map(x => x.message).join('\n'), /answers 301 to https:\/\/agenticsystemcore\.com\/; a person/);
+  r.map.set(r.at(MAIN, MAIN.network.address), response(302, { location: 'https://agenticsystemcore.com/desk/' }));
+  assert.deepEqual(fails(await run(r)), []);
+
+  // A peer's manifest that no longer lists the network, then a file other sites cannot read.
+  r.map.set(r.at(DEMO, '/agents/agent-manifest.json'), response(200, { 'access-control-allow-origin': '*', 'strict-transport-security': 'max-age=1' }, JSON.stringify({ networks: [{ name: 'other', hocon: './other.network.json' }] })));
+  assert.match(fails(await run(r)).map(x => `${x.node}: ${x.message}`).join('\n'), /demonstration node: \/agents\/agent-manifest\.json: no network named pattern_cards with a file/);
+  const closed = recording(t);
+  closed.map.set(closed.at(STANDARDS, '/agents/standards_map.network.json'), response(200, { 'strict-transport-security': 'max-age=1' }, '{}'));
+  assert.match(fails(await run(closed)).map(x => x.message).join('\n'), /no Access-Control-Allow-Origin: \*, so other sites cannot load the network/);
 });
 
 test('a failed checker fails the run; checkers that did not run fail only when they are required', async t => {
