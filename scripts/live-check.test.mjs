@@ -44,7 +44,7 @@ function recording(t) {
       const json = { 'content-type': 'application/json', 'access-control-allow-origin': '*', 'strict-transport-security': 'max-age=15552000' };
       map.set(at(`${folder}agent-manifest.json`), response(200, json, JSON.stringify({ networks: [{ name, hocon: `./${name}.network.json` }] })));
       map.set(at(`${folder}${name}.network.json`), response(200, json, '{"tools":[]}'));
-      if (node.network.page) map.set(at(node.network.address), response(302, { location: node.network.page }));
+      if (node.network.page) map.set(at(node.network.address), response(302, { location: node.network.page, 'strict-transport-security': 'max-age=15552000' }));
     }
     for (const [route, file] of Object.entries(node.committed)) {
       fs.mkdirSync(path.dirname(path.join(www, file)), { recursive: true });
@@ -194,12 +194,26 @@ test('an agent network: the manifest lists it, its file answers for other sites,
   // It redirects, but somewhere else.
   r.map.set(r.at(MAIN, MAIN.network.address), response(301, { location: 'https://agenticsystemcore.com/' }));
   assert.match(fails(await run(r)).map(x => x.message).join('\n'), /answers 301 to https:\/\/agenticsystemcore\.com\/; a person/);
+  // The right place, without Strict-Transport-Security: the redirect is a response like any other.
   r.map.set(r.at(MAIN, MAIN.network.address), response(302, { location: 'https://agenticsystemcore.com/desk/' }));
+  assert.deepEqual(fails(await run(r)).map(x => x.message), ['/desk/brief_desk: no Strict-Transport-Security header']);
+  r.map.set(r.at(MAIN, MAIN.network.address), response(302, { location: 'https://agenticsystemcore.com/desk/', 'strict-transport-security': 'max-age=1' }));
   assert.deepEqual(fails(await run(r)), []);
 
   // A peer's manifest that no longer lists the network, then a file other sites cannot read.
   r.map.set(r.at(DEMO, '/agents/agent-manifest.json'), response(200, { 'access-control-allow-origin': '*', 'strict-transport-security': 'max-age=1' }, JSON.stringify({ networks: [{ name: 'other', hocon: './other.network.json' }] })));
   assert.match(fails(await run(r)).map(x => `${x.node}: ${x.message}`).join('\n'), /demonstration node: \/agents\/agent-manifest\.json: no network named pattern_cards with a file/);
+  // A manifest whose entry names no file must not count the manifest itself as the network file.
+  const empty = recording(t);
+  empty.map.set(empty.at(STANDARDS, '/agents/agent-manifest.json'), response(200, { 'access-control-allow-origin': '*', 'strict-transport-security': 'max-age=1' }, JSON.stringify({ networks: [{ name: 'standards_map', hocon: '' }] })));
+  assert.match(fails(await run(empty)).map(x => x.message).join('\n'), /\/agents\/agent-manifest\.json: no network named standards_map with a file/);
+  // A network file on another origin is read there, not on the node.
+  const elsewhere = recording(t);
+  elsewhere.map.set(elsewhere.at(DEMO, '/agents/agent-manifest.json'), response(200, { 'access-control-allow-origin': '*', 'strict-transport-security': 'max-age=1' }, JSON.stringify({ networks: [{ name: 'pattern_cards', hocon: 'https://files.example/pattern_cards.network.json' }] })));
+  elsewhere.map.delete(elsewhere.at(DEMO, '/agents/pattern_cards.network.json'));
+  elsewhere.map.set('https://files.example/pattern_cards.network.json', response(200, { 'access-control-allow-origin': '*' }, '{"tools":[]}'));
+  assert.deepEqual(fails(await run(elsewhere)), []);
+  assert.ok(elsewhere.seen.includes('https://files.example/pattern_cards.network.json'));
   const closed = recording(t);
   closed.map.set(closed.at(STANDARDS, '/agents/standards_map.network.json'), response(200, { 'strict-transport-security': 'max-age=1' }, '{}'));
   assert.match(fails(await run(closed)).map(x => x.message).join('\n'), /no Access-Control-Allow-Origin: \*, so other sites cannot load the network/);

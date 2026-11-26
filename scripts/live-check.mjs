@@ -244,10 +244,14 @@ export async function liveCheck({ get, now, committedRoot, checkers, requireChec
       if (usable(manifestRoute, r, 'agent network')) {
         let entry = null;
         try { entry = (JSON.parse(r.body.toString('utf8')).networks || []).find(n => n.name === name) || null; } catch { /* reported below */ }
-        if (!entry || typeof entry.hocon !== 'string') add(node.name, 'agent network', 'fail', `${manifestRoute}: no network named ${name} with a file`);
+        if (!entry || typeof entry.hocon !== 'string' || !entry.hocon) add(node.name, 'agent network', 'fail', `${manifestRoute}: no network named ${name} with a file`);
         else {
-          const fileRoute = new URL(entry.hocon, at(manifestRoute)).pathname;
-          const file = await fetchRoute(fileRoute);
+          // The file may be on another origin (the runtime allows it): it is read where the manifest
+          // says, and counted in this node's header checks only when it is this node's own.
+          const fileUrl = new URL(entry.hocon, at(manifestRoute)).href;
+          const own = fileUrl.startsWith(node.base);
+          const fileRoute = own ? `/${fileUrl.slice(node.base.length)}` : fileUrl;
+          const file = own ? await fetchRoute(fileRoute) : await read(fileUrl);
           if (usable(fileRoute, file, 'agent network')) {
             const open = (file.headers['access-control-allow-origin'] || '') === '*' && (r.headers['access-control-allow-origin'] || '') === '*';
             add(node.name, 'agent network', open ? 'pass' : 'fail', open ? `${address}: the manifest lists it and its file answers, both readable from other sites` : `${manifestRoute} or ${fileRoute}: no Access-Control-Allow-Origin: *, so other sites cannot load the network`);
@@ -255,7 +259,7 @@ export async function liveCheck({ get, now, committedRoot, checkers, requireChec
         }
       }
       if (page) {
-        const bare = await read(at(address));
+        const bare = await fetchRoute(address);
         const to = bare.error === undefined && [301, 302, 307, 308].includes(bare.status) ? new URL(String(bare.headers.location || ''), at(address)).href : '';
         if (bare.error !== undefined) add(node.name, 'agent network', 'fail', `${address}: cannot be read: ${bare.error}`);
         else if (to === at(page)) add(node.name, 'agent network', 'pass', `${address}: the address itself leads to ${page}`);
