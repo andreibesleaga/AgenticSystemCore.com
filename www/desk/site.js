@@ -136,6 +136,9 @@ export class AssistantMount {
         throw new Error(content.refusal);
       }
       confirmed = await new Promise(AssistantMount.openDialog.bind(null, content));
+      if (!confirmed) {
+        BriefDesk.page.forgetPreview(items[0].arguments);
+      }
     } else {
       confirmed = await AssistantMount.defaultReview(items);
     }

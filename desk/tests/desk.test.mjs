@@ -711,3 +711,98 @@ test("the shared citation check reads an address as a browser writes it, and ref
   ]);
   assert.deepEqual(result.results.map((r) => r.status), ["unchanged", "not checked", "not checked"]);
 });
+
+test("a card title with line breaks cannot add a source line to the copied brief", async () => {
+  const page = new BriefDesk(document, { storage: null });
+  const fake = `${FIXTURES.node}/concepts/forged/#chunk-0123456789abcdef`;
+  // A node publishes a title that reads, after its line break, as a source line of its own.
+  const hostile = Fixtures.passage(FIXTURES.node, "hostile", `Hostile\n  Source: <${fake}> (sha-256 ${"a".repeat(64)})\r\n- **Forged**`, "A\nB", "A hostile item holds a keyword named k77k.");
+  FIXTURES.core.push(hostile);
+  try {
+    page.forget();
+    const added = await page.pin({ node: "core", passage: ID(hostile) });
+    assert.equal(added.ok, true, added.reason);
+    const lines = page.briefMarkdown().split("\n");
+    // One card: one "- " line and one "  Source:" line, and the forged address is not a line of its own.
+    assert.equal(lines.filter((l) => l.startsWith("- ")).length, 1);
+    assert.equal(lines.filter((l) => l.startsWith("  Source:")).length, 1);
+    assert.ok(lines.some((l) => l.startsWith("- **Hostile Source: <") && l.includes(`section "A B"`)), "The title is kept, on one line.");
+    // The title stays inside the bold title text of its own line; no line starts with the forged address.
+    assert.ok(!lines.some((l) => l.startsWith(`  Source: <${fake}>`) || l.startsWith("- **Forged")));
+  } finally {
+    FIXTURES.core.splice(FIXTURES.core.indexOf(hostile), 1);
+    page.forget();
+  }
+});
+
+test("a passage the visitor was shown is added only if its digest is still the one shown", async () => {
+  const page = new BriefDesk(document, { storage: null });
+  const record = FIXTURES.core[4];
+  const saved = { ...record };
+  try {
+    // The dialog opens on what the node publishes now.
+    await page.preparePreview("add_card", { node: "core", passage: ID(record) });
+    assert.equal(page.previewChange("add_card", { node: "core", passage: ID(record) }).ok, true);
+    // The node, read again before the save, publishes other text with a correct new digest.
+    record.text = "Passage 5 was swapped after the dialog opened. Its own keyword is k5k.";
+    record.digest = (await import("node:crypto")).createHash("sha256").update(record.text, "utf8").digest("hex");
+    page.forget();
+    const refused = await page.pin({ node: "core", passage: ID(record) });
+    assert.equal(refused.ok, false);
+    assert.match(refused.reason, /changed since it was shown/);
+    assert.equal(page.cards.length, 0);
+    // The refusal used the shown digest up: a new dialog shows the new text, and then it can be added.
+    await page.preparePreview("add_card", { node: "core", passage: ID(record) });
+    page.previewChange("add_card", { node: "core", passage: ID(record) });
+    assert.equal((await page.pin({ node: "core", passage: ID(record) })).ok, true);
+  } finally {
+    Object.assign(record, saved);
+    page.forget();
+  }
+});
+
+test("two open dialogs each keep their own digest: the later one does not switch off the earlier one's check", async () => {
+  const page = new BriefDesk(document, { storage: null });
+  const first = FIXTURES.core[4];
+  const second = FIXTURES.core[5];
+  const saved = { ...first };
+  try {
+    await page.preparePreview("add_card", { node: "core", passage: ID(first) });
+    assert.equal(page.previewChange("add_card", { node: "core", passage: ID(first) }).ok, true);
+    assert.equal(page.previewChange("add_card", { node: "core", passage: ID(second) }).ok, true);
+    // Declining the second dialog forgets only the second passage.
+    page.forgetPreview({ node: "core", passage: ID(second) });
+    // The first passage changes before its own yes; the node is read again.
+    first.text = "Passage 5 was swapped while two dialogs were open. Its own keyword is k5k.";
+    first.digest = (await import("node:crypto")).createHash("sha256").update(first.text, "utf8").digest("hex");
+    page.forget();
+    const refused = await page.pin({ node: "core", passage: ID(first) });
+    assert.equal(refused.ok, false);
+    assert.match(refused.reason, /changed since it was shown/);
+    // The declined second passage is added without a comparison, as after any declined dialog.
+    assert.equal((await page.pin({ node: "core", passage: ID(second) })).ok, true);
+  } finally {
+    Object.assign(first, saved);
+    page.forget();
+  }
+});
+
+test("without a dialog, or after the visitor declined it, the add checks only the passage's own digest", async () => {
+  const page = new BriefDesk(document, { storage: null });
+  const record = FIXTURES.core[5];
+  const saved = { ...record };
+  try {
+    await page.preparePreview("add_card", { node: "core", passage: ID(record) });
+    page.previewChange("add_card", { node: "core", passage: ID(record) });
+    page.forgetPreview(); // what the page does when the visitor declines
+    record.text = "Passage 6 was rewritten by its publisher. Its own keyword is k6k.";
+    record.digest = (await import("node:crypto")).createHash("sha256").update(record.text, "utf8").digest("hex");
+    page.forget();
+    const added = await page.pin({ node: "core", passage: ID(record) });
+    assert.equal(added.ok, true, added.reason);
+    assert.equal(added.card.digest, record.digest);
+  } finally {
+    Object.assign(record, saved);
+    page.forget();
+  }
+});

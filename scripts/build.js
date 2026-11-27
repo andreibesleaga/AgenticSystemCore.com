@@ -1366,7 +1366,7 @@ const MEASURES = [
 addPage('/', {
   title: config.site.title, summary: summaryOf('/'), description: index.fm.description, section: null,
   scripts: [...GX_SCRIPTS, ...PAGE_TOOL_SCRIPTS], styles: GX_STYLES,
-  jsonld: { '@context': 'https://schema.org', '@type': 'WebSite', name: config.site.title, url: BASE, description: index.fm.description, author: { '@type': 'Person', name: config.site.author, sameAs: ['https://orcid.org/0009-0001-3464-5283'] } },
+  jsonld: { '@context': 'https://schema.org', '@type': 'WebSite', name: config.site.title, url: BASE, description: index.fm.description, author: { '@id': 'https://andreibesleaga.com/#person', '@type': 'Person', name: config.site.author, sameAs: ['https://orcid.org/0009-0001-3464-5283'] } },
   body: `<p class="lead">AgenticSystemCore turns a folder of plain text notes (Markdown text files) into a website, a knowledge graph and a set of tools for AI assistants, all at once. Every link says what kind of link it is, every machine-readable file the node lists carries a fingerprint (a digest) that anyone can check, and every change is approved by a person or by a rule that person wrote down. People, search engines and AI agents read the same checked knowledge, and no server, database or language model is needed to build, check or publish it.</p>
 ${GX_EMBED}<p><strong>Try it:</strong> <code>npm install -g agentic-system-core</code>, then <a href="/docs/demos/">a first node in five minutes</a>. <strong>See it:</strong> <a href="/graph/">the graph explorer</a>, and <a href="/webaiassist/">WebAIAssist</a>, the assistant for the browser. <strong>Measured:</strong> <a href="/docs/benchmarks/">the benchmarks</a>.</p>
 <ul>
@@ -2190,7 +2190,7 @@ const quickstartHtml = () => {
 // about, legal
 addPage('/about/', {
   title: 'About', summary: summaryOf('/about/'), description: 'Who writes AgenticSystemCore, how to read this node, the status of the specification and how to get in touch.', section: '/about/',
-  jsonld: { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'About AgenticSystemCore', url: `${BASE}about/`, author: { '@type': 'Person', name: config.site.author, sameAs: ['https://orcid.org/0009-0001-3464-5283', 'https://github.com/andreibesleaga', CONTACT_URL] } },
+  jsonld: { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'About AgenticSystemCore', url: `${BASE}about/`, author: { '@id': 'https://andreibesleaga.com/#person', '@type': 'Person', name: config.site.author, sameAs: ['https://orcid.org/0009-0001-3464-5283', 'https://github.com/andreibesleaga', CONTACT_URL] } },
   body: md(read('site/about.md'), { ruleLinks: true }).replace('<h2 id="status">', quickstartHtml() + '<h2 id="status">') + editLink('site', 'site/about.md'),
 });
 // /conformance/ (AGSC-09-03: a node MAY publish claims at /conformance/, with a table of others'
@@ -2291,6 +2291,7 @@ ${GX_VENDOR.map(v => `<tr><td>${esc(v.name)} ${esc(v.version)}, by Vasco Asturia
 <p><strong>Other people&#39;s names belong to them.</strong> Product, project and organisation names used here &#8212; among them those of the IETF, IANA, the W3C, the Linux Foundation, Cloudflare, GitHub, npm, Google, OpenAI, Anthropic, Meta and Zenodo &#8212; are used only to say what is being talked about. They are the marks of their respective owners, and using a name is not a claim of any connection with its owner.</p>
 <p><strong>The name of this project.</strong> AgenticSystemCore&#8482; is a trademark of Andrei N. Besleaga. Other names belong to their owners.</p>
 <p><strong>What you may do with this text.</strong> The prose of this node is published under the <a href="#terms">Content Use Terms</a> above: all rights are reserved, and you may read it, quote it with attribution, index it, cite a chunk with its provenance, and compose items into a Harness for your own project. See the terms in full on this page.</p>
+<p><strong>Agents and assistants.</strong> Agents and assistants are welcome to read, cite and check everything here; only collection for model training is reserved. Google-Extended is not refused, so that Gemini can read these pages when a person asks; the reservation of text and data mining rights for model training stays as stated here, in <code>/.well-known/tdmrep.json</code> and in the content signal.</p>
 <p><strong>No guarantee of availability.</strong> This site, its files and its addresses may change, move or stop at any time, without notice. Nothing here promises that any version, address or service will stay available.</p>
 <p><strong>Rights not granted are reserved.</strong> Every right in this work that the licences on this page do not expressly grant is reserved by its author.</p>
 <p><strong>These notices may change.</strong> They may be updated at any time, and the text on this page when you use the work is the one that applies to that use. A change never takes away a permission that a licence already gave for the version you received.</p>

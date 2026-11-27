@@ -54,6 +54,22 @@ const ALLOWED_SCRIPTS = new Set([
 // The graph explorer's scripts on / and /graph/ carry an SRI hash; section (5a) checks each tag exactly.
 const GX_SCRIPT = /^<script src="\/assets\/(?:graph-data\.js|graph-explorer\.js|vendor\/force-graph-1\.52\.0\.min\.js)" integrity="sha384-[A-Za-z0-9+/]{64}" defer>$/;
 const ok = (c, m) => { if (!c) fails.push(m); };
+// The operator's private e-mail address must never be built into the site. The repository does not hold it:
+// only SHA-256 hashes of its pieces, each with its length. A piece is the text just before an "@" (two forms
+// of the local part) or just after it (the mail domain); the comparison is on lower-case text, as the check
+// that this replaces was. Proof that it still catches a leak: build a page that holds the address and run
+// this check (it must fail), then remove the page.
+const OPERATOR_BEFORE_AT = [[23, 'da4fea830e538f1a0849c95ada9e62320cb6c9865dcb6d3c6637d39e1cad03bd'], [9, '8eb72e1d13b470142993d770b2236b6944ce02ced2699db02016a2a30d0ad753']];
+const OPERATOR_AFTER_AT = [[9, '591bfe88c880df9685d3e298cac2271681a78e017441426ae3d5bd6c73cd3db7']];
+const sha256Hex = (t) => require('crypto').createHash('sha256').update(t).digest('hex');
+function leaksOperatorAddress(text) {
+  const low = text.toLowerCase();
+  for (let at = low.indexOf('@'); at !== -1; at = low.indexOf('@', at + 1)) {
+    for (const [len, sha] of OPERATOR_BEFORE_AT) if (at >= len && sha256Hex(low.slice(at - len, at)) === sha) return true;
+    for (const [len, sha] of OPERATOR_AFTER_AT) if (sha256Hex(low.slice(at + 1, at + 1 + len)) === sha) return true;
+  }
+  return false;
+}
 const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]).sort();
 const rel = f => path.relative(WWW, f).split(path.sep).join('/');
 
@@ -457,7 +473,7 @@ for (const f of files) {
   if (/\bWeb4\b|W3C (?:standard|Recommendation) for AgenticSystemCore/i.test(t)) fails.push(`${r}: forbidden claim`);
   // desk/runtime/ is third-party code republished byte for byte (checked below); its bundle names its own
   // libraries' authors.
-  if (!r.startsWith('desk/runtime/') && /andrei\.besleaga\.nicolae@|abnmaster@|@gmail\.com/i.test(s)) fails.push(`${r}: the operator's e-mail address is published`);
+  if (!r.startsWith('desk/runtime/') && leaksOperatorAddress(s)) fails.push(`${r}: the operator's e-mail address is published`);
 }
 // The Brief Desk's runtime is the agent-web repository's, republished unchanged: every built file under
 // /desk/runtime/ equals the repository's desk/runtime/, and none is missing.
@@ -559,6 +575,11 @@ for (const manifestFile of ['desk/agent-manifest.json']) {
       ok(redirects.split('\n').includes(`${from} /${folder}/ 302`), `_redirects lacks ${from} -> /${folder}/ (the network's address answers 404 without it)`);
     }
   }
+}
+// One author, one identity: the home page and the About page name the id that andreibesleaga.com publishes for the person.
+for (const page of ['index.html', 'about/index.html']) {
+  const html = exists(path.join(WWW, page)) ? fs.readFileSync(path.join(WWW, page), 'utf8') : '';
+  ok(html.includes('"@id":"https://andreibesleaga.com/#person","@type":"Person"'), `${page}: the schema.org Person lacks "@id": "https://andreibesleaga.com/#person"`);
 }
 const sitemap = exists(path.join(WWW, 'sitemap.xml')) ? fs.readFileSync(path.join(WWW, 'sitemap.xml'), 'utf8') : '';
 const locs = [...sitemap.matchAll(/<loc>https:\/\/agenticsystemcore\.com(\/[^<]*)<\/loc>/g)].map(m => m[1]);

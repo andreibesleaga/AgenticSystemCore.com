@@ -53,7 +53,7 @@ export const NODES = [
     committed: {},
     statements: ['/legal/'],
     report: true,
-    network: { address: '/agents/pattern_cards' },
+    network: { address: '/agents/pattern_cards', page: '/' },
   },
   {
     name: 'standards node',
@@ -62,7 +62,7 @@ export const NODES = [
     committed: {},
     statements: ['/legal/'],
     report: false, // it publishes no sustainability report
-    network: { address: '/agents/standards_map' },
+    network: { address: '/agents/standards_map', page: '/' },
   },
 ];
 /**

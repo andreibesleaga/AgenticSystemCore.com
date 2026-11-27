@@ -28,7 +28,11 @@
 // the maintainers (--proposals gives the page where they take it), and a person decides.
 //
 // and adds its block to `<build.out>/_headers`: another site's browser may read the three
-// JSON files (`Access-Control-Allow-Origin: *`) and may frame the bridge page. The network's
+// JSON files (`Access-Control-Allow-Origin: *`) and may frame the bridge page. It adds a block
+// to `<build.out>/_redirects` too: the network's address is a name (a runtime reads
+// agent-manifest.json beside it), so a person who opens it is sent to the node's home page, and
+// the classic icon address `/favicon.ico` goes to `/favicon.svg`, which the tool writes from
+// ../assets/favicon.svg unless the node already has a file of that name. The network's
 // address is then `<site base>agents/<name>`: another agentic website can load it, after its
 // visitor agrees, and run it in that visitor's browser; the guide then answers from passages
 // it searched and read on this node, each checked against its published digest.
@@ -65,6 +69,10 @@ const SHARED = ['search_passages', 'read_passage', 'check_citations'];
 const WRITE = 'propose_change';
 /** The folder of the files a node's bridge gets unchanged for that write. */
 const NODE_BRIDGE = path.join(path.dirname(fileURLToPath(import.meta.url)), 'node-bridge');
+/** The icon a node gets at /favicon.svg when it has none: the one of this site. */
+const FAVICON = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'assets', 'favicon.svg');
+/** The line that ends the tool's block in `_headers` and in `_redirects`. */
+const BLOCK_END = '# end of agents/';
 
 /** One line of text: no line break, no run of spaces, at most `limit` characters. */
 const oneLine = (text, limit) => {
@@ -349,19 +357,35 @@ export function bridgeRuntime(dir = path.join(DESK, 'runtime')) {
   return files;
 }
 
+/** The text of a file with the tool's block (from `start` to BLOCK_END) replaced, or added at the end. */
+function withBlock(text, start, block, file) {
+  const i = text.indexOf(start);
+  if (i === -1) return `${text.replace(/\n*$/, '\n')}\n${block}`;
+  const j = text.indexOf(BLOCK_END, i);
+  if (j === -1) die(`${file} holds the start of the agents/ block without its end`);
+  return `${text.slice(0, i)}${block}${text.slice(j + BLOCK_END.length).replace(/^\n/, '')}`;
+}
+
 /** The `_headers` text with this tool's block replaced or added. */
 export function withHeaders(headersText, files) {
   const start = '# agents/: the published agent network (tools/agentify-node.mjs); other sites\' browsers read these files.';
-  const end = '# end of agents/';
   // The bridge page is the one address of this site another site may frame: it runs only this
   // site's own scripts, and they read only this site's own published files.
   const bridge = ['/agents/bridge/*', '  ! X-Frame-Options', '  ! Content-Security-Policy', "  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'"].join('\n');
-  const block = `${start}\n${files.map(f => `/agents/${f}\n  Access-Control-Allow-Origin: *`).join('\n')}\n${bridge}\n${end}\n`;
-  const i = headersText.indexOf(start);
-  if (i === -1) return `${headersText.replace(/\n*$/, '\n')}\n${block}`;
-  const j = headersText.indexOf(end, i);
-  if (j === -1) die('_headers holds the start of the agents/ block without its end');
-  return `${headersText.slice(0, i)}${block}${headersText.slice(j + end.length).replace(/^\n/, '')}`;
+  const block = `${start}\n${files.map(f => `/agents/${f}\n  Access-Control-Allow-Origin: *`).join('\n')}\n${bridge}\n${BLOCK_END}\n`;
+  return withBlock(headersText, start, block, '_headers');
+}
+
+/**
+ * The `_redirects` text with this tool's block replaced or added. The network's address is a name:
+ * a runtime reads agent-manifest.json beside it and never asks for the address itself, so a person
+ * or a tool that opens it gets the node's home page (302, as the site's own Brief Desk address).
+ * Browsers that ask for the classic icon address get /favicon.svg.
+ */
+export function withRedirects(redirectsText, name) {
+  const start = '# agents/: the network\'s address is a name, so it leads to the node\'s home page (tools/agentify-node.mjs).';
+  const block = [start, `/agents/${name} / 302`, `/agents/${name}/ / 302`, '/favicon.ico /favicon.svg 301', BLOCK_END].join('\n');
+  return withBlock(redirectsText, start, `${block}\n`, '_redirects');
 }
 
 function main(argv) {
@@ -402,10 +426,16 @@ function main(argv) {
   for (const [f, bytes] of bridgeRuntime()) files.set(`runtime/${f}`, bytes);
   const headersFile = path.join(out, '_headers');
   const headers = withHeaders(fs.existsSync(headersFile) ? fs.readFileSync(headersFile, 'utf8') : '', [...shared.keys()]);
+  const redirectsFile = path.join(out, '_redirects');
+  const redirects = withRedirects(fs.existsSync(redirectsFile) ? fs.readFileSync(redirectsFile, 'utf8') : '', name);
+  // The icon the redirect points to: written only when the node has no /favicon.svg of its own.
+  const iconFile = path.join(out, 'favicon.svg');
   const dir = path.join(out, 'agents');
   if (argv.includes('--check')) {
     const stale = [...files].filter(([f, bytes]) => !fs.existsSync(path.join(dir, f)) || !fs.readFileSync(path.join(dir, f)).equals(bytes)).map(([f]) => `agents/${f}`);
     if (!fs.existsSync(headersFile) || fs.readFileSync(headersFile, 'utf8') !== headers) stale.push('_headers');
+    if (!fs.existsSync(redirectsFile) || fs.readFileSync(redirectsFile, 'utf8') !== redirects) stale.push('_redirects');
+    if (!fs.existsSync(iconFile)) stale.push('favicon.svg');
     process.stdout.write(stale.length ? `agentify-node: out of date: ${stale.join(', ')}\n` : `agentify-node: current (${cards.length} cards, network ${base}agents/${name})\n`);
     process.exit(stale.length ? 1 : 0);
   }
@@ -414,8 +444,10 @@ function main(argv) {
     fs.writeFileSync(path.join(dir, f), bytes);
   }
   fs.writeFileSync(headersFile, headers);
+  fs.writeFileSync(redirectsFile, redirects);
+  if (!fs.existsSync(iconFile)) fs.copyFileSync(FAVICON, iconFile);
   const size = network.tools[0].instructions.length;
-  process.stdout.write(`agentify-node: wrote ${files.size} files under agents/ (the network, its bridge and the bridge's runtime) and the _headers block\n`);
+  process.stdout.write(`agentify-node: wrote ${files.size} files under agents/ (the network, its bridge and the bridge's runtime), the _headers and _redirects blocks and favicon.svg\n`);
   process.stdout.write(`agentify-node: ${cards.length} cards; instructions ${size} characters; network address ${base}agents/${name}\n`);
 }
 

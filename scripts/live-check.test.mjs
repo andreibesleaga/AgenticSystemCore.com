@@ -185,8 +185,12 @@ test('an agent network: the manifest lists it, its file answers for other sites,
   const r = recording(t);
   const clean = await run(r);
   const passes = clean.results.filter(x => x.check === 'agent network' && x.severity === 'pass').map(x => `${x.node}: ${x.message}`);
-  assert.equal(passes.length, NODES.length + 1, passes.join(' | ')); // one per node, and the main site's address
+  assert.equal(passes.length, NODES.length + 3, passes.join(' | ')); // one per node, and the three addresses
   assert.ok(passes.some(m => m.includes('/desk/brief_desk: the address itself leads to /desk/')));
+  // The two peers' addresses lead to the node's home page.
+  assert.ok(passes.some(m => m.includes('/agents/pattern_cards: the address itself leads to /')));
+  assert.ok(passes.some(m => m.includes('/agents/standards_map: the address itself leads to /')));
+  assert.deepEqual([DEMO, STANDARDS].map(n => n.network.page), ['/', '/']);
 
   // The address named in public texts answers 404: a failure that says where it must lead.
   r.map.set(r.at(MAIN, MAIN.network.address), response(404, {}, 'not found'));
@@ -200,6 +204,13 @@ test('an agent network: the manifest lists it, its file answers for other sites,
   r.map.set(r.at(MAIN, MAIN.network.address), response(302, { location: 'https://agenticsystemcore.com/desk/', 'strict-transport-security': 'max-age=1' }));
   assert.deepEqual(fails(await run(r)), []);
 
+  // A peer's address that answers 404 again, or leads somewhere else, fails and says where it must lead.
+  const peers = recording(t);
+  peers.map.set(peers.at(DEMO, DEMO.network.address), response(404, {}, 'not found'));
+  assert.match(fails(await run(peers)).map(x => x.message).join('\n'), /\/agents\/pattern_cards: answers 404; a person who opens the network's address must reach \//);
+  peers.map.set(peers.at(DEMO, DEMO.network.address), response(302, { location: 'https://patterns.agenticsystemcore.com/', 'strict-transport-security': 'max-age=1' }));
+  peers.map.set(peers.at(STANDARDS, STANDARDS.network.address), response(302, { location: 'https://standards.agenticsystemcore.com/concepts/', 'strict-transport-security': 'max-age=1' }));
+  assert.match(fails(await run(peers)).map(x => x.message).join('\n'), /\/agents\/standards_map: answers 302 to https:\/\/standards\.agenticsystemcore\.com\/concepts\/; a person/);
   // A peer's manifest that no longer lists the network, then a file other sites cannot read.
   r.map.set(r.at(DEMO, '/agents/agent-manifest.json'), response(200, { 'access-control-allow-origin': '*', 'strict-transport-security': 'max-age=1' }, JSON.stringify({ networks: [{ name: 'other', hocon: './other.network.json' }] })));
   assert.match(fails(await run(r)).map(x => `${x.node}: ${x.message}`).join('\n'), /demonstration node: \/agents\/agent-manifest\.json: no network named pattern_cards with a file/);
