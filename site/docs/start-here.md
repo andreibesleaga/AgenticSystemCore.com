@@ -48,7 +48,7 @@ AgenticSystemCore has several doors. Find yourself below and follow that path; e
 
 1. The [status page](/docs/status/): what is live and the state of every outside step.
 2. The source repository's `GOVERNANCE.md` ("Who stands behind this": one maintainer, open licences, no support promise and no schedule) and `SECURITY.md`.
-3. Two live nodes to look at: [patterns.agenticsystemcore.com](https://patterns.agenticsystemcore.com/) and [standards.agenticsystemcore.com](https://standards.agenticsystemcore.com/).
+3. Two live nodes to look at: [patterns.agenticsystemcore.com](https://patterns.agenticsystemcore.com/) and [standards.agenticsystemcore.com](https://standards.agenticsystemcore.com/). A third, made without the engine: [agenticfeeder.com](https://agenticfeeder.com/), a daily news site that publishes a Level 0 node from PHP.
 
 ## If you are curious
 

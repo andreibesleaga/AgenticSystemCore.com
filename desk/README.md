@@ -35,7 +35,9 @@ networks of the two peer nodes, each after the visitor agrees:
 `https://standards.agenticsystemcore.com/agents/standards_map`. Those are written by
 `../tools/agentify-node.mjs` in each node's repository, with a bridge that shares three reads over
 that node's own passages (search, read with the digest check, and a check of saved citations), so a
-peer's guide answers from passages it read and checked. With `--callers`, it also shares one write
+peer's guide answers from passages it read and checked. Opened in a browser, each peer address leads
+to that node's home page, and `/favicon.ico` to its `/favicon.svg` (lines the tool adds to the
+node's `_redirects`; `agsc build` removes them, so the tool runs again after every build). With `--callers`, it also shares one write
 with the sites named: a proposal to change a card, confirmed in a window on the node's own site.
 
 ## What the checks show

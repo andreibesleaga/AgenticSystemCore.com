@@ -967,5 +967,35 @@ test("the consent card gets focus, and focus then returns to the chat", Agentifi
 test("a visitor typing in the page's form keeps focus when a consent card appears", AgentifiedSiteTest.testConsentLeavesFocusInThePage);
 test("every change to the brief asks the visitor first", AgentifiedSiteTest.testWritesAskFirst);
 test("the front agent delegates to passage_reader, which reads through a site action", AgentifiedSiteTest.testInternalAgentReadsThroughSiteAction);
+test("a declined add dialog forgets the digest it showed, so a later add is not refused for it", async () => {
+  const page = BriefDeskPage();
+  const record = FIXTURES.core[6];
+  const saved = { ...record };
+  const item = { action: "add_card", origin: BASE, effect: "irreversible", arguments: { node: "core", passage: ID(record) } };
+  try {
+    page.forgetPreview();
+    // An add loads the passage before its dialog opens, so wait for the dialog.
+    const answer = AssistantMount.review([item]);
+    let dialog = null;
+    for (let i = 0; i < 50 && !dialog?.open; i += 1) {
+      await new Promise((resolve) => setImmediate(resolve));
+      dialog = document.body.children.at(-1);
+    }
+    assert.equal(dialog?.open, true, "review() did not open the add dialog.");
+    const decline = dialog.querySelectorAll("button").find((b) => b.textContent === AssistantMount.DIALOGS.add_card.decline);
+    decline.dispatch("click");
+    assert.equal(await answer, false);
+    // The node then publishes other text with its own correct digest; the visitor asks again by the page's button.
+    record.text = "Passage 7 was rewritten by its publisher. Its own keyword is k7k.";
+    record.digest = (await import("node:crypto")).createHash("sha256").update(record.text, "utf8").digest("hex");
+    page.forget();
+    const added = await page.pin({ node: "core", passage: ID(record) });
+    assert.equal(added.ok, true, added.reason);
+    page.remove({ card: added.card.card });
+  } finally {
+    Object.assign(record, saved);
+    page.forget();
+  }
+});
 // This one changes the page for good, so it runs last.
 test("an approved irreversible call stores the record", AgentifiedSiteTest.testApprovedIrreversibleCall);
