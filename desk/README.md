@@ -27,7 +27,9 @@ It follows the [Worldwide Agentic Web MVP specification](https://github.com/cogn
 | `tools/`, `templates/` | the skill's build, partner-check and serve scripts, and the templates the build reads |
 | `tests/` | the skill's test template filled in for this page, `desk.test.mjs` (the page's own rules), `webmcp.test.mjs` (the WebMCP tools), `interop.test.mjs` (the seven interoperability checks of the specification's section 6, on this site's built files and the two peers' published networks in `fixtures/peers/`), `fixtures.mjs`, the skill's DOM stand-ins, the organisers' in-process web and scripted router in `linking/`, and `browser-check.mjs` |
 
-The network's address is `https://agenticsystemcore.com/desk/brief_desk`. It can call the
+The network's address is `https://agenticsystemcore.com/desk/brief_desk`. The address is a name:
+a runtime reads `agent-manifest.json` beside it. Opened in a browser, it leads to `/desk/` (two
+lines in `_redirects`, written by `scripts/build.js`). The network can call the
 networks of the two peer nodes, each after the visitor agrees:
 `https://patterns.agenticsystemcore.com/agents/pattern_cards` and
 `https://standards.agenticsystemcore.com/agents/standards_map`. Those are written by

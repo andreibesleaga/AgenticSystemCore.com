@@ -44,6 +44,7 @@ export const NODES = [
     committed: { '/': 'index.html', '/docs/guides/mode-0/': 'docs/guides/mode-0/index.html' },
     statements: ['/legal/', '/docs/compliance/'],
     report: true,
+    network: { address: '/desk/brief_desk', page: '/desk/' },
   },
   {
     name: 'demonstration node',
@@ -52,6 +53,7 @@ export const NODES = [
     committed: {},
     statements: ['/legal/'],
     report: true,
+    network: { address: '/agents/pattern_cards' },
   },
   {
     name: 'standards node',
@@ -60,6 +62,7 @@ export const NODES = [
     committed: {},
     statements: ['/legal/'],
     report: false, // it publishes no sustainability report
+    network: { address: '/agents/standards_map' },
   },
 ];
 /**
@@ -227,6 +230,40 @@ export async function liveCheck({ get, now, committedRoot, checkers, requireChec
           const ok = months <= REPORT_MONTHS;
           add(node.name, 'sustainability', ok ? 'pass' : 'fail', `${route}: the period ending ${period.end} is ${months} month(s) old${ok ? '' : `; at most ${REPORT_MONTHS} are allowed`}`);
         }
+      }
+    }
+
+    // The agent network: its address is a name (a runtime reads agent-manifest.json beside it), and
+    // public texts name it. The manifest must list the network, the network file must answer, and
+    // where the node has a page for the network the address itself must lead there.
+    if (node.network) {
+      const { address, page } = node.network;
+      const name = address.split('/').pop();
+      const manifestRoute = `${address.slice(0, -name.length)}agent-manifest.json`;
+      const r = await fetchRoute(manifestRoute);
+      if (usable(manifestRoute, r, 'agent network')) {
+        let entry = null;
+        try { entry = (JSON.parse(r.body.toString('utf8')).networks || []).find(n => n.name === name) || null; } catch { /* reported below */ }
+        if (!entry || typeof entry.hocon !== 'string' || !entry.hocon) add(node.name, 'agent network', 'fail', `${manifestRoute}: no network named ${name} with a file`);
+        else {
+          // The file may be on another origin (the runtime allows it): it is read where the manifest
+          // says, and counted in this node's header checks only when it is this node's own.
+          const fileUrl = new URL(entry.hocon, at(manifestRoute)).href;
+          const own = fileUrl.startsWith(node.base);
+          const fileRoute = own ? `/${fileUrl.slice(node.base.length)}` : fileUrl;
+          const file = own ? await fetchRoute(fileRoute) : await read(fileUrl);
+          if (usable(fileRoute, file, 'agent network')) {
+            const open = (file.headers['access-control-allow-origin'] || '') === '*' && (r.headers['access-control-allow-origin'] || '') === '*';
+            add(node.name, 'agent network', open ? 'pass' : 'fail', open ? `${address}: the manifest lists it and its file answers, both readable from other sites` : `${manifestRoute} or ${fileRoute}: no Access-Control-Allow-Origin: *, so other sites cannot load the network`);
+          }
+        }
+      }
+      if (page) {
+        const bare = await fetchRoute(address);
+        const to = bare.error === undefined && [301, 302, 307, 308].includes(bare.status) ? new URL(String(bare.headers.location || ''), at(address)).href : '';
+        if (bare.error !== undefined) add(node.name, 'agent network', 'fail', `${address}: cannot be read: ${bare.error}`);
+        else if (to === at(page)) add(node.name, 'agent network', 'pass', `${address}: the address itself leads to ${page}`);
+        else add(node.name, 'agent network', 'fail', `${address}: answers ${bare.status}${to ? ` to ${to}` : ''}; a person who opens the network's address must reach ${page}`);
       }
     }
 

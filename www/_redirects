@@ -7,3 +7,7 @@
 /favicon.ico /favicon.svg 301
 # The folder of the three JSON Schemas has no page of its own; /ns/ lists them.
 /ns/schema/ /ns/ 301
+# The Brief Desk network's address is a name: a runtime reads agent-manifest.json beside it and never
+# asks for the address itself. A person or a tool that opens it gets the page the network runs on.
+/desk/brief_desk /desk/ 302
+/desk/brief_desk/ /desk/ 302
