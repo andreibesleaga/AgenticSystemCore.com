@@ -67,6 +67,7 @@ export class BriefDesk extends PassageReader {
     this.version = 0;
     this.nextCard = 1;
     this.lastSearch = null;
+    this.shown = null; // the passage the open dialog shows: {address, digest}, or null
     this.storage = options.storage === undefined ? BriefDesk.browserStorage(doc) : options.storage;
     // Every site this page reads during the visit, shown under "Nodes to read".
     this.contacted = new Set();
@@ -324,6 +325,9 @@ export class BriefDesk extends PassageReader {
     if (this.cards.some((c) => c.address === address)) {
       return { ok: false, reason: "That passage is already in the brief.", field: "passage" };
     }
+    // The dialog shows this passage. Remember its digest, so that the add which follows the
+    // visitor's yes refuses text the node published after the dialog opened (see pin()).
+    this.shown = { address, digest: record.digest };
     return {
       ok: true,
       details: {
@@ -334,6 +338,11 @@ export class BriefDesk extends PassageReader {
         "Check": "The page checks the passage against its published digest before it adds it.",
       },
     };
+  }
+
+  /** Drop the digest previewChange() remembered, when the visitor declined the dialog. */
+  forgetPreview() {
+    this.shown = null;
   }
 
   /**
@@ -372,6 +381,12 @@ export class BriefDesk extends PassageReader {
     }
     const { node, record } = found;
     const address = BriefDesk.address(record);
+    // The digest the visitor's dialog showed for this passage, used up by this add.
+    const shown = this.shown && this.shown.address === address ? this.shown : null;
+    this.shown = null;
+    if (shown && shown.digest !== record.digest) {
+      return { ok: false, reason: "That passage has changed since it was shown to you, so it was not added. Ask again to see the new text.", field: "passage" };
+    }
     if (this.cards.some((c) => c.address === address)) {
       return { ok: false, reason: "That passage is already in the brief.", field: "passage" };
     }
@@ -481,7 +496,9 @@ export class BriefDesk extends PassageReader {
   briefMarkdown() {
     const lines = ["# Brief", ""];
     for (const card of this.cards) {
-      const where = card.section ? `${card.title}, section "${card.section}"` : card.title;
+      // A node chooses its titles: one line each, so a line break cannot start a source line of its own.
+      const flat = (text) => String(text).replace(/\s+/g, " ").trim();
+      const where = card.section ? `${flat(card.title)}, section "${flat(card.section)}"` : flat(card.title);
       lines.push(`- **${where}**: ${card.excerpt}`);
       lines.push(`  Source: <${card.address}> (sha-256 ${card.digest}; the text matched this digest when it was added)`);
     }
