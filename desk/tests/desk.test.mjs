@@ -761,6 +761,32 @@ test("a passage the visitor was shown is added only if its digest is still the o
   }
 });
 
+test("two open dialogs each keep their own digest: the later one does not switch off the earlier one's check", async () => {
+  const page = new BriefDesk(document, { storage: null });
+  const first = FIXTURES.core[4];
+  const second = FIXTURES.core[5];
+  const saved = { ...first };
+  try {
+    await page.preparePreview("add_card", { node: "core", passage: ID(first) });
+    assert.equal(page.previewChange("add_card", { node: "core", passage: ID(first) }).ok, true);
+    assert.equal(page.previewChange("add_card", { node: "core", passage: ID(second) }).ok, true);
+    // Declining the second dialog forgets only the second passage.
+    page.forgetPreview({ node: "core", passage: ID(second) });
+    // The first passage changes before its own yes; the node is read again.
+    first.text = "Passage 5 was swapped while two dialogs were open. Its own keyword is k5k.";
+    first.digest = (await import("node:crypto")).createHash("sha256").update(first.text, "utf8").digest("hex");
+    page.forget();
+    const refused = await page.pin({ node: "core", passage: ID(first) });
+    assert.equal(refused.ok, false);
+    assert.match(refused.reason, /changed since it was shown/);
+    // The declined second passage is added without a comparison, as after any declined dialog.
+    assert.equal((await page.pin({ node: "core", passage: ID(second) })).ok, true);
+  } finally {
+    Object.assign(first, saved);
+    page.forget();
+  }
+});
+
 test("without a dialog, or after the visitor declined it, the add checks only the passage's own digest", async () => {
   const page = new BriefDesk(document, { storage: null });
   const record = FIXTURES.core[5];

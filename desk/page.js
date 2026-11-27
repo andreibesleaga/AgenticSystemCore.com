@@ -67,7 +67,7 @@ export class BriefDesk extends PassageReader {
     this.version = 0;
     this.nextCard = 1;
     this.lastSearch = null;
-    this.shown = null; // the passage the open dialog shows: {address, digest}, or null
+    this.shown = new Map(); // address -> digest of the passage each open dialog shows
     this.storage = options.storage === undefined ? BriefDesk.browserStorage(doc) : options.storage;
     // Every site this page reads during the visit, shown under "Nodes to read".
     this.contacted = new Set();
@@ -327,7 +327,7 @@ export class BriefDesk extends PassageReader {
     }
     // The dialog shows this passage. Remember its digest, so that the add which follows the
     // visitor's yes refuses text the node published after the dialog opened (see pin()).
-    this.shown = { address, digest: record.digest };
+    this.shown.set(address, record.digest);
     return {
       ok: true,
       details: {
@@ -340,9 +340,22 @@ export class BriefDesk extends PassageReader {
     };
   }
 
-  /** Drop the digest previewChange() remembered, when the visitor declined the dialog. */
-  forgetPreview() {
-    this.shown = null;
+  /**
+   * Drop the digest previewChange() remembered for one add, when the visitor declined its dialog.
+   * Each dialog has its own entry, so declining one leaves the others in force.
+   *
+   * :param args: The declined action's arguments (node and passage); without them, every entry.
+   */
+  forgetPreview(args) {
+    if (!args) {
+      this.shown.clear();
+      return;
+    }
+    const usable = this.usableNode(args.node);
+    const record = usable.ok ? (usable.node.passages || []).find((p) => p.id.startsWith(String(args.passage))) : null;
+    if (record) {
+      this.shown.delete(BriefDesk.address(record));
+    }
   }
 
   /**
@@ -381,10 +394,12 @@ export class BriefDesk extends PassageReader {
     }
     const { node, record } = found;
     const address = BriefDesk.address(record);
-    // The digest the visitor's dialog showed for this passage, used up by this add.
-    const shown = this.shown && this.shown.address === address ? this.shown : null;
-    this.shown = null;
-    if (shown && shown.digest !== record.digest) {
+    // The digest the visitor's dialog showed for this passage, used up by this add. The page
+    // reads a node once and adds from that reading, so the text added is the text shown; the
+    // comparison matters when the node was read again in between (a re-check drops the reading).
+    const shown = this.shown.get(address);
+    this.shown.delete(address);
+    if (shown !== undefined && shown !== record.digest) {
       return { ok: false, reason: "That passage has changed since it was shown to you, so it was not added. Ask again to see the new text.", field: "passage" };
     }
     if (this.cards.some((c) => c.address === address)) {
